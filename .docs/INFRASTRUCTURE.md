@@ -25,7 +25,7 @@
 
 ```bash
 # Baixar e executar
-curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/scripts/setup-sdlc.sh | bash
+curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash
 ```
 
 Ou manualmente:

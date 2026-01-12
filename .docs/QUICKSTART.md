@@ -10,7 +10,7 @@ git clone https://github.com/arbgjr/mice_dolphins.git
 cd mice_dolphins
 
 # Execute o script de setup
-./scripts/setup-sdlc.sh
+./.scripts/setup-sdlc.sh
 ```
 
 O script instala automaticamente:
@@ -170,8 +170,8 @@ Você: "Criar feature X"
 
 ## Próximos Passos
 
-- Leia [AGENTS.md](docs/AGENTS.md) para conhecer todos os agentes
-- Veja [COMMANDS.md](docs/COMMANDS.md) para referência completa
+- Leia [AGENTS.md](AGENTS.md) para conhecer todos os agentes
+- Veja [COMMANDS.md](COMMANDS.md) para referência completa
 - Configure [INFRASTRUCTURE.md](INFRASTRUCTURE.md) para integração avançada
 
 ## Problemas Comuns

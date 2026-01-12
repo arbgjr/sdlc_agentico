@@ -24,7 +24,7 @@ O SDLC Agêntico é um framework que usa **26 agentes especializados** para guia
 
 ```bash
 # 1. Instalar dependências
-./scripts/setup-sdlc.sh
+./.scripts/setup-sdlc.sh
 
 # 2. Iniciar Claude Code
 claude
@@ -100,12 +100,15 @@ O sistema se integra com o **GitHub Copilot Coding Agent**:
 ├── memory/           # Persistência de contexto
 └── settings.json     # Configuração central
 
-scripts/
+.scripts/
 └── setup-sdlc.sh     # Script de instalação
 
-docs/
-├── adr/              # Architecture Decision Records
-└── runbooks/         # Runbooks operacionais
+.docs/
+├── AGENTS.md         # Catálogo de agentes
+├── COMMANDS.md       # Referência de comandos
+├── QUICKSTART.md     # Guia rápido
+├── INFRASTRUCTURE.md # Setup e integração
+└── playbook.md       # Playbook do SDLC
 ```
 
 ## Requisitos
@@ -120,7 +123,7 @@ docs/
 
 ```bash
 # Automática (recomendado)
-./scripts/setup-sdlc.sh
+./.scripts/setup-sdlc.sh
 
 # Manual
 pip install uv
@@ -133,10 +136,10 @@ gh auth login
 
 | Documento | Descrição |
 |-----------|-----------|
-| [QUICKSTART.md](QUICKSTART.md) | Guia rápido de início |
-| [INFRASTRUCTURE.md](INFRASTRUCTURE.md) | Setup e integração |
-| [AGENTS.md](docs/AGENTS.md) | Catálogo de agentes |
-| [COMMANDS.md](docs/COMMANDS.md) | Referência de comandos |
+| [QUICKSTART.md](.docs/QUICKSTART.md) | Guia rápido de início |
+| [INFRASTRUCTURE.md](.docs/INFRASTRUCTURE.md) | Setup e integração |
+| [AGENTS.md](.docs/AGENTS.md) | Catálogo de agentes |
+| [COMMANDS.md](.docs/COMMANDS.md) | Referência de comandos |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Como contribuir |
 
 ## Exemplo de Uso

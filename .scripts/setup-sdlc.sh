@@ -4,9 +4,9 @@
 # Instala todas as dependencias necessarias para o workflow
 #
 # Uso:
-#   curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/scripts/setup-sdlc.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash
 #   ou
-#   ./scripts/setup-sdlc.sh
+#   ./.scripts/setup-sdlc.sh
 #
 
 set -e
