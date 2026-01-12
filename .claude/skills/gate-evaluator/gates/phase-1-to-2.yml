@@ -1,0 +1,32 @@
+# Gate: Phase 1 (Discovery) -> Phase 2 (Requirements)
+# Valida que a descoberta de dominio foi concluida
+
+gate:
+  name: "Discovery to Requirements"
+  from_phase: 1
+  to_phase: 2
+  description: "Valida que pesquisa de dominio foi realizada"
+
+required_artifacts:
+  - name: "Research Brief"
+    path: ".claude/memory/research/*.yml"
+    description: "Documentacao de pesquisa de dominio"
+
+  - name: "Domain Knowledge"
+    path: ".specify/knowledge/*.md"
+    description: "Conhecimento de dominio documentado"
+
+quality_checks:
+  - check: "Best practices documentadas"
+    validation: "grep -r 'best_practices' .claude/memory/research/"
+
+  - check: "Fontes referenciadas"
+    validation: "grep -r 'sources:' .claude/memory/research/"
+
+human_approval:
+  required: false
+  reason: "Discovery nao requer aprovacao formal"
+
+blockers:
+  - "Nenhuma pesquisa de dominio realizada"
+  - "Tecnologias nao avaliadas"

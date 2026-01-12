@@ -1,0 +1,51 @@
+# Gate: Phase 3 (Architecture) -> Phase 4 (Planning)
+# Valida que arquitetura foi definida e decisoes documentadas
+
+gate:
+  name: "Architecture to Planning"
+  from_phase: 3
+  to_phase: 4
+  description: "Valida que design de arquitetura esta completo"
+
+required_artifacts:
+  - name: "Architecture Overview"
+    path: ".specify/plans/*.md"
+    description: "Documento de arquitetura de alto nivel"
+
+  - name: "ADRs"
+    path: "docs/adr/*.md"
+    description: "Architecture Decision Records para decisoes significativas"
+
+  - name: "Technical Plan"
+    path: ".specify/plans/*-technical-plan.md"
+    description: "Plano tecnico detalhado"
+
+quality_checks:
+  - check: "Componentes definidos"
+    validation: "grep -r 'components:' .specify/plans/"
+
+  - check: "Tecnologias escolhidas"
+    validation: "grep -r 'technology_choices:' .specify/plans/"
+
+  - check: "NFRs enderecados"
+    validation: "grep -r 'nfr_approach:' .specify/plans/"
+
+  - check: "Trade-offs documentados"
+    validation: "ls docs/adr/*.md 2>/dev/null | head -1"
+
+  - check: "Threat model realizado"
+    validation: "grep -r 'threat_model:' .claude/memory/"
+
+human_approval:
+  required: true
+  approvers:
+    - role: "Tech Lead"
+      reason: "Aprovacao de arquitetura"
+    - role: "Security Lead"
+      reason: "Se threat model identificou riscos altos"
+
+blockers:
+  - "Arquitetura nao documentada"
+  - "ADRs obrigatorios nao criados"
+  - "Threat model nao realizado para sistemas criticos"
+  - "NFRs nao enderecados"

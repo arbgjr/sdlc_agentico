@@ -1,0 +1,63 @@
+# Gate: Phase 7 (Release) -> Phase 8 (Operations)
+# Valida que release foi bem sucedido e sistema esta em producao
+
+gate:
+  name: "Release to Operations"
+  from_phase: 7
+  to_phase: 8
+  description: "Valida que deploy em producao foi bem sucedido"
+
+required_artifacts:
+  - name: "Release Notes"
+    path: "CHANGELOG.md"
+    description: "Release notes publicadas"
+
+  - name: "Deploy Evidence"
+    path: ".claude/memory/releases/*.yml"
+    description: "Evidencia de deploy em producao"
+
+  - name: "Runbook"
+    path: "docs/runbooks/*.md"
+    description: "Runbook operacional atualizado"
+
+  - name: "Monitoring Setup"
+    path: ".claude/memory/monitoring/*.yml"
+    description: "Alertas e dashboards configurados"
+
+quality_checks:
+  - check: "Health checks passando"
+    validation: "curl -s $PROD_URL/health | grep -q 'ok'"
+
+  - check: "Metricas fluindo"
+    validation: "grep -r 'metrics_configured: true' .claude/memory/releases/"
+
+  - check: "Alertas configurados"
+    validation: "grep -r 'alerts_configured: true' .claude/memory/releases/"
+
+  - check: "Rollback plan documentado"
+    validation: "grep -r 'rollback_plan:' .claude/memory/releases/"
+
+human_approval:
+  required: true
+  approvers:
+    - role: "Release Manager"
+      reason: "Confirmacao de deploy bem sucedido"
+    - role: "On-Call Engineer"
+      reason: "Confirmacao de prontidao operacional"
+
+post_deploy_monitoring:
+  duration: "30 minutos"
+  metrics_to_watch:
+    - "error_rate"
+    - "latency_p95"
+    - "availability"
+  rollback_triggers:
+    - "error_rate > 5%"
+    - "latency_p95 > 500ms"
+
+blockers:
+  - "Deploy falhou"
+  - "Health checks falhando"
+  - "Metricas nao fluindo"
+  - "Alertas nao configurados"
+  - "Runbook nao atualizado"
