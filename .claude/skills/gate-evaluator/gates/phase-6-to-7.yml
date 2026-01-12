@@ -1,0 +1,77 @@
+gate_name: quality_to_release
+from_phase: 6
+to_phase: 7
+description: "Transicao de Qualidade para Release"
+
+required_artifacts:
+  - type: qa_report
+    description: "Relatorio de QA completo"
+    validation:
+      - all_tests_executed: true
+      - no_critical_defects: true
+    path_pattern: "docs/qa/*.md"
+
+  - type: security_scan_report
+    description: "Relatorio de scan de seguranca"
+    validation:
+      - scan_completed: true
+      - no_critical_vulnerabilities: true
+      - no_high_vulnerabilities: true
+    path_pattern: "docs/security/*.md"
+
+  - type: performance_report
+    description: "Relatorio de performance"
+    validation:
+      - benchmarks_met: true
+    path_pattern: "docs/performance/*.md"
+    optional: true
+
+  - type: compliance_validation
+    description: "Validacao de compliance"
+    validation:
+      - all_checks_passed: true
+    path_pattern: "docs/compliance/validation*.md"
+
+quality_checks:
+  - name: test_pass_rate
+    metric: test_pass_rate
+    threshold: 1.0
+    comparison: equal
+
+  - name: security_critical_count
+    metric: security_critical_count
+    threshold: 0
+    comparison: equal
+
+  - name: security_high_count
+    metric: security_high_count
+    threshold: 0
+    comparison: equal
+
+  - name: defect_count
+    metric: open_critical_defects
+    threshold: 0
+    comparison: equal
+
+  - name: performance_slo
+    metric: performance_slo_met
+    threshold: 1
+    comparison: equal
+
+human_approval:
+  required: true
+  roles:
+    - qa_lead
+    - security_lead
+    - tech_lead
+  timeout_hours: 48
+  escalation_path:
+    - engineering_manager
+    - cto
+
+gate_conditions:
+  - all_artifacts_present: true
+  - all_quality_checks_passed: true
+  - required_approvals_obtained: true
+  - no_security_blockers: true
+  - no_compliance_blockers: true

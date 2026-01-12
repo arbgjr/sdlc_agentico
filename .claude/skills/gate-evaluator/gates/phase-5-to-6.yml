@@ -1,0 +1,76 @@
+gate_name: implementation_to_quality
+from_phase: 5
+to_phase: 6
+description: "Transicao de Implementacao para Qualidade"
+
+required_artifacts:
+  - type: source_code
+    description: "Codigo fonte implementado"
+    validation:
+      - compiles: true
+      - no_syntax_errors: true
+    path_pattern: "src/**/*"
+
+  - type: unit_tests
+    description: "Testes unitarios"
+    validation:
+      - all_passing: true
+      - coverage_minimum: true
+    path_pattern: "tests/unit/**/*"
+
+  - type: integration_tests
+    description: "Testes de integracao"
+    validation:
+      - all_passing: true
+    path_pattern: "tests/integration/**/*"
+    optional: true
+
+  - type: code_review
+    description: "Code review aprovado"
+    validation:
+      - approved: true
+      - no_blocking_comments: true
+    path_pattern: ".github/reviews/*.md"
+
+  - type: changelog
+    description: "Changelog atualizado"
+    validation:
+      - has_current_version: true
+    path_pattern: "CHANGELOG.md"
+
+quality_checks:
+  - name: build_status
+    metric: build_passing
+    threshold: 1
+    comparison: equal
+
+  - name: unit_test_coverage
+    metric: unit_test_coverage
+    threshold: 0.8
+    comparison: greater_or_equal
+
+  - name: code_quality_score
+    metric: code_quality_score
+    threshold: 0.7
+    comparison: greater_or_equal
+
+  - name: critical_issues
+    metric: critical_issue_count
+    threshold: 0
+    comparison: equal
+
+  - name: code_review_approval
+    metric: review_approved
+    threshold: 1
+    comparison: equal
+
+human_approval:
+  required: false
+  roles: []
+  timeout_hours: 0
+
+gate_conditions:
+  - all_artifacts_present: true
+  - all_quality_checks_passed: true
+  - build_green: true
+  - no_critical_issues: true

@@ -1,0 +1,27 @@
+{
+    "id": "real-time-updates",
+    "signals": [
+        "tempo real",
+        "real time",
+        "websocket",
+        "sse",
+        "notificacao",
+        "presence",
+        "chat"
+    ],
+    "mandatory_questions": [
+        "Qual a latencia maxima aceitavel",
+        "Qual o numero de conexoes simultaneas esperado",
+        "Mensagens precisam ser persistidas e reentregues"
+    ],
+    "decisions": [
+        "polling vs sse vs websocket",
+        "pubsub interno",
+        "reconexao e replay"
+    ],
+    "common_failures": [
+        "sem reconexao",
+        "fanout caro",
+        "entrega sem persistencia quando precisa"
+    ]
+}

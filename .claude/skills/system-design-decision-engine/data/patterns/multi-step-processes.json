@@ -1,0 +1,27 @@
+{
+    "id": "multi-step-processes",
+    "signals": [
+        "varias etapas",
+        "workflow",
+        "saga",
+        "compensacao",
+        "orquestracao",
+        "pagamento",
+        "cadastro longo"
+    ],
+    "mandatory_questions": [
+        "Os passos sao reversiveis",
+        "Quanto tempo o fluxo pode durar",
+        "Estado precisa sobreviver a reinicio"
+    ],
+    "decisions": [
+        "saga com compensacao",
+        "persistencia de estado por passo",
+        "idempotencia por etapa"
+    ],
+    "common_failures": [
+        "compensacao incompleta",
+        "estado perdido",
+        "duplicacao de execucao sem idempotencia"
+    ]
+}

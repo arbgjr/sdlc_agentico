@@ -1,0 +1,41 @@
+gate_name: preparation_to_discovery
+from_phase: 0
+to_phase: 1
+description: "Transicao de Preparacao para Descoberta"
+
+required_artifacts:
+  - type: intake_analysis
+    description: "Analise inicial da demanda"
+    validation:
+      - has_classification: true
+      - has_stakeholders: true
+      - has_scope: true
+    path_pattern: "docs/intake/*.md"
+
+  - type: compliance_checklist
+    description: "Checklist de compliance preenchido"
+    validation:
+      - all_items_checked: true
+      - no_blockers: true
+    path_pattern: "docs/compliance/*.md"
+
+quality_checks:
+  - name: scope_clarity
+    metric: scope_clarity_score
+    threshold: 0.7
+    comparison: greater_or_equal
+
+  - name: stakeholder_identification
+    metric: stakeholder_count
+    threshold: 1
+    comparison: greater_or_equal
+
+human_approval:
+  required: false
+  roles: []
+  timeout_hours: 0
+
+gate_conditions:
+  - all_artifacts_present: true
+  - all_quality_checks_passed: true
+  - no_compliance_blockers: true

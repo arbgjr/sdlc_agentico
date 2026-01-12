@@ -1,0 +1,26 @@
+{
+    "id": "contention",
+    "signals": [
+        "concorrencia",
+        "duas pessoas comprando",
+        "estoque",
+        "reserva",
+        "lock",
+        "race condition"
+    ],
+    "mandatory_questions": [
+        "Consistencia forte e obrigatoria",
+        "Qual a taxa de disputa pelo mesmo recurso",
+        "Erro pode ser devolvido para a pessoa usuaria"
+    ],
+    "decisions": [
+        "optimistic concurrency",
+        "pessimistic locking",
+        "reservation pattern"
+    ],
+    "common_failures": [
+        "double spend",
+        "lock global",
+        "retries sem jitter"
+    ]
+}

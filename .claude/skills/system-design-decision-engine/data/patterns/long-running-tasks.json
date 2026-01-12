@@ -1,0 +1,28 @@
+{
+    "id": "long-running-tasks",
+    "signals": [
+        "processamento pesado",
+        "demorado",
+        "timeout",
+        "job",
+        "fila",
+        "worker",
+        "exportacao",
+        "relatorio grande"
+    ],
+    "mandatory_questions": [
+        "A pessoa usuaria precisa de resposta imediata",
+        "O progresso precisa ser consultavel",
+        "A tarefa pode falhar parcialmente"
+    ],
+    "decisions": [
+        "modelo assincrono com job id",
+        "persistencia de status",
+        "retry e dlq"
+    ],
+    "common_failures": [
+        "jobs sem idempotencia",
+        "retries em tempestade",
+        "status inconsistente"
+    ]
+}

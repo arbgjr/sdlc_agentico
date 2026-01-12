@@ -1,0 +1,28 @@
+{
+    "id": "large-files",
+    "signals": [
+        "upload",
+        "download",
+        "arquivo grande",
+        "video",
+        "imagem",
+        "anexo",
+        "multipart"
+    ],
+    "mandatory_questions": [
+        "Qual o tamanho medio e o maximo dos arquivos",
+        "O backend pode tocar os bytes",
+        "Precisa retomar upload se cair a conexao"
+    ],
+    "decisions": [
+        "upload direto para storage",
+        "urls assinadas",
+        "multipart upload",
+        "processamento assincrono apos upload"
+    ],
+    "common_failures": [
+        "backend como proxy",
+        "timeouts em upload sincronizado",
+        "sem quota e limite"
+    ]
+}

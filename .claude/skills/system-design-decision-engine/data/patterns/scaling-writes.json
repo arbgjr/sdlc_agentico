@@ -1,0 +1,28 @@
+{
+    "id": "scaling-writes",
+    "signals": [
+        "muitas escritas",
+        "write heavy",
+        "ingestao",
+        "eventos",
+        "logs",
+        "pico",
+        "stream"
+    ],
+    "mandatory_questions": [
+        "Qual o pico de escrita esperado",
+        "Escritas precisam de ordenacao forte",
+        "Pode ser assincrono"
+    ],
+    "decisions": [
+        "buffer com fila",
+        "batching",
+        "particionamento ou sharding",
+        "idempotencia"
+    ],
+    "common_failures": [
+        "fila sem backpressure",
+        "hot partition",
+        "duplicacao sem idempotencia"
+    ]
+}

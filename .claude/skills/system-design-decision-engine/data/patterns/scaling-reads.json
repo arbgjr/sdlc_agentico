@@ -1,0 +1,27 @@
+{
+    "id": "scaling-reads",
+    "signals": [
+        "muitas leituras",
+        "read heavy",
+        "latencia baixa",
+        "cache",
+        "cdn",
+        "feed",
+        "timeline"
+    ],
+    "mandatory_questions": [
+        "Qual a proporcao aproximada de leituras vs escritas",
+        "Qual a latencia maxima aceitavel para leituras",
+        "Dados podem ser levemente desatualizados"
+    ],
+    "decisions": [
+        "uso de cache",
+        "estrategia de invalidacao",
+        "replicas de leitura ou particionamento para leitura"
+    ],
+    "common_failures": [
+        "cache sem invalidacao",
+        "cache stampede",
+        "replicas sem roteamento"
+    ]
+}

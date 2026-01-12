@@ -1,0 +1,14 @@
+{
+    "consistencia_vs_latencia": [
+        "Consistencia forte tende a aumentar latencia e reduzir escalabilidade",
+        "Consistencia eventual melhora escala mas exige reconciliacao e UX adequada"
+    ],
+    "custo_vs_simplicidade": [
+        "Solucoes simples custam menos para construir e operar",
+        "Solucoes resilientes e escalaveis aumentam custo e complexidade"
+    ],
+    "sincrono_vs_assincrono": [
+        "Sincrono simplifica fluxo e feedback imediato",
+        "Assincrono reduz timeout e aumenta resiliencia sob pico"
+    ]
+}

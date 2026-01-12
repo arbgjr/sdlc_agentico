@@ -1,0 +1,71 @@
+gate_name: requirements_to_architecture
+from_phase: 2
+to_phase: 3
+description: "Transicao de Requisitos para Arquitetura"
+
+required_artifacts:
+  - type: requirements_document
+    description: "Documento de requisitos completo"
+    validation:
+      - has_acceptance_criteria: true
+      - stakeholder_approved: true
+    path_pattern: "docs/requirements*.md"
+
+  - type: user_stories
+    description: "User stories com criterios de aceite"
+    validation:
+      - count_minimum: 1
+      - has_priority: true
+      - has_acceptance_criteria: true
+    path_pattern: "docs/stories/*.md"
+
+  - type: nfr_document
+    description: "Requisitos nao funcionais"
+    validation:
+      - has_performance_requirements: true
+      - has_security_requirements: true
+    path_pattern: "docs/nfr*.md"
+
+  - type: spec_document
+    description: "Spec Kit specification (se nivel >= 2)"
+    validation:
+      - valid_spec_format: true
+      - analyzed: true
+    path_pattern: "*.spec.md"
+    optional_for_levels: [0, 1]
+
+quality_checks:
+  - name: requirements_completeness
+    metric: completeness_score
+    threshold: 0.8
+    comparison: greater_or_equal
+
+  - name: ambiguity_score
+    metric: ambiguity_index
+    threshold: 0.2
+    comparison: less_or_equal
+
+  - name: testability_score
+    metric: testability_index
+    threshold: 0.7
+    comparison: greater_or_equal
+
+  - name: user_story_count
+    metric: story_count
+    threshold: 1
+    comparison: greater_or_equal
+
+human_approval:
+  required: true
+  roles:
+    - product_owner
+    - tech_lead
+  timeout_hours: 24
+  escalation_path:
+    - engineering_manager
+    - vp_engineering
+
+gate_conditions:
+  - all_artifacts_present: true
+  - all_quality_checks_passed: true
+  - required_approvals_obtained: true
