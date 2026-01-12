@@ -6,6 +6,7 @@ description: "Transicao de Qualidade para Release"
 required_artifacts:
   - type: qa_report
     description: "Relatorio de QA completo"
+    agent: "qa-analyst"
     validation:
       - all_tests_executed: true
       - no_critical_defects: true
@@ -13,6 +14,7 @@ required_artifacts:
 
   - type: security_scan_report
     description: "Relatorio de scan de seguranca"
+    agent: "security-scanner"
     validation:
       - scan_completed: true
       - no_critical_vulnerabilities: true
@@ -20,11 +22,14 @@ required_artifacts:
     path_pattern: "docs/security/*.md"
 
   - type: performance_report
-    description: "Relatorio de performance"
+    description: "Relatorio de performance e resiliencia"
+    agent: "performance-analyst"
     validation:
+      - load_test_executed: true
+      - stress_test_executed: true
       - benchmarks_met: true
+      - slo_compliance_verified: true
     path_pattern: "docs/performance/*.md"
-    optional: true
 
   - type: compliance_validation
     description: "Validacao de compliance"
@@ -58,6 +63,21 @@ quality_checks:
     threshold: 1
     comparison: equal
 
+  - name: latency_p99
+    metric: latency_p99_ms
+    threshold: 1000
+    comparison: less_or_equal
+
+  - name: error_rate
+    metric: error_rate_percent
+    threshold: 1
+    comparison: less_or_equal
+
+  - name: resilience_validated
+    metric: circuit_breaker_tested
+    threshold: 1
+    comparison: equal
+
 human_approval:
   required: true
   roles:
@@ -75,3 +95,4 @@ gate_conditions:
   - required_approvals_obtained: true
   - no_security_blockers: true
   - no_compliance_blockers: true
+  - performance_slos_met: true

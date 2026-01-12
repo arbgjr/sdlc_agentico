@@ -11,18 +11,37 @@ required_artifacts:
   - name: "Release Notes"
     path: "CHANGELOG.md"
     description: "Release notes publicadas"
+    agent: "release-manager"
 
   - name: "Deploy Evidence"
     path: ".claude/memory/releases/*.yml"
     description: "Evidencia de deploy em producao"
+    agent: "release-manager"
+
+  - name: "Change Request"
+    path: ".claude/memory/changes/*.yml"
+    description: "Change request aprovado"
+    agent: "change-manager"
 
   - name: "Runbook"
     path: "docs/runbooks/*.md"
     description: "Runbook operacional atualizado"
+    agent: "release-manager"
+
+  - name: "Observability Config"
+    path: ".claude/memory/observability/*.yml"
+    description: "Configuracao de observabilidade (logs, metricas, traces)"
+    agent: "observability-engineer"
 
   - name: "Monitoring Setup"
     path: ".claude/memory/monitoring/*.yml"
     description: "Alertas e dashboards configurados"
+    agent: "observability-engineer"
+
+  - name: "CI/CD Pipeline"
+    path: ".github/workflows/*.yml"
+    description: "Pipeline de deploy configurado"
+    agent: "cicd-engineer"
 
 quality_checks:
   - check: "Health checks passando"
@@ -37,11 +56,25 @@ quality_checks:
   - check: "Rollback plan documentado"
     validation: "grep -r 'rollback_plan:' .claude/memory/releases/"
 
+  - check: "Change request aprovado"
+    validation: "grep -r 'status: approved' .claude/memory/changes/"
+
+  - check: "Comunicacao enviada"
+    validation: "grep -r 'communication_sent: true' .claude/memory/changes/"
+
+  - check: "Observabilidade configurada"
+    validation: "grep -r 'tracing:' .claude/memory/observability/"
+
+  - check: "SLOs definidos"
+    validation: "grep -r 'slos:' .claude/memory/observability/"
+
 human_approval:
   required: true
   approvers:
     - role: "Release Manager"
       reason: "Confirmacao de deploy bem sucedido"
+    - role: "Change Manager"
+      reason: "Aprovacao de change request"
     - role: "On-Call Engineer"
       reason: "Confirmacao de prontidao operacional"
 
@@ -51,9 +84,11 @@ post_deploy_monitoring:
     - "error_rate"
     - "latency_p95"
     - "availability"
+    - "saturation"
   rollback_triggers:
     - "error_rate > 5%"
     - "latency_p95 > 500ms"
+    - "availability < 99%"
 
 blockers:
   - "Deploy falhou"
@@ -61,3 +96,5 @@ blockers:
   - "Metricas nao fluindo"
   - "Alertas nao configurados"
   - "Runbook nao atualizado"
+  - "Change request nao aprovado"
+  - "Observabilidade nao configurada"

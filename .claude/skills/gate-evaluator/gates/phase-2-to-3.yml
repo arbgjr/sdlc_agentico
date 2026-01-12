@@ -6,6 +6,7 @@ description: "Transicao de Requisitos para Arquitetura"
 required_artifacts:
   - type: requirements_document
     description: "Documento de requisitos completo"
+    agent: "requirements-analyst"
     validation:
       - has_acceptance_criteria: true
       - stakeholder_approved: true
@@ -13,6 +14,7 @@ required_artifacts:
 
   - type: user_stories
     description: "User stories com criterios de aceite"
+    agent: "requirements-analyst"
     validation:
       - count_minimum: 1
       - has_priority: true
@@ -21,10 +23,29 @@ required_artifacts:
 
   - type: nfr_document
     description: "Requisitos nao funcionais"
+    agent: "requirements-analyst"
     validation:
       - has_performance_requirements: true
       - has_security_requirements: true
     path_pattern: "docs/nfr*.md"
+
+  - type: ux_writing_spec
+    description: "Especificacao de UX Writing (textos, estados, fluxos)"
+    agent: "ux-writer"
+    validation:
+      - has_screen_definitions: true
+      - has_error_messages: true
+      - has_flow_documentation: true
+    path_pattern: "docs/ux/*.md"
+    optional_for_levels: [0, 1]
+
+  - type: product_vision
+    description: "Visao do produto e priorizacao"
+    agent: "product-owner"
+    validation:
+      - has_mvp_definition: true
+      - has_prioritization: true
+    path_pattern: "docs/product/*.md"
 
   - type: spec_document
     description: "Spec Kit specification (se nivel >= 2)"
@@ -54,6 +75,12 @@ quality_checks:
     metric: story_count
     threshold: 1
     comparison: greater_or_equal
+
+  - name: ux_screens_documented
+    metric: screen_count
+    threshold: 1
+    comparison: greater_or_equal
+    optional_for_levels: [0, 1]
 
 human_approval:
   required: true

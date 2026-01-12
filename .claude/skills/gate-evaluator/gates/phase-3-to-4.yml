@@ -11,14 +11,33 @@ required_artifacts:
   - name: "Architecture Overview"
     path: ".specify/plans/*.md"
     description: "Documento de arquitetura de alto nivel"
+    agent: "system-architect"
 
   - name: "ADRs"
     path: "docs/adr/*.md"
     description: "Architecture Decision Records para decisoes significativas"
+    agent: "adr-author"
 
   - name: "Technical Plan"
     path: ".specify/plans/*-technical-plan.md"
     description: "Plano tecnico detalhado"
+    agent: "system-architect"
+
+  - name: "Data Model"
+    path: "docs/data/*.md"
+    description: "Modelo de dados e relacionamentos"
+    agent: "data-architect"
+
+  - name: "API Contracts"
+    path: "docs/api/*.yml"
+    description: "Contratos de API (OpenAPI/AsyncAPI)"
+    agent: "data-architect"
+    optional_for_levels: [0, 1]
+
+  - name: "Threat Model"
+    path: ".claude/memory/security/*.yml"
+    description: "Analise de ameacas STRIDE"
+    agent: "threat-modeler"
 
 quality_checks:
   - check: "Componentes definidos"
@@ -36,6 +55,12 @@ quality_checks:
   - check: "Threat model realizado"
     validation: "grep -r 'threat_model:' .claude/memory/"
 
+  - check: "Modelo de dados definido"
+    validation: "grep -r 'entities:' docs/data/"
+
+  - check: "Contratos de API especificados"
+    validation: "ls docs/api/*.yml 2>/dev/null | head -1"
+
 human_approval:
   required: true
   approvers:
@@ -43,9 +68,13 @@ human_approval:
       reason: "Aprovacao de arquitetura"
     - role: "Security Lead"
       reason: "Se threat model identificou riscos altos"
+    - role: "Data Lead"
+      reason: "Se modelo de dados e complexo"
 
 blockers:
   - "Arquitetura nao documentada"
   - "ADRs obrigatorios nao criados"
   - "Threat model nao realizado para sistemas criticos"
   - "NFRs nao enderecados"
+  - "Modelo de dados nao definido"
+  - "Contratos de API nao especificados"

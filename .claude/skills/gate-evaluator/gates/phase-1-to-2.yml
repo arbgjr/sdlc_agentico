@@ -11,10 +11,23 @@ required_artifacts:
   - name: "Research Brief"
     path: ".claude/memory/research/*.yml"
     description: "Documentacao de pesquisa de dominio"
+    agent: "domain-researcher"
 
   - name: "Domain Knowledge"
     path: ".specify/knowledge/*.md"
     description: "Conhecimento de dominio documentado"
+    agent: "domain-researcher"
+
+  - name: "Documentation Index"
+    path: ".claude/rag/docs/**/*.md"
+    description: "Documentacao oficial capturada e indexada"
+    agent: "doc-crawler"
+    optional: true
+
+  - name: "RAG Corpus"
+    path: ".claude/rag/corpus.yml"
+    description: "Corpus RAG inicializado com conhecimento do dominio"
+    agent: "rag-curator"
 
 quality_checks:
   - check: "Best practices documentadas"
@@ -23,6 +36,9 @@ quality_checks:
   - check: "Fontes referenciadas"
     validation: "grep -r 'sources:' .claude/memory/research/"
 
+  - check: "Documentacao oficial capturada"
+    validation: "ls .claude/rag/docs/ 2>/dev/null | head -1"
+
 human_approval:
   required: false
   reason: "Discovery nao requer aprovacao formal"
@@ -30,3 +46,4 @@ human_approval:
 blockers:
   - "Nenhuma pesquisa de dominio realizada"
   - "Tecnologias nao avaliadas"
+  - "Corpus RAG nao inicializado"

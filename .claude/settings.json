@@ -74,11 +74,14 @@
       "intake-analyst",
       "compliance-guardian",
       "domain-researcher",
+      "doc-crawler",
       "rag-curator",
       "product-owner",
       "requirements-analyst",
+      "ux-writer",
       "system-architect",
       "adr-author",
+      "data-architect",
       "threat-modeler",
       "delivery-planner",
       "code-author",
@@ -86,11 +89,14 @@
       "test-author",
       "qa-analyst",
       "security-scanner",
+      "performance-analyst",
       "release-manager",
       "cicd-engineer",
+      "change-manager",
       "incident-commander",
       "rca-analyst",
       "metrics-analyst",
+      "observability-engineer",
       "playbook-governance"
     ]
   },
@@ -104,17 +110,17 @@
       {
         "number": 1,
         "name": "Discovery",
-        "agents": ["domain-researcher", "rag-curator"]
+        "agents": ["domain-researcher", "doc-crawler", "rag-curator"]
       },
       {
         "number": 2,
         "name": "Requirements",
-        "agents": ["product-owner", "requirements-analyst"]
+        "agents": ["product-owner", "requirements-analyst", "ux-writer"]
       },
       {
         "number": 3,
         "name": "Architecture",
-        "agents": ["system-architect", "adr-author", "threat-modeler"]
+        "agents": ["system-architect", "adr-author", "data-architect", "threat-modeler"]
       },
       {
         "number": 4,
@@ -129,17 +135,17 @@
       {
         "number": 6,
         "name": "Quality",
-        "agents": ["qa-analyst", "security-scanner"]
+        "agents": ["qa-analyst", "security-scanner", "performance-analyst"]
       },
       {
         "number": 7,
         "name": "Release",
-        "agents": ["release-manager", "cicd-engineer"]
+        "agents": ["release-manager", "cicd-engineer", "change-manager"]
       },
       {
         "number": 8,
         "name": "Operations",
-        "agents": ["incident-commander", "rca-analyst", "metrics-analyst"]
+        "agents": ["incident-commander", "rca-analyst", "metrics-analyst", "observability-engineer"]
       }
     ],
     "gates": {

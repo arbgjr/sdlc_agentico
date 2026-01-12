@@ -1,12 +1,12 @@
 # Catálogo de Agentes
 
-Documentação completa dos 26 agentes do SDLC Agêntico.
+Documentação completa dos 32 agentes do SDLC Agêntico.
 
 ## Visão Geral
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           MAPA DE AGENTES                                   │
+│                           MAPA DE AGENTES (32)                              │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  FASE 0          FASE 1          FASE 2          FASE 3                    │
@@ -16,9 +16,13 @@ Documentação completa dos 26 agentes do SDLC Agêntico.
 │  │ analyst  │    │researcher│    │ owner    │    │ architect│              │
 │  └──────────┘    └──────────┘    └──────────┘    └──────────┘              │
 │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐              │
-│  │compliance│    │ rag-     │    │requirem. │    │ adr-     │              │
-│  │ guardian │    │ curator  │    │ analyst  │    │ author   │              │
+│  │compliance│    │ doc-     │    │requirem. │    │ adr-     │              │
+│  │ guardian │    │ crawler  │    │ analyst  │    │ author   │              │
 │  └──────────┘    └──────────┘    └──────────┘    └──────────┘              │
+│                  ┌──────────┐    ┌──────────┐    ┌──────────┐              │
+│                  │ rag-     │    │ ux-      │    │ data-    │              │
+│                  │ curator  │    │ writer   │    │ architect│              │
+│                  └──────────┘    └──────────┘    └──────────┘              │
 │                                                   ┌──────────┐              │
 │                                                   │ threat-  │              │
 │                                                   │ modeler  │              │
@@ -34,10 +38,10 @@ Documentação completa dos 26 agentes do SDLC Agêntico.
 │                  │ code-    │    │ security-│    │ cicd-    │              │
 │                  │ reviewer │    │ scanner  │    │ engineer │              │
 │                  └──────────┘    └──────────┘    └──────────┘              │
-│                  ┌──────────┐                                              │
-│                  │ test-    │                                              │
-│                  │ author   │                                              │
-│                  └──────────┘                                              │
+│                  ┌──────────┐    ┌──────────┐    ┌──────────┐              │
+│                  │ test-    │    │performan.│    │ change-  │              │
+│                  │ author   │    │ analyst  │    │ manager  │              │
+│                  └──────────┘    └──────────┘    └──────────┘              │
 │                                                                             │
 │  FASE 8          CROSS-CUTTING                                             │
 │  Operação        Transversal                                               │
@@ -52,6 +56,10 @@ Documentação completa dos 26 agentes do SDLC Agêntico.
 │  ┌──────────┐                                                              │
 │  │ metrics- │                                                              │
 │  │ analyst  │                                                              │
+│  └──────────┘                                                              │
+│  ┌──────────┐                                                              │
+│  │observab. │                                                              │
+│  │ engineer │                                                              │
 │  └──────────┘                                                              │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -136,6 +144,35 @@ research_brief:
 
 ---
 
+### doc-crawler
+
+**Propósito**: Extrai e normaliza documentação oficial de tecnologias.
+
+**Quando usar**:
+- Capturar documentação oficial de novas tecnologias
+- Indexar changelogs e release notes
+- Mapear versões e compatibilidades
+- Preparar conteúdo para o RAG
+
+**Output principal**:
+```yaml
+crawl_result:
+  source:
+    name: "Nome da tecnologia"
+    official_url: "https://..."
+  versions:
+    latest: "X.Y.Z"
+    supported: [list]
+  documentation_index: [list]
+  changelog_summary: [list]
+  rag_artifacts: [list]
+```
+
+**Skills**: rag-query, memory-manager
+**Tools**: Read, Write, Glob, WebSearch, WebFetch
+
+---
+
 ### rag-curator
 
 **Propósito**: Gerencia o corpus de conhecimento RAG do projeto.
@@ -205,6 +242,37 @@ user_story:
 
 ---
 
+### ux-writer
+
+**Propósito**: Especialista em UX Writing e definição de fluxos de usuário.
+
+**Quando usar**:
+- Escrever textos de interface (microcopy)
+- Definir estados de componentes
+- Criar mensagens de erro e sucesso
+- Mapear fluxos de tela e eventos
+
+**Output principal**:
+```yaml
+ux_writing_spec:
+  feature: "Nome da feature"
+  tone_of_voice:
+    style: [formal | casual | friendly]
+  screens: [list com elementos e estados]
+  messages:
+    success: [list]
+    error: [list]
+    warning: [list]
+  flow:
+    steps: [list]
+  analytics_events: [list]
+```
+
+**Skills**: rag-query
+**Tools**: Read, Write, Glob, Grep
+
+---
+
 ## Fase 3: Arquitetura
 
 ### system-architect
@@ -267,6 +335,33 @@ threat_model:
 ```
 
 **Skills**: rag-query, memory-manager
+
+---
+
+### data-architect
+
+**Propósito**: Arquiteto de dados responsável por modelagem e contratos de API.
+
+**Quando usar**:
+- Modelar dados (entidades, relacionamentos)
+- Definir contratos de API (OpenAPI, GraphQL)
+- Especificar eventos e schemas
+- Criar data dictionaries
+
+**Output principal**:
+```yaml
+data_architecture:
+  entities: [list com atributos e relacionamentos]
+  api_contracts:
+    endpoints: [list]
+    schemas: [list]
+  events: [list com producers e consumers]
+  data_dictionary: [list com campos e validações]
+  migrations: [list]
+```
+
+**Skills**: rag-query, memory-manager
+**Tools**: Read, Write, Glob, Grep
 
 ---
 
@@ -404,6 +499,37 @@ security_report:
 
 ---
 
+### performance-analyst
+
+**Propósito**: Analista de performance e resiliência do sistema.
+
+**Quando usar**:
+- Definir testes de carga e stress
+- Analisar latência e throughput
+- Validar degradação graciosa
+- Verificar timeouts e retries
+
+**Output principal**:
+```yaml
+performance_report:
+  test_scenarios: [load, stress, spike, soak]
+  results:
+    latency:
+      p50: "Xms"
+      p95: "Xms"
+      p99: "Xms"
+    throughput: "X rps"
+    error_rate: "X%"
+  slo_compliance: [list]
+  recommendations: [list]
+  verdict: PASS | FAIL
+```
+
+**Skills**: rag-query
+**Tools**: Read, Write, Glob, Grep, Bash
+
+---
+
 ## Fase 7: Release
 
 ### release-manager
@@ -437,6 +563,40 @@ security_report:
 **Output principal**: Workflows GitHub Actions, Dockerfile
 
 **Skills**: rag-query
+
+---
+
+### change-manager
+
+**Propósito**: Gestor de mudanças para comunicação, janelas de deploy e aprovações.
+
+**Quando usar**:
+- Comunicar mudanças para stakeholders
+- Definir janelas de deploy
+- Obter aprovações necessárias
+- Coordenar rollback se necessário
+
+**Output principal**:
+```yaml
+change_request:
+  id: "CHG-YYYY-MMDD-NNN"
+  category: [standard | normal | emergency | major]
+  schedule:
+    deploy_window: "HH:MM - HH:MM UTC"
+    rollback_deadline: "HH:MM UTC"
+  approvals:
+    required: [list]
+    obtained: [list]
+  communication:
+    pre_deploy: [messages]
+    post_deploy: [messages]
+  rollback_plan:
+    trigger_conditions: [list]
+    procedure: [steps]
+```
+
+**Skills**: rag-query, memory-manager
+**Tools**: Read, Write, Glob, Grep, Bash
 
 ---
 
@@ -506,6 +666,41 @@ metrics_report:
 ```
 
 **Skills**: rag-query, memory-manager
+
+---
+
+### observability-engineer
+
+**Propósito**: Engenheiro de observabilidade para dashboards, alertas e tracing.
+
+**Quando usar**:
+- Configurar dashboards de monitoramento
+- Definir alertas e thresholds
+- Implementar tracing distribuído
+- Configurar golden signals
+
+**Output principal**:
+```yaml
+observability_config:
+  logging:
+    format: "json"
+    schema: [fields]
+  metrics:
+    golden_signals: [latency, traffic, errors, saturation]
+    custom_metrics: [list]
+  tracing:
+    tool: "OpenTelemetry"
+    sampling_rate: X
+  dashboards: [list]
+  alerts:
+    critical: [list]
+    warning: [list]
+  slos: [list with targets]
+  runbooks: [list]
+```
+
+**Skills**: rag-query, memory-manager
+**Tools**: Read, Write, Glob, Grep, Bash
 
 ---
 
