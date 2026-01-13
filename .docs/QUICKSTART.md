@@ -2,6 +2,28 @@
 
 Guia rápido para começar a usar o SDLC Agêntico em 5 minutos.
 
+## Escolha Rápida de Comando
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    QUAL COMANDO USAR?                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  É um bug fix simples?                                      │
+│  └─ SIM → /quick-fix "descrição"                            │
+│                                                             │
+│  É feature em serviço existente?                            │
+│  └─ SIM → /new-feature "nome"                               │
+│                                                             │
+│  É projeto/serviço novo?                                    │
+│  └─ SIM → /sdlc-start "descrição"                           │
+│                                                             │
+│  Precisa de compliance/aprovações?                          │
+│  └─ SIM → /sdlc-start "descrição" (Level 3)                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ## 1. Instalação (2 min)
 
 ```bash
@@ -34,13 +56,44 @@ gh auth status
 
 ## 3. Primeiro Workflow (3 min)
 
-### Opção A: Workflow Completo
+### Opção A: Bug Fix Rápido (Level 0)
 
 ```bash
-# Iniciar Claude Code
 claude
 
-# Iniciar workflow SDLC
+# Fluxo automático: branch → fix → test → PR
+/quick-fix "Corrigir erro de timeout na API de usuários"
+```
+
+O sistema automaticamente:
+1. Cria branch `fix/corrigir-erro-timeout`
+2. Implementa o fix
+3. Cria testes
+4. Faz review
+5. Cria PR
+
+### Opção B: Nova Feature (Level 1)
+
+```bash
+claude
+
+# Fluxo: branch → spec → requisitos → implementação → PR
+/new-feature "Exportação de relatórios em PDF"
+```
+
+O sistema automaticamente:
+1. Cria branch `feature/exportacao-relatorios-pdf`
+2. Cria spec para requisitos
+3. Implementa com testes
+4. Faz review e validação
+5. Cria PR
+
+### Opção C: Projeto Completo (Level 2/3)
+
+```bash
+claude
+
+# Workflow SDLC completo
 /sdlc-start "Criar endpoint de listagem de usuários com paginação"
 ```
 
@@ -49,20 +102,14 @@ O sistema automaticamente:
 2. Classifica complexidade (Level 0-3)
 3. Guia você pelas fases necessárias
 
-### Opção B: Direto ao Código (Level 0)
-
-Para mudanças simples, pule direto para implementação:
-
-```bash
-claude
-
-# O agente code-author implementa diretamente
-"Corrija o bug de paginação no endpoint /api/users"
-```
-
 ## 4. Comandos Essenciais
 
 ```bash
+# Fluxos por complexidade
+/quick-fix "descrição"      # Level 0 - Bug fixes
+/new-feature "nome"         # Level 1 - Features simples
+/sdlc-start "descrição"     # Level 2/3 - Projetos completos
+
 # Ver status atual
 /phase-status
 
@@ -139,26 +186,40 @@ Você: "Criar feature X"
 
 ### Level 0: Bug Fix
 ```bash
-/sdlc-start "Corrigir erro de null pointer em OrderService.getById"
-# → Vai direto para code-author → code-reviewer → done
+/quick-fix "Corrigir erro de null pointer em OrderService.getById"
+# → Branch fix/corrigir-erro-null-pointer criada
+# → code-author implementa fix
+# → test-author cria teste de regressão
+# → code-reviewer aprova
+# → PR criada automaticamente
 ```
 
 ### Level 1: Feature Simples
 ```bash
-/sdlc-start "Adicionar campo de telefone no cadastro de usuário"
-# → requirements-analyst → code-author → test-author → code-reviewer
+/new-feature "Campo de telefone no cadastro"
+# → Branch feature/campo-telefone-cadastro criada
+# → Spec criada em .agentic_sdlc/projects/{id}/specs/
+# → requirements-analyst define requisitos
+# → code-author + test-author implementam
+# → code-reviewer + qa-analyst validam
+# → PR criada
 ```
 
 ### Level 2: Feature Complexa
 ```bash
 /sdlc-start "Implementar sistema de notificações push"
 # → Todas as fases de 0-7
+# → Security by Design aplicado
+# → Threat model gerado
+# → IaC gerado se necessário
 ```
 
 ### Level 3: Projeto Crítico
 ```bash
 /sdlc-start "Migrar sistema de pagamentos para novo gateway"
 # → Todas as fases + aprovações humanas em cada gate
+# → Security gates obrigatórios
+# → Compliance checklist completo
 ```
 
 ## Dicas

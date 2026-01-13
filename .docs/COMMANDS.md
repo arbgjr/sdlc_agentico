@@ -2,11 +2,101 @@
 
 Documentação completa dos comandos disponíveis no SDLC Agêntico.
 
+## Comandos por Nível de Complexidade
+
+| Level | Comando | Descrição | Fases |
+|-------|---------|-----------|-------|
+| 0 | `/quick-fix` | Bug fixes, typos | 5, 6 |
+| 1 | `/new-feature` | Features simples | 2, 5, 6 |
+| 2-3 | `/sdlc-start` | Projetos completos | 0-8 |
+
+---
+
 ## Comandos do SDLC
+
+### /quick-fix
+
+Inicia fluxo rápido para bug fixes e correções simples (Level 0).
+
+```bash
+/quick-fix "Descrição do bug"
+```
+
+**Parâmetros**:
+- `descrição` (obrigatório): Descrição do bug ou correção
+
+**Critérios de Elegibilidade**:
+- Bug simples com causa conhecida
+- Alteração em até 3 arquivos
+- Sem mudança de API/contrato
+- Sem impacto em segurança
+- Sem necessidade de revisão de arquitetura
+
+**O que faz**:
+1. Cria branch `fix/{descrição}` automaticamente
+2. Aciona `code-author` para implementar fix
+3. Cria testes para o bug
+4. `code-reviewer` faz review
+5. Valida build e testes
+6. Cria PR para merge
+
+**Escalação Automática**:
+- Problema mais profundo → Level 1 (`/new-feature`)
+- Impacto em segurança → `security-scanner`
+- Mudança de API → `system-architect`
+
+**Exemplo**:
+```bash
+/quick-fix "Corrigir timeout na conexão com registradora"
+```
+
+---
+
+### /new-feature
+
+Inicia fluxo para nova feature em serviço existente (Level 1).
+
+```bash
+/new-feature "Nome da feature"
+```
+
+**Parâmetros**:
+- `nome` (obrigatório): Nome da feature
+
+**Critérios de Elegibilidade**:
+- Feature em serviço já existente
+- Sem novo serviço ou domínio
+- Sem mudança significativa de arquitetura
+- Sem requisitos de compliance novos
+
+**O que faz**:
+1. Cria branch `feature/{nome}` automaticamente
+2. Cria spec em `.agentic_sdlc/projects/{id}/specs/`
+3. `requirements-analyst` clarifica requisitos (~10 min)
+4. `code-author` + `test-author` implementam (~20-60 min)
+5. `code-reviewer` faz review
+6. `qa-analyst` valida critérios de aceite
+7. Cria PR com resumo da feature
+
+**Gatilhos de Escalação**:
+| Situação | Ação |
+|----------|------|
+| Novo domínio | Escalar para Level 2 (`/sdlc-start`) |
+| Mudança de DB schema | Chamar `@data-architect` |
+| Novo endpoint público | Chamar `@threat-modeler` |
+| Performance crítica | Chamar `@performance-analyst` |
+| Requisitos de compliance | Chamar `@compliance-guardian` |
+
+**Exemplo**:
+```bash
+/new-feature "Exportação de duplicatas em PDF"
+```
+
+---
 
 ### /sdlc-start
 
-Inicia um novo workflow SDLC.
+Inicia um novo workflow SDLC completo (Level 2/3).
 
 ```bash
 /sdlc-start "Descrição da demanda"
@@ -295,26 +385,57 @@ incident:
 
 ## Resumo de Comandos
 
-| Comando | Propósito | Fase |
-|---------|-----------|------|
-| `/sdlc-start` | Iniciar workflow | Todas |
-| `/phase-status` | Ver status atual | Todas |
-| `/gate-check` | Verificar gate | Entre fases |
-| `/sdlc-create-issues` | Criar issues GitHub | 4 → 5 |
-| `/adr-create` | Documentar decisão | 3 |
-| `/security-scan` | Scan de segurança | 6 |
-| `/release-prep` | Preparar release | 7 |
-| `/incident-start` | Iniciar incidente | 8 |
+| Comando | Propósito | Level | Fase |
+|---------|-----------|-------|------|
+| `/quick-fix` | Bug fixes rápidos | 0 | 5, 6 |
+| `/new-feature` | Features simples | 1 | 2, 5, 6 |
+| `/sdlc-start` | Workflow completo | 2-3 | 0-8 |
+| `/phase-status` | Ver status atual | Todos | Todas |
+| `/gate-check` | Verificar gate | Todos | Entre fases |
+| `/sdlc-create-issues` | Criar issues GitHub | 2-3 | 4 → 5 |
+| `/adr-create` | Documentar decisão | Todos | 3 |
+| `/security-scan` | Scan de segurança | Todos | 6 |
+| `/release-prep` | Preparar release | 2-3 | 7 |
+| `/incident-start` | Iniciar incidente | Todos | 8 |
 
 ---
 
 ## Dicas de Uso
 
-### Workflow Típico
+### Escolhendo o Comando Certo
+
+```
+É um bug fix simples?           → /quick-fix
+É feature em serviço existente? → /new-feature
+É projeto/serviço novo?         → /sdlc-start
+Precisa de compliance?          → /sdlc-start (Level 3)
+```
+
+### Workflow Típico - Bug Fix (Level 0)
+
+```bash
+/quick-fix "Corrigir validação de CNPJ"
+# → Branch fix/corrigir-validacao-cnpj criada
+# → Fix implementado e testado
+# → PR criada automaticamente
+```
+
+### Workflow Típico - Feature (Level 1)
+
+```bash
+/new-feature "Exportação PDF"
+# → Branch feature/exportacao-pdf criada
+# → Spec criada para requisitos
+# → Implementação com testes
+# → Review e validação
+# → PR criada
+```
+
+### Workflow Típico - Projeto Completo (Level 2/3)
 
 ```bash
 # 1. Iniciar projeto
-/sdlc-start "Nova feature"
+/sdlc-start "Nova API de pagamentos"
 
 # 2. Monitorar progresso
 /phase-status

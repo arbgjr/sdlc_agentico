@@ -1,4 +1,44 @@
-# Infraestrutura do SDLC Agentico
+# Infraestrutura do SDLC Agêntico
+
+## Estrutura de Diretórios
+
+```
+.claude/
+├── agents/           # 28 agentes especializados
+├── skills/           # 9 skills reutilizáveis
+├── commands/         # 10 comandos do usuário
+├── hooks/            # 5 hooks de automação
+└── settings.json     # Configuração central
+
+.agentic_sdlc/        # Artefatos do SDLC
+├── projects/         # Projetos gerenciados
+│   └── {project-id}/
+│       ├── manifest.yml      # Metadados do projeto
+│       ├── phases/           # Contexto por fase
+│       ├── decisions/        # ADRs do projeto
+│       ├── specs/            # Especificações (SpecKit)
+│       ├── security/         # Threat models, scans
+│       ├── docs/             # Documentação gerada
+│       └── iac/              # Infrastructure as Code
+├── references/       # Documentos de referência
+│   ├── legal/        # Leis, regulamentos
+│   ├── technical/    # RFCs, specs técnicas
+│   ├── business/     # Regras de negócio
+│   └── internal/     # Docs internos (link para DESENVOLVIMENTO.md)
+├── templates/        # Templates reutilizáveis
+│   ├── adr-template.yml
+│   ├── spec-template.md
+│   └── threat-model-template.yml
+├── corpus/           # RAG corpus
+│   ├── indexed/
+│   └── pending/
+└── sessions/         # Histórico de sessões
+
+.docs/                # Documentação do usuário
+.scripts/             # Scripts de instalação
+```
+
+---
 
 ## Requisitos
 
@@ -209,6 +249,34 @@ Nosso SDLC ja tem skills que funcionam como "MCPs locais":
 
 ---
 
+## Skills Disponíveis
+
+| Skill | Propósito | Comando |
+|-------|-----------|---------|
+| `gate-evaluator` | Avalia quality gates entre fases | `/gate-check` |
+| `memory-manager` | Gerencia persistência de contexto | Automático |
+| `rag-query` | Consulta corpus de conhecimento | Automático |
+| `spec-kit-integration` | Integra com GitHub Spec Kit | `/speckit.*` |
+| `bmad-integration` | Integra com BMAD Method | Automático |
+| `auto-branch` | Cria branches automaticamente | Automático |
+| `iac-generator` | Gera Infrastructure as Code | Via `iac-engineer` |
+| `doc-blueprint` | Gera blueprints de documentação | Via `doc-generator` |
+| `reference-indexer` | Indexa documentos de referência | `/ref-add`, `/ref-search` |
+
+---
+
+## Hooks Disponíveis
+
+| Hook | Trigger | Propósito |
+|------|---------|-----------|
+| `validate-commit.sh` | PreToolUse (git commit) | Valida mensagens e conteúdo |
+| `check-gate.sh` | PreToolUse (git push) | Verifica quality gate |
+| `auto-branch.sh` | Via skill | Cria branches (fix/, feature/, etc.) |
+| `update-project-timestamp.sh` | PreToolUse (git commit) | Atualiza timestamp no manifest |
+| `detect-phase.sh` | UserPromptSubmit | Detecta fase atual do SDLC |
+
+---
+
 ## Integracao Spec Kit + SDLC
 
 ### Fluxo Completo
@@ -255,24 +323,26 @@ specify init . --ai claude
 │           ▼                       ▼                             │
 │  ┌─────────────────────────────────────────┐                    │
 │  │            .claude/                      │                   │
-│  │  ├── agents/     (32 agentes)           │                   │
-│  │  ├── skills/     (18 skills)            │                   │
-│  │  └── commands/   (15 comandos)          │                   │
+│  │  ├── agents/     (28 agentes)           │                   │
+│  │  ├── skills/     (9 skills)             │                   │
+│  │  ├── commands/   (10 comandos)          │                   │
+│  │  └── hooks/      (5 hooks)              │                   │
 │  └────────────────────┬────────────────────┘                    │
 │                       │                                         │
-│           ┌───────────┴───────────┐                             │
-│           ▼                       ▼                             │
-│  ┌─────────────────┐    ┌─────────────────┐                     │
-│  │    .specify/    │    │  .github/       │                     │
-│  │  (Spec Kit)     │    │  (Copilot)      │                     │
-│  │  - specs/       │    │  - prompts/     │                     │
-│  │  - plans/       │    │  - copilot-     │                     │
-│  │  - tasks/       │    │    agent.yml    │                     │
-│  └────────┬────────┘    └────────┬────────┘                     │
-│           │                      │                              │
-└───────────┼──────────────────────┼──────────────────────────────┘
-            │                      │
-            ▼                      ▼
+│           ┌───────────┼───────────┐                             │
+│           ▼           ▼           ▼                             │
+│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐   │
+│  │  .agentic_sdlc/ │ │    .specify/    │ │  .github/       │   │
+│  │  (Artefatos)    │ │  (Spec Kit)     │ │  (Copilot)      │   │
+│  │  - projects/    │ │  - specs/       │ │  - prompts/     │   │
+│  │  - references/  │ │  - plans/       │ │  - copilot-     │   │
+│  │  - templates/   │ │  - tasks/       │ │    agent.yml    │   │
+│  │  - corpus/      │ │                 │ │                 │   │
+│  └────────┬────────┘ └────────┬────────┘ └────────┬────────┘   │
+│           │                   │                   │             │
+└───────────┼───────────────────┼───────────────────┼─────────────┘
+            │                   │                   │
+            ▼                   ▼                   ▼
 ┌───────────────────────────────────────────────────────────────┐
 │                        GITHUB                                 │
 ├───────────────────────────────────────────────────────────────┤

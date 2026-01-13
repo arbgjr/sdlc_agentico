@@ -1,6 +1,13 @@
 # Catálogo de Agentes
 
-Documentação completa dos 32 agentes do SDLC Agêntico.
+Documentação completa dos **28+ agentes** do SDLC Agêntico.
+
+## Novos Agentes (v2.0)
+
+| Agente | Fase | Propósito |
+|--------|------|-----------|
+| `iac-engineer` | 3, 5 | Gera e mantém Infrastructure as Code (Terraform, Bicep, K8s) |
+| `doc-generator` | 7 | Gera documentação técnica automaticamente |
 
 ## Visão Geral
 
@@ -365,6 +372,53 @@ data_architecture:
 
 ---
 
+### iac-engineer (NOVO)
+
+**Propósito**: Engenheiro de IaC responsável por gerar e manter código de infraestrutura.
+
+**Quando usar**:
+- Gerar Terraform para Azure/AWS/GCP
+- Criar manifests Kubernetes (Deployments, Services, ConfigMaps)
+- Definir pipelines de CI/CD
+- Implementar GitOps workflows
+
+**Output principal**:
+```yaml
+iac_output:
+  provider: azure | aws | kubernetes
+  resources:
+    - type: string
+      name: string
+      path: string
+  files_created:
+    - path: string
+      purpose: string
+  security_checks:
+    - check: string
+      status: pass | fail | warn
+  next_steps:
+    - action: string
+      command: string
+```
+
+**Princípios**:
+1. **Menor privilégio** - Apenas permissões necessárias
+2. **Infraestrutura imutável** - Não modificar em produção
+3. **GitOps** - Tudo versionado, nada manual
+4. **Security by Default** - Segurança desde o início
+
+**Templates Suportados**:
+| Provider | Recursos |
+|----------|----------|
+| Azure | Container Apps, AKS, PostgreSQL, Key Vault, Service Bus |
+| AWS | ECS/Fargate, EKS, RDS, Secrets Manager, SQS |
+| K8s | Deployment, Service, ConfigMap, Secret, Ingress, NetworkPolicy |
+
+**Skills**: iac-generator, security-scanner
+**Tools**: Read, Write, Edit, Glob, Grep, Bash
+
+---
+
 ## Fase 4: Planejamento
 
 ### delivery-planner
@@ -597,6 +651,62 @@ change_request:
 
 **Skills**: rag-query, memory-manager
 **Tools**: Read, Write, Glob, Grep, Bash
+
+---
+
+### doc-generator (NOVO)
+
+**Propósito**: Gera documentação técnica automaticamente a partir do código e artefatos.
+
+**Quando usar**:
+- Gerar README.md do projeto
+- Criar documentação de API (OpenAPI/Swagger)
+- Gerar diagramas de arquitetura (Mermaid/PlantUML)
+- Produzir guias de onboarding
+- Criar runbooks operacionais
+- Gerar release notes
+
+**Output principal**:
+```yaml
+doc_output:
+  generated:
+    - path: string
+      type: readme | api | arch | onboarding | runbook
+      sections: number
+      words: number
+  diagrams:
+    - path: string
+      type: architecture | sequence | erd | flow
+      format: mermaid | plantuml
+  validation:
+    completeness: percentage
+    broken_links: number
+    missing_sections: list[string]
+  recommendations:
+    - section: string
+      suggestion: string
+```
+
+**Tipos de Documentação**:
+| Tipo | Conteúdo |
+|------|----------|
+| README | Descrição, quick start, instalação, uso |
+| API Reference | Endpoints, schemas, autenticação, exemplos |
+| Architecture | Componentes, fluxos, ADRs |
+| Onboarding | Setup, estrutura, convenções |
+| Runbook | Procedimentos, troubleshooting, métricas |
+
+**Integração com SDLC**:
+| Fase | Documentação |
+|------|--------------|
+| 2 | User Stories, Requisitos |
+| 3 | Architecture, ADRs |
+| 5 | API Docs, Code Comments |
+| 7 | Release Notes, Changelog |
+| 8 | Runbooks, Playbooks |
+
+**Skills**: doc-blueprint
+**Tools**: Read, Write, Glob, Grep
 
 ---
 
