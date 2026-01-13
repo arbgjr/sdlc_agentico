@@ -1,5 +1,5 @@
 {
-  "$schema": "https://claude.ai/schemas/settings.json",
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "version": "1.0",
   "project": {
     "name": "mice_dolphins",
@@ -105,47 +105,82 @@
       {
         "number": 0,
         "name": "Preparation",
-        "agents": ["intake-analyst", "compliance-guardian"]
+        "agents": [
+          "intake-analyst",
+          "compliance-guardian"
+        ]
       },
       {
         "number": 1,
         "name": "Discovery",
-        "agents": ["domain-researcher", "doc-crawler", "rag-curator"]
+        "agents": [
+          "domain-researcher",
+          "doc-crawler",
+          "rag-curator"
+        ]
       },
       {
         "number": 2,
         "name": "Requirements",
-        "agents": ["product-owner", "requirements-analyst", "ux-writer"]
+        "agents": [
+          "product-owner",
+          "requirements-analyst",
+          "ux-writer"
+        ]
       },
       {
         "number": 3,
         "name": "Architecture",
-        "agents": ["system-architect", "adr-author", "data-architect", "threat-modeler"]
+        "agents": [
+          "system-architect",
+          "adr-author",
+          "data-architect",
+          "threat-modeler"
+        ]
       },
       {
         "number": 4,
         "name": "Planning",
-        "agents": ["delivery-planner"]
+        "agents": [
+          "delivery-planner"
+        ]
       },
       {
         "number": 5,
         "name": "Implementation",
-        "agents": ["code-author", "code-reviewer", "test-author"]
+        "agents": [
+          "code-author",
+          "code-reviewer",
+          "test-author"
+        ]
       },
       {
         "number": 6,
         "name": "Quality",
-        "agents": ["qa-analyst", "security-scanner", "performance-analyst"]
+        "agents": [
+          "qa-analyst",
+          "security-scanner",
+          "performance-analyst"
+        ]
       },
       {
         "number": 7,
         "name": "Release",
-        "agents": ["release-manager", "cicd-engineer", "change-manager"]
+        "agents": [
+          "release-manager",
+          "cicd-engineer",
+          "change-manager"
+        ]
       },
       {
         "number": 8,
         "name": "Operations",
-        "agents": ["incident-commander", "rca-analyst", "metrics-analyst", "observability-engineer"]
+        "agents": [
+          "incident-commander",
+          "rca-analyst",
+          "metrics-analyst",
+          "observability-engineer"
+        ]
       }
     ],
     "gates": {
@@ -156,25 +191,51 @@
       "0": {
         "name": "Quick Flow",
         "description": "Bug fix, typo, small change",
-        "phases": [5, 6],
+        "phases": [
+          5,
+          6
+        ],
         "time_estimate": "~5 min"
       },
       "1": {
         "name": "Feature",
         "description": "Feature in existing service",
-        "phases": [2, 5, 6],
+        "phases": [
+          2,
+          5,
+          6
+        ],
         "time_estimate": "~15 min"
       },
       "2": {
         "name": "BMAD Method",
         "description": "New product or service",
-        "phases": [0, 1, 2, 3, 4, 5, 6, 7],
+        "phases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
         "time_estimate": "~30 min"
       },
       "3": {
         "name": "Enterprise",
         "description": "Compliance, multi-team, critical",
-        "phases": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+        "phases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
         "time_estimate": "variable",
         "human_approval_at_all_gates": true
       }
