@@ -23,6 +23,9 @@ description: |
 model: sonnet
 skills:
   - rag-query
+references:
+  - path: .docs/engineering-playbook/stacks/devops/ci-cd.md
+    purpose: Configuracao de CI/CD, gates, branching
 ---
 
 # CI/CD Engineer Agent

@@ -24,6 +24,9 @@ model: sonnet
 skills:
   - rag-query
   - memory-manager
+references:
+  - path: .docs/engineering-playbook/stacks/devops/security.md
+    purpose: Padroes de seguranca, STRIDE, escalation triggers
 ---
 
 # Threat Modeler Agent

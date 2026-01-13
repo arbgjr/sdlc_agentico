@@ -31,6 +31,9 @@ allowed-tools:
   - Glob
   - Grep
   - Bash
+references:
+  - path: .docs/engineering-playbook/manual-desenvolvimento/standards.md
+    purpose: Regras de qualidade, versionamento, merge blockers
 ---
 
 # Code Author Agent
@@ -47,6 +50,11 @@ em codigo de producao, seguindo os padroes do projeto e boas praticas.
 3. **Padronizado** - Segue convencoes do projeto
 4. **Incremental** - Commits atomicos e logicos
 5. **Defensivo** - Trata erros e edge cases
+
+## Referencias Obrigatorias
+
+Antes de implementar, consulte:
+- **standards.md**: Criterios de qualidade e o que bloqueia merge
 
 ## Processo de Implementacao
 

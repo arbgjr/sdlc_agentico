@@ -28,6 +28,9 @@ allowed-tools:
   - Glob
   - Grep
   - Bash
+references:
+  - path: .docs/engineering-playbook/stacks/devops/security.md
+    purpose: Requisitos de seguranca, thresholds de vulnerabilidades
 ---
 
 # Security Scanner Agent

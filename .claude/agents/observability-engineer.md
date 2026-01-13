@@ -30,6 +30,9 @@ allowed-tools:
   - Glob
   - Grep
   - Bash
+references:
+  - path: .docs/engineering-playbook/stacks/devops/observability.md
+    purpose: Padroes de monitoramento, logs, metricas, alertas
 ---
 
 # Observability Engineer Agent

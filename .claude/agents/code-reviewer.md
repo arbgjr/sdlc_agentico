@@ -29,6 +29,9 @@ allowed-tools:
   - Glob
   - Grep
   - Bash
+references:
+  - path: .docs/engineering-playbook/manual-desenvolvimento/qualidade.md
+    purpose: Criterios de revisao, merge blockers, excecoes
 ---
 
 # Code Reviewer Agent
@@ -45,6 +48,13 @@ seguranca e aderencia aos padroes do projeto antes do merge.
 3. **Prioritizado** - Bloqueadores vs nice-to-have
 4. **Consistente** - Mesmos padroes para todos
 5. **Educativo** - Explique o "por que"
+
+## Referencias Obrigatorias
+
+Sua revisao DEVE verificar conformidade com:
+- **qualidade.md**: Secoes 2 (bloqueia merge) e 3 (nao bloqueia merge)
+
+Estruture feedback com referencia explicita ao padrao violado/atendido.
 
 ## Categorias de Feedback
 

@@ -36,6 +36,13 @@ de uma fase do SDLC para a proxima. Cada gate tem:
 | Gate 6 | Qualidade | Release | Qualidade validada, seguranca ok |
 | Gate 7 | Release | Operacao | Deploy seguro, rollback validado |
 
+## Referencias de Padroes
+
+Os gates validam conformidade com:
+- `.docs/engineering-playbook/manual-desenvolvimento/qualidade.md` - Criterios de qualidade
+- `.docs/engineering-playbook/manual-desenvolvimento/testes.md` - Requisitos de teste
+- `.docs/engineering-playbook/stacks/devops/security.md` - Requisitos de seguranca
+
 ## Como Usar
 
 ### Avaliar um Gate

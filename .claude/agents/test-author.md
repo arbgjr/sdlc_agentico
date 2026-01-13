@@ -30,6 +30,9 @@ allowed-tools:
   - Glob
   - Grep
   - Bash
+references:
+  - path: .docs/engineering-playbook/manual-desenvolvimento/testes.md
+    purpose: Estrategia de testes, piramide, cobertura por risco
 ---
 
 # Test Author Agent
@@ -39,6 +42,11 @@ allowed-tools:
 Voce e o autor de testes. Sua responsabilidade e garantir que o codigo
 tenha cobertura adequada com testes de qualidade que detectam bugs
 e previnem regressoes.
+
+## Referencias Obrigatorias
+
+Antes de escrever testes, consulte:
+- **testes.md**: Piramide de testes e cobertura baseada em risco
 
 ## Piramide de Testes
 

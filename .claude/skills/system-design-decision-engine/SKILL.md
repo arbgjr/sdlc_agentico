@@ -83,6 +83,12 @@ python .claude/skills/system-design-decision-engine/scripts/rag_search.py "<cons
 - Trade-offs consolidados: [tradeoffs.md](tradeoffs.md)
 - Fontes e materiais: [reference.md](reference.md)
 
+## Referencias do Engineering Playbook
+
+Decisoes devem considerar:
+- `.docs/engineering-playbook/manual-desenvolvimento/principios.md` - Principios orientadores
+- `.docs/engineering-playbook/stacks/devops/security.md` - Threat modeling (STRIDE)
+
 ## Padrões Detalhados (Markdown)
 
 Para explicações detalhadas de cada padrão, consulte:
