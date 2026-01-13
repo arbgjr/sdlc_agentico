@@ -1,0 +1,19 @@
+# Ignora arquivos e pastas de build do .NET
+**/bin/
+**/obj/
+
+# Não ignore arquivos de configuração locais
+!.claude/settings.local.json
+
+# Outras regras comuns
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignora arquivos temporários do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ignora arquivos de log
+*.log
