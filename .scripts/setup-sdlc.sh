@@ -4,12 +4,22 @@
 # Instala todas as dependencias necessarias para o workflow
 #
 # Uso:
-#   curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash
-#   ou
+#   # Instalacao completa do zero (requer repositorio clonado)
 #   ./.scripts/setup-sdlc.sh
+#
+#   # Instalacao a partir de uma release
+#   curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
+#
+#   # Instalacao de versao especifica
+#   curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.0.0
 #
 
 set -e
+
+# Configuracoes
+REPO_OWNER="arbgjr"
+REPO_NAME="mice_dolphins"
+REPO_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}"
 
 # Cores para output
 RED='\033[0;31m'
@@ -31,6 +41,62 @@ echo "   SDLC Agentico - Setup Script"
 echo "========================================"
 echo ""
 
+# Variaveis de opcoes
+FROM_RELEASE=false
+VERSION="latest"
+SKIP_DEPS=false
+
+# Parse de argumentos
+parse_args() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --from-release)
+                FROM_RELEASE=true
+                shift
+                ;;
+            --version)
+                VERSION="$2"
+                shift 2
+                ;;
+            --skip-deps)
+                SKIP_DEPS=true
+                shift
+                ;;
+            --help|-h)
+                show_usage
+                exit 0
+                ;;
+            *)
+                log_error "Opcao desconhecida: $1"
+                show_usage
+                exit 1
+                ;;
+        esac
+    done
+}
+
+# Mostrar uso
+show_usage() {
+    echo "Uso: $0 [opcoes]"
+    echo ""
+    echo "Opcoes:"
+    echo "  --from-release    Instala a partir de uma release do GitHub"
+    echo "  --version <tag>   Especifica versao (ex: v1.0.0). Padrao: latest"
+    echo "  --skip-deps       Pula instalacao de dependencias (Python, Node, etc)"
+    echo "  --help            Mostra esta mensagem"
+    echo ""
+    echo "Exemplos:"
+    echo "  # Instalacao local (apos clonar repo)"
+    echo "  ./.scripts/setup-sdlc.sh"
+    echo ""
+    echo "  # Instalacao remota (ultima release)"
+    echo "  curl -fsSL ${REPO_URL}/raw/main/.scripts/setup-sdlc.sh | bash -s -- --from-release"
+    echo ""
+    echo "  # Instalacao de versao especifica"
+    echo "  curl -fsSL ${REPO_URL}/raw/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.0.0"
+    echo ""
+}
+
 # Detectar OS
 detect_os() {
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -44,6 +110,126 @@ detect_os() {
         exit 1
     fi
     log_info "Sistema detectado: $OS"
+}
+
+# Verificar se .claude ja existe e perguntar ao usuario
+check_existing_claude() {
+    if [[ -d ".claude" ]]; then
+        echo ""
+        log_warn "O diretorio .claude/ ja existe!"
+        echo ""
+        echo "O que deseja fazer?"
+        echo "  [1] Fazer backup e substituir (recomendado)"
+        echo "  [2] Mesclar (manter arquivos existentes, adicionar novos)"
+        echo "  [3] Substituir sem backup"
+        echo "  [4] Cancelar instalacao"
+        echo ""
+        read -p "Escolha [1-4]: " choice
+
+        case $choice in
+            1)
+                BACKUP_DIR=".claude.backup.$(date +%Y%m%d_%H%M%S)"
+                log_info "Criando backup em $BACKUP_DIR..."
+                mv .claude "$BACKUP_DIR"
+                log_success "Backup criado em $BACKUP_DIR"
+                return 0
+                ;;
+            2)
+                log_info "Modo mescla selecionado. Arquivos existentes serao preservados."
+                MERGE_MODE=true
+                return 0
+                ;;
+            3)
+                log_warn "Substituindo sem backup..."
+                rm -rf .claude
+                return 0
+                ;;
+            4)
+                log_info "Instalacao cancelada pelo usuario."
+                exit 0
+                ;;
+            *)
+                log_error "Opcao invalida. Cancelando."
+                exit 1
+                ;;
+        esac
+    fi
+}
+
+# Obter URL da release
+get_release_url() {
+    if [[ "$VERSION" == "latest" ]]; then
+        log_info "Obtendo ultima release..."
+        RELEASE_URL=$(curl -s "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest" | grep "browser_download_url.*\.zip" | cut -d'"' -f4)
+
+        if [[ -z "$RELEASE_URL" ]]; then
+            log_error "Nenhuma release encontrada."
+            log_info "Verifique se existem releases em: ${REPO_URL}/releases"
+            exit 1
+        fi
+
+        VERSION=$(echo "$RELEASE_URL" | grep -oP 'v[\d.]+')
+        log_success "Versao mais recente: $VERSION"
+    else
+        log_info "Obtendo release $VERSION..."
+        RELEASE_URL="${REPO_URL}/releases/download/${VERSION}/sdlc-agentico-${VERSION}.zip"
+
+        # Verificar se existe
+        if ! curl --output /dev/null --silent --head --fail "$RELEASE_URL"; then
+            log_error "Release $VERSION nao encontrada."
+            log_info "Verifique releases disponiveis em: ${REPO_URL}/releases"
+            exit 1
+        fi
+    fi
+
+    echo "$RELEASE_URL"
+}
+
+# Baixar e extrair release
+install_from_release() {
+    log_info "Instalando a partir de release..."
+
+    # Verificar se .claude ja existe
+    check_existing_claude
+
+    # Obter URL
+    RELEASE_URL=$(get_release_url)
+    log_info "Baixando: $RELEASE_URL"
+
+    # Criar diretorio temporario
+    TEMP_DIR=$(mktemp -d)
+    trap "rm -rf $TEMP_DIR" EXIT
+
+    # Download
+    curl -sSL "$RELEASE_URL" -o "$TEMP_DIR/sdlc.zip"
+
+    # Extrair
+    log_info "Extraindo arquivos..."
+
+    if [[ "$MERGE_MODE" == "true" ]]; then
+        # Modo mescla: extrair para temp e copiar apenas arquivos que nao existem
+        unzip -q "$TEMP_DIR/sdlc.zip" -d "$TEMP_DIR/extracted"
+
+        # Copiar com merge
+        for item in "$TEMP_DIR/extracted/"*; do
+            BASE_NAME=$(basename "$item")
+            if [[ -e "$BASE_NAME" ]]; then
+                if [[ -d "$item" ]]; then
+                    # Mesclar diretorios
+                    cp -rn "$item"/* "$BASE_NAME/" 2>/dev/null || true
+                else
+                    log_warn "Pulando $BASE_NAME (ja existe)"
+                fi
+            else
+                cp -r "$item" .
+            fi
+        done
+    else
+        # Modo normal: extrair diretamente
+        unzip -q "$TEMP_DIR/sdlc.zip" -d .
+    fi
+
+    log_success "Arquivos extraidos com sucesso"
 }
 
 # Verificar Python
@@ -258,6 +444,21 @@ run_checks() {
     echo ""
 }
 
+# Tornar scripts executaveis
+make_scripts_executable() {
+    log_info "Configurando permissoes de scripts..."
+
+    if [[ -d ".scripts" ]]; then
+        chmod +x .scripts/*.sh 2>/dev/null || true
+        log_success "Scripts em .scripts/ configurados"
+    fi
+
+    if [[ -d ".claude/hooks" ]]; then
+        chmod +x .claude/hooks/*.sh 2>/dev/null || true
+        log_success "Hooks em .claude/hooks/ configurados"
+    fi
+}
+
 # Resumo final
 print_summary() {
     echo ""
@@ -283,32 +484,46 @@ print_summary() {
     echo "  5. Criar issues para Copilot:"
     echo "     gh issue create --assignee \"@copilot\" --title \"...\""
     echo ""
+    echo "Ferramentas opcionais de seguranca:"
+    echo "  ./.scripts/install-security-tools.sh --all"
+    echo ""
     echo "Documentacao:"
-    echo "  - INFRASTRUCTURE.md"
-    echo "  - .claude/guides/"
+    echo "  - .docs/QUICKSTART.md"
+    echo "  - .docs/INFRASTRUCTURE.md"
+    echo "  - .docs/playbook.md"
     echo ""
 }
 
 # Main
 main() {
+    parse_args "$@"
     detect_os
 
-    echo ""
-    log_info "Instalando dependencias..."
-    echo ""
+    # Se instalando de release
+    if [[ "$FROM_RELEASE" == "true" ]]; then
+        install_from_release
+    fi
 
-    check_python
-    install_uv
-    check_git
-    check_gh
-    check_node
-    install_claude_code
-    install_speckit
+    # Instalar dependencias (se nao puladas)
+    if [[ "$SKIP_DEPS" != "true" ]]; then
+        echo ""
+        log_info "Instalando dependencias..."
+        echo ""
+
+        check_python
+        install_uv
+        check_git
+        check_gh
+        check_node
+        install_claude_code
+        install_speckit
+    fi
 
     echo ""
     log_info "Configurando projeto..."
     echo ""
 
+    make_scripts_executable
     init_speckit
     check_claude_structure
     enable_copilot_agent

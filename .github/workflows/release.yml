@@ -1,0 +1,111 @@
+name: Release SDLC Agentico
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create release package
+        run: |
+          # Create temporary directory for package
+          mkdir -p release-package
+
+          # Copy .claude/ directory (excluding settings.local.json)
+          cp -r .claude release-package/
+          rm -f release-package/.claude/settings.local.json
+
+          # Copy only templates from .agentic_sdlc/
+          mkdir -p release-package/.agentic_sdlc
+          if [ -d ".agentic_sdlc/templates" ]; then
+            cp -r .agentic_sdlc/templates release-package/.agentic_sdlc/
+          fi
+
+          # Copy only necessary files from .docs/
+          mkdir -p release-package/.docs
+          for file in AGENTS.md COMMANDS.md QUICKSTART.md INFRASTRUCTURE.md DESENVOLVIMENTO.md playbook.md; do
+            if [ -f ".docs/$file" ]; then
+              cp ".docs/$file" release-package/.docs/
+            fi
+          done
+
+          # Copy scripts
+          mkdir -p release-package/.scripts
+          cp .scripts/setup-sdlc.sh release-package/.scripts/
+          if [ -f ".scripts/install-security-tools.sh" ]; then
+            cp .scripts/install-security-tools.sh release-package/.scripts/
+          fi
+
+          # Copy root files
+          cp CLAUDE.md release-package/
+          cp README.md release-package/
+
+          # Create ZIP
+          cd release-package
+          zip -r ../sdlc-agentico-${{ steps.version.outputs.VERSION }}.zip .
+          cd ..
+
+          # Cleanup
+          rm -rf release-package
+
+          # Show package contents
+          echo "Package contents:"
+          unzip -l sdlc-agentico-${{ steps.version.outputs.VERSION }}.zip
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          # Get previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          echo "## SDLC Agentico ${{ steps.version.outputs.VERSION }}" > release_notes.md
+          echo "" >> release_notes.md
+          echo "### Installation" >> release_notes.md
+          echo "" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "# Quick install" >> release_notes.md
+          echo 'curl -fsSL https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.VERSION }}/sdlc-agentico-${{ steps.version.outputs.VERSION }}.zip -o sdlc.zip' >> release_notes.md
+          echo "unzip sdlc.zip -d ." >> release_notes.md
+          echo "./.scripts/setup-sdlc.sh" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+
+          if [ -n "$PREV_TAG" ]; then
+            echo "### Changes since $PREV_TAG" >> release_notes.md
+            echo "" >> release_notes.md
+            git log ${PREV_TAG}..HEAD --oneline --no-merges >> release_notes.md || true
+          fi
+
+          echo "" >> release_notes.md
+          echo "### Package Contents" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "- \`.claude/\` - Agents, skills, commands, hooks, and settings" >> release_notes.md
+          echo "- \`.agentic_sdlc/templates/\` - ADR, spec, and threat model templates" >> release_notes.md
+          echo "- \`.docs/\` - Documentation and playbook" >> release_notes.md
+          echo "- \`.scripts/\` - Setup and utility scripts" >> release_notes.md
+          echo "- \`CLAUDE.md\` - Project instructions for Claude Code" >> release_notes.md
+          echo "- \`README.md\` - Project documentation" >> release_notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: sdlc-agentico-${{ steps.version.outputs.VERSION }}.zip
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -4,7 +4,7 @@ Sistema de desenvolvimento de software orientado por agentes de IA que automatiz
 
 ## O Que É
 
-O SDLC Agêntico é um framework que usa **28 agentes especializados** para guiar seu projeto através de **9 fases (0-8)** do ciclo de desenvolvimento, desde a ideia inicial até a operação em produção.
+O SDLC Agêntico é um framework que usa **34 agentes especializados** (30 orquestrados + 4 consultivos) para guiar seu projeto através de **9 fases (0-8)** do ciclo de desenvolvimento, desde a ideia inicial até a operação em produção.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -15,7 +15,7 @@ O SDLC Agêntico é um framework que usa **28 agentes especializados** para guia
 │                                         ↓                               │
 │  Produção ← [Release] ← [Quality] ← [Implementation] ← [Planning]      │
 │                                                                         │
-│  28 Agentes | 9 Fases | Quality Gates | Security by Design             │
+│  34 Agentes | 9 Fases | Quality Gates | Security by Design             │
 │  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot        │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -114,7 +114,7 @@ O sistema se integra com o **GitHub Copilot Coding Agent**:
 
 ```
 .claude/
-├── agents/           # 28 agentes especializados
+├── agents/           # 34 agentes especializados (30 + 4 consultivos)
 ├── skills/           # 9 skills reutilizáveis
 ├── commands/         # 10 comandos do usuário
 ├── hooks/            # 5 hooks de automação
@@ -128,7 +128,8 @@ O sistema se integra com o **GitHub Copilot Coding Agent**:
 └── sessions/         # Histórico de sessões
 
 .scripts/
-└── setup-sdlc.sh     # Script de instalação
+├── setup-sdlc.sh             # Script de instalação
+└── install-security-tools.sh # Ferramentas de segurança opcionais
 
 .docs/
 ├── AGENTS.md         # Catálogo de agentes
@@ -149,11 +150,50 @@ O sistema se integra com o **GitHub Copilot Coding Agent**:
 
 ## Instalação
 
-```bash
-# Automática (recomendado)
-./.scripts/setup-sdlc.sh
+### Opção 1: Instalação a partir de Release (Recomendado)
 
-# Manual
+```bash
+# Última versão (one-liner)
+curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
+
+# Versão específica
+curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.0.0
+```
+
+Se o diretório `.claude/` já existir, o script perguntará o que fazer:
+1. Fazer backup e substituir (recomendado)
+2. Mesclar (manter existentes, adicionar novos)
+3. Substituir sem backup
+4. Cancelar
+
+### Opção 2: Clone do Repositório
+
+```bash
+# Clonar repositório
+git clone https://github.com/arbgjr/mice_dolphins.git
+cd mice_dolphins
+
+# Executar setup
+./.scripts/setup-sdlc.sh
+```
+
+### Ferramentas de Segurança (Opcional)
+
+Para usar os recursos de security scanning (`/security-scan`, security gates):
+
+```bash
+# Instalar todas as ferramentas
+./.scripts/install-security-tools.sh --all
+
+# Ou instalar individualmente
+./.scripts/install-security-tools.sh --semgrep   # SAST
+./.scripts/install-security-tools.sh --trivy     # SCA/Container
+./.scripts/install-security-tools.sh --gitleaks  # Secret Scanner
+```
+
+### Instalação Manual
+
+```bash
 pip install uv
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
 npm install -g @anthropic-ai/claude-code
