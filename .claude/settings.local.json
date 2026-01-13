@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(tree:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(find:*)",
+      "Bash(chmod:*)",
+      "Bash(ln:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat\\(sdlc\\): Implementar evolucoes do SDLC Agentico\n\nImplementa melhorias identificadas durante o projeto Sistema de Duplicatas Eletronicas:\n\n## Nova estrutura .agentic_sdlc/\n- Reorganizacao de artefatos em estrutura padronizada\n- Pasta projects/ para projetos gerenciados\n- Pasta references/ para documentos externos\n- Pasta templates/ com ADR, spec e threat-model\n- Pasta corpus/ para RAG\n- Script de migracao de .claude/memory/\n\n## Automacao de Branches\n- Nova skill auto-branch com hooks\n- Criacao automatica de branches por tipo de trabalho\n- Integracao com SpecKit para criacao de specs\n\n## Novos Fluxos de Trabalho\n- Comando /quick-fix para bug fixes \\(Level 0\\)\n- Comando /new-feature para features existentes \\(Level 1\\)\n- Documentacao de criterios e escalacao\n\n## Security by Design\n- security-gate.yml com checks mandatorios por fase\n- Configuracao de escalacao automatica \\(CVSS >= 7.0\\)\n- Gates de seguranca em fases 2, 3, 5, 6, 7\n\n## Novos Agentes\n- iac-engineer: Geracao de Terraform, Bicep, K8s\n- doc-generator: Documentacao automatica \\(README, API, Arch\\)\n\n## Novas Skills\n- iac-generator: Templates de infraestrutura\n- doc-blueprint: Geracao de documentacao\n- reference-indexer: Indexacao de docs externos no RAG\n\n## Integracao DESENVOLVIMENTO.md\n- Link em references/internal/coding-standards.md\n- Regras de linguagem C# como padrao\n- Criterios de code review do manual\n\n## Atualizacoes em settings.json\n- Novos agentes e skills registrados\n- Security by Design habilitado\n- Auto-branch configurado por nivel de complexidade\n- Nova estrutura de memoria em .agentic_sdlc/\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\ndocs: Atualizar documentação com novas funcionalidades do SDLC v2.0\n\n- Adicionar novos comandos /quick-fix \\(Level 0\\) e /new-feature \\(Level 1\\)\n- Documentar novos agentes iac-engineer e doc-generator\n- Atualizar estrutura de diretórios com .agentic_sdlc/\n- Adicionar seção Security by Design com gates e escalation triggers\n- Documentar novas skills \\(auto-branch, iac-generator, doc-blueprint, reference-indexer\\)\n- Documentar novos hooks \\(auto-branch.sh, update-project-timestamp.sh\\)\n- Atualizar contagem de agentes \\(26 -> 28\\), skills \\(8 -> 9\\), comandos \\(8 -> 10\\)\n- Adicionar exemplos de workflow por nível de complexidade\n- Atualizar diagramas de arquitetura\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
