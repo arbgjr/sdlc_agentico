@@ -1,0 +1,266 @@
+# Security Gate - Obrigatorio para todas as fases
+# Este gate garante que seguranca e considerada em todas as fases do SDLC
+
+gate:
+  name: security-gate
+  description: "Gate de seguranca obrigatorio - Security by Design"
+  version: "1.0"
+  applies_to: [2, 3, 5, 6, 7]
+  failure_action: block
+  escalation: security-team
+
+  # Principios de Security by Design
+  principles:
+    - "Seguranca nao e feature, e requisito fundamental"
+    - "Validar inputs em todas as fronteiras"
+    - "Principio do menor privilegio"
+    - "Defense in depth"
+    - "Fail securely"
+    - "Nao confiar em dados externos"
+
+  # Checks por fase
+  checks:
+    # Fase 2: Requisitos
+    phase_2:
+      mandatory:
+        - name: security_requirements_documented
+          description: "Requisitos de seguranca devem estar documentados"
+          check_type: file_exists
+          path_pattern: ".agentic_sdlc/projects/{id}/specs/*.spec.md"
+          content_required: "Security Considerations"
+
+        - name: compliance_requirements_identified
+          description: "Requisitos de compliance identificados (LGPD, PCI, etc)"
+          check_type: content_search
+          path_pattern: ".agentic_sdlc/projects/{id}/specs/*.spec.md"
+          patterns:
+            - "LGPD|GDPR|PCI|SOC|ISO"
+            - "compliance|conformidade"
+
+      recommended:
+        - name: data_classification
+          description: "Classificacao de dados definida"
+
+    # Fase 3: Arquitetura
+    phase_3:
+      mandatory:
+        - name: threat_model_exists
+          description: "Threat model (STRIDE) deve existir"
+          check_type: file_exists
+          path_pattern: ".agentic_sdlc/projects/{id}/security/threat-model*.yml"
+
+        - name: high_risks_mitigated
+          description: "Ameacas HIGH/CRITICAL devem ter mitigacao"
+          check_type: yaml_query
+          path_pattern: ".agentic_sdlc/projects/{id}/security/threat-model*.yml"
+          query: "threat_model.threats.*.[] | select(.risk_level == 'high' or .risk_level == 'critical') | select(.mitigation.status != 'implemented' and .mitigation.status != 'accepted_risk')"
+          expected_count: 0
+
+        - name: auth_design_documented
+          description: "Design de autenticacao/autorizacao documentado"
+          check_type: content_search
+          path_pattern: ".agentic_sdlc/projects/{id}/decisions/adr-*.yml"
+          patterns:
+            - "autenticacao|authentication"
+            - "autorizacao|authorization"
+
+      recommended:
+        - name: security_adr_exists
+          description: "ADR de decisoes de seguranca"
+
+    # Fase 5: Implementacao
+    phase_5:
+      mandatory:
+        - name: no_hardcoded_secrets
+          description: "Sem secrets hardcoded no codigo"
+          check_type: command
+          command: |
+            git diff --cached -- '*.cs' '*.json' '*.yml' '*.yaml' '*.config' | \
+            grep -iE '(password|secret|apikey|connectionstring|token)\s*[:=]\s*["\x27][^${\x27"]+["\x27]' | \
+            grep -v 'example\|sample\|placeholder\|<' | wc -l
+          expected: "0"
+
+        - name: input_validation_present
+          description: "Validacao de input implementada"
+          check_type: content_search
+          path_pattern: "src/**/*Controller*.cs"
+          patterns:
+            - "\\[Required\\]|\\[StringLength\\]|\\[Range\\]|FluentValidation|DataAnnotations"
+
+        - name: no_sql_injection_risk
+          description: "Sem concatenacao de SQL"
+          check_type: command
+          command: |
+            find src -name "*.cs" -exec grep -l 'string\.Format.*SELECT\|"SELECT.*"\s*\+\|$".*SELECT.*{' {} \; | wc -l
+          expected: "0"
+
+      recommended:
+        - name: logging_sensitive_data
+          description: "Verificar se dados sensiveis nao estao sendo logados"
+
+        - name: error_messages_safe
+          description: "Mensagens de erro nao expoe detalhes internos"
+
+    # Fase 6: Qualidade
+    phase_6:
+      mandatory:
+        - name: sast_executed
+          description: "SAST (Static Analysis) executado"
+          check_type: file_exists
+          path_pattern: ".agentic_sdlc/projects/{id}/security/sast-report.*"
+
+        - name: sast_no_critical_high
+          description: "Sem vulnerabilidades CRITICAL ou HIGH no SAST"
+          check_type: command
+          command: |
+            if [ -f ".agentic_sdlc/projects/{id}/security/sast-report.json" ]; then
+              cat .agentic_sdlc/projects/{id}/security/sast-report.json | \
+              jq '[.results[] | select(.severity == "CRITICAL" or .severity == "HIGH")] | length'
+            else
+              echo "0"
+            fi
+          expected: "0"
+
+        - name: sca_executed
+          description: "SCA (Dependency Check) executado"
+          check_type: file_exists
+          path_pattern: ".agentic_sdlc/projects/{id}/security/sca-report.*"
+
+        - name: sca_no_critical_high
+          description: "Sem vulnerabilidades CRITICAL ou HIGH em dependencias"
+          check_type: command
+          command: |
+            if [ -f ".agentic_sdlc/projects/{id}/security/sca-report.json" ]; then
+              cat .agentic_sdlc/projects/{id}/security/sca-report.json | \
+              jq '[.vulnerabilities[] | select(.severity == "CRITICAL" or .severity == "HIGH")] | length'
+            else
+              echo "0"
+            fi
+          expected: "0"
+
+        - name: secret_scan_executed
+          description: "Scan de secrets executado"
+          check_type: command
+          command: |
+            gitleaks detect --no-git -v 2>/dev/null | grep -c "Secret" || echo "0"
+          expected: "0"
+
+      recommended:
+        - name: penetration_test
+          description: "Pentest em features criticas"
+
+        - name: security_review
+          description: "Review de seguranca por especialista"
+
+    # Fase 7: Release
+    phase_7:
+      mandatory:
+        - name: security_checklist_complete
+          description: "Checklist de seguranca para release completo"
+          check_type: file_exists
+          path_pattern: ".agentic_sdlc/projects/{id}/security/release-security-checklist.yml"
+
+        - name: all_security_gates_passed
+          description: "Todos os gates de seguranca anteriores passaram"
+          check_type: command
+          command: |
+            grep -r "status: blocked" .agentic_sdlc/projects/{id}/security/*.yml 2>/dev/null | wc -l
+          expected: "0"
+
+        - name: encryption_verified
+          description: "Encryption em transito e repouso verificada"
+
+      recommended:
+        - name: security_signoff
+          description: "Aprovacao formal de seguranca"
+
+  # Gatilhos de escalacao automatica
+  escalation_triggers:
+    - trigger: "cvss_score_high"
+      condition: "CVSS >= 7.0"
+      action: "Escalar para security-team"
+
+    - trigger: "pii_exposure"
+      condition: "Dados PII expostos"
+      action: "Escalar IMEDIATAMENTE para security-team e DPO"
+
+    - trigger: "auth_modification"
+      condition: "Mudanca em autenticacao/autorizacao"
+      action: "Review obrigatorio por security-team"
+
+    - trigger: "crypto_change"
+      condition: "Mudanca em criptografia"
+      action: "Review obrigatorio por security-team"
+
+    - trigger: "new_public_endpoint"
+      condition: "Novo endpoint publico criado"
+      action: "Threat modeling obrigatorio"
+
+  # Templates de artefatos de seguranca
+  artifacts:
+    threat_model:
+      template: ".agentic_sdlc/templates/threat-model-template.yml"
+      required_for: [3]
+
+    security_checklist:
+      template: |
+        security_checklist:
+          project_id: "{id}"
+          created_at: ""
+          phase: 7
+
+          authentication:
+            - item: "Mecanismo de autenticacao adequado"
+              status: pending
+            - item: "Senhas armazenadas com hash seguro"
+              status: pending
+            - item: "MFA habilitado para admins"
+              status: pending
+
+          authorization:
+            - item: "RBAC implementado corretamente"
+              status: pending
+            - item: "Principio do menor privilegio"
+              status: pending
+
+          data_protection:
+            - item: "Dados sensiveis criptografados"
+              status: pending
+            - item: "PII protegido conforme LGPD"
+              status: pending
+            - item: "Backup criptografado"
+              status: pending
+
+          infrastructure:
+            - item: "TLS 1.2+ em todas as conexoes"
+              status: pending
+            - item: "Secrets em Key Vault"
+              status: pending
+            - item: "Firewall configurado"
+              status: pending
+
+          monitoring:
+            - item: "Audit logging habilitado"
+              status: pending
+            - item: "Alertas de seguranca configurados"
+              status: pending
+
+  # Integracao com ferramentas
+  tools:
+    sast:
+      - name: "semgrep"
+        command: "semgrep --config auto --json -o sast-report.json ."
+      - name: "security-code-scan"
+        command: "security-scan -t ."
+
+    sca:
+      - name: "dotnet-outdated"
+        command: "dotnet list package --vulnerable --include-transitive"
+      - name: "trivy"
+        command: "trivy fs --format json -o sca-report.json ."
+
+    secrets:
+      - name: "gitleaks"
+        command: "gitleaks detect --report-format json --report-path secrets-report.json"
+      - name: "trufflehog"
+        command: "trufflehog filesystem . --json > secrets-report.json"

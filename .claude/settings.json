@@ -13,6 +13,10 @@
           {
             "type": "command",
             "command": ".claude/hooks/validate-commit.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/update-project-timestamp.sh"
           }
         ]
       },
@@ -51,6 +55,15 @@
           {
             "type": "command",
             "command": "echo 'ADR atualizado - lembre de atualizar o index'"
+          }
+        ]
+      },
+      {
+        "matcher": "Write(*.spec.md)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Spec criada - considere usar /auto-branch feature'"
           }
         ]
       }
@@ -97,7 +110,22 @@
       "rca-analyst",
       "metrics-analyst",
       "observability-engineer",
-      "playbook-governance"
+      "playbook-governance",
+      "iac-engineer",
+      "doc-generator"
+    ]
+  },
+  "skills": {
+    "available_skills": [
+      "gate-evaluator",
+      "memory-manager",
+      "rag-query",
+      "spec-kit-integration",
+      "bmad-integration",
+      "auto-branch",
+      "iac-generator",
+      "doc-blueprint",
+      "reference-indexer"
     ]
   },
   "sdlc": {
@@ -135,7 +163,8 @@
           "system-architect",
           "adr-author",
           "data-architect",
-          "threat-modeler"
+          "threat-modeler",
+          "iac-engineer"
         ]
       },
       {
@@ -151,7 +180,8 @@
         "agents": [
           "code-author",
           "code-reviewer",
-          "test-author"
+          "test-author",
+          "iac-engineer"
         ]
       },
       {
@@ -169,7 +199,8 @@
         "agents": [
           "release-manager",
           "cicd-engineer",
-          "change-manager"
+          "change-manager",
+          "doc-generator"
         ]
       },
       {
@@ -185,31 +216,39 @@
     ],
     "gates": {
       "directory": ".claude/skills/gate-evaluator/gates",
-      "enforce": true
+      "enforce": true,
+      "security_gate": "security-gate.yml"
     },
     "complexity_levels": {
       "0": {
         "name": "Quick Flow",
         "description": "Bug fix, typo, small change",
+        "command": "/quick-fix",
         "phases": [
           5,
           6
         ],
-        "time_estimate": "~5 min"
+        "time_estimate": "~5 min",
+        "auto_branch": true,
+        "branch_prefix": "fix/"
       },
       "1": {
         "name": "Feature",
         "description": "Feature in existing service",
+        "command": "/new-feature",
         "phases": [
           2,
           5,
           6
         ],
-        "time_estimate": "~15 min"
+        "time_estimate": "~15-30 min",
+        "auto_branch": true,
+        "branch_prefix": "feature/"
       },
       "2": {
         "name": "BMAD Method",
         "description": "New product or service",
+        "command": "/sdlc-start",
         "phases": [
           0,
           1,
@@ -220,11 +259,14 @@
           6,
           7
         ],
-        "time_estimate": "~30 min"
+        "time_estimate": "~30 min - hours",
+        "auto_branch": true,
+        "branch_prefix": "feature/"
       },
       "3": {
         "name": "Enterprise",
         "description": "Compliance, multi-team, critical",
+        "command": "/sdlc-start",
         "phases": [
           0,
           1,
@@ -237,7 +279,25 @@
           8
         ],
         "time_estimate": "variable",
-        "human_approval_at_all_gates": true
+        "human_approval_at_all_gates": true,
+        "auto_branch": true,
+        "branch_prefix": "feature/"
+      }
+    },
+    "security_by_design": {
+      "enabled": true,
+      "mandatory_gates": [
+        "phase-2-to-3",
+        "phase-3-to-4",
+        "phase-5-to-6",
+        "phase-6-to-7"
+      ],
+      "escalation_triggers": {
+        "cvss_threshold": 7.0,
+        "pii_exposure": true,
+        "auth_modification": true,
+        "crypto_change": true,
+        "new_public_endpoint": true
       }
     }
   },
@@ -249,13 +309,20 @@
     },
     "spec_kit": {
       "enabled": true,
-      "templates_dir": ".specify/templates"
+      "templates_dir": ".specify/templates",
+      "auto_branch_on_spec_create": true
     }
   },
   "memory": {
-    "directory": ".claude/memory",
-    "rag_corpus": ".claude/rag",
+    "directory": ".agentic_sdlc",
+    "legacy_directory": ".claude/memory",
+    "projects_dir": "projects",
+    "references_dir": "references",
+    "templates_dir": "templates",
+    "corpus_dir": "corpus",
+    "sessions_dir": "sessions",
     "persist_decisions": true,
-    "persist_learnings": true
+    "persist_learnings": true,
+    "auto_migrate": true
   }
 }
