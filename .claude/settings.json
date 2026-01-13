@@ -152,7 +152,8 @@
       "auto-branch",
       "iac-generator",
       "doc-blueprint",
-      "reference-indexer"
+      "reference-indexer",
+      "system-design-decision-engine"
     ]
   },
   "sdlc": {
