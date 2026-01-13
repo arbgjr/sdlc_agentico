@@ -239,6 +239,32 @@ O sistema rastreia automaticamente:
 - **Code Quality**: Coverage, complexity, tech debt
 - **Process**: PR cycle time, review time, rework rate
 
+## Limitações Conhecidas
+
+### Ambiente
+- **Sistema Operacional**: Testado em Linux e macOS. Windows via WSL2 é suportado, mas não testado extensivamente
+- **Node.js**: Requer versão 18 ou superior
+- **Python**: Requer versão 3.11 ou superior
+
+### Dependências Externas
+- **Claude Code CLI**: Requer conta Anthropic ativa com acesso ao Claude Code
+- **Spec Kit**: Opcional, mas necessário para comandos de especificação
+- **GitHub CLI (gh)**: Necessário para integração com GitHub e Copilot Coding Agent
+- **Ferramentas de Segurança**: gitleaks, semgrep, trivy são opcionais (instaláveis via `.scripts/install-security-tools.sh`)
+
+### Funcionalidades
+- **Lightweight Agents**: 4 agentes (failure-analyst, interview-simulator, requirements-interrogator, tradeoff-challenger) são minimalistas e dependem da skill `system-design-decision-engine`
+- **Gates de Qualidade**: Alguns checks usam padrões glob que podem não encontrar arquivos em estruturas não-padrão
+- **Auto-Branch**: Requer que o repositório tenha permissão de push para criar branches
+
+### Integrações
+- **GitHub Copilot Coding Agent**: Requer GitHub Copilot Pro+/Business/Enterprise
+- **RAG Corpus**: Funcionalidade experimental, corpus precisa ser populado manualmente
+
+## Troubleshooting
+
+Consulte [.docs/TROUBLESHOOTING.md](.docs/TROUBLESHOOTING.md) para resolução de problemas comuns.
+
 ## Contribuindo
 
 Veja [CONTRIBUTING.md](CONTRIBUTING.md) para guidelines de contribuição.

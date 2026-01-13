@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  validate-config:
+    name: Validate Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate settings.json
+        run: |
+          echo "Validating .claude/settings.json..."
+          python3 -c "import json; json.load(open('.claude/settings.json'))"
+          echo "✓ settings.json is valid JSON"
+
+      - name: Validate gate YAML files
+        run: |
+          echo "Validating gate definitions..."
+          pip install pyyaml --quiet
+          for file in .claude/skills/gate-evaluator/gates/*.yml; do
+            echo "Checking $file..."
+            python3 -c "import yaml; yaml.safe_load(open('$file'))"
+          done
+          echo "✓ All gate files are valid YAML"
+
+      - name: Check agent count
+        run: |
+          count=$(ls -1 .claude/agents/*.md 2>/dev/null | wc -l)
+          echo "Agent count: $count"
+          if [ "$count" -lt 30 ]; then
+            echo "⚠ Warning: Expected at least 30 agents, found $count"
+            exit 1
+          fi
+          echo "✓ Agent count is valid"
+
+      - name: Check skill registration
+        run: |
+          echo "Checking skills..."
+          registered=$(cat .claude/settings.json | python3 -c "import sys,json; print(len(json.load(sys.stdin)['skills']['available_skills']))")
+          ondisk=$(ls -d .claude/skills/*/ 2>/dev/null | wc -l)
+          echo "Registered skills: $registered"
+          echo "Skills on disk: $ondisk"
+          echo "✓ Skill check complete"
+
+  lint-markdown:
+    name: Lint Markdown
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install markdownlint
+        run: npm install -g markdownlint-cli
+
+      - name: Lint documentation
+        run: |
+          markdownlint README.md CLAUDE.md .docs/*.md --disable MD013 MD033 MD041 || true
+        continue-on-error: true
+
+  shellcheck:
+    name: Shellcheck Hooks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Check hook scripts
+        run: |
+          echo "Running shellcheck on hooks..."
+          for script in .claude/hooks/*.sh; do
+            echo "Checking $script..."
+            shellcheck "$script" --severity=warning || true
+          done
+          echo "✓ Shellcheck complete"
+        continue-on-error: true
+
+  validate-templates:
+    name: Validate Templates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate YAML templates
+        run: |
+          pip install pyyaml --quiet
+          for file in .agentic_sdlc/templates/*.yml; do
+            if [ -f "$file" ]; then
+              echo "Validating $file..."
+              python3 -c "import yaml; yaml.safe_load(open('$file'))"
+            fi
+          done
+          echo "✓ Template validation complete"

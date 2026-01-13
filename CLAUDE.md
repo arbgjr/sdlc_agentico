@@ -103,6 +103,17 @@ Phase 7 (Release)        → release-manager, cicd-engineer, change-manager, doc
 Phase 8 (Operations)     → incident-commander, rca-analyst, metrics-analyst, observability-engineer
 ```
 
+### Cross-Phase Agents (Meta-Agents)
+
+Two agents operate across all phases and are not tied to a specific phase:
+
+| Agent | Purpose | When Activated |
+|-------|---------|----------------|
+| **orchestrator** | Coordinates phase transitions, manages workflow state, evaluates gates | Automatically during `/sdlc-start`, phase transitions |
+| **playbook-governance** | Monitors drift from playbook, detects emerging patterns, proposes updates | When exceptions occur, during retrospectives |
+
+These agents act as supervisors ensuring consistency and continuous improvement across the entire SDLC.
+
 ### Complexity Levels
 - **Level 0 (Quick Flow)**: Bug fixes, typos → Phases 5, 6 only → Use `/quick-fix`
 - **Level 1 (Feature)**: Simple features → Phases 2, 5, 6 → Use `/new-feature`
@@ -123,6 +134,26 @@ Security is mandatory in phases 2, 3, 5, 6, 7 via `security-gate.yml`:
 - Auth/authorization changes
 - Cryptography changes
 - New public endpoints
+
+### Agent Model Selection
+
+Agents use different models based on task complexity:
+
+| Model | Use Case | Agents |
+|-------|----------|--------|
+| **opus** | Complex decisions, architecture, security analysis | system-architect, threat-modeler, compliance-guardian |
+| **sonnet** | Implementation, documentation, routine tasks | code-author, doc-generator, test-author, most others |
+
+**Heuristic**: Use `opus` when the agent needs deep reasoning, trade-off analysis, or security-critical decisions. Use `sonnet` for execution-focused tasks.
+
+### Agent Types
+
+| Type | Count | Description |
+|------|-------|-------------|
+| **Orchestrated** | 30 | Full agents with 200-500 lines, complete instructions |
+| **Consultive (Lightweight)** | 4 | Minimal agents (~20 lines) that delegate to skills |
+
+**Lightweight agents**: `failure-analyst`, `interview-simulator`, `requirements-interrogator`, `tradeoff-challenger`. These are intentionally minimal and rely on the `system-design-decision-engine` skill for their logic.
 
 ## Key Files
 
