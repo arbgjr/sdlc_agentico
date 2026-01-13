@@ -274,6 +274,58 @@ Nosso SDLC ja tem skills que funcionam como "MCPs locais":
 | `auto-branch.sh` | Via skill | Cria branches (fix/, feature/, etc.) |
 | `update-project-timestamp.sh` | PreToolUse (git commit) | Atualiza timestamp no manifest |
 | `detect-phase.sh` | UserPromptSubmit | Detecta fase atual do SDLC |
+| `detect-adr-need.sh` | PostToolUse (src/**, infrastructure/**) | Sugere ADR para mudanças arquiteturais |
+
+---
+
+## Arquivo de Permissões Local
+
+### settings.local.json
+
+O arquivo `.claude/settings.local.json` contém permissões específicas para este repositório. **Este arquivo não deve ser commitado** pois pode conter permissões sensíveis.
+
+**Propósito**: Pré-aprovar comandos frequentes para evitar prompts repetitivos durante o desenvolvimento.
+
+**Estrutura**:
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+      // ... outros comandos pré-aprovados
+    ]
+  }
+}
+```
+
+**Quando usar**:
+- Para pré-aprovar comandos git que você usa frequentemente
+- Para permitir ferramentas de build específicas
+- Para evitar prompts em comandos seguros e repetitivos
+
+**Segurança**:
+- Adicione `.claude/settings.local.json` ao `.gitignore`
+- Revise as permissões periodicamente
+- Não pré-aprove comandos destrutivos
+
+**Exemplo de permissões comuns**:
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(wc:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npm test:*)",
+      "Bash(dotnet build:*)"
+    ]
+  }
+}
+```
 
 ---
 

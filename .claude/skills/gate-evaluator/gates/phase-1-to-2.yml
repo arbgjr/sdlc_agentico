@@ -9,35 +9,39 @@ gate:
 
 required_artifacts:
   - name: "Research Brief"
-    path: ".claude/memory/research/*.yml"
+    path: ".agentic_sdlc/projects/*/research/*.yml"
+    fallback_path: ".claude/memory/research/*.yml"
     description: "Documentacao de pesquisa de dominio"
     agent: "domain-researcher"
 
   - name: "Domain Knowledge"
-    path: ".specify/knowledge/*.md"
+    path: ".agentic_sdlc/projects/*/knowledge/*.md"
+    fallback_path: ".specify/knowledge/*.md"
     description: "Conhecimento de dominio documentado"
     agent: "domain-researcher"
 
   - name: "Documentation Index"
-    path: ".claude/rag/docs/**/*.md"
+    path: ".agentic_sdlc/corpus/docs/**/*.md"
+    fallback_path: ".claude/rag/docs/**/*.md"
     description: "Documentacao oficial capturada e indexada"
     agent: "doc-crawler"
     optional: true
 
   - name: "RAG Corpus"
-    path: ".claude/rag/corpus.yml"
+    path: ".agentic_sdlc/corpus/index.yml"
+    fallback_path: ".claude/rag/corpus.yml"
     description: "Corpus RAG inicializado com conhecimento do dominio"
     agent: "rag-curator"
 
 quality_checks:
   - check: "Best practices documentadas"
-    validation: "grep -r 'best_practices' .claude/memory/research/"
+    validation: "grep -r 'best_practices' .agentic_sdlc/projects/*/research/ .claude/memory/research/ 2>/dev/null | head -1"
 
   - check: "Fontes referenciadas"
-    validation: "grep -r 'sources:' .claude/memory/research/"
+    validation: "grep -r 'sources:' .agentic_sdlc/projects/*/research/ .claude/memory/research/ 2>/dev/null | head -1"
 
   - check: "Documentacao oficial capturada"
-    validation: "ls .claude/rag/docs/ 2>/dev/null | head -1"
+    validation: "ls .agentic_sdlc/corpus/docs/ .claude/rag/docs/ 2>/dev/null | head -1"
 
 human_approval:
   required: false

@@ -76,8 +76,10 @@ results = query(
 
 ## Estrutura do Corpus
 
+O corpus RAG esta consolidado em `.agentic_sdlc/corpus/`:
+
 ```
-.claude/knowledge/
+.agentic_sdlc/corpus/
 ├── decisions/           # ADRs e decisoes
 │   └── *.yml
 ├── docs/                # Documentacao oficial
@@ -90,6 +92,11 @@ results = query(
 │   └── *.yml
 └── index.yml            # Indice do corpus
 ```
+
+**Nota**: Por compatibilidade, o sistema tambem busca em:
+- `.claude/knowledge/` (legado)
+- `.claude/memory/` (legado)
+- `.agentic_sdlc/references/` (documentos externos via reference-indexer)
 
 ## Formato de Resultado
 
@@ -120,9 +127,9 @@ query_result:
 ### Com memory-manager
 
 O rag-query le dados salvos pelo memory-manager:
-- Decisoes em `.claude/memory/decisions/`
-- Learnings em `.claude/memory/learnings/`
-- Contextos em `.claude/memory/context/`
+- Decisoes em `.agentic_sdlc/corpus/decisions/` (ou `.claude/memory/decisions/` legado)
+- Learnings em `.agentic_sdlc/corpus/learnings/` (ou `.claude/memory/learnings/` legado)
+- Contextos em `.agentic_sdlc/projects/*/context/` (ou `.claude/memory/context/` legado)
 
 ### Com rag-curator
 
@@ -136,21 +143,30 @@ O rag-curator adiciona e organiza o corpus que o rag-query consulta.
 #!/usr/bin/env python3
 """
 Consulta o corpus de conhecimento do projeto.
+Suporta paths consolidados (.agentic_sdlc/corpus/) e legados (.claude/).
 """
 import yaml
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 import re
 
+# Paths consolidados (preferencia)
+CORPUS_DIR = Path(".agentic_sdlc/corpus")
+PROJECTS_DIR = Path(".agentic_sdlc/projects")
+REFERENCES_DIR = Path(".agentic_sdlc/references")
+
+# Paths legados (fallback)
 KNOWLEDGE_DIR = Path(".claude/knowledge")
 MEMORY_DIR = Path(".claude/memory")
 
 def load_all_decisions() -> List[Dict]:
-    """Carrega todas as decisoes."""
+    """Carrega todas as decisoes de paths consolidados e legados."""
     decisions = []
-    decisions_dir = MEMORY_DIR / "decisions"
-    if decisions_dir.exists():
-        for f in decisions_dir.glob("adr-*.yml"):
+
+    # Paths consolidados (preferencia)
+    corpus_decisions = CORPUS_DIR / "decisions"
+    if corpus_decisions.exists():
+        for f in corpus_decisions.glob("adr-*.yml"):
             data = yaml.safe_load(f.read_text())
             if data and "decision" in data:
                 decisions.append({
@@ -158,14 +174,40 @@ def load_all_decisions() -> List[Dict]:
                     "source_path": str(f),
                     "type": "decision"
                 })
+
+    # Paths por projeto
+    for project_dir in PROJECTS_DIR.glob("*/decisions"):
+        for f in project_dir.glob("adr-*.yml"):
+            data = yaml.safe_load(f.read_text())
+            if data and "decision" in data:
+                decisions.append({
+                    **data["decision"],
+                    "source_path": str(f),
+                    "type": "decision"
+                })
+
+    # Paths legados (fallback)
+    legacy_decisions = MEMORY_DIR / "decisions"
+    if legacy_decisions.exists():
+        for f in legacy_decisions.glob("adr-*.yml"):
+            data = yaml.safe_load(f.read_text())
+            if data and "decision" in data:
+                decisions.append({
+                    **data["decision"],
+                    "source_path": str(f),
+                    "type": "decision"
+                })
+
     return decisions
 
 def load_all_learnings() -> List[Dict]:
-    """Carrega todos os learnings."""
+    """Carrega todos os learnings de paths consolidados e legados."""
     learnings = []
-    learnings_dir = MEMORY_DIR / "learnings"
-    if learnings_dir.exists():
-        for f in learnings_dir.glob("*.yml"):
+
+    # Paths consolidados (preferencia)
+    corpus_learnings = CORPUS_DIR / "learnings"
+    if corpus_learnings.exists():
+        for f in corpus_learnings.glob("*.yml"):
             data = yaml.safe_load(f.read_text())
             if data and "learning" in data:
                 learnings.append({
@@ -173,6 +215,30 @@ def load_all_learnings() -> List[Dict]:
                     "source_path": str(f),
                     "type": "learning"
                 })
+
+    # Paths por projeto
+    for project_dir in PROJECTS_DIR.glob("*/learnings"):
+        for f in project_dir.glob("*.yml"):
+            data = yaml.safe_load(f.read_text())
+            if data and "learning" in data:
+                learnings.append({
+                    **data["learning"],
+                    "source_path": str(f),
+                    "type": "learning"
+                })
+
+    # Paths legados (fallback)
+    legacy_learnings = MEMORY_DIR / "learnings"
+    if legacy_learnings.exists():
+        for f in legacy_learnings.glob("*.yml"):
+            data = yaml.safe_load(f.read_text())
+            if data and "learning" in data:
+                learnings.append({
+                    **data["learning"],
+                    "source_path": str(f),
+                    "type": "learning"
+                })
+
     return learnings
 
 def calculate_relevance(item: Dict, keywords: List[str]) -> float:

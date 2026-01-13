@@ -1,6 +1,8 @@
 # Catálogo de Agentes
 
-Documentação completa dos **28+ agentes** do SDLC Agêntico.
+Documentação completa dos **34 agentes** do SDLC Agêntico:
+- **30 agentes orquestrados** (parte do fluxo automático por fase)
+- **4 agentes consultivos** (invocados sob demanda via @mention)
 
 ## Novos Agentes (v2.0)
 
@@ -841,19 +843,96 @@ observability_config:
 
 ---
 
-## Agentes Auxiliares (Existentes)
+## Agentes Consultivos (Especialistas sob Demanda)
+
+Estes agentes **não fazem parte da orquestração automática** do SDLC. São especialistas que podem ser invocados explicitamente via `@mention` quando necessário.
+
+**Quando usar agentes consultivos**:
+- Quando precisar de expertise específica durante uma fase
+- Para validar decisões ou requisitos
+- Para simular entrevistas ou revisões
 
 ### requirements-interrogator
-Elimina ambiguidade de requisitos. Questiona números, limites, latência, volume.
+
+**Propósito**: Elimina ambiguidade de requisitos em system design.
+
+**Quando usar**:
+- Requisitos vagos (sem números, limites, SLAs)
+- Falta clareza sobre volume, latência, consistência
+- Restrições não especificadas
+
+**Invocação**: `@requirements-interrogator analise os requisitos de...`
+
+**Exemplo de perguntas**:
+- "Qual o volume esperado de requisições por segundo?"
+- "Qual latência é aceitável para esta operação?"
+- "Qual o tamanho máximo de payload?"
+- "É aceitável perder dados em caso de falha?"
+
+---
 
 ### tradeoff-challenger
-Ataca decisões fracas e força trade-offs explícitos em arquitetura.
+
+**Propósito**: Ataca decisões fracas e força trade-offs explícitos em arquitetura.
+
+**Quando usar**:
+- Decisões sem justificativa clara
+- Tecnologia escolhida sem comparativo
+- Falta de análise de alternativas
+
+**Invocação**: `@tradeoff-challenger desafie a decisão de...`
+
+**Exemplo de desafios**:
+- "Por que PostgreSQL e não MongoDB para este caso?"
+- "Qual o custo de usar microserviços vs monolito?"
+- "O que acontece se esta dependência falhar?"
+- "Como escala quando dobrar a carga?"
+
+---
 
 ### failure-analyst
-Analisa falhas e resiliência. Foca em filas, jobs, consistência, pontos únicos de falha.
+
+**Propósito**: Analisa falhas e resiliência do sistema.
+
+**Quando usar**:
+- Design envolve filas, jobs, tempo real
+- Preocupação com consistência eventual
+- Identificar pontos únicos de falha
+- Analisar cenários de degradação
+
+**Invocação**: `@failure-analyst analise os pontos de falha de...`
+
+**Pontos de análise**:
+- Single Points of Failure (SPOF)
+- Estratégias de retry e backoff
+- Circuit breakers e fallbacks
+- Degradação graciosa
+- Recuperação de desastres
+
+---
 
 ### interview-simulator
-Simula entrevista de system design com perguntas de follow-up.
+
+**Propósito**: Simula entrevista de system design para treino ou validação.
+
+**Quando usar**:
+- Treinar defesa de arquitetura
+- Preparar para apresentação a stakeholders
+- Validar completude do design
+
+**Invocação**: `@interview-simulator simule entrevista para o sistema de...`
+
+**Formato da simulação**:
+1. Clarifying questions (requisitos)
+2. High-level design review
+3. Deep dive em componentes
+4. Trade-off discussions
+5. Bottleneck analysis
+6. Follow-up questions
+
+---
+
+**Nota**: Estes agentes não estão em `settings.json` como parte da orquestração porque são invocados sob demanda, não automaticamente por fase.
 
 ---
 

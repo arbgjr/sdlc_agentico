@@ -9,29 +9,32 @@ gate:
 
 required_artifacts:
   - name: "Sprint Plan"
-    path: ".specify/plans/*-sprint-*.md"
+    path: ".agentic_sdlc/projects/*/plans/*-sprint-*.md"
+    fallback_path: ".specify/plans/*-sprint-*.md"
     description: "Plano de sprint com stories alocadas"
 
   - name: "Tasks"
-    path: ".specify/tasks/*.md"
+    path: ".agentic_sdlc/projects/*/tasks/*.md"
+    fallback_path: ".specify/tasks/*.md"
     description: "Tasks quebradas e estimadas"
 
   - name: "Issues Created"
-    path: ".claude/memory/issue-mapping.yml"
+    path: ".agentic_sdlc/projects/*/issue-mapping.yml"
+    fallback_path: ".claude/memory/issue-mapping.yml"
     description: "Issues criadas no GitHub"
 
 quality_checks:
   - check: "Tasks estimadas"
-    validation: "grep -r 'estimate:' .specify/tasks/"
+    validation: "grep -r 'estimate:' .agentic_sdlc/projects/*/tasks/ .specify/tasks/ 2>/dev/null | head -1"
 
   - check: "Dependencias mapeadas"
-    validation: "grep -r 'dependencies:' .specify/tasks/"
+    validation: "grep -r 'dependencies:' .agentic_sdlc/projects/*/tasks/ .specify/tasks/ 2>/dev/null | head -1"
 
   - check: "Owners atribuidos"
-    validation: "grep -r 'assignee:' .specify/tasks/"
+    validation: "grep -r 'assignee:' .agentic_sdlc/projects/*/tasks/ .specify/tasks/ 2>/dev/null | head -1"
 
   - check: "Sprint capacity validada"
-    validation: "grep -r 'capacity:' .specify/plans/*-sprint-*"
+    validation: "grep -r 'capacity:' .agentic_sdlc/projects/*/plans/*-sprint-* .specify/plans/*-sprint-* 2>/dev/null | head -1"
 
 human_approval:
   required: false

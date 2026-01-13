@@ -9,57 +9,63 @@ gate:
 
 required_artifacts:
   - name: "Architecture Overview"
-    path: ".specify/plans/*.md"
+    path: ".agentic_sdlc/projects/*/architecture/*.md"
+    fallback_path: ".specify/plans/*.md"
     description: "Documento de arquitetura de alto nivel"
     agent: "system-architect"
 
   - name: "ADRs"
-    path: "docs/adr/*.md"
+    path: ".agentic_sdlc/projects/*/decisions/adr-*.yml"
+    fallback_path: "docs/adr/*.md"
     description: "Architecture Decision Records para decisoes significativas"
     agent: "adr-author"
 
   - name: "Technical Plan"
-    path: ".specify/plans/*-technical-plan.md"
+    path: ".agentic_sdlc/projects/*/plans/*-technical-plan.md"
+    fallback_path: ".specify/plans/*-technical-plan.md"
     description: "Plano tecnico detalhado"
     agent: "system-architect"
 
   - name: "Data Model"
-    path: "docs/data/*.md"
+    path: ".agentic_sdlc/projects/*/data/*.md"
+    fallback_path: "docs/data/*.md"
     description: "Modelo de dados e relacionamentos"
     agent: "data-architect"
 
   - name: "API Contracts"
-    path: "docs/api/*.yml"
+    path: ".agentic_sdlc/projects/*/api/*.yml"
+    fallback_path: "docs/api/*.yml"
     description: "Contratos de API (OpenAPI/AsyncAPI)"
     agent: "data-architect"
     optional_for_levels: [0, 1]
 
   - name: "Threat Model"
-    path: ".claude/memory/security/*.yml"
+    path: ".agentic_sdlc/projects/*/security/threat-model*.yml"
+    fallback_path: ".claude/memory/security/*.yml"
     description: "Analise de ameacas STRIDE"
     agent: "threat-modeler"
 
 quality_checks:
   - check: "Componentes definidos"
-    validation: "grep -r 'components:' .specify/plans/"
+    validation: "grep -r 'components:' .agentic_sdlc/projects/*/architecture/ .specify/plans/ 2>/dev/null | head -1"
 
   - check: "Tecnologias escolhidas"
-    validation: "grep -r 'technology_choices:' .specify/plans/"
+    validation: "grep -r 'technology_choices:' .agentic_sdlc/projects/*/architecture/ .specify/plans/ 2>/dev/null | head -1"
 
   - check: "NFRs enderecados"
-    validation: "grep -r 'nfr_approach:' .specify/plans/"
+    validation: "grep -r 'nfr_approach:' .agentic_sdlc/projects/*/architecture/ .specify/plans/ 2>/dev/null | head -1"
 
   - check: "Trade-offs documentados"
-    validation: "ls docs/adr/*.md 2>/dev/null | head -1"
+    validation: "ls .agentic_sdlc/projects/*/decisions/adr-*.yml docs/adr/*.md 2>/dev/null | head -1"
 
   - check: "Threat model realizado"
-    validation: "grep -r 'threat_model:' .claude/memory/"
+    validation: "grep -r 'threat_model:' .agentic_sdlc/projects/*/security/ .claude/memory/ 2>/dev/null | head -1"
 
   - check: "Modelo de dados definido"
-    validation: "grep -r 'entities:' docs/data/"
+    validation: "grep -r 'entities:' .agentic_sdlc/projects/*/data/ docs/data/ 2>/dev/null | head -1"
 
   - check: "Contratos de API especificados"
-    validation: "ls docs/api/*.yml 2>/dev/null | head -1"
+    validation: "ls .agentic_sdlc/projects/*/api/*.yml docs/api/*.yml 2>/dev/null | head -1"
 
 human_approval:
   required: true

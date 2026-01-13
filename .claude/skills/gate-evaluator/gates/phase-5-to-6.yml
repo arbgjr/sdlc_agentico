@@ -15,7 +15,7 @@ required_artifacts:
     description: "Testes unitarios"
     validation:
       - all_passing: true
-      - coverage_minimum: true
+      - coverage_minimum: 80  # Percentual minimo de cobertura (80%)
     path_pattern: "tests/unit/**/*"
 
   - type: integration_tests
@@ -43,11 +43,13 @@ quality_checks:
     metric: build_passing
     threshold: 1
     comparison: equal
+    description: "Build deve passar sem erros"
 
   - name: unit_test_coverage
     metric: unit_test_coverage
-    threshold: 0.8
+    threshold: 80  # 80% de cobertura minima
     comparison: greater_or_equal
+    description: "Cobertura de testes unitarios deve ser >= 80%"
 
   - name: code_quality_score
     metric: code_quality_score

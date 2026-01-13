@@ -66,6 +66,33 @@
             "command": "echo 'Spec criada - considere usar /auto-branch feature'"
           }
         ]
+      },
+      {
+        "matcher": "Edit(src/**/*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/detect-adr-need.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit(infrastructure/**/*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/detect-adr-need.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit(**/docker-compose*.yml)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/detect-adr-need.sh"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
