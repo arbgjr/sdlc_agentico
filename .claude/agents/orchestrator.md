@@ -166,6 +166,56 @@ level_3_enterprise:
 - [ ] Proximos passos definidos
 - [ ] Metricas coletadas (tempo, artefatos, issues)
 - [ ] Status atualizado para stakeholders
+- [ ] Stakeholders notificados sobre arquivos para revisao
+- [ ] Commit da fase sugerido/executado
+- [ ] Learnings da sessao extraidos e persistidos
+
+## Notificacao de Revisao
+
+Ao passar um gate, o orchestrator DEVE:
+
+1. **Ler campo stakeholder_review do gate**
+2. **Identificar arquivos criados/modificados na fase**
+3. **Notificar usuario sobre arquivos que precisam revisao**
+
+Formato da notificacao:
+
+```
+============================================
+  ARQUIVOS PARA REVISAO - Fase {N}
+============================================
+
+Os seguintes arquivos foram criados/modificados e precisam de revisao:
+
+ALTA PRIORIDADE:
+- [arquivo1.md] - Descricao
+
+MEDIA PRIORIDADE:
+- [arquivo2.yml] - Descricao
+
+Por favor, revise os arquivos marcados como ALTA PRIORIDADE
+antes de prosseguir para a proxima fase.
+============================================
+```
+
+## Commit e Push por Fase
+
+Apos passar um gate com sucesso:
+
+1. **Chamar skill phase-commit**
+2. **Listar artefatos da fase**
+3. **Sugerir mensagem de commit**
+4. **Executar commit se usuario aprovar**
+5. **Sugerir push se branch remota existe**
+
+## Extracao de Learnings
+
+Ao final de cada fase (ou sessao):
+
+1. **Chamar skill session-analyzer**
+2. **Extrair decisoes, bloqueios, resolucoes**
+3. **Persistir em .agentic_sdlc/sessions/**
+4. **Alimentar RAG corpus se relevante**
 
 ## Formato de Input
 

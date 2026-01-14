@@ -96,3 +96,42 @@ gate_conditions:
   - all_artifacts_present: true
   - all_quality_checks_passed: true
   - required_approvals_obtained: true
+
+stakeholder_review:
+  description: "Arquivos que stakeholders devem revisar antes de prosseguir"
+  notification: true
+  reviewers:
+    - role: product_owner
+      files:
+        - pattern: "docs/requirements*.md"
+          priority: high
+          description: "Documento de requisitos - validar completude"
+        - pattern: "docs/product/*.md"
+          priority: high
+          description: "Visao do produto e MVP"
+        - pattern: "docs/stories/*.md"
+          priority: medium
+          description: "User stories e prioridades"
+    - role: tech_lead
+      files:
+        - pattern: "docs/nfr*.md"
+          priority: high
+          description: "Requisitos nao funcionais - validar viabilidade"
+        - pattern: "*.spec.md"
+          priority: medium
+          description: "Especificacao tecnica"
+    - role: ux_designer
+      files:
+        - pattern: "docs/ux/*.md"
+          priority: high
+          description: "Especificacao de UX Writing"
+  message_template: |
+    ## Revisao de Fase 2 (Requirements) Necessaria
+
+    Os seguintes arquivos precisam ser revisados antes de avancar para Arquitetura:
+
+    {{#each files}}
+    - **{{this.description}}**: `{{this.pattern}}` (Prioridade: {{this.priority}})
+    {{/each}}
+
+    Por favor, revise e aprove para prosseguir.

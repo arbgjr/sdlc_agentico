@@ -25,23 +25,38 @@ Esta skill gerencia a memoria persistente do projeto, incluindo:
 
 ## Estrutura de Armazenamento
 
+**IMPORTANTE:** A partir da v1.2.0, todos os artefatos devem ser salvos em `.agentic_sdlc/`.
+O diretorio `.claude/memory/` e legado e sera migrado automaticamente.
+
 ```
-.claude/memory/
-├── project.yml              # Estado atual do projeto
-├── decisions/               # Decisoes registradas
-│   ├── adr-001.yml
-│   ├── adr-002.yml
-│   └── index.yml
-├── learnings/               # Licoes aprendidas
-│   ├── incident-001.yml
-│   └── retrospective-001.yml
-├── context/                 # Contexto por fase
-│   ├── phase-0.yml
-│   ├── phase-1.yml
-│   └── ...
-└── sessions/                # Historico de sessoes
-    └── session-{date}.yml
+.agentic_sdlc/
+├── projects/
+│   └── {project-id}/
+│       ├── manifest.yml         # Estado do projeto (antigo project.yml)
+│       ├── decisions/           # ADRs e decisoes
+│       │   ├── adr-001.yml
+│       │   ├── adr-002.yml
+│       │   └── index.yml
+│       ├── phases/              # Contexto por fase
+│       │   ├── phase-0.yml
+│       │   ├── phase-1.yml
+│       │   └── ...
+│       ├── specs/               # Especificacoes
+│       ├── security/            # Threat models, scans
+│       └── docs/                # Documentacao gerada
+├── corpus/
+│   ├── decisions/               # Decisoes indexadas para RAG
+│   ├── learnings/               # Licoes aprendidas
+│   ├── docs/                    # Documentacao pesquisavel
+│   └── research/                # Pesquisas de dominio
+├── sessions/                    # Historico de sessoes analisadas
+├── references/                  # Documentos de referencia externos
+└── templates/                   # Templates reutilizaveis
 ```
+
+### Migracao Automatica
+
+O hook `auto-migrate.sh` migra automaticamente de `.claude/memory/` para `.agentic_sdlc/` na primeira execucao de cada dia.
 
 ## Schema de Dados
 
@@ -240,13 +255,44 @@ O memory-manager alimenta o corpus RAG:
 #!/usr/bin/env python3
 """
 Operacoes de memoria para o SDLC.
+v1.2.0 - Usa .agentic_sdlc como diretorio principal
 """
 import yaml
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Dict, List, Any
+import os
 
-MEMORY_DIR = Path(".claude/memory")
+# Diretorio principal (v1.2.0+)
+AGENTIC_SDLC_DIR = Path(".agentic_sdlc")
+# Diretorio legado (para compatibilidade)
+LEGACY_MEMORY_DIR = Path(".claude/memory")
+
+def get_project_dir(project_id: str = None) -> Path:
+    """Retorna diretorio do projeto atual."""
+    if project_id is None:
+        # Tentar obter do manifest ou project.yml
+        project_id = get_current_project_id()
+    return AGENTIC_SDLC_DIR / "projects" / project_id
+
+def get_current_project_id() -> str:
+    """Obtem ID do projeto atual."""
+    # Verificar .agentic_sdlc primeiro
+    current_file = AGENTIC_SDLC_DIR / ".current-project"
+    if current_file.exists():
+        return current_file.read_text().strip()
+
+    # Fallback para .claude/memory
+    if (LEGACY_MEMORY_DIR / "project.yml").exists():
+        with open(LEGACY_MEMORY_DIR / "project.yml") as f:
+            data = yaml.safe_load(f)
+            return data.get("project", {}).get("id", "default")
+
+    return "default"
+
+def get_memory_dir(project_id: str = None) -> Path:
+    """Retorna diretorio de memoria do projeto."""
+    return get_project_dir(project_id)
 
 def ensure_structure():
     """Garante que a estrutura de diretorios existe."""

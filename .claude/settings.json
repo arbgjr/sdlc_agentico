@@ -8,6 +8,33 @@
   "hooks": {
     "PreToolUse": [
       {
+        "matcher": "Write(.agentic_sdlc/**/*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/ensure-feature-branch.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write(src/**/*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/ensure-feature-branch.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit(src/**/*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/ensure-feature-branch.sh"
+          }
+        ]
+      },
+      {
         "matcher": "Bash(git commit*)",
         "hooks": [
           {
@@ -101,6 +128,10 @@
           {
             "type": "command",
             "command": ".claude/hooks/detect-phase.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/auto-migrate.sh"
           }
         ]
       }
@@ -153,7 +184,9 @@
       "iac-generator",
       "doc-blueprint",
       "reference-indexer",
-      "system-design-decision-engine"
+      "system-design-decision-engine",
+      "phase-commit",
+      "session-analyzer"
     ]
   },
   "sdlc": {

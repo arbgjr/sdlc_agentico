@@ -1,0 +1,67 @@
+decision:
+  id: adr-threat-model-agenda-001
+  type: security
+  title: "Threat Model STRIDE para Agenda Inteligente"
+  created_at: "2026-01-13T00:00:00Z"
+  status: accepted
+  phase: 3
+  author: threat-modeler
+
+  context: |
+    Aplicativo Android de agenda com dados sensíveis de saúde (medicamentos).
+    Compliance com LGPD Art. 11 é obrigatório.
+    Backend Firebase (Auth + Firestore).
+
+  decision: |
+    Foram identificadas 20 ameaças usando framework STRIDE:
+    - 3 CRÍTICAS (DREAD >= 7.0)
+    - 9 ALTAS
+    - 7 MÉDIAS
+    - 1 BAIXA
+
+    Principais riscos:
+    1. I-001 (DREAD 9.2): Firestore Rules mal configuradas
+    2. S-001 (DREAD 7.0): Falta de MFA
+    3. E-001 (DREAD 7.6): IDOR em dados de medicação
+
+  consequences:
+    positive:
+      - "Identificação proativa de 3 riscos críticos ANTES da implementação"
+      - "Plano de mitigação priorizado (14 action items)"
+      - "Compliance LGPD documentado"
+      - "Redução de risco de vazamento de dados de saúde"
+
+    negative:
+      - "Aumento de escopo (MFA, App Check, Audit Log)"
+      - "Necessidade de penetration test antes de GA"
+      - "Custo adicional com segurança"
+
+    risks:
+      - "Se não mitigar P0: violação de LGPD Art. 11 (multa de 2% faturamento)"
+      - "Risco à saúde dos usuários se alarmes forem comprometidos"
+      - "Dano reputacional irreparável em caso de vazamento"
+
+  related_decisions: []
+  approvers:
+    - "security-lead (pendente)"
+    - "dpo (pendente)"
+
+  metadata:
+    complexity: high
+    reversible: false
+    cost_impact: "Alto (security tools + penetration test)"
+    compliance: ["LGPD Art. 11", "LGPD Art. 46", "LGPD Art. 48"]
+
+  artifacts:
+    - path: ".agentic_sdlc/projects/agenda-inteligente/security/threat-model-agenda-inteligente.yml"
+      type: threat_model
+    - path: ".agentic_sdlc/projects/agenda-inteligente/security/THREAT-MODEL-SUMMARY.md"
+      type: documentation
+
+  tags:
+    - security
+    - stride
+    - lgpd
+    - health-data
+    - firebase
+    - android

@@ -12,6 +12,10 @@ SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orc
 - Infrastructure as Code (IaC) generation
 - Automatic documentation generation
 - Quality gates between all phases
+- Commit automation per phase (v1.2.0)
+- Session learning and knowledge extraction (v1.2.0)
+- Stakeholder review notifications (v1.2.0)
+- Automatic migration to `.agentic_sdlc/` (v1.2.0)
 
 ## Setup Commands
 
@@ -181,6 +185,9 @@ Hooks are triggered automatically:
 | `auto-branch.sh` | Creates branches automatically (fix/, feature/, hotfix/, release/) |
 | `update-project-timestamp.sh` | Updates project manifest with real UTC timestamp |
 | `detect-phase.sh` | Detects current SDLC phase from context |
+| `ensure-feature-branch.sh` | Verifies proper branch before creating files (v1.2.0) |
+| `auto-migrate.sh` | Migrates artifacts from `.claude/memory` to `.agentic_sdlc` (v1.2.0) |
+| `phase-commit-reminder.sh` | Reminds to commit after passing a gate (v1.2.0) |
 
 ## Integrations
 
@@ -203,6 +210,8 @@ Available skills for automation:
 | `iac-generator` | Generates Infrastructure as Code (Terraform, Bicep, K8s) |
 | `doc-blueprint` | Generates documentation blueprints (README, API, Architecture) |
 | `reference-indexer` | Indexes external reference documents for RAG |
+| `phase-commit` | Commits artifacts at the end of each phase (v1.2.0) |
+| `session-analyzer` | Extracts learnings from Claude Code sessions (v1.2.0) |
 
 ## New Agents (v2.0)
 
