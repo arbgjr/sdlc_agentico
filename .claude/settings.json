@@ -132,6 +132,10 @@
           {
             "type": "command",
             "command": ".claude/hooks/auto-migrate.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/detect-documents.sh"
           }
         ]
       }

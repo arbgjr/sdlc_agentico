@@ -24,6 +24,7 @@ model: sonnet
 skills:
   - rag-query
   - spec-kit-integration
+  - document-processor
 ---
 
 # Requirements Analyst Agent
@@ -256,6 +257,81 @@ user_story:
     - API de pedidos ja existe: GET /api/v1/orders
     - Paginacao deve usar cursor, nao offset
 ```
+
+## Processamento de Documentos de Requisitos
+
+Quando requisitos vem em documentos (PDF, XLSX, DOCX), use o skill `document-processor`:
+
+### Quando Usar
+
+```yaml
+document_processing_triggers:
+  - Especificacao em PDF
+  - Matriz de requisitos em Excel
+  - Documento de visao em Word
+  - RFP/RFI de cliente
+```
+
+### Comandos Disponveis
+
+```bash
+# Extrair requisitos de documento
+/doc-extract especificacao.pdf
+
+# Processar matriz de requisitos
+/doc-extract matriz-requisitos.xlsx
+
+# Extrair de documento Word com tracked changes
+/doc-extract requisitos.docx
+```
+
+### Fluxo com Documentos
+
+```yaml
+requirements_from_documents:
+  1_extract:
+    - /doc-extract para obter texto/dados
+    - Preservar estrutura original
+
+  2_parse:
+    - Identificar requisitos funcionais
+    - Identificar NFRs
+    - Detectar criterios de aceite implicitos
+
+  3_transform:
+    - Converter para formato INVEST
+    - Criar user stories
+    - Mapear acceptance criteria
+
+  4_validate:
+    - Verificar completude
+    - Identificar ambiguidades
+    - Listar perguntas abertas
+```
+
+### Matriz de Requisitos (Excel)
+
+Se receber planilha Excel com matriz de requisitos:
+
+```yaml
+excel_requirements_matrix:
+  expected_columns:
+    - ID
+    - Descricao
+    - Prioridade
+    - Tipo (funcional/nao-funcional)
+    - Status
+
+  extraction:
+    command: "/doc-extract matriz.xlsx"
+    output: "JSON com dados estruturados"
+
+  transformation:
+    - Cada linha vira user story ou NFR
+    - Prioridade mapeia para must/should/could
+```
+
+---
 
 ## Checklist de Qualidade
 

@@ -24,6 +24,7 @@ model: sonnet
 skills:
   - rag-query
   - bmad-integration
+  - document-processor
 ---
 
 # Intake Analyst Agent
@@ -199,6 +200,57 @@ intake_result:
 
   next_agent: "compliance-guardian"
 ```
+
+## Processamento de Documentos
+
+Quando a demanda vem acompanhada de documentos (PDF, XLSX, DOCX), use o skill `document-processor`:
+
+### Quando Usar
+
+```yaml
+document_processing_triggers:
+  - Usuario enviou arquivo PDF com requisitos
+  - Planilha Excel com dados de entrada
+  - Documento Word com especificacoes
+  - Contrato ou documento legal para analisar
+```
+
+### Comandos Disponveis
+
+```bash
+# Extrair texto de documento
+/doc-extract requisitos.pdf
+
+# Extrair dados de planilha
+/doc-extract dados.xlsx
+
+# Validar documento
+/doc-validate relatorio.xlsx
+```
+
+### Fluxo de Intake com Documentos
+
+```yaml
+intake_with_documents:
+  1_receive:
+    - Identificar documentos anexados
+    - Classificar tipo (requisitos, dados, legal)
+
+  2_extract:
+    - Usar /doc-extract para cada documento
+    - Coletar texto/dados estruturados
+
+  3_analyze:
+    - Extrair requisitos do conteudo
+    - Identificar stakeholders mencionados
+    - Detectar restricoes e prazos
+
+  4_integrate:
+    - Incorporar ao intake_result
+    - Referenciar documentos originais
+```
+
+---
 
 ## Checklist
 

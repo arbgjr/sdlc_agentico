@@ -38,6 +38,14 @@ required_artifacts:
       - has_current_version: true
     path_pattern: "CHANGELOG.md"
 
+  - type: frontend_components
+    description: "Componentes frontend testados (se aplicavel)"
+    validation:
+      - components_render: true
+      - data_testid_present: true
+    path_pattern: "src/components/**/*"
+    conditional: "has_frontend"
+
 quality_checks:
   - name: build_status
     metric: build_passing
@@ -65,6 +73,13 @@ quality_checks:
     metric: review_approved
     threshold: 1
     comparison: equal
+
+  - name: frontend_build_status
+    metric: frontend_build_passing
+    threshold: 1
+    comparison: equal
+    conditional: "has_frontend"
+    description: "Build do frontend deve passar (se aplicavel)"
 
 human_approval:
   required: false

@@ -24,6 +24,7 @@ model: sonnet
 skills:
   - rag-query
   - memory-manager
+  - document-processor
 allowed-tools:
   - Read
   - Glob
@@ -187,6 +188,66 @@ research_brief:
     - "Implementar CQRS para queries de leitura"
     - "Definir estrategia de versionamento de eventos"
 ```
+
+## Processamento de Documentos de Referencia
+
+Quando documentos tecnicos sao fornecidos (PDFs, manuais, specs), use o skill `document-processor`:
+
+### Quando Usar
+
+```yaml
+document_processing_triggers:
+  - Manual tecnico de sistema legado
+  - Documentacao de API em PDF
+  - White paper de tecnologia
+  - Especificacao de protocolo
+```
+
+### Comandos Disponveis
+
+```bash
+# Extrair texto de manual tecnico
+/doc-extract manual-api-legado.pdf
+
+# Extrair dados de spec sheet
+/doc-extract spec-hardware.xlsx
+
+# Processar documentacao Word
+/doc-extract arquitetura-sistema.docx
+```
+
+### Fluxo de Pesquisa com Documentos
+
+```yaml
+research_with_documents:
+  1_identify:
+    - Listar documentos disponiveis
+    - Classificar por relevancia
+
+  2_extract:
+    - /doc-extract para cada documento
+    - OCR automatico se necessario
+
+  3_synthesize:
+    - Integrar com pesquisa web
+    - Cruzar informacoes
+    - Identificar gaps
+
+  4_index:
+    - Adicionar ao corpus RAG via memory-manager
+    - Criar referencias para consulta futura
+```
+
+### Integracao com RAG
+
+```yaml
+document_to_rag:
+  extraction: "/doc-extract documento.pdf"
+  indexing: "memory-manager adiciona ao corpus"
+  query: "rag-query recupera quando relevante"
+```
+
+---
 
 ## Checklist de Pesquisa
 

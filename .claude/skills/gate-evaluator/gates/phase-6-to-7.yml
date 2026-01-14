@@ -12,6 +12,17 @@ required_artifacts:
       - no_critical_defects: true
     path_pattern: "docs/qa/*.md"
 
+  - type: frontend_test_report
+    description: "Relatorio de testes E2E frontend (se aplicavel)"
+    agent: "qa-analyst"
+    skill: "frontend-testing"
+    validation:
+      - e2e_tests_executed: true
+      - screenshots_captured: true
+      - no_console_errors: true
+    path_pattern: "docs/qa/frontend-*.md"
+    conditional: "has_frontend"
+
   - type: security_scan_report
     description: "Relatorio de scan de seguranca"
     agent: "security-scanner"
@@ -77,6 +88,20 @@ quality_checks:
     metric: circuit_breaker_tested
     threshold: 1
     comparison: equal
+
+  - name: frontend_e2e_pass_rate
+    metric: frontend_e2e_pass_rate
+    threshold: 1.0
+    comparison: equal
+    conditional: "has_frontend"
+    description: "Testes E2E frontend devem passar (se aplicavel)"
+
+  - name: frontend_console_errors
+    metric: frontend_console_error_count
+    threshold: 0
+    comparison: equal
+    conditional: "has_frontend"
+    description: "Console do browser sem erros criticos"
 
 human_approval:
   required: true

@@ -23,6 +23,7 @@ description: |
 model: sonnet
 skills:
   - rag-query
+  - frontend-testing
 ---
 
 # QA Analyst Agent
@@ -339,6 +340,61 @@ qa_sdlc_integration:
     - Gerar quality report
     - Aprovar ou bloquear release
 ```
+
+## Frontend Testing
+
+Quando o projeto inclui frontend web, use o skill `frontend-testing` para:
+
+### Quando Usar
+
+```yaml
+frontend_testing_triggers:
+  - Projeto tem frontend React/Vue/Angular
+  - Criterios de aceite incluem UI/UX
+  - Precisa validar fluxos de usuario
+  - Regressao visual e importante
+```
+
+### Comandos Disponveis
+
+```bash
+# Capturar screenshot da aplicacao
+/frontend-screenshot http://localhost:3000
+
+# Executar testes E2E
+/frontend-test http://localhost:3000
+
+# Verificar dependencias
+/frontend-check
+```
+
+### Integracao com Test Plan
+
+```yaml
+test_plan_frontend:
+  e2e_tests:
+    tool: "frontend-testing (Playwright)"
+    coverage: "Happy paths principais"
+    automation: 80%
+
+  visual_tests:
+    method: "Screenshots para comparacao"
+    tool: "/frontend-screenshot"
+
+  accessibility:
+    check: "data-testid em elementos interativos"
+```
+
+### Checklist Frontend QA
+
+- [ ] Aplicacao inicia sem erros
+- [ ] Screenshots capturados dos fluxos principais
+- [ ] Testes E2E passando
+- [ ] Console sem erros criticos
+- [ ] Elementos interativos tem data-testid
+- [ ] Estados de loading/error/empty validados
+
+---
 
 ## Checklist
 
