@@ -16,6 +16,9 @@ SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orc
 - Session learning and knowledge extraction (v1.2.0)
 - Stakeholder review notifications (v1.2.0)
 - Automatic migration to `.agentic_sdlc/` (v1.2.0)
+- Document processing (PDF, XLSX, DOCX) for requirements extraction (v1.3.0)
+- Frontend E2E testing with Playwright integration (v1.3.0)
+- Automatic document detection hook (v1.3.0)
 
 ## Setup Commands
 
@@ -175,7 +178,7 @@ Agents use different models based on task complexity:
 Hooks are triggered automatically:
 - `PreToolUse`: Validates commits, checks gates before push, updates project timestamp
 - `PostToolUse`: Formats Python files with black, reminds about ADR updates
-- `UserPromptSubmit`: Detects current SDLC phase
+- `UserPromptSubmit`: Detects current SDLC phase, detects documents in project (v1.3.0)
 
 ### Available Hooks
 | Hook | Purpose |
@@ -188,6 +191,7 @@ Hooks are triggered automatically:
 | `ensure-feature-branch.sh` | Verifies proper branch before creating files (v1.2.0) |
 | `auto-migrate.sh` | Migrates artifacts from `.claude/memory` to `.agentic_sdlc` (v1.2.0) |
 | `phase-commit-reminder.sh` | Reminds to commit after passing a gate (v1.2.0) |
+| `detect-documents.sh` | Detects PDF/XLSX/DOCX files and suggests document-processor (v1.3.0) |
 
 ## Integrations
 
@@ -284,6 +288,23 @@ These skills implement patterns extracted from official Anthropic skills:
 | **Reconnaissance-Then-Action** | Discover DOM selectors, never hardcode |
 
 Patterns documented at: `.agentic_sdlc/corpus/patterns/anthropic-skills-patterns.md`
+
+### Skill Integration with Agents (v1.3.0)
+
+Skills are automatically available to agents based on their phase:
+
+| Agent | Skills | Phase |
+|-------|--------|-------|
+| `intake-analyst` | document-processor | 0 |
+| `domain-researcher` | document-processor | 1 |
+| `requirements-analyst` | document-processor | 2 |
+| `qa-analyst` | frontend-testing | 6 |
+
+**Quality Gates with Frontend Testing:**
+- Phase 5→6: `frontend_build_passing` (conditional)
+- Phase 6→7: `frontend_e2e_pass_rate`, `frontend_console_error_count` (conditional)
+
+All frontend checks are conditional (`has_frontend`) and only applied when project has frontend code.
 
 ## New Agents (v2.0)
 

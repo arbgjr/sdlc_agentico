@@ -48,6 +48,50 @@ jobs:
           echo "Skills on disk: $ondisk"
           echo "✓ Skill check complete"
 
+  validate-skill-scripts:
+    name: Validate Skill Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check Python syntax in skills
+        run: |
+          echo "Validating Python scripts in skills..."
+          errors=0
+          for script in .claude/skills/*/scripts/*.py; do
+            if [ -f "$script" ]; then
+              echo "Checking $script..."
+              if ! python3 -m py_compile "$script" 2>/dev/null; then
+                echo "❌ Syntax error in $script"
+                errors=$((errors + 1))
+              fi
+            fi
+          done
+          if [ $errors -gt 0 ]; then
+            echo "❌ Found $errors Python syntax errors"
+            exit 1
+          fi
+          echo "✓ All Python scripts have valid syntax"
+
+      - name: Validate skill structure
+        run: |
+          echo "Checking skill structure..."
+          for skill_dir in .claude/skills/*/; do
+            skill_name=$(basename "$skill_dir")
+            echo "Checking skill: $skill_name"
+
+            # Check for SKILL.md
+            if [ ! -f "${skill_dir}SKILL.md" ]; then
+              echo "⚠ Warning: ${skill_name} missing SKILL.md"
+            fi
+          done
+          echo "✓ Skill structure check complete"
+
   lint-markdown:
     name: Lint Markdown
     runs-on: ubuntu-latest
