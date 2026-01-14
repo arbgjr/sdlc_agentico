@@ -18,6 +18,7 @@ O SDLC Agêntico é um framework que usa **34 agentes especializados** (30 orque
 │  34 Agentes | 9 Fases | Quality Gates | Security by Design             │
 │  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot        │
 │  Phase Commits | Session Learning | Stakeholder Reviews (v1.2.0)       │
+│  Document Processing | Frontend E2E Testing | Patterns (v1.3.0)        │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -96,15 +97,15 @@ O sistema se integra com o **GitHub Copilot Coding Agent**:
 # O Copilot implementa automaticamente e cria PRs
 ```
 
-### Novidades v1.2.0
+### Changelog
 
-| Feature | Descrição |
-|---------|-----------|
-| **Phase Commits** | Commit automático ao final de cada fase com mensagem padronizada |
-| **Session Learning** | Extrai learnings de sessões Claude Code e persiste no corpus RAG |
-| **Stakeholder Reviews** | Notifica usuário sobre arquivos que precisam revisão em cada gate |
-| **Auto-Migration** | Migração automática de `.claude/memory` para `.agentic_sdlc/` |
-| **Branch Validation** | Verifica branch correta antes de criar/editar arquivos |
+Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanças.
+
+**Destaques da v1.3.0:**
+- Processamento de documentos (PDF, XLSX, DOCX) com OCR e validação
+- Testes E2E frontend com Playwright
+- Detecção automática de documentos
+- Padrões de design dos skills oficiais Anthropic
 
 ## Comandos Disponíveis
 
@@ -126,9 +127,9 @@ O sistema se integra com o **GitHub Copilot Coding Agent**:
 ```
 .claude/
 ├── agents/           # 34 agentes especializados (30 + 4 consultivos)
-├── skills/           # 11 skills reutilizáveis
+├── skills/           # 13 skills reutilizáveis (+2 em v1.3.0)
 ├── commands/         # 10 comandos do usuário
-├── hooks/            # 8 hooks de automação
+├── hooks/            # 9 hooks de automação (+1 em v1.3.0)
 └── settings.json     # Configuração central
 
 .agentic_sdlc/        # Artefatos do SDLC (NOVO)
@@ -143,12 +144,18 @@ O sistema se integra com o **GitHub Copilot Coding Agent**:
 └── install-security-tools.sh # Ferramentas de segurança opcionais
 
 .docs/
-├── AGENTS.md         # Catálogo de agentes
-├── COMMANDS.md       # Referência de comandos
-├── QUICKSTART.md     # Guia rápido
-├── INFRASTRUCTURE.md # Setup e integração
-├── DESENVOLVIMENTO.md # Padrões de desenvolvimento C#
-└── playbook.md       # Playbook do SDLC
+├── guides/                   # Guias de uso
+│   ├── quickstart.md         # Guia rápido
+│   ├── infrastructure.md     # Setup e integração
+│   └── troubleshooting.md    # Resolução de problemas
+├── sdlc/                     # Documentação do SDLC
+│   ├── agents.md             # Catálogo de agentes
+│   ├── commands.md           # Referência de comandos
+│   └── overview.md           # Visão geral do framework
+├── engineering-playbook/     # Padrões de engenharia
+│   ├── manual-desenvolvimento/ # Standards, práticas, qualidade
+│   └── stacks/               # .NET, Python, Rust, DevOps
+└── examples/                 # Exemplos de uso
 ```
 
 ## Requisitos
@@ -215,10 +222,11 @@ gh auth login
 
 | Documento | Descrição |
 |-----------|-----------|
-| [QUICKSTART.md](.docs/QUICKSTART.md) | Guia rápido de início |
-| [INFRASTRUCTURE.md](.docs/INFRASTRUCTURE.md) | Setup e integração |
-| [AGENTS.md](.docs/AGENTS.md) | Catálogo de agentes |
-| [COMMANDS.md](.docs/COMMANDS.md) | Referência de comandos |
+| [quickstart.md](.docs/guides/quickstart.md) | Guia rápido de início |
+| [infrastructure.md](.docs/guides/infrastructure.md) | Setup e integração |
+| [agents.md](.docs/sdlc/agents.md) | Catálogo de agentes |
+| [commands.md](.docs/sdlc/commands.md) | Referência de comandos |
+| [engineering-playbook](.docs/engineering-playbook/) | Padrões de engenharia |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Como contribuir |
 
 ## Exemplo de Uso
