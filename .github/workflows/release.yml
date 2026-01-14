@@ -29,19 +29,55 @@ jobs:
           cp -r .claude release-package/
           rm -f release-package/.claude/settings.local.json
 
-          # Copy only templates from .agentic_sdlc/
+          # Copy templates and patterns from .agentic_sdlc/
           mkdir -p release-package/.agentic_sdlc
+
+          # Copy templates
           if [ -d ".agentic_sdlc/templates" ]; then
             cp -r .agentic_sdlc/templates release-package/.agentic_sdlc/
           fi
 
-          # Copy only necessary files from .docs/
+          # Copy corpus patterns (design patterns documentation)
+          if [ -d ".agentic_sdlc/corpus/patterns" ]; then
+            mkdir -p release-package/.agentic_sdlc/corpus
+            cp -r .agentic_sdlc/corpus/patterns release-package/.agentic_sdlc/corpus/
+          fi
+
+          # Create empty directories for user data
+          mkdir -p release-package/.agentic_sdlc/projects
+          mkdir -p release-package/.agentic_sdlc/references
+          mkdir -p release-package/.agentic_sdlc/sessions
+          touch release-package/.agentic_sdlc/projects/.gitkeep
+          touch release-package/.agentic_sdlc/references/.gitkeep
+          touch release-package/.agentic_sdlc/sessions/.gitkeep
+
+          # Copy documentation from .docs/
           mkdir -p release-package/.docs
-          for file in AGENTS.md COMMANDS.md QUICKSTART.md INFRASTRUCTURE.md DESENVOLVIMENTO.md playbook.md; do
-            if [ -f ".docs/$file" ]; then
-              cp ".docs/$file" release-package/.docs/
-            fi
-          done
+
+          # Copy README
+          if [ -f ".docs/README.md" ]; then
+            cp .docs/README.md release-package/.docs/
+          fi
+
+          # Copy guides
+          if [ -d ".docs/guides" ]; then
+            cp -r .docs/guides release-package/.docs/
+          fi
+
+          # Copy SDLC documentation
+          if [ -d ".docs/sdlc" ]; then
+            cp -r .docs/sdlc release-package/.docs/
+          fi
+
+          # Copy engineering playbook (standards, practices)
+          if [ -d ".docs/engineering-playbook" ]; then
+            cp -r .docs/engineering-playbook release-package/.docs/
+          fi
+
+          # Copy examples
+          if [ -d ".docs/examples" ]; then
+            cp -r .docs/examples release-package/.docs/
+          fi
 
           # Copy scripts
           mkdir -p release-package/.scripts
@@ -94,8 +130,14 @@ jobs:
           echo "### Package Contents" >> release_notes.md
           echo "" >> release_notes.md
           echo "- \`.claude/\` - Agents, skills, commands, hooks, and settings" >> release_notes.md
-          echo "- \`.agentic_sdlc/templates/\` - ADR, spec, and threat model templates" >> release_notes.md
-          echo "- \`.docs/\` - Documentation and playbook" >> release_notes.md
+          echo "- \`.agentic_sdlc/\` - SDLC artifacts:" >> release_notes.md
+          echo "  - \`templates/\` - ADR, spec, and threat model templates" >> release_notes.md
+          echo "  - \`corpus/patterns/\` - Design patterns (Anthropic skills)" >> release_notes.md
+          echo "- \`.docs/\` - Documentation:" >> release_notes.md
+          echo "  - \`guides/\` - Quickstart, infrastructure, troubleshooting" >> release_notes.md
+          echo "  - \`sdlc/\` - Agents, commands, and SDLC overview" >> release_notes.md
+          echo "  - \`engineering-playbook/\` - Development standards and practices" >> release_notes.md
+          echo "  - \`examples/\` - Usage examples" >> release_notes.md
           echo "- \`.scripts/\` - Setup and utility scripts" >> release_notes.md
           echo "- \`CLAUDE.md\` - Project instructions for Claude Code" >> release_notes.md
           echo "- \`README.md\` - Project documentation" >> release_notes.md
