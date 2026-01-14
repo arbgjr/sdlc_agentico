@@ -186,7 +186,9 @@
       "reference-indexer",
       "system-design-decision-engine",
       "phase-commit",
-      "session-analyzer"
+      "session-analyzer",
+      "document-processor",
+      "frontend-testing"
     ]
   },
   "sdlc": {

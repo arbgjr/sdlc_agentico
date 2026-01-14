@@ -212,6 +212,78 @@ Available skills for automation:
 | `reference-indexer` | Indexes external reference documents for RAG |
 | `phase-commit` | Commits artifacts at the end of each phase (v1.2.0) |
 | `session-analyzer` | Extracts learnings from Claude Code sessions (v1.2.0) |
+| `document-processor` | Processes PDF, XLSX, DOCX documents for requirements extraction (v1.3.0) |
+| `frontend-testing` | E2E testing with Playwright, screenshots, browser logs (v1.3.0) |
+
+## New Skills (v1.3.0) - Document Processing & Frontend Testing
+
+### document-processor
+
+Processes enterprise documents with production-grade quality:
+
+```bash
+# Extract text/tables from documents
+/doc-extract requirements.pdf
+/doc-extract financials.xlsx
+/doc-extract spec.docx
+
+# Validate document integrity
+/doc-validate report.xlsx  # Check Excel formulas
+/doc-validate contract.docx  # Check formatting
+```
+
+**Features:**
+- PDF extraction with OCR support for scanned documents
+- Excel formula validation using LibreOffice headless
+- Word tracked changes detection (OOXML parsing)
+- Zero-error policy for generated documents
+
+**Dependencies (optional):**
+```bash
+./.scripts/setup-sdlc.sh --install-optional
+# Or manually: pip install pdfplumber openpyxl python-docx
+# System: apt install poppler-utils tesseract-ocr libreoffice
+```
+
+### frontend-testing
+
+E2E testing for web applications using Playwright:
+
+```bash
+# Run E2E tests
+/frontend-test http://localhost:3000
+
+# Capture screenshots
+/frontend-screenshot http://localhost:3000 homepage
+
+# Health check
+/frontend-check http://localhost:3000
+```
+
+**Features:**
+- Reconnaissance-then-action pattern
+- Server lifecycle management (with_server.py)
+- Console error capture and reporting
+- Integration with qa-analyst for Phase 6
+
+**Dependencies (optional):**
+```bash
+pip install playwright pytest-playwright
+playwright install chromium
+```
+
+### Design Patterns (from Anthropic Skills)
+
+These skills implement patterns extracted from official Anthropic skills:
+
+| Pattern | Description |
+|---------|-------------|
+| **Validation-First** | Separate creation from validation, collect ALL errors before reporting |
+| **Multi-Tool Strategy** | Python for processing, Node.js for creation, CLI for validation |
+| **Zero-Error Policy** | Generated documents must have zero errors |
+| **Reconnaissance-Then-Action** | Discover DOM selectors, never hardcode |
+
+Patterns documented at: `.agentic_sdlc/corpus/patterns/anthropic-skills-patterns.md`
 
 ## New Agents (v2.0)
 

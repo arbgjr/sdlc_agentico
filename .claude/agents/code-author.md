@@ -110,6 +110,130 @@ tests/
     └── test_{domain}_api.py
 ```
 
+### Estrutura de Arquivos (Frontend React/TypeScript)
+
+```
+src/
+├── components/
+│   ├── ui/              # Componentes base (Button, Input, Card)
+│   ├── features/        # Componentes de feature
+│   └── layouts/         # Layouts de pagina
+├── hooks/               # Custom hooks
+├── lib/                 # Utilitarios
+├── services/            # Chamadas de API
+├── stores/              # Estado global
+├── types/               # TypeScript types
+└── styles/              # CSS/Tailwind customizations
+```
+
+## Frontend Development Guidelines
+
+Baseado nos principios do frontend-design skill da Anthropic.
+
+### Design Philosophy
+
+> "Bold maximalism and refined minimalism both work - the key is intentionality, not intensity."
+> "No design should be the same."
+
+### Processo de Design (Antes de Implementar)
+
+1. **Purpose & Audience** - Qual problema resolve? Quem usa?
+2. **Aesthetic Tone** - Escolher direcao distinta (nao generica)
+3. **Technical Constraints** - Framework, performance, acessibilidade
+
+### Direcionamentos Esteticos Validos
+
+| Direcao | Caracteristicas |
+|---------|-----------------|
+| Brutalist | Raw, honesto, sem decoracao |
+| Maximalist | Rico em detalhes, camadas |
+| Retro-futuristic | Nostalgia + modernidade |
+| Organic | Curvas, natureza, suavidade |
+| Luxury | Espacamento generoso, tipografia elegante |
+| Playful | Cores vibrantes, interacoes divertidas |
+| Editorial | Tipografia forte, grid rigoroso |
+
+### Anti-Patterns: Evitar "AI Slop"
+
+❌ **NAO FAZER:**
+- Fontes genericas (Arial, Inter como padrao)
+- Gradientes roxos/azuis cliches
+- Centralizacao excessiva de tudo
+- Bordas arredondadas uniformes
+- Layouts previsiveis e simetricos
+- Designs sem carater especifico ao contexto
+
+✅ **FAZER:**
+- Escolher fontes bonitas, unicas, interessantes
+- Paletas de cores coesas com CSS variables
+- Layouts inesperados (assimetria, sobreposicao, diagonal)
+- Elementos que quebram o grid intencionalmente
+- Animacoes de alto impacto em pontos estrategicos
+
+### Checklist Frontend
+
+```yaml
+frontend_checklist:
+  typography:
+    - [ ] Fonte principal nao e Arial/Inter/system
+    - [ ] Hierarquia tipografica clara
+    - [ ] Line-height e letter-spacing ajustados
+
+  colors:
+    - [ ] Paleta definida com CSS variables
+    - [ ] Contraste adequado (WCAG AA)
+    - [ ] Estados interativos (hover, focus, active)
+
+  layout:
+    - [ ] Grid/Flexbox usado apropriadamente
+    - [ ] Espacamento consistente (spacing scale)
+    - [ ] Responsivo (mobile-first)
+
+  interaction:
+    - [ ] Feedback visual para acoes
+    - [ ] Animacoes sutis mas significativas
+    - [ ] Estados de loading/error/empty
+```
+
+### Componentes Recomendados
+
+Para projetos React/TypeScript, considerar:
+- **shadcn/ui**: Componentes acessiveis e customizaveis
+- **Radix UI**: Primitivos de acessibilidade
+- **Tailwind CSS**: Utility-first styling
+
+### Exemplo: Componente com Design Intencional
+
+```tsx
+// ❌ Generico (AI Slop)
+<button className="bg-purple-500 rounded-lg px-4 py-2 text-white">
+  Submit
+</button>
+
+// ✅ Intencional (Design consciente)
+<button
+  className="
+    bg-slate-900 text-slate-50
+    px-6 py-3
+    font-medium tracking-wide
+    border border-slate-800
+    hover:bg-slate-800 hover:border-slate-700
+    focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2
+    transition-all duration-200
+    active:scale-[0.98]
+  "
+>
+  Submit
+</button>
+```
+
+### Integracao com frontend-testing
+
+Apos implementar frontend:
+1. Use `/frontend-screenshot` para capturar estado
+2. Use `/frontend-test` para validar E2E
+3. Garanta `data-testid` em elementos interativos
+
 ### Checklist de Codigo
 
 ```yaml

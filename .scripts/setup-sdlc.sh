@@ -45,6 +45,8 @@ echo ""
 FROM_RELEASE=false
 VERSION="latest"
 SKIP_DEPS=false
+INSTALL_OPTIONAL=false
+CHECK_OPTIONAL=false
 
 # Parse de argumentos
 parse_args() {
@@ -60,6 +62,14 @@ parse_args() {
                 ;;
             --skip-deps)
                 SKIP_DEPS=true
+                shift
+                ;;
+            --install-optional)
+                INSTALL_OPTIONAL=true
+                shift
+                ;;
+            --check-optional)
+                CHECK_OPTIONAL=true
                 shift
                 ;;
             --help|-h)
@@ -80,10 +90,12 @@ show_usage() {
     echo "Uso: $0 [opcoes]"
     echo ""
     echo "Opcoes:"
-    echo "  --from-release    Instala a partir de uma release do GitHub"
-    echo "  --version <tag>   Especifica versao (ex: v1.0.0). Padrao: latest"
-    echo "  --skip-deps       Pula instalacao de dependencias (Python, Node, etc)"
-    echo "  --help            Mostra esta mensagem"
+    echo "  --from-release      Instala a partir de uma release do GitHub"
+    echo "  --version <tag>     Especifica versao (ex: v1.0.0). Padrao: latest"
+    echo "  --skip-deps         Pula instalacao de dependencias (Python, Node, etc)"
+    echo "  --install-optional  Instala dependencias opcionais (document-processor, frontend-testing)"
+    echo "  --check-optional    Apenas verifica dependencias opcionais"
+    echo "  --help              Mostra esta mensagem"
     echo ""
     echo "Exemplos:"
     echo "  # Instalacao local (apos clonar repo)"
@@ -459,6 +471,95 @@ make_scripts_executable() {
     fi
 }
 
+# Verificar dependencias opcionais (document-processor e frontend-testing skills)
+check_optional_deps() {
+    log_info "Verificando dependencias opcionais dos skills..."
+    echo ""
+
+    # Verificar dependencias Python para document-processor
+    local PYTHON_DEPS_MISSING=""
+
+    for pkg in pdfplumber openpyxl python-docx pandas; do
+        if python3 -c "import ${pkg//-/_}" 2>/dev/null; then
+            log_success "Python: $pkg"
+        else
+            PYTHON_DEPS_MISSING="$PYTHON_DEPS_MISSING $pkg"
+        fi
+    done
+
+    # Verificar Playwright
+    if python3 -c "import playwright" 2>/dev/null; then
+        log_success "Python: playwright"
+    else
+        PYTHON_DEPS_MISSING="$PYTHON_DEPS_MISSING playwright"
+    fi
+
+    # Verificar ferramentas de sistema
+    echo ""
+    log_info "Ferramentas de sistema (opcionais):"
+
+    if command -v pdftotext &> /dev/null; then
+        log_success "pdftotext (poppler-utils)"
+    else
+        log_warn "pdftotext nao instalado (apt install poppler-utils)"
+    fi
+
+    if command -v tesseract &> /dev/null; then
+        log_success "tesseract (OCR)"
+    else
+        log_warn "tesseract nao instalado (apt install tesseract-ocr)"
+    fi
+
+    if command -v libreoffice &> /dev/null; then
+        log_success "libreoffice (validacao XLSX)"
+    else
+        log_warn "libreoffice nao instalado (apt install libreoffice)"
+    fi
+
+    # Sugerir instalacao
+    if [[ -n "$PYTHON_DEPS_MISSING" ]]; then
+        echo ""
+        log_info "Para instalar dependencias Python faltantes:"
+        echo "  pip install$PYTHON_DEPS_MISSING"
+    fi
+
+    echo ""
+}
+
+# Instalar dependencias opcionais
+install_optional_deps() {
+    log_info "Instalando dependencias opcionais dos skills..."
+    echo ""
+
+    # Dependencias Python
+    log_info "Instalando pacotes Python..."
+    pip install pdfplumber openpyxl python-docx pandas playwright pytest-playwright defusedxml 2>/dev/null || {
+        log_warn "Alguns pacotes Python podem nao ter sido instalados"
+    }
+
+    # Instalar browser do Playwright
+    log_info "Instalando browser Chromium para Playwright..."
+    python3 -m playwright install chromium 2>/dev/null || {
+        log_warn "Playwright browser nao foi instalado"
+    }
+
+    # Dependencias de sistema (Linux apenas)
+    if [[ "$OS" == "linux" ]]; then
+        log_info "Instalando ferramentas de sistema..."
+        sudo apt-get install -y poppler-utils tesseract-ocr 2>/dev/null || {
+            log_warn "Algumas ferramentas de sistema nao foram instaladas"
+        }
+    elif [[ "$OS" == "macos" ]]; then
+        log_info "Instalando ferramentas de sistema..."
+        brew install poppler tesseract 2>/dev/null || {
+            log_warn "Algumas ferramentas de sistema nao foram instaladas"
+        }
+    fi
+
+    log_success "Dependencias opcionais instaladas"
+    echo ""
+}
+
 # Resumo final
 print_summary() {
     echo ""
@@ -484,8 +585,13 @@ print_summary() {
     echo "  5. Criar issues para Copilot:"
     echo "     gh issue create --assignee \"@copilot\" --title \"...\""
     echo ""
-    echo "Ferramentas opcionais de seguranca:"
+    echo "Ferramentas opcionais:"
+    echo "  # Seguranca:"
     echo "  ./.scripts/install-security-tools.sh --all"
+    echo ""
+    echo "  # Skills (document-processor, frontend-testing):"
+    echo "  ./.scripts/setup-sdlc.sh --check-optional    # Verificar"
+    echo "  ./.scripts/setup-sdlc.sh --install-optional  # Instalar"
     echo ""
     echo "Documentacao:"
     echo "  - .docs/QUICKSTART.md"
@@ -528,6 +634,15 @@ main() {
     check_claude_structure
     enable_copilot_agent
     run_checks
+
+    # Dependencias opcionais
+    if [[ "$CHECK_OPTIONAL" == "true" ]]; then
+        check_optional_deps
+    fi
+
+    if [[ "$INSTALL_OPTIONAL" == "true" ]]; then
+        install_optional_deps
+    fi
 
     print_summary
 }
