@@ -1,3 +1,5 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 # SDLC Agêntico
 
 Sistema de desenvolvimento de software orientado por agentes de IA que automatiza e coordena todo o ciclo de vida do desenvolvimento.
@@ -290,8 +292,8 @@ Veja [CONTRIBUTING.md](CONTRIBUTING.md) para guidelines de contribuição.
 
 ## Licença
 
-MIT
+[MIT](LICENSE)
 
 ---
 
-**Criado com** Claude Code + GitHub Copilot
+**Criado em conjunto com** Claude Code + GitHub Copilot
