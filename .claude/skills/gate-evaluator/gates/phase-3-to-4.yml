@@ -84,3 +84,42 @@ blockers:
   - "NFRs nao enderecados"
   - "Modelo de dados nao definido"
   - "Contratos de API nao especificados"
+
+stakeholder_review:
+  description: "Arquivos que stakeholders devem revisar antes de prosseguir para Planning"
+  notification: true
+  reviewers:
+    - role: tech_lead
+      files:
+        - pattern: ".agentic_sdlc/projects/*/architecture/*.md"
+          priority: high
+          description: "Arquitetura de alto nivel"
+        - pattern: ".agentic_sdlc/projects/*/decisions/adr-*.yml"
+          priority: high
+          description: "Decisoes arquiteturais (ADRs)"
+        - pattern: ".agentic_sdlc/projects/*/plans/*-technical-plan.md"
+          priority: high
+          description: "Plano tecnico detalhado"
+    - role: security_lead
+      files:
+        - pattern: ".agentic_sdlc/projects/*/security/threat-model*.yml"
+          priority: critical
+          description: "Modelo de ameacas STRIDE"
+    - role: data_lead
+      files:
+        - pattern: ".agentic_sdlc/projects/*/data/*.md"
+          priority: high
+          description: "Modelo de dados"
+        - pattern: ".agentic_sdlc/projects/*/api/*.yml"
+          priority: medium
+          description: "Contratos de API"
+  message_template: |
+    ## Revisao de Fase 3 (Architecture) Necessaria
+
+    Os seguintes arquivos de arquitetura precisam ser revisados:
+
+    {{#each files}}
+    - **{{this.description}}**: `{{this.pattern}}` (Prioridade: {{this.priority}})
+    {{/each}}
+
+    Por favor, revise e aprove para prosseguir para Planning.
