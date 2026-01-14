@@ -2,8 +2,8 @@
 **/bin/
 **/obj/
 
-# Não ignore arquivos de configuração locais
-!.claude/settings.local.json
+# Configurações locais (não versionar)
+.claude/settings.local.json
 
 # Outras regras comuns
 *.user

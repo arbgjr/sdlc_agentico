@@ -17,6 +17,7 @@ O SDLC Agêntico é um framework que usa **34 agentes especializados** (30 orque
 │                                                                         │
 │  34 Agentes | 9 Fases | Quality Gates | Security by Design             │
 │  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot        │
+│  Phase Commits | Session Learning | Stakeholder Reviews (v1.2.0)       │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -95,6 +96,16 @@ O sistema se integra com o **GitHub Copilot Coding Agent**:
 # O Copilot implementa automaticamente e cria PRs
 ```
 
+### Novidades v1.2.0
+
+| Feature | Descrição |
+|---------|-----------|
+| **Phase Commits** | Commit automático ao final de cada fase com mensagem padronizada |
+| **Session Learning** | Extrai learnings de sessões Claude Code e persiste no corpus RAG |
+| **Stakeholder Reviews** | Notifica usuário sobre arquivos que precisam revisão em cada gate |
+| **Auto-Migration** | Migração automática de `.claude/memory` para `.agentic_sdlc/` |
+| **Branch Validation** | Verifica branch correta antes de criar/editar arquivos |
+
 ## Comandos Disponíveis
 
 | Comando | Descrição |
@@ -115,9 +126,9 @@ O sistema se integra com o **GitHub Copilot Coding Agent**:
 ```
 .claude/
 ├── agents/           # 34 agentes especializados (30 + 4 consultivos)
-├── skills/           # 9 skills reutilizáveis
+├── skills/           # 11 skills reutilizáveis
 ├── commands/         # 10 comandos do usuário
-├── hooks/            # 5 hooks de automação
+├── hooks/            # 8 hooks de automação
 └── settings.json     # Configuração central
 
 .agentic_sdlc/        # Artefatos do SDLC (NOVO)
@@ -157,7 +168,7 @@ O sistema se integra com o **GitHub Copilot Coding Agent**:
 curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
 
 # Versão específica
-curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.0.0
+curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.2.0
 ```
 
 Se o diretório `.claude/` já existir, o script perguntará o que fazer:
