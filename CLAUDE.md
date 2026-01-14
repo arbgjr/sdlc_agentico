@@ -19,6 +19,10 @@ SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orc
 - Document processing (PDF, XLSX, DOCX) for requirements extraction (v1.3.0)
 - Frontend E2E testing with Playwright integration (v1.3.0)
 - Automatic document detection hook (v1.3.0)
+- Semantic knowledge graph with hybrid search (v1.4.0)
+- Automatic concept extraction from documents (v1.4.0)
+- Graph visualization with Mermaid diagrams (v1.4.0)
+- Graph integrity quality gate (v1.4.0)
 
 ## Setup Commands
 
@@ -192,6 +196,7 @@ Hooks are triggered automatically:
 | `auto-migrate.sh` | Migrates artifacts from `.claude/memory` to `.agentic_sdlc` (v1.2.0) |
 | `phase-commit-reminder.sh` | Reminds to commit after passing a gate (v1.2.0) |
 | `detect-documents.sh` | Detects PDF/XLSX/DOCX files and suggests document-processor (v1.3.0) |
+| `auto-graph-sync.sh` | Updates semantic graph when corpus nodes are modified (v1.4.0) |
 
 ## Integrations
 
@@ -218,6 +223,7 @@ Available skills for automation:
 | `session-analyzer` | Extracts learnings from Claude Code sessions (v1.2.0) |
 | `document-processor` | Processes PDF, XLSX, DOCX documents for requirements extraction (v1.3.0) |
 | `frontend-testing` | E2E testing with Playwright, screenshots, browser logs (v1.3.0) |
+| `graph-navigator` | Semantic graph navigation, concept extraction, visualization (v1.4.0) |
 
 ## New Skills (v1.3.0) - Document Processing & Frontend Testing
 
@@ -305,6 +311,69 @@ Skills are automatically available to agents based on their phase:
 - Phase 6→7: `frontend_e2e_pass_rate`, `frontend_console_error_count` (conditional)
 
 All frontend checks are conditional (`has_frontend`) and only applied when project has frontend code.
+
+## New Skills (v1.4.0) - Semantic Knowledge Graph
+
+### graph-navigator
+
+Navigate and query the semantic knowledge graph:
+
+```bash
+# Build graph from corpus
+python .claude/skills/graph-navigator/scripts/graph_builder.py --infer
+
+# Search with graph expansion
+python .claude/skills/rag-query/scripts/hybrid_search.py "database" --mode hybrid
+
+# Find related decisions
+python .claude/skills/graph-navigator/scripts/graph_manager.py neighbors ADR-001 --hops 2
+
+# Find path between decisions
+python .claude/skills/graph-navigator/scripts/graph_manager.py path ADR-001 ADR-010
+
+# Generate visualization
+python .claude/skills/graph-navigator/scripts/graph_visualizer.py --format mermaid
+
+# Extract concepts from documents
+python .claude/skills/graph-navigator/scripts/concept_extractor.py --output save
+```
+
+**Features:**
+- Hybrid search combining text + graph traversal
+- Multi-hop neighbor queries (find related nodes)
+- Shortest path between nodes
+- Transitive closure (all dependencies)
+- Concept extraction with confidence scores
+- Mermaid diagram generation
+- DOT format export for Graphviz
+
+**Semantic Relations:**
+| Relation | Meaning |
+|----------|---------|
+| `supersedes` | Replaces previous decision |
+| `implements` | Implements a pattern |
+| `addresses` | Addresses a requirement |
+| `dependsOn` | Depends on another decision |
+| `relatedTo` | Generic bidirectional relation |
+| `isA` | Concept hierarchy |
+
+**Corpus Structure (v1.4.0):**
+```
+.agentic_sdlc/corpus/
+├── nodes/                  # Reorganized node storage
+│   ├── decisions/          # ADRs
+│   ├── learnings/          # Lessons learned
+│   ├── patterns/           # Design patterns
+│   └── concepts/           # Extracted concepts
+├── graph.json              # Semantic graph
+├── adjacency.json          # Fast traversal index
+├── index.yml               # Text search index
+└── schema/context.json     # Relation definitions
+```
+
+**Quality Gate:**
+- `graph-integrity.yml` validates graph structure before release
+- Checks for orphan edges, valid relations, coverage thresholds
 
 ## New Agents (v2.0)
 

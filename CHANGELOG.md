@@ -7,6 +7,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-01-14
+
+### Added
+
+- **Semantic Knowledge Graph** (`graph-navigator` skill)
+  - Hybrid search combining text + graph traversal
+  - Multi-hop neighbor queries (find related nodes)
+  - Shortest path finding between nodes
+  - Transitive closure for dependency analysis
+  - Graph statistics and centrality metrics
+  - Commands: neighbors, path, closure, stats, validate
+
+- **Concept Extraction** (`concept_extractor.py`)
+  - Automatic extraction of concepts from corpus documents
+  - Seed-based matching for technologies, patterns, domains
+  - Pattern-based extraction (CamelCase, kebab-case)
+  - Confidence scoring for extracted concepts
+  - Saved as YAML files in `nodes/concepts/`
+
+- **Hybrid Search** (`hybrid_search.py`)
+  - Combined text + graph search for RAG corpus
+  - TF-IDF based text search with caching
+  - Graph expansion from text results
+  - Filtering by phase, concept, and node type
+  - Integrated with `rag-query` skill
+
+- **Graph Visualization** (`graph_visualizer.py`)
+  - Mermaid diagram generation
+  - DOT format export (for Graphviz)
+  - Subgraph generation around specific nodes
+  - Filtering by type and phase
+  - Graph metrics and centrality analysis
+
+- **Graph Integrity Gate** (`graph-integrity.yml`)
+  - Validates graph.json and adjacency.json
+  - Checks for orphan edges
+  - Validates relation types
+  - Concept and relation coverage thresholds
+
+- **Auto Graph Sync Hook** (`auto-graph-sync.sh`)
+  - Automatically updates graph when corpus nodes are modified
+  - Incremental updates for single file changes
+  - Triggered by PostToolUse on Write operations
+
+- **Reorganized Corpus Structure**
+  - `nodes/` directory with subdirectories for decisions, learnings, patterns, concepts
+  - `schema/context.json` with semantic relation definitions
+  - `graph.json` as main graph with nodes and edges
+  - `adjacency.json` for fast traversal index
+  - `index.yml` for text search
+  - `.cache/` for search result caching
+
+### Changed
+
+- Updated corpus structure for v1.4.0 compatibility
+- Enhanced `rag-query` skill with hybrid search support
+- Updated CLAUDE.md with v1.4.0 documentation
+
 ## [1.3.0] - 2026-01-14
 
 ### Added

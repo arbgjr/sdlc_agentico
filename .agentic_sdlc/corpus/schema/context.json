@@ -1,0 +1,119 @@
+{
+  "version": "1.4.0",
+  "description": "Semantic relation definitions for SDLC Agentico knowledge graph",
+
+  "node_types": {
+    "Decision": {
+      "prefix": "ADR-",
+      "description": "Architecture Decision Record",
+      "required_fields": ["id", "title", "status", "date"],
+      "optional_fields": ["context", "decision", "consequences", "semantic"]
+    },
+    "Learning": {
+      "prefix": "LEARNING-",
+      "description": "Lesson learned from incidents, retrospectives, or discoveries",
+      "required_fields": ["id", "title", "type"],
+      "optional_fields": ["insight", "actions", "source", "semantic"]
+    },
+    "Pattern": {
+      "prefix": "PATTERN-",
+      "description": "Reusable design or implementation pattern",
+      "required_fields": ["id", "title"],
+      "optional_fields": ["description", "implementation", "examples", "semantic"]
+    },
+    "Concept": {
+      "prefix": "CONCEPT-",
+      "description": "Extracted concept from corpus documents",
+      "required_fields": ["id", "label"],
+      "optional_fields": ["description", "aliases", "semantic", "metadata"]
+    }
+  },
+
+  "relation_types": {
+    "supersedes": {
+      "description": "Replaces a previous decision",
+      "inverse": "supersededBy",
+      "valid_sources": ["Decision"],
+      "valid_targets": ["Decision"]
+    },
+    "implements": {
+      "description": "Implements a pattern or standard",
+      "inverse": "implementedBy",
+      "valid_sources": ["Decision"],
+      "valid_targets": ["Pattern", "Concept"]
+    },
+    "addresses": {
+      "description": "Addresses a requirement or concern",
+      "inverse": "addressedBy",
+      "valid_sources": ["Decision"],
+      "valid_targets": ["Concept"]
+    },
+    "causedBy": {
+      "description": "Learning caused by an incident or event",
+      "inverse": "caused",
+      "valid_sources": ["Learning"],
+      "valid_targets": ["Decision", "Learning"]
+    },
+    "relatedTo": {
+      "description": "Generic bidirectional relation",
+      "inverse": "relatedTo",
+      "valid_sources": ["Decision", "Learning", "Pattern", "Concept"],
+      "valid_targets": ["Decision", "Learning", "Pattern", "Concept"]
+    },
+    "dependsOn": {
+      "description": "Depends on another decision or pattern",
+      "inverse": "dependedOnBy",
+      "valid_sources": ["Decision", "Pattern"],
+      "valid_targets": ["Decision", "Pattern", "Concept"]
+    },
+    "usedIn": {
+      "description": "Used in a specific SDLC phase",
+      "inverse": "uses",
+      "valid_sources": ["Decision", "Pattern"],
+      "valid_targets": ["Concept"]
+    },
+    "isA": {
+      "description": "Concept hierarchy (is-a relationship)",
+      "inverse": "hasSubtype",
+      "valid_sources": ["Concept"],
+      "valid_targets": ["Concept"]
+    },
+    "partOf": {
+      "description": "Part-of relationship",
+      "inverse": "hasPart",
+      "valid_sources": ["Concept", "Pattern"],
+      "valid_targets": ["Concept", "Pattern"]
+    }
+  },
+
+  "concept_categories": {
+    "technology": {
+      "description": "Technology, framework, or tool",
+      "examples": ["postgresql", "docker", "kubernetes"]
+    },
+    "pattern": {
+      "description": "Design or architectural pattern",
+      "examples": ["microservices", "cqrs", "event-sourcing"]
+    },
+    "domain": {
+      "description": "Domain concept or capability",
+      "examples": ["authentication", "logging", "monitoring"]
+    },
+    "process": {
+      "description": "Process or methodology",
+      "examples": ["agile", "devops", "cicd"]
+    }
+  },
+
+  "sdlc_phases": {
+    "0": "Preparation",
+    "1": "Discovery",
+    "2": "Requirements",
+    "3": "Architecture",
+    "4": "Planning",
+    "5": "Implementation",
+    "6": "Quality",
+    "7": "Release",
+    "8": "Operations"
+  }
+}

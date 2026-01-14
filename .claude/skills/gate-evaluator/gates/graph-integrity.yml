@@ -1,0 +1,288 @@
+# Graph Integrity Quality Gate
+# Validates semantic graph structure and consistency
+
+gate_id: graph-integrity
+name: Graph Integrity Gate
+version: "1.0"
+description: |
+  Validates the semantic knowledge graph for:
+  - File existence and validity
+  - Edge consistency (no orphans)
+  - Adjacency synchronization
+  - Coverage thresholds
+
+triggers:
+  - after_graph_build
+  - before_release
+  - manual
+
+# Gate checks
+checks:
+  # ==================== Critical Checks ====================
+
+  - id: graph_file_exists
+    name: Graph file exists
+    description: The graph.json file must exist
+    severity: critical
+    type: file_exists
+    config:
+      path: .agentic_sdlc/corpus/graph.json
+
+  - id: graph_file_valid_json
+    name: Graph file is valid JSON
+    description: The graph.json must be parseable JSON
+    severity: critical
+    type: script
+    config:
+      language: python
+      script: |
+        import json
+        from pathlib import Path
+
+        graph_file = Path(".agentic_sdlc/corpus/graph.json")
+        if not graph_file.exists():
+            raise AssertionError("graph.json does not exist")
+
+        try:
+            with open(graph_file) as f:
+                data = json.load(f)
+            assert "nodes" in data, "Missing 'nodes' key"
+            assert "edges" in data, "Missing 'edges' key"
+        except json.JSONDecodeError as e:
+            raise AssertionError(f"Invalid JSON: {e}")
+
+  - id: adjacency_file_exists
+    name: Adjacency file exists
+    description: The adjacency.json file must exist
+    severity: critical
+    type: file_exists
+    config:
+      path: .agentic_sdlc/corpus/adjacency.json
+
+  # ==================== High Severity Checks ====================
+
+  - id: no_orphan_edges
+    name: No orphan edges
+    description: All edge sources must exist as nodes
+    severity: high
+    type: script
+    config:
+      language: python
+      script: |
+        import json
+        from pathlib import Path
+
+        with open(".agentic_sdlc/corpus/graph.json") as f:
+            graph = json.load(f)
+
+        node_ids = {n["id"] for n in graph.get("nodes", [])}
+        orphan_sources = []
+
+        for edge in graph.get("edges", []):
+            if edge["source"] not in node_ids:
+                orphan_sources.append(edge["source"])
+
+        if orphan_sources:
+            raise AssertionError(
+                f"Found {len(orphan_sources)} orphan edge sources: "
+                f"{orphan_sources[:5]}"
+            )
+
+  - id: adjacency_sync
+    name: Adjacency synchronized
+    description: Adjacency must match graph edges
+    severity: high
+    type: script
+    config:
+      language: python
+      script: |
+        import json
+
+        with open(".agentic_sdlc/corpus/graph.json") as f:
+            graph = json.load(f)
+        with open(".agentic_sdlc/corpus/adjacency.json") as f:
+            adj_data = json.load(f)
+
+        adjacency = adj_data.get("adjacency", {})
+
+        # Count edges in adjacency
+        adj_edge_count = 0
+        for node_adj in adjacency.values():
+            for targets in node_adj.get("outgoing", {}).values():
+                adj_edge_count += len(targets)
+
+        graph_edge_count = len(graph.get("edges", []))
+
+        # Allow small difference due to external targets
+        diff = abs(adj_edge_count - graph_edge_count)
+        if diff > graph_edge_count * 0.1:  # More than 10% difference
+            raise AssertionError(
+                f"Edge count mismatch: graph={graph_edge_count}, "
+                f"adjacency={adj_edge_count}"
+            )
+
+  # ==================== Medium Severity Checks ====================
+
+  - id: node_has_required_fields
+    name: Nodes have required fields
+    description: All nodes must have id, type, and title
+    severity: medium
+    type: script
+    config:
+      language: python
+      script: |
+        import json
+
+        with open(".agentic_sdlc/corpus/graph.json") as f:
+            graph = json.load(f)
+
+        invalid_nodes = []
+        for node in graph.get("nodes", []):
+            if not node.get("id"):
+                invalid_nodes.append("missing id")
+            elif not node.get("type"):
+                invalid_nodes.append(f"{node['id']}: missing type")
+            elif not node.get("title"):
+                invalid_nodes.append(f"{node['id']}: missing title")
+
+        if invalid_nodes:
+            raise AssertionError(
+                f"Found {len(invalid_nodes)} invalid nodes: "
+                f"{invalid_nodes[:5]}"
+            )
+
+  - id: valid_relation_types
+    name: Valid relation types
+    description: All edges must use defined relation types
+    severity: medium
+    type: script
+    config:
+      language: python
+      script: |
+        import json
+
+        VALID_RELATIONS = {
+            "supersedes", "implements", "addresses", "causedBy",
+            "relatedTo", "dependsOn", "usedIn", "isA", "partOf"
+        }
+
+        with open(".agentic_sdlc/corpus/graph.json") as f:
+            graph = json.load(f)
+
+        invalid_relations = []
+        for edge in graph.get("edges", []):
+            if edge["relation"] not in VALID_RELATIONS:
+                invalid_relations.append(
+                    f"{edge['source']}->{edge['target']}: {edge['relation']}"
+                )
+
+        if invalid_relations:
+            raise AssertionError(
+                f"Found {len(invalid_relations)} invalid relations: "
+                f"{invalid_relations[:5]}"
+            )
+
+  # ==================== Low Severity Checks ====================
+
+  - id: concept_coverage
+    name: Concept coverage >= 30%
+    description: At least 30% of nodes should have concepts
+    severity: low
+    type: script
+    config:
+      language: python
+      script: |
+        import json
+
+        with open(".agentic_sdlc/corpus/graph.json") as f:
+            graph = json.load(f)
+
+        nodes = graph.get("nodes", [])
+        if not nodes:
+            return  # Skip if no nodes
+
+        with_concepts = sum(
+            1 for n in nodes
+            if n.get("concepts") and len(n["concepts"]) > 0
+        )
+
+        coverage = with_concepts / len(nodes)
+        if coverage < 0.3:
+            raise AssertionError(
+                f"Concept coverage {coverage:.1%} < 30% threshold"
+            )
+
+  - id: relation_coverage
+    name: Relation coverage >= 20%
+    description: At least 20% of nodes should have relations
+    severity: low
+    type: script
+    config:
+      language: python
+      script: |
+        import json
+
+        with open(".agentic_sdlc/corpus/adjacency.json") as f:
+            adj_data = json.load(f)
+
+        adjacency = adj_data.get("adjacency", {})
+        if not adjacency:
+            return  # Skip if empty
+
+        with_edges = sum(
+            1 for adj in adjacency.values()
+            if adj.get("outgoing") or adj.get("incoming")
+        )
+
+        coverage = with_edges / len(adjacency) if adjacency else 0
+        if coverage < 0.2:
+            raise AssertionError(
+                f"Relation coverage {coverage:.1%} < 20% threshold"
+            )
+
+  - id: no_self_loops
+    name: No self-referential edges
+    description: Nodes should not reference themselves
+    severity: low
+    type: script
+    config:
+      language: python
+      script: |
+        import json
+
+        with open(".agentic_sdlc/corpus/graph.json") as f:
+            graph = json.load(f)
+
+        self_loops = [
+            e for e in graph.get("edges", [])
+            if e["source"] == e["target"]
+        ]
+
+        if self_loops:
+            raise AssertionError(
+                f"Found {len(self_loops)} self-referential edges"
+            )
+
+# Pass thresholds by severity
+pass_threshold:
+  critical: 100%
+  high: 100%
+  medium: 80%
+  low: 50%
+
+# Actions on failure
+actions_on_failure:
+  - notify: orchestrator
+  - block_release: true
+  - suggest_fix: |
+      Run the following to rebuild the graph:
+      python .claude/skills/graph-navigator/scripts/graph_builder.py --infer
+
+# Remediation commands
+remediation:
+  rebuild_graph: |
+    python .claude/skills/graph-navigator/scripts/graph_builder.py --infer
+  validate_only: |
+    python .claude/skills/graph-navigator/scripts/graph_manager.py validate
+  show_stats: |
+    python .claude/skills/graph-navigator/scripts/graph_manager.py stats
