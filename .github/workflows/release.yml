@@ -25,9 +25,13 @@ jobs:
           # Create temporary directory for package
           mkdir -p release-package
 
-          # Copy .claude/ directory (excluding settings.local.json)
+          # Copy .claude/ directory (excluding local/documentation files)
           cp -r .claude release-package/
           rm -f release-package/.claude/settings.local.json
+          rm -rf release-package/.claude/memory
+          rm -rf release-package/.claude/guides
+          rm -f release-package/.claude/best-practices.md
+          rm -f release-package/.claude/quick-reference.md
 
           # Copy templates and patterns from .agentic_sdlc/
           mkdir -p release-package/.agentic_sdlc
@@ -74,10 +78,7 @@ jobs:
             cp -r .docs/engineering-playbook release-package/.docs/
           fi
 
-          # Copy examples
-          if [ -d ".docs/examples" ]; then
-            cp -r .docs/examples release-package/.docs/
-          fi
+          # NOTE: .docs/examples/ is NOT included in the package (development only)
 
           # Copy scripts
           mkdir -p release-package/.scripts
@@ -86,9 +87,10 @@ jobs:
             cp .scripts/install-security-tools.sh release-package/.scripts/
           fi
 
-          # Copy root files
-          cp CLAUDE.md release-package/
+          # Copy root files (CLAUDE.md is NOT included - project-specific)
           cp README.md release-package/
+          cp CHANGELOG.md release-package/
+          cp LICENSE release-package/
 
           # Create ZIP
           cd release-package
@@ -137,10 +139,10 @@ jobs:
           echo "  - \`guides/\` - Quickstart, infrastructure, troubleshooting" >> release_notes.md
           echo "  - \`sdlc/\` - Agents, commands, and SDLC overview" >> release_notes.md
           echo "  - \`engineering-playbook/\` - Development standards and practices" >> release_notes.md
-          echo "  - \`examples/\` - Usage examples" >> release_notes.md
           echo "- \`.scripts/\` - Setup and utility scripts" >> release_notes.md
-          echo "- \`CLAUDE.md\` - Project instructions for Claude Code" >> release_notes.md
           echo "- \`README.md\` - Project documentation" >> release_notes.md
+          echo "- \`CHANGELOG.md\` - Version history" >> release_notes.md
+          echo "- \`LICENSE\` - License information" >> release_notes.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

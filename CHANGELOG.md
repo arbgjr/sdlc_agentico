@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-01-14
+
+### Changed
+
+- **Release Pipeline** (`release.yml`)
+  - Removed `CLAUDE.md` from package (project-specific, not distributable)
+  - Added `CHANGELOG.md` and `LICENSE` to package
+  - Excluded `.docs/examples/` from package (development only)
+  - Excluded internal documentation files from package:
+    - `.claude/memory/` (migrated to `.agentic_sdlc/`)
+    - `.claude/guides/` (internal reference)
+    - `.claude/best-practices.md` (internal reference)
+    - `.claude/quick-reference.md` (internal reference)
+  - Updated release notes template to reflect package changes
+
+### Removed
+
+- **`.claude/memory/`**: Removed residual folder (migrated to `.agentic_sdlc/sessions/` in v1.2.0)
+
 ## [1.6.0] - 2026-01-14
 
 ### Added
