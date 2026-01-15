@@ -192,7 +192,8 @@
       "phase-commit",
       "session-analyzer",
       "document-processor",
-      "frontend-testing"
+      "frontend-testing",
+      "decay-scoring"
     ]
   },
   "sdlc": {

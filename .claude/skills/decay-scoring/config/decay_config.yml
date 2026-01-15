@@ -1,0 +1,63 @@
+version: "1.0.0"
+description: "Configuracao do sistema de decay scoring"
+
+# Pesos para calculo do score final
+weights:
+  age: 0.40
+  validation: 0.30
+  access: 0.20
+  type_bonus: 0.10
+
+# Half-life em dias por tipo de conteudo
+# Quanto maior, mais lento o decaimento
+half_lives:
+  concepts: 365    # Conhecimento fundamental, muito estavel
+  patterns: 270    # Padroes de design evoluem devagar
+  decisions: 180   # ADRs podem ser superseded
+  learnings: 120   # Contexto-especifico, decai mais rapido
+  tactical: 60     # Detalhes de implementacao mudam rapido
+  default: 180     # Fallback para tipos desconhecidos
+
+# Thresholds para classificacao de status
+thresholds:
+  fresh: 0.70      # Score >= 0.70 = fresh
+  aging: 0.40      # Score >= 0.40 = aging
+  stale: 0.20      # Score >= 0.20 = stale
+  obsolete: 0.00   # Score < 0.20 = obsolete
+
+# Bonus de estabilidade por tipo de conteudo
+# Multiplicador aplicado ao componente type_bonus
+type_stability_bonus:
+  concepts: 1.0    # Mais estavel
+  patterns: 0.9
+  decisions: 0.7
+  learnings: 0.5
+  tactical: 0.3    # Menos estavel
+
+# Configuracao de triggers automaticos
+triggers:
+  # Threshold minimo para sugerir revisao automatica
+  auto_review_threshold: 0.40
+
+  # Threshold para sugerir arquivamento
+  auto_archive_threshold: 0.10
+
+  # Dias sem validacao para gerar reminder
+  review_reminder_days: 30
+
+  # Intervalo em horas para recalculo automatico
+  recalculation_interval_hours: 24
+
+# Configuracao do gate de saude
+health_gate:
+  # Score minimo do corpus
+  min_average_score: 0.50
+
+  # Maximo de nodes obsoletos permitidos
+  max_obsolete_nodes: 3
+
+  # Ratio maximo de conteudo stale
+  max_stale_ratio: 0.15
+
+  # Items criticos no review queue bloqueia release
+  block_on_critical: true
