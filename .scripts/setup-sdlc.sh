@@ -503,6 +503,13 @@ make_scripts_executable() {
         chmod +x .claude/hooks/*.sh 2>/dev/null || true
         log_success "Hooks em .claude/hooks/ configurados"
     fi
+
+    # Configurar scripts das skills
+    if [[ -d ".claude/skills" ]]; then
+        find .claude/skills -name "*.sh" -type f -exec chmod +x {} \; 2>/dev/null || true
+        find .claude/skills -name "*.py" -type f -exec chmod +x {} \; 2>/dev/null || true
+        log_success "Scripts das skills configurados"
+    fi
 }
 
 # Verificar dependencias opcionais (document-processor e frontend-testing skills)
