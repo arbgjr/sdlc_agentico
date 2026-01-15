@@ -52,6 +52,8 @@ class SearchResult:
     snippet: str
     node_type: str = "Decision"
     path_from_query: Optional[List[str]] = None
+    decay_score: Optional[float] = None
+    decay_status: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
@@ -65,6 +67,9 @@ class SearchResult:
         }
         if self.path_from_query:
             result["pathFromQuery"] = self.path_from_query
+        if self.decay_score is not None:
+            result["decayScore"] = round(self.decay_score, 3)
+            result["decayStatus"] = self.decay_status
         return result
 
 
@@ -490,6 +495,7 @@ class HybridSearcher:
     # Weights for combining scores
     TEXT_WEIGHT = 0.7
     GRAPH_WEIGHT = 0.3
+    DECAY_BOOST_WEIGHT = 0.5  # How much decay affects final score
 
     def __init__(self, corpus_path: Optional[Path] = None):
         """Initialize hybrid searcher."""
@@ -499,6 +505,49 @@ class HybridSearcher:
         self.corpus_path = Path(corpus_path)
         self.text_index = TextIndex(corpus_path)
         self.graph_searcher = GraphSearcher(corpus_path)
+        self._decay_index: Optional[Dict[str, Any]] = None
+
+    def _load_decay_index(self) -> Dict[str, Any]:
+        """Load decay index from file."""
+        if self._decay_index is not None:
+            return self._decay_index
+
+        decay_path = self.corpus_path / "decay_index.json"
+        if decay_path.exists():
+            try:
+                with open(decay_path, "r", encoding="utf-8") as f:
+                    self._decay_index = json.load(f)
+            except Exception:
+                self._decay_index = {"nodes": {}}
+        else:
+            self._decay_index = {"nodes": {}}
+
+        return self._decay_index
+
+    def _apply_decay_boost(self, results: List[SearchResult]) -> List[SearchResult]:
+        """Apply decay score as boost factor to search results."""
+        decay_index = self._load_decay_index()
+        nodes = decay_index.get("nodes", {})
+
+        for result in results:
+            decay_data = nodes.get(result.node_id, {})
+            decay_score = decay_data.get("score", 0.5)  # Default to 0.5 if not found
+            decay_status = decay_data.get("status", "unknown")
+
+            # Store decay info in result
+            result.decay_score = decay_score
+            result.decay_status = decay_status
+
+            # Apply decay as multiplicative boost
+            # Fresh content (score 1.0) gets full score
+            # Obsolete content (score 0.1) gets reduced score
+            boost_factor = self.DECAY_BOOST_WEIGHT + (1 - self.DECAY_BOOST_WEIGHT) * decay_score
+            result.score = result.score * boost_factor
+
+        # Re-sort by boosted score
+        results.sort(key=lambda r: r.score, reverse=True)
+
+        return results
 
     def search(
         self,
@@ -562,6 +611,9 @@ class HybridSearcher:
 
         # Merge results
         merged = self._merge_results(text_results, graph_results, limit, type_filter)
+
+        # Apply decay boosting
+        merged = self._apply_decay_boost(merged)
 
         return merged
 

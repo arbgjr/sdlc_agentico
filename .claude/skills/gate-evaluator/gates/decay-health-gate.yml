@@ -1,0 +1,113 @@
+id: decay-health-gate
+name: Corpus Decay Health Gate
+version: "1.0.0"
+description: |
+  Valida a saude do corpus RAG antes de releases.
+  Garante que o conhecimento esta atualizado e curado.
+
+applies_to:
+  - phase-6-to-7  # Before release
+  - phase-7-to-8  # Before operations
+
+checks:
+  - id: corpus_health_score
+    name: Corpus Health Score
+    type: numeric
+    threshold: 0.5
+    operator: ">="
+    description: "Score medio do corpus deve ser pelo menos 0.5"
+    source: decay_index.json
+    path: "summary.average_score"
+    severity: blocking
+
+  - id: obsolete_node_count
+    name: Obsolete Nodes
+    type: numeric
+    threshold: 3
+    operator: "<="
+    description: "Maximo 3 nodes obsoletos permitidos"
+    source: decay_index.json
+    path: "summary.obsolete"
+    severity: blocking
+
+  - id: stale_ratio
+    name: Stale Content Ratio
+    type: formula
+    expression: "stale / total_nodes"
+    threshold: 0.15
+    operator: "<="
+    description: "Conteudo stale deve ser menos de 15% do corpus"
+    sources:
+      stale: "decay_index.json:summary.stale"
+      total_nodes: "decay_index.json:summary.total_nodes"
+    severity: warning
+
+  - id: review_queue_critical
+    name: Critical Review Items
+    type: check
+    condition: "review_queue has no critical items"
+    description: "Nenhum item critico pendente de revisao"
+    severity: blocking
+
+validation_script: |
+  #!/bin/bash
+  # Validate decay health gate
+
+  DECAY_INDEX=".agentic_sdlc/corpus/decay_index.json"
+
+  if [ ! -f "$DECAY_INDEX" ]; then
+    echo "WARN: Decay index not found. Run decay_calculator.py first."
+    exit 0  # Non-blocking if index doesn't exist
+  fi
+
+  # Check average score
+  AVG_SCORE=$(jq -r '.summary.average_score // 0' "$DECAY_INDEX")
+  if (( $(echo "$AVG_SCORE < 0.5" | bc -l) )); then
+    echo "FAIL: Corpus health score ($AVG_SCORE) below threshold (0.5)"
+    exit 1
+  fi
+
+  # Check obsolete count
+  OBSOLETE=$(jq -r '.summary.obsolete // 0' "$DECAY_INDEX")
+  if [ "$OBSOLETE" -gt 3 ]; then
+    echo "FAIL: Too many obsolete nodes ($OBSOLETE > 3)"
+    exit 1
+  fi
+
+  # Check stale ratio
+  STALE=$(jq -r '.summary.stale // 0' "$DECAY_INDEX")
+  TOTAL=$(jq -r '.summary.total_nodes // 1' "$DECAY_INDEX")
+  if [ "$TOTAL" -gt 0 ]; then
+    RATIO=$(echo "scale=2; $STALE / $TOTAL" | bc)
+    if (( $(echo "$RATIO > 0.15" | bc -l) )); then
+      echo "WARN: Stale content ratio ($RATIO) exceeds 15%"
+    fi
+  fi
+
+  echo "PASS: Corpus decay health check passed"
+  exit 0
+
+on_failure:
+  - action: block
+    message: |
+      Corpus health check failed.
+      Run: python .claude/skills/decay-scoring/scripts/decay_trigger.py
+      to see required curation actions.
+
+  - action: notify
+    targets:
+      - rag-curator
+    message: "Corpus needs curation before release"
+
+remediation:
+  - step: "Run decay calculator to update scores"
+    command: "python .claude/skills/decay-scoring/scripts/decay_calculator.py --update-nodes"
+
+  - step: "Review curation suggestions"
+    command: "python .claude/skills/decay-scoring/scripts/decay_trigger.py"
+
+  - step: "Validate or archive obsolete nodes"
+    command: "python .claude/skills/decay-scoring/scripts/decay_tracker.py validate NODE_ID"
+
+  - step: "Recalculate scores after curation"
+    command: "python .claude/skills/decay-scoring/scripts/decay_calculator.py"

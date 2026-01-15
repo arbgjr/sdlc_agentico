@@ -23,6 +23,9 @@ SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orc
 - Automatic concept extraction from documents (v1.4.0)
 - Graph visualization with Mermaid diagrams (v1.4.0)
 - Graph integrity quality gate (v1.4.0)
+- Decay scoring for knowledge freshness (v1.5.0)
+- Automatic curation suggestions for obsolete content (v1.5.0)
+- Search results boosted by content freshness (v1.5.0)
 
 ## Setup Commands
 
@@ -224,6 +227,7 @@ Available skills for automation:
 | `document-processor` | Processes PDF, XLSX, DOCX documents for requirements extraction (v1.3.0) |
 | `frontend-testing` | E2E testing with Playwright, screenshots, browser logs (v1.3.0) |
 | `graph-navigator` | Semantic graph navigation, concept extraction, visualization (v1.4.0) |
+| `decay-scoring` | Temporal scoring for knowledge freshness, curation triggers (v1.5.0) |
 
 ## New Skills (v1.3.0) - Document Processing & Frontend Testing
 
@@ -374,6 +378,68 @@ python .claude/skills/graph-navigator/scripts/concept_extractor.py --output save
 **Quality Gate:**
 - `graph-integrity.yml` validates graph structure before release
 - Checks for orphan edges, valid relations, coverage thresholds
+
+## New Skill (v1.5.0) - Decay Scoring
+
+### decay-scoring
+
+Sistema de pontuacao temporal para nodes de conhecimento do corpus RAG:
+
+```bash
+# Calculate decay scores for all nodes
+python .claude/skills/decay-scoring/scripts/decay_calculator.py
+
+# Update node files with scores
+python .claude/skills/decay-scoring/scripts/decay_calculator.py --update-nodes
+
+# Generate curation report
+python .claude/skills/decay-scoring/scripts/decay_trigger.py
+
+# Record node validation
+python .claude/skills/decay-scoring/scripts/decay_tracker.py validate NODE_ID
+
+# Track node access
+python .claude/skills/decay-scoring/scripts/decay_tracker.py access NODE_ID
+```
+
+**Decay Algorithm:**
+```
+decay_score = 0.40 * age_score + 0.30 * validation_score + 0.20 * access_score + 0.10 * type_bonus
+```
+
+**Score Thresholds:**
+| Score | Status | Action |
+|-------|--------|--------|
+| 0.70-1.00 | `fresh` | No action |
+| 0.40-0.69 | `aging` | Consider validation |
+| 0.20-0.39 | `stale` | Review recommended |
+| 0.00-0.19 | `obsolete` | Curation required |
+
+**Features:**
+- Exponential decay based on content age
+- Validation tracking with history
+- Access frequency monitoring
+- Content type stability multipliers
+- Automatic curation suggestions
+- Search results boosted by freshness
+
+**Slash Commands:**
+- `/decay-status` - Show corpus decay health and review queue
+- `/validate-node NODE_ID` - Mark node as validated/current
+
+**Quality Gate:**
+- `decay-health-gate.yml` validates corpus health before releases
+- Blocks if average score < 0.5 or too many obsolete nodes
+
+**Node Schema Addition:**
+```yaml
+decay_metadata:
+  last_validated_at: "2025-01-14T10:00:00Z"
+  last_accessed_at: "2025-01-14T08:30:00Z"
+  access_count_30d: 5
+  decay_score: 0.85
+  decay_status: fresh
+```
 
 ## New Agents (v2.0)
 
