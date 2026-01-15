@@ -21,6 +21,8 @@ O SDLC Agêntico é um framework que usa **34 agentes especializados** (30 orque
 │  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot        │
 │  Phase Commits | Session Learning | Stakeholder Reviews (v1.2.0)       │
 │  Document Processing | Frontend E2E Testing | Patterns (v1.3.0)        │
+│  Semantic Graph | Hybrid Search | Graph Visualization (v1.4.0)         │
+│  Decay Scoring | Content Freshness | Curation Triggers (v1.5.0)        │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -103,11 +105,17 @@ O sistema se integra com o **GitHub Copilot Coding Agent**:
 
 Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanças.
 
-**Destaques da v1.3.0:**
-- Processamento de documentos (PDF, XLSX, DOCX) com OCR e validação
-- Testes E2E frontend com Playwright
-- Detecção automática de documentos
-- Padrões de design dos skills oficiais Anthropic
+**Destaques da v1.5.0:**
+- Decay scoring para freshness de conhecimento
+- Sugestões automáticas de curadoria para conteúdo obsoleto
+- Resultados de busca priorizados por freshness
+- Quality gate de saúde do corpus
+
+**Destaques da v1.4.0:**
+- Grafo semântico com busca híbrida (texto + grafo)
+- Extração automática de conceitos
+- Visualização de grafos em Mermaid
+- Gate de integridade do grafo
 
 ## Comandos Disponíveis
 
@@ -123,13 +131,15 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 | `/release-prep` | Prepara release |
 | `/incident-start` | Inicia gestão de incidente |
 | `/sdlc-create-issues` | Cria issues no GitHub |
+| `/decay-status` | Mostra saúde do corpus RAG |
+| `/validate-node` | Marca node como validado |
 
 ## Estrutura do Projeto
 
 ```
 .claude/
 ├── agents/           # 34 agentes especializados (30 + 4 consultivos)
-├── skills/           # 13 skills reutilizáveis (+2 em v1.3.0)
+├── skills/           # 16 skills reutilizáveis (+1 em v1.5.0)
 ├── commands/         # 10 comandos do usuário
 ├── hooks/            # 9 hooks de automação (+1 em v1.3.0)
 └── settings.json     # Configuração central

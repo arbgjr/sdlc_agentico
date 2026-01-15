@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-01-15
+
+### Added
+
+- **Decay Scoring Skill** (`decay-scoring`)
+  - Automatic temporal scoring for knowledge nodes
+  - Exponential decay algorithm based on age, validation, access, and content type
+  - Score thresholds: fresh (0.7+), aging (0.4-0.69), stale (0.2-0.39), obsolete (<0.2)
+  - Scripts: `decay_calculator.py`, `decay_tracker.py`, `decay_trigger.py`
+  - Commands: `/decay-status`, `/validate-node`
+
+- **Curation Trigger System** (`decay_trigger.py`)
+  - Automatic review queue generation
+  - Priority-based suggestions (critical, high, medium, low)
+  - Corpus health assessment (healthy, needs_attention, critical)
+  - Suggested actions: archive, review, validate
+
+- **Access Tracking** (`decay_tracker.py`)
+  - Track node access patterns with timestamps
+  - Validation history with audit trail
+  - Rolling 30-day access counts
+  - Access log cleanup for old events
+
+- **Decay-Boosted Search**
+  - Integration with `hybrid_search.py`
+  - Fresh content boosted in search results
+  - Decay score and status returned with results
+
+- **Corpus Health Gate** (`decay-health-gate.yml`)
+  - Validates corpus health before releases
+  - Blocks if average score < 0.5
+  - Blocks if too many obsolete nodes (> 3)
+  - Warns if stale ratio > 15%
+
+- **Automation Hooks**
+  - `auto-decay-recalc.sh` - Auto-recalculate scores (max every 24h)
+  - `track-rag-access.sh` - Track access on RAG queries
+
+### Changed
+
+- Updated `hybrid_search.py` with decay boost integration
+- Updated `settings.json` to include decay-scoring skill
+- Updated CLAUDE.md with v1.5.0 documentation
+
 ## [1.4.0] - 2026-01-14
 
 ### Added
@@ -197,7 +241,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/arbgjr/mice_dolphins/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/arbgjr/mice_dolphins/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/arbgjr/mice_dolphins/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/arbgjr/mice_dolphins/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/arbgjr/mice_dolphins/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/arbgjr/mice_dolphins/compare/v1.1.0...v1.2.0
