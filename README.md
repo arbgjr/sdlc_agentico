@@ -24,6 +24,7 @@ O SDLC Agêntico é um framework que usa **34 agentes especializados** (30 orque
 │  Semantic Graph | Hybrid Search | Graph Visualization (v1.4.0)         │
 │  Decay Scoring | Content Freshness | Curation Triggers (v1.5.0)        │
 │  GitHub Projects | Milestones | Wiki Sync | Dashboard (v1.6.0)         │
+│  Structured Logging | Loki/Tempo/Grafana Integration (v1.7.0)          │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -129,9 +130,60 @@ O sistema se integra nativamente com:
 2. Cada transição de fase → Atualiza campo "Phase" das issues
 3. `/release-prep` → Fecha Milestone + Sincroniza Wiki
 
+### Observabilidade (v1.7.0)
+
+O sistema inclui logging estruturado integrado com a stack de observabilidade:
+
+| Componente | Porta | Propósito |
+|------------|-------|-----------|
+| **Loki** | 3100 | Agregação de logs |
+| **Tempo** | 4318 | Tracing distribuído (OTLP) |
+| **Grafana** | 3003 | Visualização e dashboards |
+
+**Características:**
+- JSON estruturado para ingestão no Loki
+- Correlation IDs automáticos para rastreamento
+- Níveis: DEBUG, INFO, WARNING, ERROR, CRITICAL
+- Labels: `app`, `skill`, `phase`, `level`, `script`
+- Dashboard pré-configurado em `.claude/config/logging/dashboards/`
+
+**Variáveis de Ambiente:**
+```bash
+SDLC_LOG_LEVEL=DEBUG              # Nível de log (default: DEBUG)
+SDLC_LOKI_ENABLED=true            # Habilita envio ao Loki
+SDLC_LOKI_URL=http://localhost:3100
+SDLC_TRACE_ENABLED=true           # Habilita tracing
+SDLC_TEMPO_URL=http://localhost:4318
+```
+
+**Uso em Python:**
+```python
+from sdlc_logging import get_logger, log_operation
+logger = get_logger(__name__, skill="decay-scoring", phase=6)
+logger.info("Processing node", extra={"node_id": "ADR-001"})
+
+with log_operation(logger, "batch_processing"):
+    # Operação cronometrada automaticamente
+    process_batch()
+```
+
+**Uso em Shell:**
+```bash
+source .claude/lib/shell/logging_utils.sh
+sdlc_set_context skill="git-hooks" phase="5"
+sdlc_log_info "Validating commit" "commit_hash=$COMMIT_HASH"
+```
+
 ### Changelog
 
 Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanças.
+
+**Destaques da v1.7.0:**
+- Logging estruturado com integração Loki/Tempo/Grafana
+- Módulos Python e Shell para logging consistente
+- Dashboard Grafana pré-configurado para SDLC
+- Correlation IDs para rastreamento de requisições
+- Tracing distribuído com OpenTelemetry
 
 **Destaques da v1.6.0:**
 - Integração nativa com GitHub Projects V2
@@ -169,9 +221,14 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 ```
 .claude/
 ├── agents/           # 34 agentes especializados (30 + 4 consultivos)
-├── skills/           # 19 skills reutilizáveis (+3 em v1.6.0)
-├── commands/         # 12 comandos do usuário (+2 em v1.6.0)
-├── hooks/            # 9 hooks de automação
+├── skills/           # 19 skills reutilizáveis
+├── commands/         # 12 comandos do usuário
+├── hooks/            # 13 hooks de automação
+├── lib/              # Bibliotecas compartilhadas (v1.7.0)
+│   ├── python/       # sdlc_logging.py, sdlc_tracing.py
+│   └── shell/        # logging_utils.sh
+├── config/           # Configurações centralizadas
+│   └── logging/      # logging.yml, dashboards/
 └── settings.json     # Configuração central
 
 .agentic_sdlc/        # Artefatos do SDLC (NOVO)

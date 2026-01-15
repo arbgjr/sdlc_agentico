@@ -1,0 +1,171 @@
+# =============================================================================
+# SDLC Agentico Logging Configuration
+# =============================================================================
+# Centralized logging configuration for the SDLC Agentico framework.
+#
+# This file defines logging behavior for all Python scripts and Shell hooks.
+# Values can be overridden by environment variables.
+# =============================================================================
+
+version: "1.0"
+
+# -----------------------------------------------------------------------------
+# Global Settings
+# -----------------------------------------------------------------------------
+global:
+  # Default log level (DEBUG = verbose mode)
+  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  default_level: DEBUG
+
+  # Output format
+  # true = JSON (for Loki/machine parsing)
+  # false = human-readable with colors
+  json_format: true
+
+  # Application identifier
+  app_name: sdlc-agentico
+
+  # Environment
+  environment: development
+
+# -----------------------------------------------------------------------------
+# Handler Configurations
+# -----------------------------------------------------------------------------
+handlers:
+  # Console/stderr handler
+  console:
+    enabled: true
+    level: DEBUG
+    format: json  # or "console" for human-readable
+    stream: stderr
+
+  # Loki log aggregation handler
+  loki:
+    enabled: true
+    url: http://localhost:3100
+    batch_size: 100
+    flush_interval: 5.0
+    timeout: 5
+    labels:
+      app: sdlc-agentico
+      env: development
+
+  # File handler (optional, disabled by default)
+  file:
+    enabled: false
+    path: /tmp/sdlc-agentico.log
+    max_bytes: 10485760  # 10MB
+    backup_count: 5
+    level: DEBUG
+
+# -----------------------------------------------------------------------------
+# Tracing Configuration (OpenTelemetry)
+# -----------------------------------------------------------------------------
+tracing:
+  enabled: true
+  exporter: otlp
+  endpoint: http://localhost:4318
+  service_name: sdlc-agentico
+  service_version: "1.7.0"
+
+  # Sampling configuration
+  sampling:
+    type: always_on  # Options: always_on, always_off, trace_id_ratio
+    ratio: 1.0  # Only used if type is trace_id_ratio
+
+# -----------------------------------------------------------------------------
+# Label Schema (for Loki)
+# -----------------------------------------------------------------------------
+labels:
+  # Static labels (set at handler initialization)
+  static:
+    - app
+    - env
+
+  # Dynamic labels (extracted from log context)
+  dynamic:
+    - level
+    - skill
+    - phase
+    - agent
+    - script
+
+  # Fields that should NOT be labels (high cardinality)
+  content_only:
+    - correlation_id
+    - trace_id
+    - duration_ms
+    - node_id
+    - error_message
+
+# -----------------------------------------------------------------------------
+# Logger-specific Overrides
+# -----------------------------------------------------------------------------
+loggers:
+  # Quiet noisy loggers
+  urllib3:
+    level: WARNING
+  opentelemetry:
+    level: WARNING
+  requests:
+    level: WARNING
+
+  # Verbose for debugging specific areas
+  gate_evaluation:
+    level: DEBUG
+  security:
+    level: DEBUG
+  phase_transition:
+    level: DEBUG
+
+  # Skill-specific configurations
+  skills:
+    decay-scoring:
+      level: DEBUG
+    graph-navigator:
+      level: DEBUG
+    github-sync:
+      level: INFO
+    document-processor:
+      level: DEBUG
+    frontend-testing:
+      level: DEBUG
+
+# -----------------------------------------------------------------------------
+# SDLC Phase Mapping
+# -----------------------------------------------------------------------------
+phases:
+  0: "Preparation"
+  1: "Discovery"
+  2: "Requirements"
+  3: "Architecture"
+  4: "Planning"
+  5: "Implementation"
+  6: "Quality"
+  7: "Release"
+  8: "Operations"
+
+# -----------------------------------------------------------------------------
+# Skills Mapping (for automatic context)
+# -----------------------------------------------------------------------------
+skills:
+  - decay-scoring
+  - graph-navigator
+  - github-sync
+  - github-projects
+  - github-wiki
+  - document-processor
+  - frontend-testing
+  - gate-evaluator
+  - memory-manager
+  - rag-query
+  - spec-kit-integration
+  - bmad-integration
+  - auto-branch
+  - iac-generator
+  - doc-blueprint
+  - reference-indexer
+  - phase-commit
+  - session-analyzer
+  - system-design-decision-engine
+  - skill-io-creator

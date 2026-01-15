@@ -30,6 +30,9 @@ SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orc
 - Automatic Milestone creation per sprint (v1.6.0)
 - GitHub Wiki synchronization with ADRs (v1.6.0)
 - Consolidated GitHub dashboard command (v1.6.0)
+- Structured logging with Loki/Tempo/Grafana integration (v1.7.0)
+- Python and Shell logging utilities with correlation IDs (v1.7.0)
+- Pre-configured Grafana dashboard for SDLC observability (v1.7.0)
 
 ## Setup Commands
 
@@ -101,6 +104,11 @@ All behavior is defined in `.claude/settings.json`, which configures:
 │   └── gate-evaluator/gates/  # YAML quality gate definitions (including security-gate.yml)
 ├── commands/         # Slash commands for user interaction
 ├── hooks/            # Git automation (validate-commit, auto-branch, etc.)
+├── lib/              # Shared libraries (v1.7.0)
+│   ├── python/       # sdlc_logging.py, sdlc_tracing.py
+│   └── shell/        # logging_utils.sh
+├── config/           # Centralized configuration (v1.7.0)
+│   └── logging/      # logging.yml, dashboards/
 └── settings.json     # Central configuration
 
 .agentic_sdlc/        # SDLC artifacts and project state (NEW)
@@ -189,6 +197,9 @@ Agents use different models based on task complexity:
 | `.agentic_sdlc/templates/*.yml` | Templates for ADR, spec, threat-model |
 | `.docs/playbook.md` | Development principles, standards, and practices |
 | `.docs/DESENVOLVIMENTO.md` | C# development standards and guidelines |
+| `.claude/lib/python/sdlc_logging.py` | Python logging module with Loki handler (v1.7.0) |
+| `.claude/lib/shell/logging_utils.sh` | Shell logging functions (v1.7.0) |
+| `.claude/config/logging/logging.yml` | Centralized logging configuration (v1.7.0) |
 
 ## Hook System
 
@@ -210,6 +221,10 @@ Hooks are triggered automatically:
 | `phase-commit-reminder.sh` | Reminds to commit after passing a gate (v1.2.0) |
 | `detect-documents.sh` | Detects PDF/XLSX/DOCX files and suggests document-processor (v1.3.0) |
 | `auto-graph-sync.sh` | Updates semantic graph when corpus nodes are modified (v1.4.0) |
+| `auto-decay-recalc.sh` | Recalculates decay scores periodically (v1.5.0) |
+| `track-rag-access.sh` | Tracks access patterns on RAG queries (v1.5.0) |
+
+**Note:** All hooks use structured logging via `logging_utils.sh` (v1.7.0) with skill and phase context.
 
 ## Integrations
 
@@ -556,6 +571,72 @@ GitHub Wiki synchronization:
 |-------|-------|---------|
 | `iac-engineer` | 3, 5 | Generates and maintains Infrastructure as Code |
 | `doc-generator` | 7 | Generates technical documentation automatically |
+
+## Observability (v1.7.0)
+
+### Logging Infrastructure
+
+The project includes structured logging integrated with the observability stack:
+
+| Component | Port | Purpose |
+|-----------|------|---------|
+| **Loki** | 3100 | Log aggregation |
+| **Tempo** | 4318 | Distributed tracing (OTLP) |
+| **Grafana** | 3003 | Visualization and dashboards |
+
+### Python Logging
+
+```python
+import sys
+sys.path.insert(0, '.claude/lib/python')
+from sdlc_logging import get_logger, log_operation
+
+logger = get_logger(__name__, skill="decay-scoring", phase=6)
+logger.info("Processing node", extra={"node_id": "ADR-001"})
+
+# Timed operations
+with log_operation(logger, "batch_processing"):
+    process_batch()
+```
+
+### Shell Logging
+
+```bash
+source .claude/lib/shell/logging_utils.sh
+sdlc_set_context skill="git-hooks" phase="5"
+sdlc_log_info "Validating commit" "commit_hash=$COMMIT_HASH"
+```
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SDLC_LOG_LEVEL` | DEBUG | Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL) |
+| `SDLC_LOKI_ENABLED` | true | Enable Loki log shipping |
+| `SDLC_LOKI_URL` | http://localhost:3100 | Loki Push API URL |
+| `SDLC_TRACE_ENABLED` | false | Enable OpenTelemetry tracing |
+| `SDLC_TEMPO_URL` | http://localhost:4318 | Tempo OTLP endpoint |
+| `SDLC_JSON_LOGS` | false | Force JSON output to console |
+
+### Loki Labels
+
+All logs are tagged with:
+- `app`: sdlc-agentico
+- `env`: development/production
+- `level`: debug/info/warning/error/critical
+- `skill`: Name of the skill or hook
+- `phase`: SDLC phase number (0-8)
+- `script`: Script filename
+
+### Grafana Dashboard
+
+Import `.claude/config/logging/dashboards/sdlc-overview.json` into Grafana for:
+- Log Volume by Level (timeseries)
+- Errors by Skill (bar gauge)
+- Activity by SDLC Phase (stat)
+- Gate Evaluations (logs panel)
+- Security Events (logs panel)
+- Live Logs with JSON parsing
 
 ## Development Playbook Principles
 

@@ -16,6 +16,13 @@
 
 set -euo pipefail
 
+# Load logging utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "${SCRIPT_DIR}/../lib/shell/logging_utils.sh" ]]; then
+    source "${SCRIPT_DIR}/../lib/shell/logging_utils.sh"
+    sdlc_set_context skill="graph-navigator"
+fi
+
 # Configuration
 CORPUS_NODES_PATH=".agentic_sdlc/corpus/nodes"
 LEGACY_DECISIONS_PATH=".agentic_sdlc/decisions"
@@ -24,6 +31,7 @@ GRAPH_BUILDER=".claude/skills/graph-navigator/scripts/graph_builder.py"
 
 # Check if sync is enabled
 if [[ "${GRAPH_SYNC_ENABLED:-true}" == "false" ]]; then
+    sdlc_log_debug "Graph sync disabled via environment"
     exit 0
 fi
 
@@ -31,8 +39,11 @@ fi
 MODIFIED_FILE="${1:-}"
 
 if [[ -z "$MODIFIED_FILE" ]]; then
+    sdlc_log_debug "No file specified"
     exit 0
 fi
+
+sdlc_log_debug "Checking file for graph sync" "file=$MODIFIED_FILE"
 
 # Check if the modified file is a corpus node
 is_corpus_node() {
@@ -69,27 +80,30 @@ is_yaml_file() {
 if is_corpus_node "$MODIFIED_FILE" && is_yaml_file "$MODIFIED_FILE"; then
     # Check if graph builder exists
     if [[ ! -f "$GRAPH_BUILDER" ]]; then
-        if [[ "${GRAPH_SYNC_VERBOSE:-false}" == "true" ]]; then
-            echo "[auto-graph-sync] Graph builder not found: $GRAPH_BUILDER"
-        fi
+        sdlc_log_debug "Graph builder not found" "path=$GRAPH_BUILDER"
         exit 0
     fi
 
     # Check if Python is available
     if ! command -v python3 &> /dev/null; then
-        if [[ "${GRAPH_SYNC_VERBOSE:-false}" == "true" ]]; then
-            echo "[auto-graph-sync] Python3 not found"
-        fi
+        sdlc_log_warn "Python3 not found, cannot sync graph"
         exit 0
     fi
 
+    sdlc_log_info "Updating graph for modified file" "file=$MODIFIED_FILE"
+
     # Run incremental update
     if [[ "${GRAPH_SYNC_VERBOSE:-false}" == "true" ]]; then
-        echo "[auto-graph-sync] Updating graph for: $MODIFIED_FILE"
         python3 "$GRAPH_BUILDER" --incremental "$MODIFIED_FILE"
     else
-        python3 "$GRAPH_BUILDER" --incremental "$MODIFIED_FILE" 2>/dev/null || true
+        if python3 "$GRAPH_BUILDER" --incremental "$MODIFIED_FILE" 2>/dev/null; then
+            sdlc_log_debug "Graph sync completed"
+        else
+            sdlc_log_warn "Graph sync failed"
+        fi
     fi
+else
+    sdlc_log_debug "File is not a corpus node" "file=$MODIFIED_FILE"
 fi
 
 exit 0

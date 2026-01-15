@@ -4,30 +4,41 @@
 
 set -e
 
+# Load logging utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "${SCRIPT_DIR}/../lib/shell/logging_utils.sh" ]]; then
+    source "${SCRIPT_DIR}/../lib/shell/logging_utils.sh"
+    sdlc_set_context skill="memory-manager"
+fi
+
+sdlc_log_debug "Updating project timestamp"
+
 # Determinar arquivo do projeto
 CURRENT_PROJECT_FILE=".agentic_sdlc/.current-project"
 if [ -f "$CURRENT_PROJECT_FILE" ]; then
-  PROJECT_ID=$(cat "$CURRENT_PROJECT_FILE")
+    PROJECT_ID=$(cat "$CURRENT_PROJECT_FILE")
 else
-  PROJECT_ID="default"
+    PROJECT_ID="default"
 fi
 
 PROJECT_FILE=".agentic_sdlc/projects/${PROJECT_ID}/manifest.yml"
 
 # Verificar se arquivo existe
 if [ ! -f "$PROJECT_FILE" ]; then
-  # Tentar estrutura antiga
-  PROJECT_FILE=".claude/memory/project.yml"
-  if [ ! -f "$PROJECT_FILE" ]; then
-    echo "Nenhum arquivo de projeto encontrado."
-    exit 0
-  fi
+    # Tentar estrutura antiga
+    PROJECT_FILE=".claude/memory/project.yml"
+    if [ ! -f "$PROJECT_FILE" ]; then
+        sdlc_log_debug "No project file found"
+        exit 0
+    fi
 fi
+
+sdlc_log_debug "Project file found" "path=$PROJECT_FILE" "project_id=$PROJECT_ID"
 
 # Verificar se Python esta disponivel
 if ! command -v python3 &> /dev/null; then
-  echo "Python3 nao encontrado. Pulando atualizacao de timestamp."
-  exit 0
+    sdlc_log_warn "Python3 not found, skipping timestamp update"
+    exit 0
 fi
 
 # Atualizar timestamp
@@ -56,10 +67,12 @@ except Exception as e:
     sys.exit(0)
 EOF
 
+sdlc_log_info "Timestamp updated" "file=$PROJECT_FILE"
+
 # Adicionar ao staging se houver mudanca
 if git diff --quiet "$PROJECT_FILE" 2>/dev/null; then
-  : # Sem mudancas
+    sdlc_log_debug "No changes to stage"
 else
-  git add "$PROJECT_FILE"
-  echo "Arquivo ${PROJECT_FILE} adicionado ao staging."
+    git add "$PROJECT_FILE"
+    sdlc_log_debug "File added to staging" "file=$PROJECT_FILE"
 fi

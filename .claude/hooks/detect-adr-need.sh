@@ -7,6 +7,15 @@
 
 set -e
 
+# Load logging utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "${SCRIPT_DIR}/../lib/shell/logging_utils.sh" ]]; then
+    source "${SCRIPT_DIR}/../lib/shell/logging_utils.sh"
+    sdlc_set_context skill="adr-author" phase="3"
+fi
+
+sdlc_log_debug "Checking for architectural changes"
+
 # Padroes que indicam mudanca arquitetural
 ARCHITECTURAL_PATTERNS=(
     "docker-compose"
@@ -44,8 +53,12 @@ CODE_PATTERNS=(
 MODIFIED_FILES=$(git diff --cached --name-only 2>/dev/null || git diff HEAD~1 --name-only 2>/dev/null || echo "")
 
 if [[ -z "$MODIFIED_FILES" ]]; then
+    sdlc_log_debug "No modified files found"
     exit 0
 fi
+
+FILE_COUNT=$(echo "$MODIFIED_FILES" | wc -l)
+sdlc_log_debug "Analyzing modified files" "count=$FILE_COUNT"
 
 NEEDS_ADR=0
 REASONS=()
@@ -55,6 +68,7 @@ for pattern in "${ARCHITECTURAL_PATTERNS[@]}"; do
     if echo "$MODIFIED_FILES" | grep -i "$pattern" > /dev/null; then
         NEEDS_ADR=1
         REASONS+=("Arquivo modificado: $pattern")
+        sdlc_log_debug "Architectural pattern matched" "pattern=$pattern"
     fi
 done
 
@@ -67,6 +81,7 @@ for file in $MODIFIED_FILES; do
                 if git diff --cached "$file" 2>/dev/null | grep "^+" | grep -E "$pattern" > /dev/null; then
                     NEEDS_ADR=1
                     REASONS+=("Novo padrao em $file: $pattern")
+                    sdlc_log_debug "Code pattern matched" "file=$file" "pattern=$pattern"
                     break
                 fi
             fi
@@ -76,6 +91,7 @@ done
 
 # Output
 if [[ $NEEDS_ADR -eq 1 ]]; then
+    sdlc_log_info "ADR recommended" "reasons_count=${#REASONS[@]}"
     echo "---"
     echo "ADR_RECOMMENDED=true"
     echo "REASONS:"
@@ -86,6 +102,8 @@ if [[ $NEEDS_ADR -eq 1 ]]; then
     echo "Considere criar um ADR para documentar esta decisao:"
     echo "  /adr-create \"Titulo da Decisao\""
     echo "---"
+else
+    sdlc_log_debug "No ADR needed"
 fi
 
 exit 0

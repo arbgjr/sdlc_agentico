@@ -7,6 +7,80 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-01-15
+
+### Added
+
+- **Structured Logging System** (`sdlc_logging.py`)
+  - JSON formatter for Loki ingestion
+  - Loki Push API handler with batching
+  - Correlation IDs (auto-generated or inherited)
+  - Context managers for operations (`log_operation`)
+  - Specialized functions: `log_phase_transition`, `log_gate_evaluation`, `log_security_event`
+  - Console formatter with colors for development
+  - Environment variables: `SDLC_LOG_LEVEL`, `SDLC_LOKI_URL`, `SDLC_LOKI_ENABLED`, `SDLC_JSON_LOGS`
+
+- **OpenTelemetry Tracing** (`sdlc_tracing.py`)
+  - Tempo integration via OTLP HTTP (port 4318)
+  - Span creation and context propagation
+  - Graceful degradation when OpenTelemetry not installed
+  - Trace context injection/extraction for distributed tracing
+  - Environment variables: `SDLC_TRACE_ENABLED`, `SDLC_TEMPO_URL`
+
+- **Shell Logging Utilities** (`logging_utils.sh`)
+  - JSON structured output for Loki
+  - Async push to Loki Push API
+  - Correlation ID management across scripts
+  - Operation timing (`sdlc_operation_start`, `sdlc_operation_end`)
+  - Legacy compatibility: `log_info`, `log_error`, `log_warn`, `log_ok`
+  - Context management: `sdlc_set_context`, `sdlc_new_correlation_id`
+
+- **Centralized Configuration** (`logging.yml`)
+  - Handler configuration (console, file, loki)
+  - Tracing settings
+  - Label definitions for Loki
+  - Logger overrides per module
+
+- **Grafana Dashboard** (`sdlc-overview.json`)
+  - Log Volume by Level (timeseries)
+  - Errors by Skill (bar gauge)
+  - Activity by SDLC Phase (stat)
+  - Gate Evaluations (logs)
+  - Security Events (logs)
+  - Live Logs with JSON parsing
+  - Variables: skill, phase, level
+
+- **New Directory Structure**
+  - `.claude/lib/python/` - Python logging modules
+  - `.claude/lib/shell/` - Shell logging utilities
+  - `.claude/config/logging/` - Configuration and dashboards
+
+### Changed
+
+- **All 13 Shell Hooks** migrated to use structured logging:
+  - `validate-commit.sh` (skill=git-hooks, phase=5)
+  - `auto-branch.sh` (skill=git-hooks, phase=5)
+  - `detect-phase.sh` (skill=orchestrator)
+  - `check-gate.sh` (skill=gate-evaluator)
+  - `auto-migrate.sh` (skill=memory-manager)
+  - `detect-documents.sh` (skill=document-processor, phase=0)
+  - `ensure-feature-branch.sh` (skill=git-hooks, phase=5)
+  - `phase-commit-reminder.sh` (skill=phase-commit)
+  - `auto-decay-recalc.sh` (skill=decay-scoring)
+  - `auto-graph-sync.sh` (skill=graph-navigator)
+  - `detect-adr-need.sh` (skill=adr-author, phase=3)
+  - `track-rag-access.sh` (skill=rag-query)
+  - `update-project-timestamp.sh` (skill=memory-manager)
+
+- Python scripts can gradually adopt logging via `from sdlc_logging import get_logger`
+
+### Documentation
+
+- Added Observability section to README.md
+- Added v1.7.0 highlights to README.md
+- Updated project structure documentation
+- Updated CLAUDE.md with logging references
+
 ## [1.6.1] - 2026-01-14
 
 ### Changed
@@ -326,7 +400,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/arbgjr/mice_dolphins/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/arbgjr/mice_dolphins/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/arbgjr/mice_dolphins/compare/v1.6.1...v1.7.0
+[1.6.1]: https://github.com/arbgjr/mice_dolphins/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/arbgjr/mice_dolphins/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/arbgjr/mice_dolphins/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/arbgjr/mice_dolphins/compare/v1.3.0...v1.4.0

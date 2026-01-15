@@ -5,6 +5,15 @@
 
 set -e
 
+# Load logging utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "${SCRIPT_DIR}/../lib/shell/logging_utils.sh" ]]; then
+    source "${SCRIPT_DIR}/../lib/shell/logging_utils.sh"
+    sdlc_set_context skill="document-processor" phase="0"
+fi
+
+sdlc_log_debug "Scanning for documents"
+
 # Find document files in common locations
 DOCS_FOUND=()
 
@@ -26,6 +35,7 @@ fi
 
 # If documents found, output suggestion
 if [ ${#DOCS_FOUND[@]} -gt 0 ]; then
+    sdlc_log_info "Documents detected" "count=${#DOCS_FOUND[@]}"
     echo "DOCUMENTS_DETECTED=true"
     echo "DOCUMENT_COUNT=${#DOCS_FOUND[@]}"
     echo "DOCUMENTS_HINT=Use /doc-extract to process documents"
@@ -34,10 +44,13 @@ if [ ${#DOCS_FOUND[@]} -gt 0 ]; then
     count=0
     for doc in "${DOCS_FOUND[@]}"; do
         if [ $count -lt 5 ]; then
+            sdlc_log_debug "Document found" "path=$doc"
             echo "DOCUMENT_$count=$doc"
             ((count++))
         fi
     done
+else
+    sdlc_log_debug "No documents found"
 fi
 
 exit 0
