@@ -26,6 +26,10 @@ SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orc
 - Decay scoring for knowledge freshness (v1.5.0)
 - Automatic curation suggestions for obsolete content (v1.5.0)
 - Search results boosted by content freshness (v1.5.0)
+- Native GitHub Projects V2 integration (v1.6.0)
+- Automatic Milestone creation per sprint (v1.6.0)
+- GitHub Wiki synchronization with ADRs (v1.6.0)
+- Consolidated GitHub dashboard command (v1.6.0)
 
 ## Setup Commands
 
@@ -71,6 +75,12 @@ gh auth status
 
 # Create GitHub issues (optionally assign to Copilot)
 /sdlc-create-issues --assign-copilot
+
+# View consolidated GitHub dashboard (v1.6.0)
+/github-dashboard
+
+# Sync documentation with GitHub Wiki (v1.6.0)
+/wiki-sync
 ```
 
 ## Architecture
@@ -206,6 +216,9 @@ Hooks are triggered automatically:
 - **GitHub Copilot Coding Agent**: Issues can be assigned to `@copilot` for automatic implementation
 - **Spec Kit**: `specify` CLI for specification-driven development
 - **GitHub CLI**: `gh` for repository operations
+- **GitHub Projects V2**: Automatic project management via GraphQL (v1.6.0)
+- **GitHub Milestones**: Sprint tracking and release coordination (v1.6.0)
+- **GitHub Wiki**: Documentation synchronization via Git (v1.6.0)
 
 ## Skills
 
@@ -228,6 +241,9 @@ Available skills for automation:
 | `frontend-testing` | E2E testing with Playwright, screenshots, browser logs (v1.3.0) |
 | `graph-navigator` | Semantic graph navigation, concept extraction, visualization (v1.4.0) |
 | `decay-scoring` | Temporal scoring for knowledge freshness, curation triggers (v1.5.0) |
+| `github-sync` | Base skill for GitHub synchronization: issues, labels, milestones (v1.6.0) |
+| `github-projects` | GitHub Projects V2 management via GraphQL API (v1.6.0) |
+| `github-wiki` | GitHub Wiki synchronization via Git (v1.6.0) |
 
 ## New Skills (v1.3.0) - Document Processing & Frontend Testing
 
@@ -440,6 +456,99 @@ decay_metadata:
   decay_score: 0.85
   decay_status: fresh
 ```
+
+## New Skills (v1.6.0) - GitHub Integration
+
+### github-sync
+
+Base skill for GitHub synchronization:
+
+```bash
+# Ensure SDLC labels exist
+python .claude/skills/github-sync/scripts/label_manager.py ensure
+
+# Create milestone for sprint
+python .claude/skills/github-sync/scripts/milestone_sync.py create \
+  --title "Sprint 1" \
+  --description "MVP delivery" \
+  --due-date "2026-01-28"
+
+# Create issue with SDLC labels
+python .claude/skills/github-sync/scripts/issue_sync.py create \
+  --title "[TASK-001] Implement feature" \
+  --phase 5 \
+  --type task \
+  --milestone "Sprint 1"
+```
+
+**Features:**
+- Automatic SDLC label management (`phase:0-8`, `complexity:0-3`, `type:*`)
+- Milestone CRUD operations
+- Issue creation with automatic labeling
+- Integration with `/sdlc-create-issues`
+
+### github-projects
+
+GitHub Projects V2 management via GraphQL:
+
+```bash
+# Create project
+python .claude/skills/github-projects/scripts/project_manager.py create "SDLC: Feature X"
+
+# Configure custom fields
+python .claude/skills/github-projects/scripts/project_manager.py configure-fields --project-number 1
+
+# Add issue to project
+python .claude/skills/github-projects/scripts/project_manager.py add-item \
+  --project-number 1 \
+  --issue-url "https://github.com/owner/repo/issues/123"
+
+# Update field value
+python .claude/skills/github-projects/scripts/project_manager.py update-field \
+  --project-number 1 \
+  --item-id ITEM_ID \
+  --field "Phase" \
+  --value "In Progress"
+```
+
+**Features:**
+- Project V2 creation and configuration
+- Custom fields: Phase, Priority, Story Points
+- SDLC Kanban columns (Backlog → Done)
+- Item management and field updates
+
+### github-wiki
+
+GitHub Wiki synchronization:
+
+```bash
+# Full sync
+.claude/skills/github-wiki/scripts/wiki_sync.sh
+
+# Dry run
+.claude/skills/github-wiki/scripts/wiki_sync.sh --dry-run
+
+# Publish specific ADR
+.claude/skills/github-wiki/scripts/publish_adr.sh path/to/adr.yml
+
+# Publish all ADRs
+.claude/skills/github-wiki/scripts/publish_adr.sh --all
+```
+
+**Features:**
+- Automatic Home and Sidebar generation
+- ADR YAML to Markdown conversion
+- Project documentation sync
+- Git-based (no API required)
+
+**Slash Commands:**
+- `/github-dashboard` - Consolidated project status
+- `/wiki-sync` - Manual Wiki synchronization
+
+**Automatic Integration:**
+- Phase 0: Creates Project V2 + Milestone
+- Phase transitions: Updates Project fields
+- Phase 7: Closes Milestone + Syncs Wiki
 
 ## New Agents (v2.0)
 

@@ -3,6 +3,7 @@ name: sdlc-create-issues
 description: |
   Cria issues no GitHub a partir das tasks geradas pelo SDLC.
   Opcionalmente atribui ao Copilot Coding Agent para implementacao automatica.
+  Integra com GitHub Projects, Milestones e Labels SDLC.
 
   Examples:
   - <example>
@@ -21,7 +22,30 @@ description: |
 
 ## Instrucoes
 
-Voce deve criar issues no GitHub a partir das tasks geradas pelo processo SDLC.
+Voce deve criar issues no GitHub a partir das tasks geradas pelo processo SDLC,
+com integracao completa a Projects V2, Milestones e Labels SDLC.
+
+## Pre-requisitos
+
+### 1. Garantir Labels SDLC Existem
+
+```bash
+python .claude/skills/github-sync/scripts/label_manager.py ensure
+```
+
+### 2. Verificar Milestone do Sprint
+
+```bash
+python .claude/skills/github-sync/scripts/milestone_sync.py list
+```
+
+Se nao existir, criar:
+```bash
+python .claude/skills/github-sync/scripts/milestone_sync.py create \
+  --title "Sprint 1" \
+  --description "Sprint goal" \
+  --due-date "$(date -d '+14 days' +%Y-%m-%d)"
+```
 
 ## Processo
 
@@ -29,19 +53,29 @@ Voce deve criar issues no GitHub a partir das tasks geradas pelo processo SDLC.
 
 Busque por tasks em:
 - `.specify/tasks/*.md` (Spec Kit)
-- `.claude/memory/tasks/*.yml` (Memory Manager)
+- `.agentic_sdlc/projects/*/tasks/*.yml` (Memory Manager)
+- `.claude/memory/tasks/*.yml` (Legacy)
 - Contexto da conversa atual
 
-### 2. Para Cada Task, Criar Issue
+### 2. Para Cada Task, Criar Issue com Labels SDLC
 
-Use o GitHub CLI para criar issues:
+Use o script issue_sync.py ou GitHub CLI:
 
 ```bash
+# Opcao 1: Via script (recomendado)
+python .claude/skills/github-sync/scripts/issue_sync.py create \
+  --title "[TASK-XXX] Titulo da Task" \
+  --body-file <arquivo_da_task> \
+  --phase 5 \
+  --type task \
+  --milestone "Sprint 1"
+
+# Opcao 2: Via gh CLI com labels SDLC
 gh issue create \
   --title "[TASK-XXX] Titulo da Task" \
   --body-file <arquivo_da_task> \
-  --label "sdlc,task" \
-  --milestone "<sprint_atual>"
+  --label "sdlc:auto,phase:5,type:task" \
+  --milestone "Sprint 1"
 ```
 
 ### 3. Formato do Body da Issue
@@ -85,14 +119,30 @@ gh issue create \
 Adicione `--assignee "@copilot"` ao comando:
 
 ```bash
-gh issue create \
+python .claude/skills/github-sync/scripts/issue_sync.py create \
   --title "[TASK-XXX] Titulo" \
   --body-file task.md \
-  --assignee "@copilot" \
-  --label "copilot-agent,sdlc"
+  --phase 5 \
+  --type task \
+  --milestone "Sprint 1" \
+  --assignee "@copilot"
 ```
 
-### 5. Registrar Issues Criadas
+### 5. Adicionar ao GitHub Project (Opcional)
+
+Se o projeto tiver um GitHub Project V2 configurado:
+
+```bash
+# Obter URL da issue criada
+ISSUE_URL="https://github.com/owner/repo/issues/123"
+
+# Adicionar ao project
+python .claude/skills/github-projects/scripts/project_manager.py add-item \
+  --project-number 1 \
+  --issue-url "$ISSUE_URL"
+```
+
+### 6. Registrar Issues Criadas
 
 Salve mapeamento task -> issue:
 

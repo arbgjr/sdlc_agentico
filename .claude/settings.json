@@ -193,7 +193,10 @@
       "session-analyzer",
       "document-processor",
       "frontend-testing",
-      "decay-scoring"
+      "decay-scoring",
+      "github-sync",
+      "github-projects",
+      "github-wiki"
     ]
   },
   "sdlc": {

@@ -23,6 +23,7 @@ O SDLC Agêntico é um framework que usa **34 agentes especializados** (30 orque
 │  Document Processing | Frontend E2E Testing | Patterns (v1.3.0)        │
 │  Semantic Graph | Hybrid Search | Graph Visualization (v1.4.0)         │
 │  Decay Scoring | Content Freshness | Curation Triggers (v1.5.0)        │
+│  GitHub Projects | Milestones | Wiki Sync | Dashboard (v1.6.0)         │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -101,21 +102,48 @@ O sistema se integra com o **GitHub Copilot Coding Agent**:
 # O Copilot implementa automaticamente e cria PRs
 ```
 
+### Integração GitHub Nativa (v1.6.0)
+
+O sistema se integra nativamente com:
+
+| Recurso | Automação |
+|---------|-----------|
+| **GitHub Projects V2** | Criado automaticamente no início do SDLC, atualizado a cada fase |
+| **Milestones** | Criado para cada sprint, fechado no release |
+| **Wiki** | Sincronizada com ADRs e documentação do projeto |
+| **Labels** | Gerenciados automaticamente (`phase:0-8`, `complexity:0-3`, `type:*`) |
+
+```bash
+# Ver dashboard consolidado
+/github-dashboard
+
+# Sincronizar documentação com Wiki
+/wiki-sync
+
+# Criar issues com labels e milestone
+/sdlc-create-issues
+```
+
+**Fluxo Automático:**
+1. `/sdlc-start` → Cria Project V2 + Milestone "Sprint 1"
+2. Cada transição de fase → Atualiza campo "Phase" das issues
+3. `/release-prep` → Fecha Milestone + Sincroniza Wiki
+
 ### Changelog
 
 Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanças.
+
+**Destaques da v1.6.0:**
+- Integração nativa com GitHub Projects V2
+- Milestones automatizados por sprint
+- Sincronização de documentação com GitHub Wiki
+- Dashboard consolidado do projeto (`/github-dashboard`)
 
 **Destaques da v1.5.0:**
 - Decay scoring para freshness de conhecimento
 - Sugestões automáticas de curadoria para conteúdo obsoleto
 - Resultados de busca priorizados por freshness
 - Quality gate de saúde do corpus
-
-**Destaques da v1.4.0:**
-- Grafo semântico com busca híbrida (texto + grafo)
-- Extração automática de conceitos
-- Visualização de grafos em Mermaid
-- Gate de integridade do grafo
 
 ## Comandos Disponíveis
 
@@ -133,15 +161,17 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 | `/sdlc-create-issues` | Cria issues no GitHub |
 | `/decay-status` | Mostra saúde do corpus RAG |
 | `/validate-node` | Marca node como validado |
+| `/github-dashboard` | Dashboard consolidado do GitHub |
+| `/wiki-sync` | Sincroniza documentação com Wiki |
 
 ## Estrutura do Projeto
 
 ```
 .claude/
 ├── agents/           # 34 agentes especializados (30 + 4 consultivos)
-├── skills/           # 16 skills reutilizáveis (+1 em v1.5.0)
-├── commands/         # 10 comandos do usuário
-├── hooks/            # 9 hooks de automação (+1 em v1.3.0)
+├── skills/           # 19 skills reutilizáveis (+3 em v1.6.0)
+├── commands/         # 12 comandos do usuário (+2 em v1.6.0)
+├── hooks/            # 9 hooks de automação
 └── settings.json     # Configuração central
 
 .agentic_sdlc/        # Artefatos do SDLC (NOVO)

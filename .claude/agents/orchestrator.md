@@ -45,6 +45,9 @@ skills:
   - mcp-connector
   - spec-kit-integration
   - bmad-integration
+  - github-projects
+  - github-wiki
+  - github-sync
 ---
 
 # Orchestrator Agent
@@ -289,6 +292,82 @@ Use `mcp-connector` para:
 - Criar PRs para implementacoes
 - Monitorar status de Actions
 - Gerenciar releases
+
+## Integracao Completa com GitHub
+
+### Phase 0 (Intake) - Criar Project e Milestone
+
+Ao iniciar workflow com `/sdlc-start`:
+
+```bash
+# 1. Garantir labels SDLC existem
+python .claude/skills/github-sync/scripts/label_manager.py ensure
+
+# 2. Criar GitHub Project V2
+python .claude/skills/github-projects/scripts/project_manager.py create \
+  --title "SDLC: {feature_name}"
+
+# 3. Configurar campos customizados (Phase, Sprint, Story Points)
+python .claude/skills/github-projects/scripts/project_manager.py configure-fields \
+  --project-number {N}
+
+# 4. Criar primeiro Milestone (Sprint 1)
+python .claude/skills/github-sync/scripts/milestone_sync.py create \
+  --title "Sprint 1" \
+  --description "Sprint inicial" \
+  --due-date "$(date -d '+14 days' +%Y-%m-%d)"
+```
+
+### Transicao de Fase - Atualizar Project
+
+Ao passar de uma fase para outra:
+
+```bash
+# Atualizar campo Phase das issues no Project
+# (As issues devem ser movidas para a coluna correspondente)
+python .claude/skills/github-projects/scripts/project_manager.py update-field \
+  --project-number {N} \
+  --item-id {item_id} \
+  --field "Phase" \
+  --value "{new_phase_name}"
+```
+
+### Phase 7 (Release) - Fechar e Sincronizar
+
+Ao aprovar gate de release:
+
+```bash
+# 1. Fechar Milestone do sprint atual
+python .claude/skills/github-sync/scripts/milestone_sync.py close \
+  --title "{current_sprint}"
+
+# 2. Sincronizar documentacao com Wiki
+.claude/skills/github-wiki/scripts/wiki_sync.sh
+
+# 3. Se tag existir, criar GitHub Release
+gh release create v{version} \
+  --title "Release v{version}" \
+  --notes-file CHANGELOG.md
+```
+
+### Mapeamento Fase -> Coluna do Project
+
+| Fase SDLC | Coluna do Project |
+|-----------|-------------------|
+| Phase 0-1 | Backlog |
+| Phase 2 | Requirements |
+| Phase 3 | Architecture |
+| Phase 4 | Planning |
+| Phase 5 | In Progress |
+| Phase 6 | QA |
+| Phase 7 | Release |
+| Completo | Done |
+
+### Comandos Uteis
+
+- `/github-dashboard` - Ver status consolidado
+- `/wiki-sync` - Sincronizar docs com Wiki manualmente
+- `/sdlc-create-issues` - Criar issues das tasks
 
 ## Pontos de Pesquisa
 
