@@ -7,6 +7,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-01-14
+
+### Added
+
+- **GitHub Projects V2 Integration** (`github-projects` skill)
+  - Create and manage GitHub Projects V2 via GraphQL API
+  - Automatic project creation during SDLC start
+  - Custom fields: Phase, Priority, Story Points
+  - SDLC Kanban columns (Backlog → Done)
+  - Scripts: `project_manager.py`
+
+- **GitHub Milestones Integration** (`github-sync` skill)
+  - Automatic Milestone creation during sprint planning
+  - Sprint to Milestone mapping
+  - Issue assignment to Milestones
+  - Scripts: `milestone_sync.py`, `issue_sync.py`, `label_manager.py`
+
+- **GitHub Wiki Synchronization** (`github-wiki` skill)
+  - Automatic documentation sync to GitHub Wiki
+  - ADR publishing with YAML to Markdown conversion
+  - Auto-generated Home and Sidebar pages
+  - Scripts: `wiki_sync.sh`, `publish_adr.sh`
+  - Commands: `/wiki-sync`
+
+- **GitHub Dashboard** (`/github-dashboard` command)
+  - Consolidated project status view
+  - Project, Milestone, and Wiki status
+  - Issues by SDLC phase
+  - Quick links to GitHub resources
+
+- **SDLC Label Management**
+  - Automatic label creation: `phase:0-8`, `complexity:0-3`, `type:story/task/epic`, `sdlc:auto`
+  - Color-coded labels for easy identification
+  - Integration with `/sdlc-create-issues`
+
+- **GitHub Projects Scope Verification**
+  - Setup script now verifies `project` scope for GitHub CLI
+  - Automatic prompt to add scope if missing
+
+### Changed
+
+- **orchestrator agent**: Added full GitHub integration
+  - Creates Project V2 during Phase 0
+  - Updates Project fields during phase transitions
+  - Syncs Wiki and closes Milestone during Phase 7
+  - New skills: github-projects, github-wiki, github-sync
+
+- **delivery-planner agent**: Added Milestone integration
+  - Automatically creates GitHub Milestone for each sprint
+  - Issues assigned to Milestone during sprint planning
+  - New skill: github-sync
+
+- **`/sdlc-create-issues` command**: Enhanced with GitHub integration
+  - Ensures SDLC labels exist before creating issues
+  - Assigns issues to current Milestone
+  - Adds issues to GitHub Project V2
+
+- Updated `settings.json` with 3 new skills
+
+### Documentation
+
+- Added GitHub Integration section to README.md
+- Updated CLAUDE.md with v1.6.0 documentation
+- Updated skills count (16 → 19)
+- Updated commands count (10 → 12)
+
 ## [1.5.0] - 2026-01-15
 
 ### Added
@@ -241,7 +307,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/arbgjr/mice_dolphins/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/arbgjr/mice_dolphins/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/arbgjr/mice_dolphins/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/arbgjr/mice_dolphins/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/arbgjr/mice_dolphins/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/arbgjr/mice_dolphins/compare/v1.2.0...v1.3.0

@@ -333,6 +333,8 @@ check_gh() {
         # Verificar autenticacao
         if gh auth status &> /dev/null; then
             log_success "GitHub CLI autenticado"
+            # Verificar scope project para GitHub Projects V2
+            check_gh_project_scope
         else
             log_warn "GitHub CLI nao autenticado. Execute: gh auth login"
         fi
@@ -349,6 +351,38 @@ check_gh() {
     fi
     log_success "GitHub CLI instalado"
     log_warn "Execute 'gh auth login' para autenticar"
+}
+
+# Verificar scope project para GitHub Projects V2
+check_gh_project_scope() {
+    log_info "Verificando scope 'project' para GitHub Projects V2..."
+
+    # Verificar scopes atuais
+    local SCOPES=$(gh auth status 2>&1 | grep -i "Token scopes" || echo "")
+
+    if echo "$SCOPES" | grep -qi "project"; then
+        log_success "Scope 'project' disponivel"
+        return 0
+    fi
+
+    # Scope project nao encontrado
+    log_warn "Scope 'project' nao encontrado"
+    log_info "Este scope e necessario para gerenciar GitHub Projects V2"
+    echo ""
+    echo "Para adicionar o scope, execute:"
+    echo "  gh auth refresh -s project"
+    echo ""
+
+    # Perguntar se quer adicionar agora
+    read -p "Deseja adicionar o scope agora? [y/N]: " ADD_SCOPE
+    if [[ "$ADD_SCOPE" =~ ^[Yy]$ ]]; then
+        log_info "Executando 'gh auth refresh -s project'..."
+        gh auth refresh -s project && {
+            log_success "Scope 'project' adicionado com sucesso"
+        } || {
+            log_warn "Falha ao adicionar scope. Execute manualmente: gh auth refresh -s project"
+        }
+    fi
 }
 
 # Verificar Node.js (para Claude Code)
