@@ -33,6 +33,11 @@ jobs:
           rm -f release-package/.claude/best-practices.md
           rm -f release-package/.claude/quick-reference.md
 
+          # Ensure all scripts have executable permissions
+          chmod +x release-package/.claude/hooks/*.sh 2>/dev/null || true
+          find release-package/.claude/skills -name "*.sh" -type f -exec chmod +x {} \; 2>/dev/null || true
+          find release-package/.claude/skills -name "*.py" -type f -exec chmod +x {} \; 2>/dev/null || true
+
           # Copy templates and patterns from .agentic_sdlc/
           mkdir -p release-package/.agentic_sdlc
 
@@ -86,15 +91,21 @@ jobs:
           if [ -f ".scripts/install-security-tools.sh" ]; then
             cp .scripts/install-security-tools.sh release-package/.scripts/
           fi
+          chmod +x release-package/.scripts/*.sh 2>/dev/null || true
 
           # Copy root files (CLAUDE.md is NOT included - project-specific)
           cp README.md release-package/
           cp CHANGELOG.md release-package/
           cp LICENSE release-package/
 
-          # Create ZIP
+          # Verify permissions before creating ZIP
+          echo "Verifying executable permissions:"
+          ls -la release-package/.claude/hooks/*.sh | head -5
+          ls -la release-package/.scripts/*.sh
+
+          # Create ZIP preserving Unix permissions
           cd release-package
-          zip -r ../sdlc-agentico-${{ steps.version.outputs.VERSION }}.zip .
+          zip -r -X ../sdlc-agentico-${{ steps.version.outputs.VERSION }}.zip .
           cd ..
 
           # Cleanup
