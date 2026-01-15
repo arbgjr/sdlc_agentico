@@ -1,1 +1,0 @@
-../../../.docs/DESENVOLVIMENTO.md
