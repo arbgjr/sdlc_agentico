@@ -267,14 +267,31 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 
 ## Instalação
 
-### Opção 1: Instalação a partir de Release (Recomendado)
+### Opção 1: Download Direto (Linux/macOS/WSL)
+
+```bash
+# Definir versão desejada (consulte releases para última versão)
+VERSION="v1.7.1"
+
+# Download e extração (preserva permissões de execução)
+curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -
+
+# Executar setup
+./.scripts/setup-sdlc.sh
+```
+
+> **WSL2**: Use os mesmos comandos acima. O tar.gz preserva as permissões Unix corretamente.
+>
+> **Releases**: https://github.com/arbgjr/sdlc_agentico/releases
+
+### Opção 2: Via Script Automático
 
 ```bash
 # Última versão (one-liner)
-curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
+curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
 
 # Versão específica
-curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.2.0
+curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.7.1
 ```
 
 Se o diretório `.claude/` já existir, o script perguntará o que fazer:
@@ -283,7 +300,7 @@ Se o diretório `.claude/` já existir, o script perguntará o que fazer:
 3. Substituir sem backup
 4. Cancelar
 
-### Opção 2: Clone do Repositório
+### Opção 3: Clone do Repositório
 
 ```bash
 # Clonar repositório

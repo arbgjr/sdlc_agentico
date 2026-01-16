@@ -26,12 +26,24 @@ Guia rápido para começar a usar o SDLC Agêntico em 5 minutos.
 
 ## 1. Instalação (2 min)
 
-```bash
-# Clone o repositório (se ainda não fez)
-git clone https://github.com/arbgjr/mice_dolphins.git
-cd mice_dolphins
+### Linux/macOS/WSL (Recomendado)
 
-# Execute o script de setup
+```bash
+# Definir versão (consulte https://github.com/arbgjr/sdlc_agentico/releases)
+VERSION="v1.7.1"
+
+# Download e extração (preserva permissões)
+curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -
+
+# Execute o setup
+./.scripts/setup-sdlc.sh
+```
+
+### Alternativa: Clone do Repositório
+
+```bash
+git clone https://github.com/arbgjr/sdlc_agentico.git
+cd sdlc_agentico
 ./.scripts/setup-sdlc.sh
 ```
 
