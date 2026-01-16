@@ -97,6 +97,24 @@ gate_conditions:
   - all_quality_checks_passed: true
   - required_approvals_obtained: true
 
+# ODR checks para Level 2-3
+odr_checks:
+  - name: resource_odr
+    description: "ODR de recursos necessário se budget > R$100k"
+    condition: "project.budget > 100000"
+    required_odr:
+      category: "resource"
+      status: "approved"
+    optional_for_levels: [0, 1]
+
+  - name: stakeholder_alignment_odr
+    description: "ODR de alinhamento necessário se 3+ stakeholders"
+    condition: "project.stakeholders_count >= 3"
+    required_odr:
+      category: "business"
+      status: "approved"
+    optional_for_levels: [0, 1]
+
 stakeholder_review:
   description: "Arquivos que stakeholders devem revisar antes de prosseguir"
   notification: true

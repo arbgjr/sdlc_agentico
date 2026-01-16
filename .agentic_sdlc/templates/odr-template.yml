@@ -1,0 +1,172 @@
+# Organizational Decision Record (ODR) Template
+# ==============================================
+# ODRs documentam decisões organizacionais/negócio, diferente de ADRs que são técnicos.
+#
+# Quando usar ODR vs ADR:
+# - ODR: Decisões de negócio, budget, timeline, escopo, stakeholders, priorização
+# - ADR: Decisões técnicas, arquitetura, ferramentas, padrões de código
+#
+# Exemplos de ODRs:
+# - Mudança de budget do projeto
+# - Alteração de timeline/escopo
+# - Decisão de build vs buy
+# - Mudança de stakeholders chave
+# - Priorização entre features conflitantes
+
+odr:
+  # Identificador único (gerado automaticamente)
+  id: "ODR-XXX"
+  
+  # Título descritivo da decisão
+  title: ""
+  
+  # Data de criação (ISO 8601)
+  created_at: ""
+  
+  # Data da última atualização
+  updated_at: ""
+  
+  # Status do ODR
+  # - draft: Rascunho, em elaboração
+  # - pending_input: Aguardando inputs de stakeholders
+  # - pending_approval: Inputs coletados, aguardando aprovação
+  # - approved: Decisão aprovada por todos stakeholders
+  # - rejected: Decisão rejeitada
+  # - superseded: Substituída por outro ODR
+  status: "draft"
+  
+  # Prazo para decisão (opcional)
+  deadline: null
+  
+  # Contexto organizacional/negócio
+  # Descreva a situação que levou à necessidade desta decisão
+  business_context: |
+    Descreva o contexto de negócio que motivou esta decisão.
+    - Qual problema ou oportunidade está sendo endereçado?
+    - Quais são os impactos no negócio?
+    - Há pressões externas (mercado, regulatório, etc)?
+
+  # Stakeholders envolvidos
+  stakeholders:
+    # Responsável pela decisão
+    decision_maker:
+      name: ""
+      role: ""
+      email: ""
+    
+    # Pessoas que devem ser consultadas (dão input)
+    consulted:
+      - name: ""
+        role: ""
+        input_status: "pending"  # pending | received | waived
+        input: ""
+        received_at: null
+    
+    # Pessoas que devem ser informadas (não dão input)
+    informed:
+      - name: ""
+        role: ""
+        notified_at: null
+
+  # Alternativas consideradas
+  alternatives:
+    - id: "A"
+      title: ""
+      description: ""
+      pros:
+        - ""
+      cons:
+        - ""
+      estimated_cost: ""
+      estimated_time: ""
+      risk_level: "low"  # low | medium | high
+
+  # Trade-offs identificados
+  trade_offs:
+    - description: ""
+      # O que ganhamos
+      gain: ""
+      # O que perdemos
+      loss: ""
+      # Avaliação (acceptable | unacceptable | requires_mitigation)
+      assessment: "acceptable"
+      # Mitigação se necessário
+      mitigation: null
+
+  # A decisão tomada
+  decision:
+    # Qual alternativa foi escolhida
+    chosen_alternative: "A"
+    
+    # Descrição detalhada da decisão
+    description: |
+      Descreva a decisão tomada de forma clara e acionável.
+    
+    # Justificativa
+    rationale: |
+      Por que esta alternativa foi escolhida sobre as outras?
+
+  # Consequências da decisão
+  consequences:
+    # Impactos positivos esperados
+    positive:
+      - ""
+    
+    # Impactos negativos conhecidos
+    negative:
+      - ""
+    
+    # Riscos identificados
+    risks:
+      - description: ""
+        probability: "medium"  # low | medium | high
+        impact: "medium"       # low | medium | high
+        mitigation: ""
+
+  # Registro de aprovações
+  approvals:
+    - stakeholder: ""
+      approved: null  # true | false | null (pending)
+      approved_at: null
+      comments: ""
+
+  # Relacionamentos
+  relationships:
+    # ODRs relacionados
+    related_odrs: []
+    
+    # ADRs técnicos que derivam desta decisão
+    derived_adrs: []
+    
+    # Issues/tasks relacionadas
+    related_issues: []
+    
+    # Fase do SDLC onde esta decisão se aplica
+    sdlc_phase: null  # 0-8
+
+  # Metadados
+  metadata:
+    # Categoria da decisão
+    category: "business"  # business | resource | timeline | scope | strategic
+    
+    # Nível de impacto
+    impact_level: "medium"  # low | medium | high | critical
+    
+    # Reversibilidade
+    reversible: true
+    
+    # Custo estimado de reversão
+    reversal_cost: "low"  # low | medium | high | irreversible
+    
+    # Projeto associado
+    project_id: null
+    
+    # Tags para busca
+    tags: []
+
+  # Histórico de mudanças
+  history:
+    - timestamp: ""
+      action: "created"
+      by: ""
+      details: ""

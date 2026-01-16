@@ -146,6 +146,7 @@
     "orchestrator_model": "opus",
     "available_agents": [
       "orchestrator",
+      "alignment-agent",
       "intake-analyst",
       "compliance-guardian",
       "domain-researcher",
@@ -196,7 +197,8 @@
       "decay-scoring",
       "github-sync",
       "github-projects",
-      "github-wiki"
+      "github-wiki",
+      "alignment-workflow"
     ]
   },
   "sdlc": {

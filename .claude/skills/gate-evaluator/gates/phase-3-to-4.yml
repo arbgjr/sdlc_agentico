@@ -84,6 +84,25 @@ blockers:
   - "NFRs nao enderecados"
   - "Modelo de dados nao definido"
   - "Contratos de API nao especificados"
+  - "ODR de build vs buy nao aprovado (se aplicavel)"
+
+# ODR checks para Level 2-3
+odr_checks:
+  - name: build_vs_buy_odr
+    description: "ODR necessário para decisões de build vs buy"
+    condition: "decisions.has_build_vs_buy == true"
+    required_odr:
+      category: "strategic"
+      status: "approved"
+    optional_for_levels: [0, 1]
+
+  - name: significant_tradeoffs_odr
+    description: "ODR necessário para trade-offs arquiteturais significativos"
+    condition: "architecture.significant_tradeoffs == true"
+    required_odr:
+      category: "business"
+      status: "approved"
+    optional_for_levels: [0, 1]
 
 stakeholder_review:
   description: "Arquivos que stakeholders devem revisar antes de prosseguir para Planning"

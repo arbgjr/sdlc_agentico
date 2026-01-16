@@ -357,17 +357,37 @@ check_gh() {
 check_gh_project_scope() {
     log_info "Verificando scope 'project' para GitHub Projects V2..."
 
-    # Verificar scopes atuais
-    local SCOPES=$(gh auth status 2>&1 | grep -i "Token scopes" || echo "")
+    # Verificar se está autenticado
+    if ! gh auth status &> /dev/null; then
+        log_warn "GitHub CLI não autenticado. Execute 'gh auth login' primeiro."
+        return 1
+    fi
 
-    if echo "$SCOPES" | grep -qi "project"; then
-        log_success "Scope 'project' disponivel"
+    # Verificar scopes atuais usando gh auth status
+    local AUTH_OUTPUT=$(gh auth status 2>&1)
+    
+    # Procurar por "Token scopes" na saída
+    if echo "$AUTH_OUTPUT" | grep -qi "project"; then
+        log_success "Scope 'project' disponível"
         return 0
     fi
 
-    # Scope project nao encontrado
-    log_warn "Scope 'project' nao encontrado"
-    log_info "Este scope e necessario para gerenciar GitHub Projects V2"
+    # Verificar via API diretamente (método mais confiável)
+    local SCOPES=$(gh api user -H "X-OAuth-Scopes: true" 2>&1 | head -1 || echo "")
+    if echo "$SCOPES" | grep -qi "project"; then
+        log_success "Scope 'project' disponível (via API)"
+        return 0
+    fi
+
+    # Scope project não encontrado
+    log_warn "Scope 'project' não encontrado"
+    log_info "Este scope é necessário para gerenciar GitHub Projects V2"
+    echo ""
+    echo "O scope 'project' permite:"
+    echo "  - Criar e gerenciar Projects V2"
+    echo "  - Adicionar issues a Projects"
+    echo "  - Atualizar campos customizados"
+    echo "  - Mover items entre colunas"
     echo ""
     echo "Para adicionar o scope, execute:"
     echo "  gh auth refresh -s project"
@@ -377,11 +397,22 @@ check_gh_project_scope() {
     read -p "Deseja adicionar o scope agora? [y/N]: " ADD_SCOPE
     if [[ "$ADD_SCOPE" =~ ^[Yy]$ ]]; then
         log_info "Executando 'gh auth refresh -s project'..."
-        gh auth refresh -s project && {
+        if gh auth refresh -s project; then
             log_success "Scope 'project' adicionado com sucesso"
-        } || {
-            log_warn "Falha ao adicionar scope. Execute manualmente: gh auth refresh -s project"
-        }
+            
+            # Verificar novamente
+            if gh api user -H "X-OAuth-Scopes: true" 2>&1 | grep -qi "project"; then
+                log_success "Verificação: scope 'project' confirmado"
+            fi
+            return 0
+        else
+            log_error "Falha ao adicionar scope."
+            log_info "Execute manualmente: gh auth refresh -s project"
+            return 1
+        fi
+    else
+        log_warn "Scope 'project' não adicionado. GitHub Projects V2 pode não funcionar."
+        return 1
     fi
 }
 

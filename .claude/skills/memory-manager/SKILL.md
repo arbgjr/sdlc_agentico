@@ -81,12 +81,95 @@ project:
   metrics:
     phase_durations: object
     decisions_count: number
+    odrs_count: number       # ODRs organizacionais
     learnings_count: number
 
   tags: list[string]
 ```
 
-### Decision Record
+### Organizational Decision Record (ODR)
+
+ODRs documentam decisões organizacionais/negócio, diferente de ADRs que são técnicos.
+Veja `.docs/guides/adr-vs-odr.md` para guia completo.
+
+```yaml
+# decisions/odr-NNN.yml
+odr:
+  id: string               # ODR-001, ODR-002, etc
+  title: string
+  created_at: datetime
+  updated_at: datetime
+  status: [draft | pending_input | pending_approval | approved | rejected | superseded]
+  deadline: datetime | null
+
+  business_context: string
+
+  stakeholders:
+    decision_maker:
+      name: string
+      role: string
+    consulted:
+      - name: string
+        role: string
+        input_status: [pending | received | waived]
+        input: string
+    informed:
+      - name: string
+        role: string
+
+  alternatives:
+    - id: string           # A, B, C, etc
+      title: string
+      description: string
+      pros: list[string]
+      cons: list[string]
+      estimated_cost: string
+      risk_level: [low | medium | high]
+
+  trade_offs:
+    - description: string
+      gain: string
+      loss: string
+      assessment: [acceptable | unacceptable | requires_mitigation]
+      mitigation: string | null
+
+  decision:
+    chosen_alternative: string
+    description: string
+    rationale: string
+
+  consequences:
+    positive: list[string]
+    negative: list[string]
+    risks:
+      - description: string
+        probability: [low | medium | high]
+        impact: [low | medium | high]
+        mitigation: string
+
+  approvals:
+    - stakeholder: string
+      approved: boolean | null
+      approved_at: datetime | null
+      comments: string
+
+  relationships:
+    related_odrs: list[string]
+    derived_adrs: list[string]  # ADRs técnicos que derivam deste ODR
+    related_issues: list[string]
+    sdlc_phase: number | null
+
+  metadata:
+    category: [business | resource | timeline | scope | strategic]
+    impact_level: [low | medium | high | critical]
+    reversible: boolean
+    project_id: string | null
+    tags: list[string]
+```
+
+### Decision Record (ADR)
+
+ADRs documentam decisões técnicas/arquiteturais.
 
 ```yaml
 # decisions/adr-NNN.yml
