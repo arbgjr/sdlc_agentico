@@ -18,3 +18,4 @@ Thumbs.db
 # Ignora arquivos de log
 *.log
 .venv/
+__pycache__/

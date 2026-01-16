@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.2] - 2026-01-16
+
+### Fixed
+
+- **memory-manager skill** - Scripts ausentes causavam erro ao executar SDLC
+  - Criado `memory_ops.py` com todas as operações de memória (save_decision, load_decision, save_learning, etc)
+  - Criado `memory_store.py` como wrapper/alias para compatibilidade
+  - Criado `__init__.py` para permitir import como pacote Python
+  - Adicionado `README.md` com documentação e exemplos de uso
+  - Corrigido uso de `datetime.utcnow()` deprecado para `datetime.now(timezone.utc)`
+  - Estrutura de armazenamento em `.agentic_sdlc/` conforme v1.2.0
+
 ## [1.7.0] - 2026-01-15
 
 ### Added
