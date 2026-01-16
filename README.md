@@ -37,6 +37,83 @@ O SDLC Agêntico é um framework que usa **34 agentes especializados** (30 orque
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
+## Requisitos
+
+- **Python** 3.11+
+- **Node.js** 18+
+- **Claude Code** CLI
+- **GitHub CLI** (`gh`)
+- **Copilot Pro+/Business/Enterprise** (para coding agent)
+
+## Instalação
+
+### Opção 1: Download Direto (Linux/macOS/WSL)
+
+```bash
+# Definir versão desejada (consulte releases para última versão)
+VERSION="v1.7.1"
+
+# Download e extração (preserva permissões de execução)
+curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -
+
+# Executar setup
+./.scripts/setup-sdlc.sh
+```
+
+> **WSL2**: Use os mesmos comandos acima. O tar.gz preserva as permissões Unix corretamente.
+>
+> **Releases**: https://github.com/arbgjr/sdlc_agentico/releases
+
+### Opção 2: Via Script Automático
+
+```bash
+# Última versão (one-liner)
+curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
+
+# Versão específica
+curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.7.1
+```
+
+Se o diretório `.claude/` já existir, o script perguntará o que fazer:
+1. Fazer backup e substituir (recomendado)
+2. Mesclar (manter existentes, adicionar novos)
+3. Substituir sem backup
+4. Cancelar
+
+### Opção 3: Clone do Repositório
+
+```bash
+# Clonar repositório
+git clone https://github.com/arbgjr/mice_dolphins.git
+cd mice_dolphins
+
+# Executar setup
+./.scripts/setup-sdlc.sh
+```
+
+### Ferramentas de Segurança (Opcional)
+
+Para usar os recursos de security scanning (`/security-scan`, security gates):
+
+```bash
+# Instalar todas as ferramentas
+./.scripts/install-security-tools.sh --all
+
+# Ou instalar individualmente
+./.scripts/install-security-tools.sh --semgrep   # SAST
+./.scripts/install-security-tools.sh --trivy     # SCA/Container
+./.scripts/install-security-tools.sh --gitleaks  # Secret Scanner
+```
+
+### Instalação Manual
+
+```bash
+pip install uv
+uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+npm install -g @anthropic-ai/claude-code
+gh auth login
+```
+
 ## Quick Start
 
 ```bash
@@ -263,83 +340,6 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 │   ├── manual-desenvolvimento/ # Standards, práticas, qualidade
 │   └── stacks/               # .NET, Python, Rust, DevOps
 └── examples/                 # Exemplos de uso
-```
-
-## Requisitos
-
-- **Python** 3.11+
-- **Node.js** 18+
-- **Claude Code** CLI
-- **GitHub CLI** (`gh`)
-- **Copilot Pro+/Business/Enterprise** (para coding agent)
-
-## Instalação
-
-### Opção 1: Download Direto (Linux/macOS/WSL)
-
-```bash
-# Definir versão desejada (consulte releases para última versão)
-VERSION="v1.7.1"
-
-# Download e extração (preserva permissões de execução)
-curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -
-
-# Executar setup
-./.scripts/setup-sdlc.sh
-```
-
-> **WSL2**: Use os mesmos comandos acima. O tar.gz preserva as permissões Unix corretamente.
->
-> **Releases**: https://github.com/arbgjr/sdlc_agentico/releases
-
-### Opção 2: Via Script Automático
-
-```bash
-# Última versão (one-liner)
-curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
-
-# Versão específica
-curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.7.1
-```
-
-Se o diretório `.claude/` já existir, o script perguntará o que fazer:
-1. Fazer backup e substituir (recomendado)
-2. Mesclar (manter existentes, adicionar novos)
-3. Substituir sem backup
-4. Cancelar
-
-### Opção 3: Clone do Repositório
-
-```bash
-# Clonar repositório
-git clone https://github.com/arbgjr/mice_dolphins.git
-cd mice_dolphins
-
-# Executar setup
-./.scripts/setup-sdlc.sh
-```
-
-### Ferramentas de Segurança (Opcional)
-
-Para usar os recursos de security scanning (`/security-scan`, security gates):
-
-```bash
-# Instalar todas as ferramentas
-./.scripts/install-security-tools.sh --all
-
-# Ou instalar individualmente
-./.scripts/install-security-tools.sh --semgrep   # SAST
-./.scripts/install-security-tools.sh --trivy     # SCA/Container
-./.scripts/install-security-tools.sh --gitleaks  # Secret Scanner
-```
-
-### Instalação Manual
-
-```bash
-pip install uv
-uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
-npm install -g @anthropic-ai/claude-code
-gh auth login
 ```
 
 ## Documentação
