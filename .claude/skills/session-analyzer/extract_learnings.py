@@ -15,7 +15,7 @@ import json
 import os
 import re
 import argparse
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 import yaml
@@ -51,8 +51,11 @@ LEARNING_KEYWORDS = [
 
 
 def encode_project_path(path: str) -> str:
-    """Converte path do projeto para formato encoded do Claude Code."""
-    return path.replace("/", "-")
+    """Converte path do projeto para formato encoded do Claude Code.
+
+    Claude Code encodes paths by replacing both '/' and '_' with '-'.
+    """
+    return path.replace("/", "-").replace("_", "-")
 
 
 def find_claude_sessions_dir() -> Path:
@@ -216,7 +219,7 @@ def analyze_session(events: list[dict]) -> dict:
 def generate_summary(session_path: Path, analysis: dict, project_path: str) -> dict:
     """Gera um resumo estruturado da analise."""
     session_id = session_path.stem
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
     return {
         "session_analysis": {
