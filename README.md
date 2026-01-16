@@ -385,7 +385,7 @@ O sistema rastreia automaticamente:
 ## Limitações Conhecidas
 
 ### Ambiente
-- **Sistema Operacional**: Testado em Linux e macOS. Windows via WSL2 é suportado, mas não testado extensivamente
+- **Sistema Operacional**: Testado em Windows via WSL2.
 - **Node.js**: Requer versão 18 ou superior
 - **Python**: Requer versão 3.11 ou superior
 
