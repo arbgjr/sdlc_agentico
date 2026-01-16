@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.5] - 2026-01-16
+
+### Fixed
+
+- **Timestamps reais UTC** - Adicionada instrução CRÍTICA no CLAUDE.md
+  - Agentes devem usar timestamps reais UTC, não valores fictícios/arredondados
+  - Fixes: Manifests com timestamps suspeitos (19:30:00, 22:00:00) que não batem com hora real
+  - Exemplo correto: `2026-01-16T23:25:44Z` (inclui segundos)
+
+- **Release package** - Removidos README.md e CHANGELOG.md do pacote
+  - Arquivos são específicos do repositório, não devem ser distribuídos
+  - Apenas LICENSE é incluído no pacote de release
+  - Fixes: Pacotes continham arquivos desnecessários
+
+### Changed
+
+- **README.md** - Atualizado badge de versão para v1.7.4
+
 ## [1.7.4] - 2026-01-16
 
 ### Added

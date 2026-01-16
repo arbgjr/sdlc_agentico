@@ -93,9 +93,9 @@ jobs:
           fi
           chmod +x release-package/.scripts/*.sh 2>/dev/null || true
 
-          # Copy root files (CLAUDE.md is NOT included - project-specific)
-          cp README.md release-package/
-          cp CHANGELOG.md release-package/
+          # Copy root files
+          # NOTE: README.md and CHANGELOG.md are NOT included - repository-specific
+          # NOTE: CLAUDE.md is NOT included - project-specific
           cp LICENSE release-package/
 
           # Verify permissions before creating archive
