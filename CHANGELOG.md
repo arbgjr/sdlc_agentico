@@ -7,14 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.7.5] - 2026-01-16
+## [1.7.6] - 2026-01-16
 
 ### Fixed
 
-- **Timestamps reais UTC** - Adicionada instrução CRÍTICA no CLAUDE.md
-  - Agentes devem usar timestamps reais UTC, não valores fictícios/arredondados
-  - Fixes: Manifests com timestamps suspeitos (19:30:00, 22:00:00) que não batem com hora real
-  - Exemplo correto: `2026-01-16T23:25:44Z` (inclui segundos)
+- **Timestamps reais UTC** - Adicionada instrução CRÍTICA no orchestrator.md
+  - Instruções movidas para `.claude/agents/orchestrator.md` (vai no pacote de release)
+  - CLAUDE.md não vai no pacote, então instruções lá não funcionam
+  - Agentes devem usar timestamps reais UTC com segundos, não valores fictícios
+  - Fixes: Manifests com timestamps suspeitos (19:30:00, 22:00:00)
 
 - **Release package** - Removidos README.md e CHANGELOG.md do pacote
   - Arquivos são específicos do repositório, não devem ser distribuídos
@@ -24,6 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **README.md** - Atualizado badge de versão para v1.7.4
+
+## [1.7.5] - 2026-01-16
+
+### Fixed
+
+- **Release package** - Tentativa de adicionar instruções de timestamp no CLAUDE.md
+  - ⚠️ INCORRETO: CLAUDE.md não vai no pacote, instruções não funcionam
+  - Corrigido na v1.7.6 movendo para orchestrator.md
 
 ## [1.7.4] - 2026-01-16
 

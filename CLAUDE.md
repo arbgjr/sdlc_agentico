@@ -2,24 +2,6 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## CRITICAL: Timestamps Must Be Real UTC
-
-**MANDATORY:** When generating ANY file with timestamps (JSON, YAML, etc.), you MUST use REAL current UTC time, NOT fictional/example/rounded timestamps.
-
-**WRONG:**
-```json
-{"created_at": "2026-01-16T19:30:00Z"}  // ❌ Too rounded, looks fake
-{"updated_at": "2026-01-16T22:00:00Z"}  // ❌ Exact hour, suspicious
-```
-
-**CORRECT:**
-```json
-{"created_at": "2026-01-16T23:25:44Z"}  // ✅ Real UTC timestamp
-{"updated_at": "2026-01-16T23:26:12Z"}  // ✅ Includes seconds
-```
-
-**How to verify:** File modification time (`stat`) must match JSON timestamps within seconds.
-
 ## Project Overview
 
 SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orchestrates **34 specialized agents (30 orchestrated + 4 consultive)** through **9 development phases (0-8)**. This is a **configuration and orchestration framework**, not a traditional application codebase.

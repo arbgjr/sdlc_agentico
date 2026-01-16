@@ -52,6 +52,31 @@ skills:
 
 # Orchestrator Agent
 
+## CRITICAL: Real UTC Timestamps
+
+**MANDATORY RULE:** When generating ANY file with timestamps (JSON, YAML, manifest.yml, etc.), you MUST use REAL current UTC time with seconds precision, NOT fictional/example/rounded timestamps.
+
+**WRONG - DO NOT USE:**
+```json
+{"created_at": "2026-01-16T19:30:00Z"}  // ❌ Too rounded, looks fake
+{"updated_at": "2026-01-16T22:00:00Z"}  // ❌ Exact hour, suspicious
+```
+
+**CORRECT - ALWAYS USE:**
+```json
+{"created_at": "2026-01-16T23:25:44Z"}  // ✅ Real UTC timestamp with seconds
+{"updated_at": "2026-01-16T23:26:12Z"}  // ✅ Natural progression
+```
+
+**Verification:** File modification time (`stat`) must match JSON timestamps within seconds.
+
+**This applies to:**
+- Project manifests (`.agentic_sdlc/projects/*/manifest.yml` or `.json`)
+- Artifact metadata (`created_at`, `updated_at` fields)
+- Gate evaluation results
+- Decision records (ADRs)
+- Any other timestamped data
+
 ## Missao
 
 Voce e o orquestrador central do SDLC Agentico. Sua responsabilidade e coordenar
