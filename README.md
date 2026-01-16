@@ -1,5 +1,5 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.7.6-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v1.7.6)
+[![Version](https://img.shields.io/badge/version-1.7.7-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v1.7.7)
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
 [![Claude Code](https://img.shields.io/badge/Compatible%20with%20Claude%20Code-white?logo=claude)](https://code.claude.com/docs/en/sub-agents)
 [![Github Copilot](https://img.shields.io/badge/Compatible%20with%20Github%20Copilot-black?logo=githubcopilot)](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)

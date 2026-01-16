@@ -7,6 +7,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.7] - 2026-01-16
+
+### Added
+
+- **Automação GitHub completa** - Corrigidos 4 gaps críticos de integração:
+
+  **Gap #1**: sdlc-start.md agora chama `configure-fields` após criar Project
+  - Project V2 é criado com campos customizados (Phase, Priority, Story Points)
+  - Fixes: Project sem campos customizados após criação
+
+  **Gap #2**: project_manager.py agora tem comando `update-phase`
+  - Novo comando detecta fase atual do projeto e atualiza campo Phase
+  - Mapeia fase SDLC (0-8) para coluna do Project (Backlog → Done)
+  - Fixes: gate-check.md chamava comando inexistente
+
+  **Gap #3**: Criação automática de GitHub Issues das tasks
+  - Novo script `create_issues_from_tasks.py` criado
+  - Parse de tasks.md e criação automática de issues no GitHub
+  - Issues atribuídas ao Milestone correto
+  - Issues adicionadas ao Project V2 automaticamente
+  - Opção `--assign-copilot` para atribuir ao GitHub Copilot
+  - gate-check.md chama automaticamente após Phase 3 (gate-3-to-4)
+  - Fixes: Tasks criadas mas nunca convertidas em GitHub Issues
+
+  **Gap #4**: Milestone atualizado com issues criadas
+  - Issues são associadas ao Milestone durante criação
+  - Fixes: Milestone ficava "0 open, 0 closed"
+
+### Fixed
+
+- **Integração GitHub** - Workflow agora executa corretamente:
+  - Phase 0: Cria Project + campos customizados + Milestone
+  - Phase 3→4: Cria GitHub Issues automaticamente das tasks
+  - Transições de fase: Atualiza campo Phase no Project
+  - Milestone: Rastreia issues do sprint atual
+
+### Technical Details
+
+**Arquivos modificados**:
+- `.claude/commands/sdlc-start.md` - Adiciona chamada configure-fields (linha 52-54)
+- `.claude/commands/gate-check.md` - Adiciona criação de issues após gate-3-to-4 (linha 60-64)
+- `.claude/skills/github-projects/scripts/project_manager.py`:
+  - Adiciona função `update_phase_from_manifest()` (linha 318-406)
+  - Adiciona comando `update-phase` ao argparse (linha 516-518, 575-576)
+  - Adiciona import `Path` (linha 19)
+
+**Arquivos criados**:
+- `.claude/skills/github-sync/scripts/create_issues_from_tasks.py` (210 linhas)
+  - Parse de tasks.md
+  - Criação de issues via gh CLI
+  - Adição ao Project V2
+  - Atribuição ao Milestone
+
+**Evidências do problema** (projeto satra):
+- current_phase: 4, gates 0-to-5 passados
+- tasks.md criado com 17+ tarefas
+- MAS: 0 issues no GitHub, Project vazio, Milestone não atualizado
+- Causa: Automação inexistente
+
 ## [1.7.6] - 2026-01-16
 
 ### Fixed

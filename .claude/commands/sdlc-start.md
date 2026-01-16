@@ -49,6 +49,10 @@ retry_with_backoff "python3 .claude/skills/github-sync/scripts/label_manager.py 
 # Criar GitHub Project V2
 PROJECT_NUM=$(gh project create --owner @me --title "SDLC: {feature_name}" --format json | jq '.number')
 
+# Configurar campos customizados SDLC (Phase, Priority, Story Points)
+python3 .claude/skills/github-projects/scripts/project_manager.py configure-fields \
+  --project-number $PROJECT_NUM
+
 # Criar Milestone inicial
 # Usar python para calcular data de forma portável (funciona em Linux e macOS)
 DUE_DATE=$(python3 -c "import datetime; print((datetime.date.today() + datetime.timedelta(days=14)).isoformat())")

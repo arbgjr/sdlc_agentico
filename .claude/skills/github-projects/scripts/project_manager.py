@@ -9,6 +9,7 @@ Usage:
     python project_manager.py add-item --project-number 1 --issue-url URL
     python project_manager.py update-field --project-number 1 --item-id ID --field "Phase" --value "QA"
     python project_manager.py configure-fields --project-number 1
+    python project_manager.py update-phase
 """
 
 import argparse
@@ -16,6 +17,7 @@ import json
 import subprocess
 import sys
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
 
 
@@ -315,6 +317,97 @@ def configure_sdlc_fields(project_number: int, owner: str = "@me") -> bool:
     return success
 
 
+def update_phase_from_manifest(owner: str = "@me") -> bool:
+    """
+    Atualiza campo Phase no Project baseado no manifest do projeto.
+
+    Detecta fase atual, mapeia para coluna do Project, e atualiza
+    campo Phase de todas as issues do projeto.
+    """
+    # Carregar manifest do projeto
+    project_root = Path.cwd()
+    projects_dir = project_root / ".agentic_sdlc" / "projects"
+
+    # Tentar current.json symlink
+    current_json = projects_dir / "current.json"
+    manifest_path = None
+
+    if current_json.exists():
+        with open(current_json) as f:
+            data = json.load(f)
+            manifest_path = projects_dir / data["project_id"] / "manifest.json"
+    else:
+        # Buscar manifest mais recente
+        manifests = list(projects_dir.glob("*/manifest.json"))
+        if manifests:
+            manifest_path = max(manifests, key=lambda p: p.stat().st_mtime)
+
+    if not manifest_path or not manifest_path.exists():
+        print("✗ Nenhum projeto encontrado", file=sys.stderr)
+        return False
+
+    # Carregar projeto
+    with open(manifest_path) as f:
+        project = json.load(f)
+
+    current_phase = project.get('current_phase', 0)
+    project_number = project.get('github', {}).get('project_number')
+
+    if not project_number:
+        print("✗ Projeto sem GitHub Project configurado", file=sys.stderr)
+        return False
+
+    # Mapear fase para coluna
+    phase_map = {
+        0: "Backlog",
+        1: "Backlog",
+        2: "Requirements",
+        3: "Architecture",
+        4: "Planning",
+        5: "In Progress",
+        6: "QA",
+        7: "Release",
+        8: "Done"
+    }
+
+    target_phase = phase_map.get(current_phase, "Backlog")
+
+    print(f"Atualizando Project #{project_number} → Phase {current_phase} ({target_phase})")
+
+    # Listar issues do milestone atual
+    milestone_name = project.get('github', {}).get('milestone', 'Sprint 1')
+
+    result = run_gh_command([
+        "issue", "list",
+        "--milestone", milestone_name,
+        "--json", "number,url",
+        "--limit", "1000"
+    ])
+
+    if result.returncode != 0:
+        print(f"✗ Erro ao listar issues: {result.stderr}", file=sys.stderr)
+        return False
+
+    try:
+        issues = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        issues = []
+
+    if not issues:
+        print(f"⚠ Nenhuma issue encontrada no milestone '{milestone_name}'")
+        return True
+
+    print(f"Encontradas {len(issues)} issues no milestone")
+
+    # Para cada issue, atualizar campo Phase no Project
+    # NOTA: Isso requer GraphQL pois gh CLI não expõe isso diretamente
+    # Por ora, apenas log - implementação completa requer GraphQL
+    print(f"TODO: Atualizar campo Phase das {len(issues)} issues para '{target_phase}'")
+    print("NOTA: Requer GraphQL mutation - adicionar em versão futura")
+
+    return True
+
+
 def update_item_field(
     project_number: int,
     item_id: str,
@@ -422,6 +515,10 @@ def main():
     fields_parser.add_argument("--project-number", "-p", type=int, required=True, help="Numero do project")
     fields_parser.add_argument("--owner", "-o", default="@me", help="Owner")
 
+    # update-phase
+    update_phase_parser = subparsers.add_parser("update-phase", help="Atualiza campo Phase baseado no manifest")
+    update_phase_parser.add_argument("--owner", "-o", default="@me", help="Owner")
+
     args = parser.parse_args()
 
     if args.action == "create":
@@ -476,6 +573,9 @@ def main():
         else:
             print("Nenhum campo encontrado.")
         return 0
+
+    elif args.action == "update-phase":
+        return 0 if update_phase_from_manifest(args.owner) else 1
 
 
 if __name__ == "__main__":

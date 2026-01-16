@@ -57,7 +57,13 @@ if [ $RESULT -eq 0 ]; then
     # 4d. Indexar ADRs no corpus RAG (rag-curator)
     python3 .claude/skills/rag-curator/scripts/index_adrs.py
 
-    # 4e. Notificar arquivos para revisao
+    # 4e. Criar GitHub Issues das tasks (após Phase 3)
+    if [[ "$GATE" == "phase-3-to-4" ]] && check_service github; then
+        log_info "Criando GitHub Issues das tasks" "gate-check"
+        python3 .claude/skills/github-sync/scripts/create_issues_from_tasks.py --assign-copilot
+    fi
+
+    # 4f. Notificar arquivos para revisao
     # (implementado no orchestrator)
 else
     log_warn "Gate $GATE BLOCKED" "gate-check"
