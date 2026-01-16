@@ -30,13 +30,13 @@ Gerencia labels SDLC no repositorio.
 
 ```bash
 # Criar todos os labels SDLC se nao existem
-python .claude/skills/github-sync/scripts/label_manager.py ensure
+python3 .claude/skills/github-sync/scripts/label_manager.py ensure
 
 # Listar labels existentes
-python .claude/skills/github-sync/scripts/label_manager.py list
+python3 .claude/skills/github-sync/scripts/label_manager.py list
 
 # Verificar se labels SDLC existem
-python .claude/skills/github-sync/scripts/label_manager.py check
+python3 .claude/skills/github-sync/scripts/label_manager.py check
 ```
 
 **Labels criados:**
@@ -51,19 +51,19 @@ Gerencia milestones (sprints) no repositorio.
 
 ```bash
 # Criar milestone
-python .claude/skills/github-sync/scripts/milestone_sync.py create \
+python3 .claude/skills/github-sync/scripts/milestone_sync.py create \
   --title "Sprint 1" \
   --description "Sprint goal" \
   --due-date "2026-01-28"
 
 # Fechar milestone
-python .claude/skills/github-sync/scripts/milestone_sync.py close --title "Sprint 1"
+python3 .claude/skills/github-sync/scripts/milestone_sync.py close --title "Sprint 1"
 
 # Listar milestones
-python .claude/skills/github-sync/scripts/milestone_sync.py list
+python3 .claude/skills/github-sync/scripts/milestone_sync.py list
 
 # Obter milestone por titulo
-python .claude/skills/github-sync/scripts/milestone_sync.py get --title "Sprint 1"
+python3 .claude/skills/github-sync/scripts/milestone_sync.py get --title "Sprint 1"
 ```
 
 ### issue_sync.py
@@ -72,7 +72,7 @@ Gerencia issues com integracao SDLC.
 
 ```bash
 # Criar issue com labels SDLC
-python .claude/skills/github-sync/scripts/issue_sync.py create \
+python3 .claude/skills/github-sync/scripts/issue_sync.py create \
   --title "[TASK-001] Implementar feature X" \
   --body-file task.md \
   --phase 5 \
@@ -80,17 +80,17 @@ python .claude/skills/github-sync/scripts/issue_sync.py create \
   --milestone "Sprint 1"
 
 # Atualizar issue
-python .claude/skills/github-sync/scripts/issue_sync.py update \
+python3 .claude/skills/github-sync/scripts/issue_sync.py update \
   --number 123 \
   --phase 6 \
   --state open
 
 # Sincronizar task YAML para issue
-python .claude/skills/github-sync/scripts/issue_sync.py sync-task \
+python3 .claude/skills/github-sync/scripts/issue_sync.py sync-task \
   --task-path .agentic_sdlc/projects/xxx/tasks/task-001.yml
 
 # Buscar issue por titulo
-python .claude/skills/github-sync/scripts/issue_sync.py find --title "[TASK-001]"
+python3 .claude/skills/github-sync/scripts/issue_sync.py find --title "[TASK-001]"
 ```
 
 ## Mapeamento SDLC <-> GitHub
@@ -155,10 +155,10 @@ gh auth refresh -s project
 
 ```bash
 # 1. Criar labels
-python .claude/skills/github-sync/scripts/label_manager.py ensure
+python3 .claude/skills/github-sync/scripts/label_manager.py ensure
 
 # 2. Criar primeiro milestone
-python .claude/skills/github-sync/scripts/milestone_sync.py create \
+python3 .claude/skills/github-sync/scripts/milestone_sync.py create \
   --title "Sprint 1" \
   --description "Inicio do projeto" \
   --due-date "$(date -d '+14 days' +%Y-%m-%d)"
@@ -167,7 +167,7 @@ python .claude/skills/github-sync/scripts/milestone_sync.py create \
 ### Criar issue para task
 
 ```bash
-python .claude/skills/github-sync/scripts/issue_sync.py create \
+python3 .claude/skills/github-sync/scripts/issue_sync.py create \
   --title "[TASK-001] Implementar autenticacao" \
   --body "## Descricao\n\nImplementar sistema de autenticacao OAuth2.\n\n## Acceptance Criteria\n\n- [ ] Login funcional\n- [ ] Logout funcional" \
   --phase 5 \
@@ -179,7 +179,7 @@ python .claude/skills/github-sync/scripts/issue_sync.py create \
 
 ```bash
 # Atualizar issue para nova fase
-python .claude/skills/github-sync/scripts/issue_sync.py update \
+python3 .claude/skills/github-sync/scripts/issue_sync.py update \
   --number 123 \
   --phase 6
 ```

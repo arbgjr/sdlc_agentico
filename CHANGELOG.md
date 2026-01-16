@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.3] - 2026-01-16
+
+### Fixed
+
+- **Compatibilidade com Python 3** - Corrigido uso de `python` para `python3` em todos os scripts
+  - Substituído `python` por `python3` em documentação (CLAUDE.md, skills, agents, commands)
+  - Afetados: github-sync, github-projects, graph-navigator, decay-scoring, session-analyzer, alignment-workflow
+  - Total: 15 arquivos corrigidos (124 linhas alteradas)
+  - Fixes: `python: command not found` em ambientes onde `python` não está disponível
+
 ## [1.7.2] - 2026-01-16
 
 ### Fixed

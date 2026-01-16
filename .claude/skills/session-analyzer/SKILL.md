@@ -47,10 +47,10 @@ Esta skill analisa sessoes do Claude Code para:
 
 ```bash
 # Uso direto do Python
-python .claude/skills/session-analyzer/scripts/extract_learnings.py
+python3 .claude/skills/session-analyzer/scripts/extract_learnings.py
 
 # Com opções
-python .claude/skills/session-analyzer/scripts/extract_learnings.py \
+python3 .claude/skills/session-analyzer/scripts/extract_learnings.py \
   --session-id <uuid> \
   --persist \
   --project /path/to/project
@@ -66,7 +66,7 @@ O gate-check invoca session-analyzer automaticamente após aprovação:
 # Em gate-check.md
 if [ $RESULT -eq 0 ]; then
     # Extrair learnings
-    python .claude/skills/session-analyzer/scripts/analyze.py --extract-learnings
+    python3 .claude/skills/session-analyzer/scripts/analyze.py --extract-learnings
 fi
 ```
 
@@ -265,13 +265,13 @@ O script `extract_learnings.py` implementa a logica de extracao.
 
 ```bash
 # Analisar sessao mais recente do projeto atual
-python .claude/skills/session-analyzer/extract_learnings.py
+python3 .claude/skills/session-analyzer/extract_learnings.py
 
 # Analisar sessao especifica
-python .claude/skills/session-analyzer/extract_learnings.py --session-id <uuid>
+python3 .claude/skills/session-analyzer/extract_learnings.py --session-id <uuid>
 
 # Analisar e persistir
-python .claude/skills/session-analyzer/extract_learnings.py --persist
+python3 .claude/skills/session-analyzer/extract_learnings.py --persist
 ```
 
 ## Limitacoes

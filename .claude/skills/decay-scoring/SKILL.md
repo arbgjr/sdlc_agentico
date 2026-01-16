@@ -75,13 +75,13 @@ Calcula scores de decay para todos os nodes do corpus.
 
 ```bash
 # Calcular scores
-python .claude/skills/decay-scoring/scripts/decay_calculator.py
+python3 .claude/skills/decay-scoring/scripts/decay_calculator.py
 
 # Atualizar nodes com scores
-python .claude/skills/decay-scoring/scripts/decay_calculator.py --update-nodes
+python3 .claude/skills/decay-scoring/scripts/decay_calculator.py --update-nodes
 
 # Output JSON
-python .claude/skills/decay-scoring/scripts/decay_calculator.py --json
+python3 .claude/skills/decay-scoring/scripts/decay_calculator.py --json
 ```
 
 ### decay_tracker.py
@@ -90,13 +90,13 @@ Rastreia acessos e validacoes de nodes.
 
 ```bash
 # Registrar acesso
-python .claude/skills/decay-scoring/scripts/decay_tracker.py access NODE_ID
+python3 .claude/skills/decay-scoring/scripts/decay_tracker.py access NODE_ID
 
 # Registrar validacao
-python .claude/skills/decay-scoring/scripts/decay_tracker.py validate NODE_ID
+python3 .claude/skills/decay-scoring/scripts/decay_tracker.py validate NODE_ID
 
 # Ver estatisticas
-python .claude/skills/decay-scoring/scripts/decay_tracker.py stats
+python3 .claude/skills/decay-scoring/scripts/decay_tracker.py stats
 ```
 
 ### decay_trigger.py
@@ -105,10 +105,10 @@ Gera sugestoes de curadoria baseadas nos scores.
 
 ```bash
 # Gerar relatorio
-python .claude/skills/decay-scoring/scripts/decay_trigger.py
+python3 .claude/skills/decay-scoring/scripts/decay_trigger.py
 
 # Filtrar por prioridade
-python .claude/skills/decay-scoring/scripts/decay_trigger.py --priority critical
+python3 .claude/skills/decay-scoring/scripts/decay_trigger.py --priority critical
 ```
 
 ## Integracao

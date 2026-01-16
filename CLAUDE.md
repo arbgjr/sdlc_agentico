@@ -355,22 +355,22 @@ Navigate and query the semantic knowledge graph:
 
 ```bash
 # Build graph from corpus
-python .claude/skills/graph-navigator/scripts/graph_builder.py --infer
+python3 .claude/skills/graph-navigator/scripts/graph_builder.py --infer
 
 # Search with graph expansion
-python .claude/skills/rag-query/scripts/hybrid_search.py "database" --mode hybrid
+python3 .claude/skills/rag-query/scripts/hybrid_search.py "database" --mode hybrid
 
 # Find related decisions
-python .claude/skills/graph-navigator/scripts/graph_manager.py neighbors ADR-001 --hops 2
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py neighbors ADR-001 --hops 2
 
 # Find path between decisions
-python .claude/skills/graph-navigator/scripts/graph_manager.py path ADR-001 ADR-010
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py path ADR-001 ADR-010
 
 # Generate visualization
-python .claude/skills/graph-navigator/scripts/graph_visualizer.py --format mermaid
+python3 .claude/skills/graph-navigator/scripts/graph_visualizer.py --format mermaid
 
 # Extract concepts from documents
-python .claude/skills/graph-navigator/scripts/concept_extractor.py --output save
+python3 .claude/skills/graph-navigator/scripts/concept_extractor.py --output save
 ```
 
 **Features:**
@@ -418,19 +418,19 @@ Sistema de pontuacao temporal para nodes de conhecimento do corpus RAG:
 
 ```bash
 # Calculate decay scores for all nodes
-python .claude/skills/decay-scoring/scripts/decay_calculator.py
+python3 .claude/skills/decay-scoring/scripts/decay_calculator.py
 
 # Update node files with scores
-python .claude/skills/decay-scoring/scripts/decay_calculator.py --update-nodes
+python3 .claude/skills/decay-scoring/scripts/decay_calculator.py --update-nodes
 
 # Generate curation report
-python .claude/skills/decay-scoring/scripts/decay_trigger.py
+python3 .claude/skills/decay-scoring/scripts/decay_trigger.py
 
 # Record node validation
-python .claude/skills/decay-scoring/scripts/decay_tracker.py validate NODE_ID
+python3 .claude/skills/decay-scoring/scripts/decay_tracker.py validate NODE_ID
 
 # Track node access
-python .claude/skills/decay-scoring/scripts/decay_tracker.py access NODE_ID
+python3 .claude/skills/decay-scoring/scripts/decay_tracker.py access NODE_ID
 ```
 
 **Decay Algorithm:**
@@ -480,16 +480,16 @@ Base skill for GitHub synchronization:
 
 ```bash
 # Ensure SDLC labels exist
-python .claude/skills/github-sync/scripts/label_manager.py ensure
+python3 .claude/skills/github-sync/scripts/label_manager.py ensure
 
 # Create milestone for sprint
-python .claude/skills/github-sync/scripts/milestone_sync.py create \
+python3 .claude/skills/github-sync/scripts/milestone_sync.py create \
   --title "Sprint 1" \
   --description "MVP delivery" \
   --due-date "2026-01-28"
 
 # Create issue with SDLC labels
-python .claude/skills/github-sync/scripts/issue_sync.py create \
+python3 .claude/skills/github-sync/scripts/issue_sync.py create \
   --title "[TASK-001] Implement feature" \
   --phase 5 \
   --type task \
@@ -508,18 +508,18 @@ GitHub Projects V2 management via GraphQL:
 
 ```bash
 # Create project
-python .claude/skills/github-projects/scripts/project_manager.py create "SDLC: Feature X"
+python3 .claude/skills/github-projects/scripts/project_manager.py create "SDLC: Feature X"
 
 # Configure custom fields
-python .claude/skills/github-projects/scripts/project_manager.py configure-fields --project-number 1
+python3 .claude/skills/github-projects/scripts/project_manager.py configure-fields --project-number 1
 
 # Add issue to project
-python .claude/skills/github-projects/scripts/project_manager.py add-item \
+python3 .claude/skills/github-projects/scripts/project_manager.py add-item \
   --project-number 1 \
   --issue-url "https://github.com/owner/repo/issues/123"
 
 # Update field value
-python .claude/skills/github-projects/scripts/project_manager.py update-field \
+python3 .claude/skills/github-projects/scripts/project_manager.py update-field \
   --project-number 1 \
   --item-id ITEM_ID \
   --field "Phase" \

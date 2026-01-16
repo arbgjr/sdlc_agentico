@@ -30,13 +30,13 @@ Marca um node do corpus como validado, resetando seu componente de decay de vali
 ### Passo 1: Validar o Node
 
 ```bash
-python .claude/skills/decay-scoring/scripts/decay_tracker.py validate NODE_ID --validator human
+python3 .claude/skills/decay-scoring/scripts/decay_tracker.py validate NODE_ID --validator human
 ```
 
 ### Passo 2: Recalcular Score (Opcional)
 
 ```bash
-python .claude/skills/decay-scoring/scripts/decay_calculator.py --update-nodes
+python3 .claude/skills/decay-scoring/scripts/decay_calculator.py --update-nodes
 ```
 
 ## Exemplo de Uso

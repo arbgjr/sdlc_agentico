@@ -32,13 +32,13 @@ Execute os seguintes passos:
 ### Passo 1: Calcular Scores
 
 ```bash
-python .claude/skills/decay-scoring/scripts/decay_calculator.py --update-nodes
+python3 .claude/skills/decay-scoring/scripts/decay_calculator.py --update-nodes
 ```
 
 ### Passo 2: Gerar Relatorio
 
 ```bash
-python .claude/skills/decay-scoring/scripts/decay_trigger.py
+python3 .claude/skills/decay-scoring/scripts/decay_trigger.py
 ```
 
 ### Passo 3: Interpretar Resultados
@@ -62,7 +62,7 @@ Para nodes com status stale ou obsolete:
 
 1. **Validar**: Confirmar que o conteudo ainda e relevante
    ```bash
-   python .claude/skills/decay-scoring/scripts/decay_tracker.py validate NODE_ID
+   python3 .claude/skills/decay-scoring/scripts/decay_tracker.py validate NODE_ID
    ```
 
 2. **Atualizar**: Editar o conteudo para refletir estado atual

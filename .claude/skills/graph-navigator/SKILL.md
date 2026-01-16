@@ -23,40 +23,40 @@ CRUD operations on the semantic graph.
 
 ```bash
 # Add a node
-python .claude/skills/graph-navigator/scripts/graph_manager.py add \
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py add \
     --id ADR-015 \
     --type Decision \
     --title "Use Redis for caching"
 
 # Add an edge (relationship)
-python .claude/skills/graph-navigator/scripts/graph_manager.py edge \
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py edge \
     --source ADR-015 \
     --relation dependsOn \
     --target ADR-001
 
 # Get neighbors (1 hop)
-python .claude/skills/graph-navigator/scripts/graph_manager.py neighbors ADR-001
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py neighbors ADR-001
 
 # Get neighbors (2 hops, outgoing only)
-python .claude/skills/graph-navigator/scripts/graph_manager.py neighbors ADR-001 \
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py neighbors ADR-001 \
     --hops 2 \
     --direction outgoing
 
 # Find shortest path between nodes
-python .claude/skills/graph-navigator/scripts/graph_manager.py path ADR-001 ADR-010
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py path ADR-001 ADR-010
 
 # Get transitive closure (all dependencies)
-python .claude/skills/graph-navigator/scripts/graph_manager.py closure ADR-001 \
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py closure ADR-001 \
     --relation dependsOn
 
 # Show graph statistics
-python .claude/skills/graph-navigator/scripts/graph_manager.py stats
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py stats
 
 # Validate graph integrity
-python .claude/skills/graph-navigator/scripts/graph_manager.py validate
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py validate
 
 # List nodes
-python .claude/skills/graph-navigator/scripts/graph_manager.py list --type Decision
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py list --type Decision
 ```
 
 ### graph_builder.py
@@ -65,16 +65,16 @@ Build the graph from corpus YAML files.
 
 ```bash
 # Full rebuild
-python .claude/skills/graph-navigator/scripts/graph_builder.py
+python3 .claude/skills/graph-navigator/scripts/graph_builder.py
 
 # Rebuild with relation inference (finds related nodes by shared concepts)
-python .claude/skills/graph-navigator/scripts/graph_builder.py --infer
+python3 .claude/skills/graph-navigator/scripts/graph_builder.py --infer
 
 # Dry run (show stats without saving)
-python .claude/skills/graph-navigator/scripts/graph_builder.py --dry-run
+python3 .claude/skills/graph-navigator/scripts/graph_builder.py --dry-run
 
 # Incremental update for single file
-python .claude/skills/graph-navigator/scripts/graph_builder.py \
+python3 .claude/skills/graph-navigator/scripts/graph_builder.py \
     --incremental .agentic_sdlc/corpus/nodes/decisions/adr-015.yml
 ```
 
@@ -84,20 +84,20 @@ Extract concepts from corpus documents.
 
 ```bash
 # Show extracted concepts as JSON
-python .claude/skills/graph-navigator/scripts/concept_extractor.py --output json
+python3 .claude/skills/graph-navigator/scripts/concept_extractor.py --output json
 
 # Save concepts as YAML files
-python .claude/skills/graph-navigator/scripts/concept_extractor.py --output save
+python3 .claude/skills/graph-navigator/scripts/concept_extractor.py --output save
 
 # Filter by minimum confidence
-python .claude/skills/graph-navigator/scripts/concept_extractor.py \
+python3 .claude/skills/graph-navigator/scripts/concept_extractor.py \
     --min-confidence 0.5
 
 # Show extraction statistics
-python .claude/skills/graph-navigator/scripts/concept_extractor.py --output stats
+python3 .claude/skills/graph-navigator/scripts/concept_extractor.py --output stats
 
 # Extract from single file
-python .claude/skills/graph-navigator/scripts/concept_extractor.py \
+python3 .claude/skills/graph-navigator/scripts/concept_extractor.py \
     --file .agentic_sdlc/corpus/nodes/decisions/adr-001.yml
 ```
 
@@ -107,32 +107,32 @@ Generate visualizations from the graph.
 
 ```bash
 # Generate Mermaid diagram
-python .claude/skills/graph-navigator/scripts/graph_visualizer.py --format mermaid
+python3 .claude/skills/graph-navigator/scripts/graph_visualizer.py --format mermaid
 
 # Generate DOT format (for Graphviz)
-python .claude/skills/graph-navigator/scripts/graph_visualizer.py --format dot
+python3 .claude/skills/graph-navigator/scripts/graph_visualizer.py --format dot
 
 # Filter by node type
-python .claude/skills/graph-navigator/scripts/graph_visualizer.py \
+python3 .claude/skills/graph-navigator/scripts/graph_visualizer.py \
     --format mermaid \
     --type Decision
 
 # Filter by phase
-python .claude/skills/graph-navigator/scripts/graph_visualizer.py \
+python3 .claude/skills/graph-navigator/scripts/graph_visualizer.py \
     --format mermaid \
     --phase 3
 
 # Generate subgraph around a node
-python .claude/skills/graph-navigator/scripts/graph_visualizer.py \
+python3 .claude/skills/graph-navigator/scripts/graph_visualizer.py \
     --format mermaid \
     --center ADR-001 \
     --hops 2
 
 # Show graph metrics
-python .claude/skills/graph-navigator/scripts/graph_visualizer.py --metrics
+python3 .claude/skills/graph-navigator/scripts/graph_visualizer.py --metrics
 
 # Save to file
-python .claude/skills/graph-navigator/scripts/graph_visualizer.py \
+python3 .claude/skills/graph-navigator/scripts/graph_visualizer.py \
     --format mermaid \
     --output graph.md
 ```
@@ -176,7 +176,7 @@ python .claude/skills/graph-navigator/scripts/graph_visualizer.py \
 The `hybrid_search.py` script uses the graph for expanded search:
 
 ```bash
-python .claude/skills/rag-query/scripts/hybrid_search.py "database" --mode hybrid
+python3 .claude/skills/rag-query/scripts/hybrid_search.py "database" --mode hybrid
 ```
 
 Results include:
@@ -190,7 +190,7 @@ When saving decisions/learnings, the graph can be updated incrementally:
 
 ```bash
 # After saving a new ADR
-python .claude/skills/graph-navigator/scripts/graph_builder.py \
+python3 .claude/skills/graph-navigator/scripts/graph_builder.py \
     --incremental .agentic_sdlc/corpus/nodes/decisions/adr-new.yml
 ```
 
@@ -209,7 +209,7 @@ The `graph-integrity` gate validates:
 Find all decisions affected by changing ADR-001:
 
 ```bash
-python .claude/skills/graph-navigator/scripts/graph_manager.py neighbors ADR-001 \
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py neighbors ADR-001 \
     --hops 3 \
     --direction incoming
 ```
@@ -219,7 +219,7 @@ python .claude/skills/graph-navigator/scripts/graph_manager.py neighbors ADR-001
 Find the path from a feature decision to its dependencies:
 
 ```bash
-python .claude/skills/graph-navigator/scripts/graph_manager.py path ADR-010 ADR-001
+python3 .claude/skills/graph-navigator/scripts/graph_manager.py path ADR-010 ADR-001
 ```
 
 ### Knowledge Map
@@ -227,7 +227,7 @@ python .claude/skills/graph-navigator/scripts/graph_manager.py path ADR-010 ADR-
 Generate a visual map of architecture decisions:
 
 ```bash
-python .claude/skills/graph-navigator/scripts/graph_visualizer.py \
+python3 .claude/skills/graph-navigator/scripts/graph_visualizer.py \
     --format mermaid \
     --type Decision \
     --output docs/architecture-graph.md
@@ -238,7 +238,7 @@ python .claude/skills/graph-navigator/scripts/graph_visualizer.py \
 Extract and review concepts before adding to graph:
 
 ```bash
-python .claude/skills/graph-navigator/scripts/concept_extractor.py \
+python3 .claude/skills/graph-navigator/scripts/concept_extractor.py \
     --output json \
     --min-confidence 0.6 \
     --top 20

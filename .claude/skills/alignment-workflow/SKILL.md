@@ -62,19 +62,19 @@ Gerencia o workflow de consenso.
 
 ```bash
 # Transicionar ODR para próximo estado
-python .claude/skills/alignment-workflow/scripts/consensus_manager.py \
+python3 .claude/skills/alignment-workflow/scripts/consensus_manager.py \
   transition --odr ODR-001 --to pending_input
 
 # Registrar input de stakeholder
-python .claude/skills/alignment-workflow/scripts/consensus_manager.py \
+python3 .claude/skills/alignment-workflow/scripts/consensus_manager.py \
   add-input --odr ODR-001 --stakeholder "CTO" --input "Prefiro build interno"
 
 # Aprovar ODR
-python .claude/skills/alignment-workflow/scripts/consensus_manager.py \
+python3 .claude/skills/alignment-workflow/scripts/consensus_manager.py \
   approve --odr ODR-001 --approver "PM" --comment "Alinhado com estratégia"
 
 # Verificar timeouts
-python .claude/skills/alignment-workflow/scripts/consensus_manager.py \
+python3 .claude/skills/alignment-workflow/scripts/consensus_manager.py \
   check-timeouts --project my-project
 ```
 
@@ -84,11 +84,11 @@ Gerencia escalações de decisões.
 
 ```bash
 # Escalar ODR
-python .claude/skills/alignment-workflow/scripts/escalation.py \
+python3 .claude/skills/alignment-workflow/scripts/escalation.py \
   escalate --odr ODR-001 --reason "Timeout de input do CTO"
 
 # Ver escalações pendentes
-python .claude/skills/alignment-workflow/scripts/escalation.py \
+python3 .claude/skills/alignment-workflow/scripts/escalation.py \
   list --project my-project
 ```
 

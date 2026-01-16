@@ -301,18 +301,18 @@ Ao iniciar workflow com `/sdlc-start`:
 
 ```bash
 # 1. Garantir labels SDLC existem
-python .claude/skills/github-sync/scripts/label_manager.py ensure
+python3 .claude/skills/github-sync/scripts/label_manager.py ensure
 
 # 2. Criar GitHub Project V2
-python .claude/skills/github-projects/scripts/project_manager.py create \
+python3 .claude/skills/github-projects/scripts/project_manager.py create \
   --title "SDLC: {feature_name}"
 
 # 3. Configurar campos customizados (Phase, Sprint, Story Points)
-python .claude/skills/github-projects/scripts/project_manager.py configure-fields \
+python3 .claude/skills/github-projects/scripts/project_manager.py configure-fields \
   --project-number {N}
 
 # 4. Criar primeiro Milestone (Sprint 1)
-python .claude/skills/github-sync/scripts/milestone_sync.py create \
+python3 .claude/skills/github-sync/scripts/milestone_sync.py create \
   --title "Sprint 1" \
   --description "Sprint inicial" \
   --due-date "$(date -d '+14 days' +%Y-%m-%d)"
@@ -325,7 +325,7 @@ Ao passar de uma fase para outra:
 ```bash
 # Atualizar campo Phase das issues no Project
 # (As issues devem ser movidas para a coluna correspondente)
-python .claude/skills/github-projects/scripts/project_manager.py update-field \
+python3 .claude/skills/github-projects/scripts/project_manager.py update-field \
   --project-number {N} \
   --item-id {item_id} \
   --field "Phase" \
@@ -338,7 +338,7 @@ Ao aprovar gate de release:
 
 ```bash
 # 1. Fechar Milestone do sprint atual
-python .claude/skills/github-sync/scripts/milestone_sync.py close \
+python3 .claude/skills/github-sync/scripts/milestone_sync.py close \
   --title "{current_sprint}"
 
 # 2. Sincronizar documentacao com Wiki

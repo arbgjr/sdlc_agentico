@@ -34,30 +34,30 @@ Gerencia Projects V2 via GraphQL.
 
 ```bash
 # Criar project
-python .claude/skills/github-projects/scripts/project_manager.py create \
+python3 .claude/skills/github-projects/scripts/project_manager.py create \
   --title "SDLC: Feature X" \
   --description "Projeto para feature X"
 
 # Obter project por titulo
-python .claude/skills/github-projects/scripts/project_manager.py get --title "SDLC: Feature X"
+python3 .claude/skills/github-projects/scripts/project_manager.py get --title "SDLC: Feature X"
 
 # Listar projects
-python .claude/skills/github-projects/scripts/project_manager.py list
+python3 .claude/skills/github-projects/scripts/project_manager.py list
 
 # Adicionar issue ao project
-python .claude/skills/github-projects/scripts/project_manager.py add-item \
+python3 .claude/skills/github-projects/scripts/project_manager.py add-item \
   --project-number 1 \
   --issue-url "https://github.com/owner/repo/issues/123"
 
 # Atualizar campo de um item
-python .claude/skills/github-projects/scripts/project_manager.py update-field \
+python3 .claude/skills/github-projects/scripts/project_manager.py update-field \
   --project-number 1 \
   --item-id "PVTI_xxx" \
   --field "Phase" \
   --value "Implementation"
 
 # Configurar campos customizados SDLC
-python .claude/skills/github-projects/scripts/project_manager.py configure-fields \
+python3 .claude/skills/github-projects/scripts/project_manager.py configure-fields \
   --project-number 1
 ```
 
@@ -67,15 +67,15 @@ Gerencia views (Kanban, Timeline, Table) do Project.
 
 ```bash
 # Criar view Kanban por fase
-python .claude/skills/github-projects/scripts/project_views.py create-kanban \
+python3 .claude/skills/github-projects/scripts/project_views.py create-kanban \
   --project-number 1
 
 # Criar view Timeline
-python .claude/skills/github-projects/scripts/project_views.py create-timeline \
+python3 .claude/skills/github-projects/scripts/project_views.py create-timeline \
   --project-number 1
 
 # Listar views
-python .claude/skills/github-projects/scripts/project_views.py list \
+python3 .claude/skills/github-projects/scripts/project_views.py list \
   --project-number 1
 ```
 

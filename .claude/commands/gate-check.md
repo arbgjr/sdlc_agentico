@@ -35,7 +35,7 @@ log_info "Avaliando gate: $GATE" "gate-check"
 
 # 3. Executar gate-evaluator
 trace_id=$(trace_start "gate-check-$GATE")
-python .claude/skills/gate-evaluator/evaluate.py --gate "$GATE"
+python3 .claude/skills/gate-evaluator/evaluate.py --gate "$GATE"
 RESULT=$?
 trace_end "$trace_id" "$([ $RESULT -eq 0 ] && echo success || echo error)"
 
@@ -48,11 +48,11 @@ if [ $RESULT -eq 0 ]; then
     
     # 4b. Atualizar GitHub Project (se disponivel)
     if check_service github; then
-        python .claude/skills/github-projects/scripts/project_manager.py update-phase
+        python3 .claude/skills/github-projects/scripts/project_manager.py update-phase
     fi
     
     # 4c. Extrair learnings (session-analyzer)
-    python .claude/skills/session-analyzer/scripts/analyze.py --extract-learnings
+    python3 .claude/skills/session-analyzer/scripts/analyze.py --extract-learnings
     
     # 4d. Notificar arquivos para revisao
     # (implementado no orchestrator)

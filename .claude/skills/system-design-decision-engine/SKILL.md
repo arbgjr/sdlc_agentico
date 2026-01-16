@@ -40,11 +40,11 @@ Fluxo de trabalho.
 
 Etapa 1. Detectar padrões a partir do enunciado
 Execute:
-python .claude/skills/system-design-decision-engine/scripts/detect_patterns.py "<texto do problema>"
+python3 .claude/skills/system-design-decision-engine/scripts/detect_patterns.py "<texto do problema>"
 
 Etapa 2. Gerar perguntas obrigatórias por padrão ativado
 Execute:
-python .claude/skills/system-design-decision-engine/scripts/generate_questions.py "<lista de ids de padrões>"
+python3 .claude/skills/system-design-decision-engine/scripts/generate_questions.py "<lista de ids de padrões>"
 
 Etapa 3. Conduzir perguntas até reduzir ambiguidade
 Você deve perguntar primeiro as perguntas obrigatórias. Se a pessoa usuária não souber,
@@ -70,10 +70,10 @@ Política completa em:
 [reference-rag-policy.md](reference-rag-policy.md)
 
 Ingestão do corpus local:
-python .claude/skills/system-design-decision-engine/scripts/rag_ingest.py
+python3 .claude/skills/system-design-decision-engine/scripts/rag_ingest.py
 
 Busca no corpus:
-python .claude/skills/system-design-decision-engine/scripts/rag_search.py "<consulta>"
+python3 .claude/skills/system-design-decision-engine/scripts/rag_search.py "<consulta>"
 
 ## Arquivos de referência
 

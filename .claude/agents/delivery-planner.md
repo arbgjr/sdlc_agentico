@@ -265,7 +265,7 @@ Ao definir um sprint plan, SEMPRE crie o Milestone correspondente no GitHub:
 
 ```bash
 # Criar milestone para o sprint
-python .claude/skills/github-sync/scripts/milestone_sync.py create \
+python3 .claude/skills/github-sync/scripts/milestone_sync.py create \
   --title "Sprint {N}" \
   --description "{Sprint goal}" \
   --due-date "{end_date}"
@@ -286,10 +286,10 @@ github_mapping:
 1. **Ao criar sprint plan:**
    ```bash
    # Verificar se milestone ja existe
-   python .claude/skills/github-sync/scripts/milestone_sync.py get --title "Sprint 1"
+   python3 .claude/skills/github-sync/scripts/milestone_sync.py get --title "Sprint 1"
 
    # Se nao existe, criar
-   python .claude/skills/github-sync/scripts/milestone_sync.py create \
+   python3 .claude/skills/github-sync/scripts/milestone_sync.py create \
      --title "Sprint 1" \
      --description "MVP do portal de historico" \
      --due-date "2026-01-24"
@@ -298,7 +298,7 @@ github_mapping:
 2. **Ao criar issues para o sprint:**
    ```bash
    # Issues sao automaticamente atribuidas ao milestone
-   python .claude/skills/github-sync/scripts/issue_sync.py create \
+   python3 .claude/skills/github-sync/scripts/issue_sync.py create \
      --title "[US-001] Lista de pedidos" \
      --phase 5 \
      --type story \
@@ -308,7 +308,7 @@ github_mapping:
 3. **Ao finalizar sprint:**
    ```bash
    # Fechar milestone
-   python .claude/skills/github-sync/scripts/milestone_sync.py close --title "Sprint 1"
+   python3 .claude/skills/github-sync/scripts/milestone_sync.py close --title "Sprint 1"
    ```
 
 ### Burndown e Progresso

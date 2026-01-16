@@ -30,18 +30,18 @@ com integracao completa a Projects V2, Milestones e Labels SDLC.
 ### 1. Garantir Labels SDLC Existem
 
 ```bash
-python .claude/skills/github-sync/scripts/label_manager.py ensure
+python3 .claude/skills/github-sync/scripts/label_manager.py ensure
 ```
 
 ### 2. Verificar Milestone do Sprint
 
 ```bash
-python .claude/skills/github-sync/scripts/milestone_sync.py list
+python3 .claude/skills/github-sync/scripts/milestone_sync.py list
 ```
 
 Se nao existir, criar:
 ```bash
-python .claude/skills/github-sync/scripts/milestone_sync.py create \
+python3 .claude/skills/github-sync/scripts/milestone_sync.py create \
   --title "Sprint 1" \
   --description "Sprint goal" \
   --due-date "$(date -d '+14 days' +%Y-%m-%d)"
@@ -63,7 +63,7 @@ Use o script issue_sync.py ou GitHub CLI:
 
 ```bash
 # Opcao 1: Via script (recomendado)
-python .claude/skills/github-sync/scripts/issue_sync.py create \
+python3 .claude/skills/github-sync/scripts/issue_sync.py create \
   --title "[TASK-XXX] Titulo da Task" \
   --body-file <arquivo_da_task> \
   --phase 5 \
@@ -119,7 +119,7 @@ gh issue create \
 Adicione `--assignee "@copilot"` ao comando:
 
 ```bash
-python .claude/skills/github-sync/scripts/issue_sync.py create \
+python3 .claude/skills/github-sync/scripts/issue_sync.py create \
   --title "[TASK-XXX] Titulo" \
   --body-file task.md \
   --phase 5 \
@@ -137,7 +137,7 @@ Se o projeto tiver um GitHub Project V2 configurado:
 ISSUE_URL="https://github.com/owner/repo/issues/123"
 
 # Adicionar ao project
-python .claude/skills/github-projects/scripts/project_manager.py add-item \
+python3 .claude/skills/github-projects/scripts/project_manager.py add-item \
   --project-number 1 \
   --issue-url "$ISSUE_URL"
 ```
