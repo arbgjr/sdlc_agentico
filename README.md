@@ -4,6 +4,10 @@
 [![Claude Code](https://img.shields.io/badge/Compatible%20with%20Claude%20Code-white?logo=claude)](https://code.claude.com/docs/en/sub-agents)
 [![Github Copilot](https://img.shields.io/badge/Compatible%20with%20Github%20Copilot-black?logo=githubcopilot)](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
 
+<p align="center">
+  <img src=".agentic_sdlc/logo.png" alt="SDLC Agêntico Logo" width="400">
+</p>
+
 # SDLC Agêntico
 
 Sistema de desenvolvimento de software orientado por agentes de IA que automatiza e coordena todo o ciclo de vida do desenvolvimento.
