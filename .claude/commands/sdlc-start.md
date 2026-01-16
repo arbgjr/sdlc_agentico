@@ -5,7 +5,12 @@ argument-hint: "[descricao do projeto/feature]"
 
 # Iniciar Workflow SDLC
 
-Voce esta iniciando um novo workflow de desenvolvimento. Siga estes passos:
+Voce esta iniciando um novo workflow de desenvolvimento. Este comando:
+
+1. **Detecta nivel de complexidade** do projeto
+2. **Cria estrutura no GitHub** (Project V2, Milestone, Labels)
+3. **Inicializa memoria persistente** do projeto
+4. **Invoca @orchestrator** para coordenar automaticamente
 
 ## 1. Detectar Nivel de Complexidade
 
@@ -27,28 +32,67 @@ Analise a descricao fornecida e classifique:
 - Compliance, multi-team, critico
 - Todas as fases + aprovacao humana em cada gate
 
-## 2. Iniciar Memoria do Projeto
+## 2. Preparar GitHub (Level 2+)
+
+Para projetos Level 2 ou superior, execute automaticamente:
+
+```bash
+# Carregar biblioteca de fallback
+source .claude/lib/fallback.sh
+
+# Verificar pre-requisitos
+check_prerequisites github network
+
+# Criar labels SDLC (se nao existem)
+retry_with_backoff "python .claude/skills/github-sync/scripts/label_manager.py ensure"
+
+# Criar GitHub Project V2
+PROJECT_NUM=$(gh project create --owner @me --title "SDLC: {feature_name}" --format json | jq '.number')
+
+# Criar Milestone inicial
+python .claude/skills/github-sync/scripts/milestone_sync.py create \
+  --title "Sprint 1" \
+  --description "Sprint inicial - {feature_name}" \
+  --due-date "$(date -d '+14 days' +%Y-%m-%d)"
+```
+
+## 3. Iniciar Memoria do Projeto
 
 Use @memory-manager para:
-- Criar registro do projeto
-- Definir fase inicial
+- Criar registro do projeto com ID unico
+- Definir fase inicial baseada no nivel
 - Registrar complexidade detectada
+- Vincular Project e Milestone do GitHub
 
-## 3. Executar Fase Inicial
+## 4. Invocar Orchestrator
 
-### Se Level 0:
-- Va direto para implementacao
-- Use @code-author e @code-reviewer
+**IMPORTANTE**: Este comando DEVE invocar @orchestrator para coordenar o workflow.
 
-### Se Level 1:
-- Inicie com @requirements-analyst
-- Pule arquitetura detalhada
+```yaml
+orchestrator_request:
+  type: start_workflow
+  project_id: "{generated_id}"
+  context:
+    current_phase: 0  # Ou fase inicial baseada no nivel
+    complexity_level: {detected_level}
+    artifacts: []
+    pending_decisions: []
+  payload:
+    description: "{user_description}"
+    github_project_number: {PROJECT_NUM}
+    github_milestone: "Sprint 1"
+```
 
-### Se Level 2+:
-- Inicie com @intake-analyst (Fase 0)
-- Siga o fluxo completo
+O @orchestrator ira:
+1. Validar pre-requisitos
+2. Carregar contexto do memory-manager
+3. Iniciar fase apropriada
+4. Delegar para agentes especificos
+5. Gerenciar transicoes de fase automaticamente
+6. Invocar gate-evaluator entre fases
+7. Persistir progresso e decisoes
 
-## 4. Formato de Saida
+## 5. Formato de Saida
 
 ```yaml
 sdlc_initiated:
@@ -58,16 +102,40 @@ sdlc_initiated:
   starting_phase: number
   agents_needed: list[string]
   estimated_duration: string
+  github:
+    project_number: number
+    project_url: string
+    milestone: string
+  orchestrator_status: "active"
   next_steps:
     - step: string
       agent: string
 ```
 
-## 5. Proximos Passos
+## 6. Fallback sem GitHub
 
-Apos iniciar, use:
+Se GitHub nao estiver disponivel (offline, auth falhou):
+
+1. Log warning para usuario
+2. Continuar workflow local
+3. Sincronizar com GitHub quando disponivel via `/github-sync`
+
+```bash
+if ! check_service github; then
+    log_warn "GitHub indisponivel. Workflow continuara local."
+    save_state "pending_github_sync" "{...}"
+fi
+```
+
+## 7. Proximos Passos
+
+O @orchestrator gerenciara automaticamente os proximos passos.
+
+Para intervencao manual, use:
 - `/phase-status` para ver progresso
 - `/gate-check` para avaliar transicao de fase
+- `/github-dashboard` para ver status no GitHub
+- `/alignment-status` para ver ODRs pendentes
 
 ---
 

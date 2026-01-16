@@ -1,8 +1,8 @@
 ---
 name: gate-check
 description: |
-  Verificacao manual de quality gate entre fases do SDLC.
-  Avalia se todos os artefatos e criterios foram cumpridos.
+  Verificacao de quality gate entre fases do SDLC.
+  Avalia criterios, executa commit se aprovado, e avanca fase automaticamente.
 
   Examples:
   - <example>
@@ -15,16 +15,51 @@ description: |
 
 ## Instrucoes
 
-Voce deve avaliar se o projeto atende aos criterios do gate especificado.
+Este comando avalia quality gates e, se aprovado:
+1. Executa commit dos artefatos da fase (via `phase-commit`)
+2. Atualiza status no GitHub Project
+3. Notifica arquivos para revisao
+4. Extrai learnings da sessao
+5. Avanca para proxima fase automaticamente
 
-## Processo
+## Processo Automatizado
 
-1. **Identificar Gate**: Determinar qual transicao esta sendo avaliada
-2. **Carregar Criterios**: Usar skill `gate-evaluator` para obter criterios
-3. **Verificar Artefatos**: Checar se artefatos obrigatorios existem
-4. **Avaliar Qualidade**: Verificar criterios de qualidade
-5. **Identificar Bloqueadores**: Listar o que impede aprovacao
-6. **Emitir Veredicto**: PASSED ou BLOCKED
+```bash
+# 1. Carregar biblioteca de fallback
+source .claude/lib/fallback.sh
+source .claude/lib/logging.sh
+
+# 2. Identificar gate
+GATE="${1:-$(detect_current_gate)}"
+log_info "Avaliando gate: $GATE" "gate-check"
+
+# 3. Executar gate-evaluator
+trace_id=$(trace_start "gate-check-$GATE")
+python .claude/skills/gate-evaluator/evaluate.py --gate "$GATE"
+RESULT=$?
+trace_end "$trace_id" "$([ $RESULT -eq 0 ] && echo success || echo error)"
+
+# 4. Se PASSED, executar acoes pos-gate
+if [ $RESULT -eq 0 ]; then
+    log_info "Gate $GATE PASSED" "gate-check"
+    
+    # 4a. Commit dos artefatos (phase-commit)
+    .claude/skills/phase-commit/scripts/phase-commit.sh
+    
+    # 4b. Atualizar GitHub Project (se disponivel)
+    if check_service github; then
+        python .claude/skills/github-projects/scripts/project_manager.py update-phase
+    fi
+    
+    # 4c. Extrair learnings (session-analyzer)
+    python .claude/skills/session-analyzer/scripts/analyze.py --extract-learnings
+    
+    # 4d. Notificar arquivos para revisao
+    # (implementado no orchestrator)
+else
+    log_warn "Gate $GATE BLOCKED" "gate-check"
+fi
+```
 
 ## Gates Disponiveis
 
@@ -32,8 +67,8 @@ Voce deve avaliar se o projeto atende aos criterios do gate especificado.
 |------|-----|------|-----------------|
 | phase-0-to-1 | Preparacao | Descoberta | Intake, Compliance |
 | phase-1-to-2 | Descoberta | Requisitos | Research Brief |
-| phase-2-to-3 | Requisitos | Arquitetura | Specs, User Stories |
-| phase-3-to-4 | Arquitetura | Planejamento | ADRs, Design Docs |
+| phase-2-to-3 | Requisitos | Arquitetura | Specs, User Stories, **ODRs** |
+| phase-3-to-4 | Arquitetura | Planejamento | ADRs, Design Docs, **ODRs** |
 | phase-4-to-5 | Planejamento | Implementacao | Sprint Plan |
 | phase-5-to-6 | Implementacao | Qualidade | Codigo, Testes |
 | phase-6-to-7 | Qualidade | Release | Security Scan |
@@ -65,19 +100,49 @@ gate_evaluation:
     - check: "Criterios de aceite definidos"
       passed: true
 
-    - check: "NFRs documentados"
-      passed: false
-      reason: "Faltam requisitos de performance"
+    - check: "ODRs aprovados"
+      passed: true
 
-  blockers:
-    - "NFRs de performance nao documentados"
+  blockers: []
 
-  score: 0.85
-  verdict: "BLOCKED"
+  score: 1.0
+  verdict: "PASSED"
 
-  required_actions:
-    - "Adicionar NFRs de performance na spec"
-    - "Definir SLAs de tempo de resposta"
+  # Acoes executadas apos aprovacao
+  post_gate_actions:
+    - action: "phase-commit"
+      status: "completed"
+      commit: "abc123"
+    - action: "github-project-update"
+      status: "completed"
+    - action: "session-analyzer"
+      status: "completed"
+      learnings_extracted: 3
+
+  next_phase:
+    number: 3
+    name: "Arquitetura e Design"
+    agents: ["system-architect", "adr-author"]
+```
+
+## Integracao com Orchestrator
+
+Quando executado pelo @orchestrator, o gate-check:
+
+1. Registra resultado no memory-manager
+2. Atualiza manifest do projeto
+3. Dispara transicao de fase automaticamente
+4. Notifica stakeholders se necessario
+
+## Fallback
+
+Se algum servico falhar:
+
+```yaml
+fallback_behavior:
+  github_unavailable: "Skip GitHub update, mark for retry"
+  phase_commit_fail: "Warn user, continue evaluation"
+  session_analyzer_fail: "Log error, continue"
 ```
 
 ## Uso
@@ -86,4 +151,6 @@ gate_evaluation:
 /gate-check                    # Avalia gate da fase atual
 /gate-check phase-2-to-3       # Avalia gate especifico
 /gate-check --force            # Registra como passed mesmo com warnings
+/gate-check --no-commit        # Avalia sem commitar
+/gate-check --verbose          # Output detalhado
 ```
