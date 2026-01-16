@@ -11,7 +11,9 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="${SCRIPT_DIR}/../../.."
+# Script está em .claude/skills/session-analyzer/scripts/
+# Precisa subir 4 níveis para chegar ao root do projeto
+PROJECT_ROOT="${SCRIPT_DIR}/../../../.."
 
 # Carregar biblioteca de fallback
 if [[ -f "${PROJECT_ROOT}/.claude/lib/fallback.sh" ]]; then

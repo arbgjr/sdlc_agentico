@@ -46,9 +46,9 @@ main() {
     fi
     
     if [[ -x "$wiki_script" ]]; then
-        # Executa com fallback se disponível
-        if command -v with_fallback &>/dev/null; then
-            with_fallback 2 5 "$wiki_script"
+        # Executa com retry se biblioteca fallback disponível
+        if command -v retry_with_backoff &>/dev/null; then
+            retry_with_backoff "$wiki_script" 3 2 || echo "⚠️ Wiki sync falhou após retries (continuando workflow)"
         else
             "$wiki_script" || echo "⚠️ Wiki sync falhou (continuando workflow)"
         fi

@@ -79,9 +79,14 @@ check_service() {
             curl -s --connect-timeout 2 "${LOKI_URL}/ready" >/dev/null 2>&1
             ;;
         wiki)
-            # Verificar se wiki do repo esta acessivel
+            # Verificar se wiki do repo esta acessivel via git ls-remote
             local repo=$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)
-            [[ -n "$repo" ]] && curl -s --connect-timeout 2 "https://github.com/${repo}.wiki.git" >/dev/null 2>&1
+            if [[ -n "$repo" ]]; then
+                # Wiki Git URLs não respondem HTTP, usar git ls-remote
+                git ls-remote "https://github.com/${repo}.wiki.git" HEAD >/dev/null 2>&1
+            else
+                return 1
+            fi
             ;;
         network)
             ping -c 1 -W 2 github.com >/dev/null 2>&1 || ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1
@@ -230,9 +235,13 @@ exec_with_timeout() {
     
     if command -v timeout >/dev/null 2>&1; then
         timeout "$timeout_secs" "$@"
+    elif command -v gtimeout >/dev/null 2>&1; then
+        # GNU timeout no macOS via coreutils
+        gtimeout "$timeout_secs" "$@"
     else
-        # Fallback para sistemas sem timeout (macOS)
-        perl -e 'alarm shift; exec @ARGV' "$timeout_secs" "$@"
+        # Fallback para sistemas sem timeout (macOS nativo)
+        # Usa perl com sintaxe corrigida
+        perl -e 'alarm $ARGV[0]; shift @ARGV; exec @ARGV' "$timeout_secs" "$@"
     fi
 }
 

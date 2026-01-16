@@ -50,10 +50,12 @@ retry_with_backoff "python .claude/skills/github-sync/scripts/label_manager.py e
 PROJECT_NUM=$(gh project create --owner @me --title "SDLC: {feature_name}" --format json | jq '.number')
 
 # Criar Milestone inicial
+# Usar python para calcular data de forma portável (funciona em Linux e macOS)
+DUE_DATE=$(python3 -c "import datetime; print((datetime.date.today() + datetime.timedelta(days=14)).isoformat())")
 python .claude/skills/github-sync/scripts/milestone_sync.py create \
   --title "Sprint 1" \
   --description "Sprint inicial - {feature_name}" \
-  --due-date "$(date -d '+14 days' +%Y-%m-%d)"
+  --due-date "$DUE_DATE"
 ```
 
 ## 3. Iniciar Memoria do Projeto

@@ -120,9 +120,10 @@ EOF
 # Extrai learnings da sessão atual (se session-analyzer disponível)
 extract_session_learnings() {
     local analyzer_script="$REPO_ROOT/.claude/skills/session-analyzer/scripts/extract_learnings.py"
-    
-    if [[ -x "$analyzer_script" ]]; then
-        python3 "$analyzer_script" --output "$CORPUS_LEARNINGS" 2>/dev/null || true
+
+    if [[ -f "$analyzer_script" ]]; then
+        # Flag correta é --output-dir, não --output
+        python3 "$analyzer_script" --persist --output-dir "$CORPUS_LEARNINGS" 2>/dev/null || true
     fi
 }
 
