@@ -3,13 +3,15 @@ name: session-analyzer
 description: |
   Analisa sessoes do Claude Code para extrair learnings e persistir conhecimento.
   Le arquivos de sessao em ~/.claude/projects/ e extrai decisoes, bloqueios e resolucoes.
+  Invocado automaticamente pelo gate-check e orchestrator.
   Use quando: fim de fase, retrospectiva, analise de progresso.
 allowed-tools:
   - Read
   - Write
   - Bash
   - Glob
-user-invocable: false
+user-invocable: true
+version: "1.1.0"
 ---
 
 # Session Analyzer Skill
@@ -22,6 +24,72 @@ Esta skill analisa sessoes do Claude Code para:
 2. **Capturar bloqueios** - Registrar problemas encontrados e como foram resolvidos
 3. **Persistir learnings** - Salvar conhecimento em `.agentic_sdlc/sessions/`
 4. **Alimentar RAG** - Adicionar ao corpus para consultas futuras
+
+## Scripts Disponíveis
+
+### analyze.sh (wrapper)
+
+```bash
+# Analisar sessão mais recente
+.claude/skills/session-analyzer/scripts/analyze.sh
+
+# Analisar e persistir
+.claude/skills/session-analyzer/scripts/analyze.sh --persist
+
+# Extrair learnings para RAG corpus
+.claude/skills/session-analyzer/scripts/analyze.sh --extract-learnings
+
+# Especificar projeto
+.claude/skills/session-analyzer/scripts/analyze.sh --project /path/to/project
+```
+
+### extract_learnings.py
+
+```bash
+# Uso direto do Python
+python .claude/skills/session-analyzer/scripts/extract_learnings.py
+
+# Com opções
+python .claude/skills/session-analyzer/scripts/extract_learnings.py \
+  --session-id <uuid> \
+  --persist \
+  --project /path/to/project
+```
+
+## Integração Automática
+
+### Com gate-check
+
+O gate-check invoca session-analyzer automaticamente após aprovação:
+
+```bash
+# Em gate-check.md
+if [ $RESULT -eq 0 ]; then
+    # Extrair learnings
+    python .claude/skills/session-analyzer/scripts/analyze.py --extract-learnings
+fi
+```
+
+### Com orchestrator
+
+O orchestrator invoca ao fim de cada fase:
+
+```yaml
+on_phase_complete:
+  - call: session-analyzer
+    when: phase_completed
+    persist: true
+```
+
+### Com memory-manager
+
+Learnings são persistidos automaticamente:
+
+```yaml
+on_learning_found:
+  - persist_to: .agentic_sdlc/corpus/learnings/
+  - update: rag_index
+```
 
 ## Localizacao das Sessoes
 
