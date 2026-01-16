@@ -1,4 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.7.1-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v1.7.1)
+[![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
 
 # SDLC Agêntico
 
