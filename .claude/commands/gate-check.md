@@ -52,9 +52,12 @@ if [ $RESULT -eq 0 ]; then
     fi
     
     # 4c. Extrair learnings (session-analyzer)
-    python3 .claude/skills/session-analyzer/scripts/analyze.py --extract-learnings
-    
-    # 4d. Notificar arquivos para revisao
+    .claude/skills/session-analyzer/scripts/analyze.sh --extract-learnings
+
+    # 4d. Indexar ADRs no corpus RAG (rag-curator)
+    python3 .claude/skills/rag-curator/scripts/index_adrs.py
+
+    # 4e. Notificar arquivos para revisao
     # (implementado no orchestrator)
 else
     log_warn "Gate $GATE BLOCKED" "gate-check"

@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.4] - 2026-01-16
+
+### Added
+
+- **rag-curator skill** - Curador do corpus RAG para indexação automática de conhecimento
+  - Criado `index_adrs.py` para copiar ADRs de projetos para corpus
+  - Indexação automática executada em cada gate-check
+  - Suporte para indexar projeto específico ou todos os projetos
+  - Estrutura completa: `.agentic_sdlc/corpus/nodes/{decisions,learnings,concepts,patterns}`
+
+### Fixed
+
+- **gate-check command** - Corrigido comando do session-analyzer
+  - Alterado de `analyze.py` para `analyze.sh` (comando correto)
+  - Adicionada chamada ao rag-curator após session-analyzer
+  - Fixes: ADRs criados não eram indexados automaticamente no corpus RAG
+
+- **Estrutura do corpus** - Atualizada para v1.4.0
+  - Criado `corpus/nodes/` com subdiretorios: decisions/, learnings/, concepts/, patterns/
+  - Fixes: Skills graph-navigator e github-wiki esperavam `nodes/` mas não existia
+
 ## [1.7.3] - 2026-01-16
 
 ### Fixed
