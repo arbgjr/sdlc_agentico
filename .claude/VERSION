@@ -1,0 +1,39 @@
+# SDLC Agêntico Version
+version: "1.0.0"
+build_date: "2026-01-16"
+release_notes: |
+  Primeira versão estável do SDLC Agêntico.
+  
+  Features:
+  - Framework completo de 8 fases
+  - Integração com GitHub (Projects, Wiki, Issues)
+  - Sistema de quality gates
+  - RAG corpus para conhecimento
+  - Session analyzer para learnings
+  - Feature flags para experimentação
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-01-16"
+    changes:
+      - "feat: Integração completa com GitHub Projects V2"
+      - "feat: Sincronização automática de Wiki"
+      - "feat: RAG corpus indexer"
+      - "feat: Session analyzer com learnings"
+      - "feat: Sistema de feature flags"
+      - "feat: Hooks automáticos por fase"
+      - "fix: Fallbacks robustos para serviços externos"
+      - "docs: Documentação completa de skills e comandos"
+
+  - version: "0.9.0"
+    date: "2026-01-14"
+    changes:
+      - "feat: Estrutura base do SDLC"
+      - "feat: Agentes para todas as fases"
+      - "feat: Skills iniciais"
+
+compatibility:
+  min_claude_version: "1.0.0"
+  min_gh_version: "2.0.0"
+  python: ">=3.9"
+  node: ">=18"

@@ -1,0 +1,118 @@
+# SDLC Agêntico Feature Flags
+# Gerencie via /sdlc-flags ou editando este arquivo
+
+flags:
+  # Integrações GitHub
+  github_projects:
+    enabled: true
+    description: "Integração com GitHub Projects V2"
+    since: "1.0.0"
+    
+  wiki_sync:
+    enabled: true
+    description: "Sincronização automática de Wiki"
+    since: "1.0.0"
+    
+  github_milestones:
+    enabled: true
+    description: "Criação automática de Milestones"
+    since: "1.0.0"
+
+  # Memória e RAG
+  rag_indexing:
+    enabled: true
+    description: "Indexação automática do RAG corpus"
+    since: "1.0.0"
+    
+  session_analyzer:
+    enabled: true
+    description: "Análise de sessões para learnings"
+    since: "1.0.0"
+    
+  memory_persistence:
+    enabled: true
+    description: "Persistência de contexto entre sessões"
+    since: "1.0.0"
+
+  # Automação
+  auto_commit:
+    enabled: false
+    description: "Commits automáticos por fase"
+    since: "1.0.0"
+    experimental: true
+    warning: "Pode criar commits indesejados"
+    
+  copilot_assign:
+    enabled: false
+    description: "Atribuir issues ao Copilot por default"
+    since: "1.0.0"
+    
+  auto_issue_create:
+    enabled: false
+    description: "Criar issues automaticamente na Phase 4"
+    since: "1.0.0"
+
+  # Quality Gates
+  strict_gates:
+    enabled: false
+    description: "Gates obrigatórios (bloqueia avanço)"
+    since: "1.0.0"
+    warning: "Pode impedir progresso se artefatos faltando"
+    
+  gate_notifications:
+    enabled: true
+    description: "Notificações ao passar gates"
+    since: "1.0.0"
+
+  # Experimentação
+  ab_experiments:
+    enabled: false
+    description: "Experimentos A/B nos fluxos"
+    since: "1.0.0"
+    experimental: true
+
+  # Logging e Observabilidade
+  loki_integration:
+    enabled: false
+    description: "Enviar logs para Loki"
+    since: "1.0.0"
+    requires: "Loki disponível em localhost:3100"
+    
+  verbose_logging:
+    enabled: false
+    description: "Logging detalhado para debug"
+    since: "1.0.0"
+
+# Configurações de Experimentos A/B
+experiments:
+  gate_notification_style:
+    enabled: false
+    description: "Testar estilos de notificação de gate"
+    variants:
+      - name: "minimal"
+        weight: 50
+        config:
+          style: "compact"
+      - name: "detailed"
+        weight: 50
+        config:
+          style: "expanded"
+          show_suggestions: true
+    metrics:
+      - "user_action_time"
+      - "gate_retry_rate"
+
+# Overrides por ambiente
+environments:
+  development:
+    verbose_logging: true
+    strict_gates: false
+    
+  staging:
+    strict_gates: true
+    loki_integration: true
+    
+  production:
+    strict_gates: true
+    auto_commit: false
+    copilot_assign: false
