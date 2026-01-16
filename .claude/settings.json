@@ -131,6 +131,10 @@
           },
           {
             "type": "command",
+            "command": ".claude/hooks/query-phase-learnings.sh"
+          },
+          {
+            "type": "command",
             "command": ".claude/hooks/auto-migrate.sh"
           },
           {

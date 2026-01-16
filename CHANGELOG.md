@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.8] - 2026-01-16
+
+### Added
+
+- **Análise Proativa de Learnings e Erros** - Fluxo completo de aprendizado contínuo:
+
+  **INÍCIO da sessão** (UserPromptSubmit hook):
+  - ✅ Novo hook `query-phase-learnings.sh` consulta corpus RAG
+  - ✅ Exibe learnings/warnings anteriores da fase ao usuário
+  - ✅ Dicas e problemas conhecidos antes de iniciar trabalho
+
+  **FIM da fase** (gate-check pré-gate):
+  - ✅ Novo script `query_phase_errors.py` consulta Loki por erros da fase
+  - ✅ Novo script `classify_error.py` classifica erros automaticamente:
+    - Bug do SDLC Agêntico → Reporta ao owner (arbgjr)
+    - Problema do projeto → Notifica usuário com decisão continuar/abortar
+  - ✅ Novo script `report_sdlc_bug.sh` cria GitHub issue automaticamente
+  - ✅ Análise de erros ANTES de avaliar gate (previne avanço com problemas)
+
+  **Notificações ao usuário**:
+  - 🐛 Bugs do SDLC: Aviso + auto-report ao owner
+  - ⚠️  Problemas do projeto: Prompt "Continuar mesmo com problemas? (y/N)"
+  - ✓ Decisão consciente do usuário sobre prosseguir
+
+### Changed
+
+- **gate-check.md** - Adicionada etapa 3 (PRÉ-GATE) antes da avaliação:
+  1. Consulta Loki por erros
+  2. Classifica erros (SDLC vs projeto)
+  3. Notifica usuário e permite decisão
+  4. Reporta bugs do SDLC ao owner
+  5. Só então avalia gate
+
+- **settings.json** - Adicionado hook `query-phase-learnings.sh` ao UserPromptSubmit
+
+### Technical Details
+
+**Arquivos criados**:
+- `.claude/hooks/query-phase-learnings.sh` (142 linhas)
+- `.claude/skills/session-analyzer/scripts/query_phase_errors.py` (182 linhas)
+- `.claude/skills/session-analyzer/scripts/classify_error.py` (183 linhas)
+- `.claude/skills/session-analyzer/scripts/report_sdlc_bug.sh` (107 linhas)
+
+**Arquivos modificados**:
+- `.claude/commands/gate-check.md` - Adicionada análise pré-gate (linhas 36-69)
+- `.claude/settings.json` - Adicionado hook UserPromptSubmit (linha 134)
+
+**Fluxo completo**:
+```
+INÍCIO → Consulta RAG learnings → Exibe ao usuário
+   ↓
+TRABALHO → Logs enviados ao Loki
+   ↓
+FIM → Consulta Loki erros → Classifica → Notifica → Decide → Avalia gate
+   ↓
+APÓS GATE → Extrai learnings → Grava no RAG
+```
+
+**Padrões de classificação**:
+- SDLC bugs: `.claude/`, `manifest.json not found`, `update-phase command not found`
+- Project issues: `test failed`, `syntax error`, `npm ERR`, `docker failed`
+
 ## [1.7.7] - 2026-01-16
 
 ### Added

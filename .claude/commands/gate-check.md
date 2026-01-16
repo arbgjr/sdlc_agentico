@@ -33,13 +33,48 @@ source .claude/lib/logging.sh
 GATE="${1:-$(detect_current_gate)}"
 log_info "Avaliando gate: $GATE" "gate-check"
 
-# 3. Executar gate-evaluator
+# 3. PRÉ-GATE: Analisar erros da fase (NOVO v1.7.8)
+log_info "Analisando erros da fase antes de avaliar gate" "gate-check"
+
+# 3a. Consultar Loki por erros
+ERRORS_JSON="/tmp/phase_errors_${GATE}.json"
+python3 .claude/skills/session-analyzer/scripts/query_phase_errors.py \
+  --json > "$ERRORS_JSON" 2>/dev/null || true
+
+# 3b. Se encontrou erros, classificar e notificar
+if [ -s "$ERRORS_JSON" ]; then
+    CLASSIFIED_JSON="/tmp/classified_errors_${GATE}.json"
+    python3 .claude/skills/session-analyzer/scripts/classify_error.py \
+      --error-json "$ERRORS_JSON" --output "$CLASSIFIED_JSON"
+
+    SDLC_BUGS=$(jq -r '.summary.sdlc_bugs' "$CLASSIFIED_JSON" 2>/dev/null || echo "0")
+    PROJECT_ISSUES=$(jq -r '.summary.project_issues' "$CLASSIFIED_JSON" 2>/dev/null || echo "0")
+
+    # Notificar bugs do SDLC
+    if [ "$SDLC_BUGS" -gt 0 ]; then
+        log_error "🐛 $SDLC_BUGS bugs do SDLC Agêntico detectados" "gate-check"
+        echo "⚠️  Bugs serão reportados ao owner. Pode haver problemas de funcionamento."
+        check_service github && .claude/skills/session-analyzer/scripts/report_sdlc_bug.sh "$CLASSIFIED_JSON" || true
+    fi
+
+    # Notificar problemas do projeto
+    if [ "$PROJECT_ISSUES" -gt 0 ]; then
+        log_warn "⚠️  $PROJECT_ISSUES problemas do projeto detectados" "gate-check"
+        read -p "Continuar mesmo com problemas? (y/N): " -n 1 -r
+        echo ""
+        [[ ! $REPLY =~ ^[Yy]$ ]] && log_info "Gate ABORTADO pelo usuário" "gate-check" && exit 1
+    fi
+
+    rm -f "$ERRORS_JSON" "$CLASSIFIED_JSON" 2>/dev/null || true
+fi
+
+# 4. Executar gate-evaluator
 trace_id=$(trace_start "gate-check-$GATE")
 python3 .claude/skills/gate-evaluator/evaluate.py --gate "$GATE"
 RESULT=$?
 trace_end "$trace_id" "$([ $RESULT -eq 0 ] && echo success || echo error)"
 
-# 4. Se PASSED, executar acoes pos-gate
+# 5. Se PASSED, executar acoes pos-gate
 if [ $RESULT -eq 0 ]; then
     log_info "Gate $GATE PASSED" "gate-check"
     
