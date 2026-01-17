@@ -286,6 +286,9 @@ on_gate_pass:
 
 ## Notas
 
-- Esta skill NAO faz push automaticamente
-- O usuario deve aprovar o commit explicitamente em contextos criticos
+- ✅ Esta skill FAZ COMMIT **E PUSH** automaticamente (v1.7.15+)
+- ✅ Push detecta se branch tem upstream e configura automaticamente
+- ✅ Logs estruturados com Loki (skill="phase-commit")
+- ✅ Atualiza manifest.yml com commit hash e timestamp
+- ⚠️ Se push falhar, o commit local é mantido e erro é reportado
 - Commits podem ser agrupados se varias fases forem completadas rapidamente

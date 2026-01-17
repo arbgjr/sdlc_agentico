@@ -230,11 +230,20 @@ antes de prosseguir para a proxima fase.
 
 Apos passar um gate com sucesso:
 
-1. **Chamar skill phase-commit**
-2. **Listar artefatos da fase**
-3. **Sugerir mensagem de commit**
-4. **Executar commit se usuario aprovar**
-5. **Sugerir push se branch remota existe**
+1. **Executar automaticamente o phase-commit (v1.7.15+)**
+   ```bash
+   # O hook phase-commit-reminder.sh executará automaticamente:
+   bash .claude/skills/phase-commit/scripts/phase-commit.sh "$PROJECT_ID" "$PHASE" "completar fase"
+   ```
+   **IMPORTANTE:**
+   - O script faz commit **E PUSH** automaticamente
+   - Atualiza manifest.yml com commit hash
+   - Logs estruturados com Loki
+   - Se push falhar, reporta erro mas mantém commit local
+
+2. **Verificar sucesso do commit+push**
+3. **Continuar para próxima fase se sucesso**
+4. **Se falhar, reportar erro e sugerir correção manual**
 
 ## Extracao de Learnings
 

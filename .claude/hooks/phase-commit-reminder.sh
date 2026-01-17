@@ -51,25 +51,50 @@ else
     PHASE_NAME="atual"
 fi
 
+# EXECUTAR AUTOMATICAMENTE o phase-commit (v1.7.15+)
+sdlc_log_info "Executando phase-commit automaticamente" "phase=$CURRENT_PHASE"
+
 echo ""
 echo "============================================"
-echo "  LEMBRETE: Commit de Fase"
+echo "  Auto-commit: Fase ${CURRENT_PHASE} (${PHASE_NAME})"
 echo "============================================"
 echo ""
-echo "Voce passou o gate da fase ${CURRENT_PHASE} (${PHASE_NAME})."
-echo "Existem ${CHANGES} arquivo(s) nao commitado(s)."
-echo ""
-echo "Recomendacao: Faca commit dos artefatos desta fase antes de prosseguir."
-echo ""
-echo "Voce pode usar:"
-echo "  - Skill /phase-commit para commit automatico"
-echo "  - git add . && git commit -m 'feat(phase-${CURRENT_PHASE}): ${PHASE_NAME}'"
+
+# Obter PROJECT_ID
+PROJECT_ID=""
+if [ -f ".agentic_sdlc/.current-project" ]; then
+    PROJECT_ID=$(cat .agentic_sdlc/.current-project)
+fi
+
+# Executar phase-commit.sh
+PHASE_COMMIT_SCRIPT="${SCRIPT_DIR}/../skills/phase-commit/scripts/phase-commit.sh"
+
+if [ -f "$PHASE_COMMIT_SCRIPT" ]; then
+    sdlc_log_debug "Chamando phase-commit.sh" "script=$PHASE_COMMIT_SCRIPT"
+
+    if bash "$PHASE_COMMIT_SCRIPT" "$PROJECT_ID" "$CURRENT_PHASE" "completar fase ${PHASE_NAME}"; then
+        sdlc_log_info "Phase-commit executado com sucesso" "phase=$CURRENT_PHASE"
+        echo ""
+        echo "✓ Commit e push realizados automaticamente"
+    else
+        sdlc_log_error "Falha ao executar phase-commit" "phase=$CURRENT_PHASE"
+        echo ""
+        echo "✗ Erro ao executar phase-commit automatico"
+        echo "Execute manualmente: bash $PHASE_COMMIT_SCRIPT"
+    fi
+else
+    sdlc_log_warn "Script phase-commit.sh nao encontrado" "path=$PHASE_COMMIT_SCRIPT"
+    echo ""
+    echo "⚠ Script phase-commit.sh nao encontrado"
+    echo "Faca commit manualmente: git add . && git commit && git push"
+fi
+
 echo ""
 echo "============================================"
 echo ""
 
 # Exportar variavel para o Claude Code
-echo "PHASE_COMMIT_SUGGESTED=true"
-echo "UNCOMMITTED_CHANGES=${CHANGES}"
+echo "PHASE_COMMIT_EXECUTED=true"
+echo "CURRENT_PHASE=${CURRENT_PHASE}"
 
 exit 0
