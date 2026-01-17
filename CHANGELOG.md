@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.12] - 2026-01-17
+
+### Fixed
+
+- **memory-manager/memory_ops.py** - Script agora aceita argumentos CLI e cria manifest completo:
+  - 🐛 **Problema**: Script ignorava argumentos `--project-name`, `--description`, etc. e apenas executava testes
+  - 🐛 **Consequência**: `/sdlc-start` criava diretórios mas NÃO criava `manifest.yml` do projeto
+  - ✅ **Solução**: Implementado CLI com argparse e comando `init`
+  - ✅ Nova função `init_project()` cria manifest completo com todos os metadados
+  - ✅ Cria arquivo `.current-project` apontando para projeto ativo
+  - ✅ Comando `test` preserva comportamento antigo para testes
+
+### Added
+
+- **memory_ops.py** - CLI completo:
+  - Comando `init` para inicializar projeto
+  - Parâmetros: `--project-name`, `--description`, `--complexity`, `--phase`
+  - Parâmetros GitHub: `--github-project`, `--github-milestone`, `--github-url`
+  - Gera `project_id` único (format: `proj-{uuid[:8]}`)
+  - Cria manifest.yml com estrutura completa (artifacts, decisions, team, metadata)
+
+### Changed
+
+- **manifest.yml** - Estrutura padronizada:
+  - Campos: project_id, name, description, created_at, updated_at
+  - current_phase, complexity_level, status, phases_completed
+  - artifacts (specs, adrs, diagrams, tests, documentation)
+  - decisions, team (owner, contributors), metadata, tags
+  - github (project_number, project_url, milestone) - opcional
+
 ## [1.7.11] - 2026-01-17
 
 ### Fixed

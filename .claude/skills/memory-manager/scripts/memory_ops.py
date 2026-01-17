@@ -232,23 +232,134 @@ def update_project_manifest(project_id: str, updates: Dict):
         yaml.dump(manifest, f, default_flow_style=False, allow_unicode=True)
 
 
-if __name__ == "__main__":
-    # Testes basicos
+def init_project(
+    project_name: str,
+    description: str,
+    complexity: int = 2,
+    phase: int = 0,
+    github_project: Optional[int] = None,
+    github_milestone: Optional[str] = None,
+    github_url: Optional[str] = None
+) -> str:
+    """
+    Inicializa um novo projeto no SDLC.
+
+    Returns:
+        Project ID gerado
+    """
+    import uuid
+
     ensure_directories()
-    print("Diretorios criados com sucesso")
 
-    # Teste de salvar decisao
-    decision_id = save_decision(
-        project_id="test",
-        decision_type="architecture",
-        title="Teste de decisao",
-        context="Contexto de teste",
-        decision="Decisao de teste",
-        consequences=["Consequencia 1", "Consequencia 2"],
-        phase=3
-    )
-    print(f"Decisao salva: {decision_id}")
+    # Gerar project ID unico
+    project_id = f"proj-{str(uuid.uuid4())[:8]}"
+    project_dir = get_project_dir(project_id)
 
-    # Teste de carregar
-    loaded = load_decision("test", decision_id)
-    print(f"Decisao carregada: {loaded['title']}")
+    # Criar manifest completo
+    manifest = {
+        "project_id": project_id,
+        "name": project_name,
+        "description": description,
+        "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "updated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "current_phase": phase,
+        "complexity_level": complexity,
+        "status": "active",
+        "phases_completed": [],
+        "artifacts": {
+            "specs": [],
+            "adrs": [],
+            "diagrams": [],
+            "tests": [],
+            "documentation": []
+        },
+        "decisions": [],
+        "team": {
+            "owner": os.environ.get("USER", "unknown"),
+            "contributors": []
+        },
+        "metadata": {},
+        "tags": []
+    }
+
+    # Adicionar GitHub info se fornecido
+    if github_project or github_milestone or github_url:
+        manifest["github"] = {}
+        if github_project:
+            manifest["github"]["project_number"] = github_project
+        if github_url:
+            manifest["github"]["project_url"] = github_url
+        if github_milestone:
+            manifest["github"]["milestone"] = github_milestone
+
+    # Salvar manifest
+    manifest_file = project_dir / "manifest.yml"
+    with open(manifest_file, "w") as f:
+        yaml.dump(manifest, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
+
+    # Criar .current-project
+    current_project_file = AGENTIC_SDLC_DIR / ".current-project"
+    with open(current_project_file, "w") as f:
+        f.write(project_id)
+
+    print(f"✓ Projeto inicializado: {project_id}")
+    print(f"✓ Manifest criado: {manifest_file}")
+    print(f"✓ Projeto atual: {current_project_file}")
+
+    return project_id
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Memory Manager - Operacoes de memoria do SDLC")
+    subparsers = parser.add_subparsers(dest="command", help="Comando a executar")
+
+    # Comando: init
+    init_parser = subparsers.add_parser("init", help="Inicializa novo projeto")
+    init_parser.add_argument("--project-name", required=True, help="Nome do projeto")
+    init_parser.add_argument("--description", required=True, help="Descricao do projeto")
+    init_parser.add_argument("--complexity", type=int, default=2, help="Nivel de complexidade (0-3)")
+    init_parser.add_argument("--phase", type=int, default=0, help="Fase inicial (0-8)")
+    init_parser.add_argument("--github-project", type=int, help="Numero do GitHub Project")
+    init_parser.add_argument("--github-milestone", help="Nome do GitHub Milestone")
+    init_parser.add_argument("--github-url", help="URL do GitHub Project")
+
+    # Comando: test (antigo comportamento)
+    test_parser = subparsers.add_parser("test", help="Executa testes basicos")
+
+    args = parser.parse_args()
+
+    if args.command == "init":
+        project_id = init_project(
+            project_name=args.project_name,
+            description=args.description,
+            complexity=args.complexity,
+            phase=args.phase,
+            github_project=args.github_project,
+            github_milestone=args.github_milestone,
+            github_url=args.github_url
+        )
+        print(f"\nProject ID: {project_id}")
+
+    elif args.command == "test":
+        # Testes basicos (antigo comportamento)
+        ensure_directories()
+        print("Diretorios criados com sucesso")
+
+        decision_id = save_decision(
+            project_id="test",
+            decision_type="architecture",
+            title="Teste de decisao",
+            context="Contexto de teste",
+            decision="Decisao de teste",
+            consequences=["Consequencia 1", "Consequencia 2"],
+            phase=3
+        )
+        print(f"Decisao salva: {decision_id}")
+
+        loaded = load_decision("test", decision_id)
+        print(f"Decisao carregada: {loaded['title']}")
+
+    else:
+        parser.print_help()
