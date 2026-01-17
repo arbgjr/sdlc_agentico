@@ -7,6 +7,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.15] - 2026-01-17
+
+### Added
+
+- **github-sync/create_all_sprints.py** - Script automático de criação de milestones:
+  - 📦 **Funcionalidade**: Cria todos os milestones de uma vez a partir do task-breakdown.yml
+  - ✅ Extrai configuração automática de sprints (nome, descrição, duração)
+  - ✅ Calcula datas de vencimento baseadas em duration_weeks
+  - ✅ Suporta Sprint 0, EPICs 001-005 e Sprint 6 Polish
+  - ✅ Usa milestone_sync.py como biblioteca
+  - ✅ Evita duplicação (detecta milestones existentes)
+  - ✅ Base date configurável (default: hoje)
+
+- **github-sync/assign_issues_bulk.py** - Script de atribuição em massa de issues:
+  - 📦 **Funcionalidade**: Atribui automaticamente issues aos milestones corretos
+  - ✅ Mapeia TASK-XXX → Milestone title baseado em assigned_sprint
+  - ✅ Busca issues via `gh issue list` (limit 200)
+  - ✅ Resolve milestone title → milestone number automaticamente
+  - ✅ Cache de milestone numbers para performance
+  - ✅ Rate limiting (0.3s entre atualizações)
+  - ✅ Resumo detalhado (updated/skipped/failed)
+
+- **Uso**:
+  ```bash
+  # Criar todos os milestones
+  python3 .claude/skills/github-sync/scripts/create_all_sprints.py \
+    task-breakdown.yml \
+    --base-date 2026-01-20
+
+  # Atribuir issues aos milestones
+  python3 .claude/skills/github-sync/scripts/assign_issues_bulk.py \
+    task-breakdown.yml
+  ```
+
+- **Output esperado**:
+  ```
+  Creating 7 sprint milestones...
+  Base date: 2026-01-20
+
+  Creating Sprint 0 - Infrastructure & Setup (due: 2026-01-27)...
+  Milestone criado: #2 - Sprint 0 - Infrastructure & Setup
+
+  Creating Sprint 1 - EPIC-001: Ingestão de Dados (due: 2026-02-10)...
+  Milestone criado: #3 - Sprint 1 - EPIC-001: Ingestão de Dados
+
+  ============================================================
+  ✓ Created: 7
+  ✗ Failed: 0
+  ============================================================
+
+  Mapping 114 tasks to milestones...
+
+  ✓ Issue #50 (TASK-001) → Milestone #2 (Sprint 0 - Infrastructure & Setup)
+  ✓ Issue #51 (TASK-002) → Milestone #2 (Sprint 0 - Infrastructure & Setup)
+  ✓ Issue #52 (TASK-003) → Milestone #3 (Sprint 1)
+
+  ============================================================
+  ✓ Updated: 114
+  ⊘ Skipped: 0
+  ✗ Failed: 0
+  ============================================================
+  ```
+
+### Fixed
+
+- **assign_issues_bulk.py**: Corrigido uso de milestone title em vez de número
+  - Problema: `gh issue edit --milestone {number}` falhava com "not found"
+  - Solução: Usar título do milestone: `gh issue edit --milestone "{title}"`
+  - Referência: Issue relatada no projeto satra (122 issues mapeadas)
+
 ## [1.7.14] - 2026-01-17
 
 ### Added
