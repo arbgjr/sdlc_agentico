@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.14] - 2026-01-17
+
+### Added
+
+- **github-sync/bulk_create_issues.py** - Script de criação em massa de issues GitHub:
+  - 📦 **Funcionalidade**: Cria múltiplas issues a partir de task-breakdown.yml
+  - ✅ Suporta estrutura completa de EPICs, Stories e Tasks
+  - ✅ Adiciona metadata: Epic, Sprint, Type, Priority, Story Points
+  - ✅ Formata acceptance criteria como checkboxes
+  - ✅ Inclui dependencies e technical notes
+  - ✅ Aplica labels automaticamente (phase, priority, type)
+  - ✅ Rate limiting (0.5s entre requisições)
+  - ✅ Resumo detalhado de criação (success/failed)
+
+- **Estrutura suportada**:
+  - Sprint 0 Infrastructure
+  - EPICs 001-005 (Ingestão, Métricas, Alertas, Dashboard, Notificações)
+  - Sprint 6 Polish & QA
+  - Mapping automático de tasks para sprints
+
+- **Uso**:
+  ```bash
+  python3 .claude/skills/github-sync/scripts/bulk_create_issues.py \
+    task-breakdown.yml \
+    <project-number>
+  ```
+
+- **Output esperado**:
+  ```
+  ✓ Created issue #123: [TASK-001] Setup PostgreSQL
+  ✓ Created issue #124: [TASK-002] Configure Redis
+
+  ============================================================
+  Issue Creation Summary
+  ============================================================
+  ✓ Successfully created: 45
+  ✗ Failed: 0
+  Total: 45/45
+  ============================================================
+  ```
+
 ## [1.7.13] - 2026-01-17
 
 ### Fixed
