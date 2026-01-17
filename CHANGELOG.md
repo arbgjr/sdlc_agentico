@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.9] - 2026-01-17
+
+### Fixed
+
+- **install-security-tools.sh** - Corrigido suporte para PEP 668 (externally-managed-environment):
+  - 🐛 **Problema**: Script falhava em distribuições Linux modernas (Debian 12+, Ubuntu 23.04+, Fedora 38+)
+    ```
+    error: externally-managed-environment
+    × This environment is externally managed
+    ```
+  - ✅ **Solução**: Usa `pipx` por padrão em sistemas Linux (isolamento por aplicação)
+  - ✅ Detecta PEP 668 automaticamente via `/usr/lib/python3.*/EXTERNALLY-MANAGED`
+  - ✅ Instala `pipx` automaticamente se não existir (apt/dnf/pacman)
+  - ✅ Fallback para `pip3 --user` em sistemas sem PEP 668
+  - ✅ Aviso se ferramenta não estiver no PATH após instalação
+
+### Changed
+
+- **Estratégia de instalação do Semgrep** (por prioridade):
+  1. **pipx** (recomendado - isolado, compatível com PEP 668)
+  2. **brew** (macOS)
+  3. **pip3 --user** (fallback para sistemas antigos)
+
+### Added
+
+- Função `has_pep668()` - Detecta sistemas com PEP 668 ativo
+- Função `ensure_pipx()` - Instala pipx automaticamente se necessário
+  - Suporte para: apt (Debian/Ubuntu), dnf (Fedora/RHEL), pacman (Arch)
+
+### Technical Details
+
+**Distribuições afetadas**:
+- ✅ Debian 12+ (Bookworm)
+- ✅ Ubuntu 23.04+ (Lunar Lobster)
+- ✅ Fedora 38+
+- ✅ Arch Linux (rolling)
+- ✅ Pop!_OS 22.04+
+
+**Arquivos modificados**:
+- `.scripts/install-security-tools.sh` (+92 linhas, -17 linhas)
+
+**Referências**:
+- PEP 668: https://peps.python.org/pep-0668/
+- pipx: https://pipx.pypa.io/
+
 ## [1.7.8] - 2026-01-16
 
 ### Added

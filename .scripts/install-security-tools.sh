@@ -44,6 +44,50 @@ detect_os() {
     log_info "Sistema detectado: $OS"
 }
 
+# Detectar se sistema tem PEP 668 (externally-managed-environment)
+has_pep668() {
+    # PEP 668: Distribuições Linux modernas marcam Python do sistema como externally-managed
+    test -f /usr/lib/python3.*/EXTERNALLY-MANAGED 2>/dev/null
+}
+
+# Instalar pipx se não existir (necessário em sistemas PEP 668)
+ensure_pipx() {
+    if command -v pipx &> /dev/null; then
+        return 0
+    fi
+
+    log_info "pipx não encontrado. Instalando pipx..."
+
+    if [[ "$OS" == "linux" ]]; then
+        # Tentar apt/dnf/pacman
+        if command -v apt &> /dev/null; then
+            sudo apt update && sudo apt install -y pipx
+        elif command -v dnf &> /dev/null; then
+            sudo dnf install -y pipx
+        elif command -v pacman &> /dev/null; then
+            sudo pacman -S --noconfirm python-pipx
+        else
+            # Fallback: pip install pipx para usuário
+            python3 -m pip install --user pipx 2>/dev/null || {
+                log_error "Falha ao instalar pipx"
+                return 1
+            }
+        fi
+
+        # Adicionar pipx ao PATH se necessário
+        python3 -m pipx ensurepath 2>/dev/null || true
+
+    elif [[ "$OS" == "macos" ]]; then
+        brew install pipx
+    else
+        log_error "Instalação automática de pipx não suportada no Windows"
+        log_info "Instale manualmente: python -m pip install --user pipx"
+        return 1
+    fi
+
+    log_success "pipx instalado"
+}
+
 # Instalar Semgrep (SAST)
 install_semgrep() {
     log_info "Verificando Semgrep..."
@@ -55,19 +99,44 @@ install_semgrep() {
 
     log_info "Instalando Semgrep..."
 
-    if command -v pip3 &> /dev/null; then
-        pip3 install semgrep
-    elif command -v pipx &> /dev/null; then
+    # Estratégia de instalação por prioridade:
+    # 1. pipx (recomendado para ferramentas CLI, especialmente em sistemas PEP 668)
+    # 2. brew (macOS)
+    # 3. pip3 --user (fallback para sistemas sem PEP 668)
+
+    if has_pep668 || [[ "$OS" == "linux" ]]; then
+        # Sistema com PEP 668 ou Linux: usar pipx
+        log_info "Sistema detectado com PEP 668 ou Linux - usando pipx (isolado)"
+        ensure_pipx || {
+            log_error "Falha ao configurar pipx"
+            return 1
+        }
         pipx install semgrep
+
     elif command -v brew &> /dev/null; then
+        # macOS com brew
         brew install semgrep
+
+    elif command -v pip3 &> /dev/null; then
+        # Fallback: pip3 --user (evitar --break-system-packages)
+        log_warn "Usando pip3 --user (instalação no diretório do usuário)"
+        pip3 install --user semgrep
+
     else
-        log_error "Nenhum gerenciador de pacotes encontrado (pip3, pipx, brew)"
+        log_error "Nenhum gerenciador de pacotes encontrado"
         log_info "Instale manualmente: https://semgrep.dev/docs/getting-started/"
+        log_info "Ou instale pipx: python3 -m pip install --user pipx"
         return 1
     fi
 
     log_success "Semgrep instalado"
+
+    # Verificar se precisa adicionar ao PATH
+    if ! command -v semgrep &> /dev/null; then
+        log_warn "Semgrep instalado mas não está no PATH"
+        log_info "Adicione ao PATH: export PATH=\"\$HOME/.local/bin:\$PATH\""
+        log_info "Ou reinicie o terminal"
+    fi
 }
 
 # Instalar Trivy (SCA - Container/Dependency Scanner)
