@@ -94,7 +94,7 @@ class DecayTracker:
 
         with open(node_path, "w", encoding="utf-8") as f:
             yaml.dump(
-                node_data, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+                node_data, f, default_flow_style=False, sort_keys=False, allow_unicode=True, default_style="'"
             )
 
         print(f"Recorded validation for {node_id}")
@@ -154,7 +154,7 @@ class DecayTracker:
 
         with open(node_path, "w", encoding="utf-8") as f:
             yaml.dump(
-                node_data, f, default_flow_style=False, sort_keys=False, allow_unicode=True
+                node_data, f, default_flow_style=False, sort_keys=False, allow_unicode=True, default_style="'"
             )
 
         return True

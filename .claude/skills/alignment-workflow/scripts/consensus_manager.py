@@ -52,7 +52,7 @@ def save_odr(odr: Dict, project_id: str = None):
     odr["updated_at"] = datetime.now().isoformat()
     
     with open(odr_path, "w") as f:
-        yaml.dump({"odr": odr}, f, default_flow_style=False, allow_unicode=True)
+        yaml.dump({"odr": odr}, f, default_flow_style=False, allow_unicode=True, default_style="'")
 
 
 def transition_odr(odr_id: str, new_status: str, project_id: str = None) -> bool:

@@ -76,7 +76,7 @@ def save_decision(
     # Salvar
     adr_file = decisions_dir / f"{decision_id.lower()}.yml"
     with open(adr_file, "w") as f:
-        yaml.dump(adr, f, default_flow_style=False, allow_unicode=True)
+        yaml.dump(adr, f, default_flow_style=False, allow_unicode=True, default_style="'")
 
     return decision_id
 
@@ -164,7 +164,7 @@ def save_learning(
     # Salvar
     learning_file = learnings_dir / f"{learning_id.lower()}.yml"
     with open(learning_file, "w") as f:
-        yaml.dump(learning, f, default_flow_style=False, allow_unicode=True)
+        yaml.dump(learning, f, default_flow_style=False, allow_unicode=True, default_style="'")
 
     return learning_id
 
@@ -212,7 +212,7 @@ def get_project_manifest(project_id: str) -> Dict:
             "complexity": 2
         }
         with open(manifest_file, "w") as f:
-            yaml.dump(manifest, f, default_flow_style=False, allow_unicode=True)
+            yaml.dump(manifest, f, default_flow_style=False, allow_unicode=True, default_style="'")
         return manifest
 
     with open(manifest_file) as f:
@@ -229,7 +229,7 @@ def update_project_manifest(project_id: str, updates: Dict):
     manifest_file = project_dir / "manifest.yml"
 
     with open(manifest_file, "w") as f:
-        yaml.dump(manifest, f, default_flow_style=False, allow_unicode=True)
+        yaml.dump(manifest, f, default_flow_style=False, allow_unicode=True, default_style="'")
 
 
 def init_project(
@@ -295,7 +295,7 @@ def init_project(
     # Salvar manifest
     manifest_file = project_dir / "manifest.yml"
     with open(manifest_file, "w") as f:
-        yaml.dump(manifest, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
+        yaml.dump(manifest, f, default_flow_style=False, allow_unicode=True, sort_keys=False, default_style="'")
 
     # Criar .current-project
     current_project_file = AGENTIC_SDLC_DIR / ".current-project"

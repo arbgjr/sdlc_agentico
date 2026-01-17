@@ -247,7 +247,7 @@ def save_analysis(summary: dict, output_dir: Path):
     output_path = output_dir / f"{session_id}.yml"
 
     with open(output_path, "w", encoding="utf-8") as f:
-        yaml.dump(summary, f, default_flow_style=False, allow_unicode=True)
+        yaml.dump(summary, f, default_flow_style=False, allow_unicode=True, default_style="'")
 
     return output_path
 

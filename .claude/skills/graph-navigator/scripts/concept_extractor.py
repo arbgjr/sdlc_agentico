@@ -554,7 +554,7 @@ class ConceptExtractor:
 
             with open(file_path, "w", encoding="utf-8") as f:
                 yaml.dump(content, f, default_flow_style=False, sort_keys=False,
-                         allow_unicode=True)
+                         allow_unicode=True, default_style="'")
 
             saved += 1
 

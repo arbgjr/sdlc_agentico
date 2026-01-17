@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.13] - 2026-01-17
+
+### Fixed
+
+- **Todos os scripts Python** - Corrigido formato YAML gerado com aspas mal escapadas:
+  - 🐛 **Problema**: PyYAML gerava YAML inválido quando strings continham aspas duplas
+    ```yaml
+    # YAML INVÁLIDO gerado
+    acceptance_criteria:
+      - "Estado anterior para "cruza""  # ❌ Erro de parsing
+    ```
+  - 🐛 **Consequência**: Erro ao carregar YAML:
+    ```
+    yaml.constructor.ConstructorError: while constructing a mapping
+    found unexpected ':' in "<string>"
+    ```
+  - ✅ **Solução**: Adicionado `default_style="'"` em todos os `yaml.dump()`
+  - ✅ **Resultado**: PyYAML agora usa aspas simples por padrão, evitando conflito
+    ```yaml
+    # YAML VÁLIDO gerado
+    acceptance_criteria:
+      - 'Estado anterior para "cruza"'  # ✓ Parsing correto
+    ```
+
+### Changed
+
+- **7 arquivos Python corrigidos**:
+  - `.claude/skills/memory-manager/scripts/memory_ops.py` (5 ocorrências)
+  - `.claude/skills/alignment-workflow/scripts/consensus_manager.py` (1 ocorrência)
+  - `.claude/skills/decay-scoring/scripts/decay_calculator.py` (1 ocorrência)
+  - `.claude/skills/decay-scoring/scripts/decay_tracker.py` (2 ocorrências)
+  - `.claude/skills/rag-query/scripts/hybrid_search.py` (1 ocorrência)
+  - `.claude/skills/graph-navigator/scripts/concept_extractor.py` (1 ocorrência)
+  - `.claude/skills/session-analyzer/scripts/extract_learnings.py` (1 ocorrência)
+
+- **Todos os yaml.dump() agora usam**:
+  ```python
+  yaml.dump(data, f,
+      default_flow_style=False,
+      allow_unicode=True,
+      default_style="'",  # ← NOVO: força aspas simples
+      sort_keys=False     # onde aplicável
+  )
+  ```
+
 ## [1.7.12] - 2026-01-17
 
 ### Fixed

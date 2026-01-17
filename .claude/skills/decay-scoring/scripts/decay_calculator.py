@@ -257,7 +257,7 @@ def load_node_yaml(path: Path) -> Dict[str, Any]:
 def save_node_yaml(path: Path, data: Dict[str, Any]) -> None:
     """Save a node YAML file."""
     with open(path, "w", encoding="utf-8") as f:
-        yaml.dump(data, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
+        yaml.dump(data, f, default_flow_style=False, sort_keys=False, allow_unicode=True, default_style="'")
 
 
 def process_corpus(
