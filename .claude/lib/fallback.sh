@@ -62,23 +62,47 @@ retry_with_backoff() {
 }
 
 #######################################
+# Verifica se estamos em um repositorio GitHub
+# Returns:
+#   0 se em repo GitHub, 1 caso contrario
+#######################################
+is_github_repo() {
+    # Verificar se ha remote git
+    if ! git remote get-url origin >/dev/null 2>&1; then
+        return 1
+    fi
+
+    # Verificar se gh CLI consegue acessar o repo
+    gh repo view --json nameWithOwner -q '.nameWithOwner' >/dev/null 2>&1
+}
+
+#######################################
 # Verifica se um servico esta disponivel
 # Arguments:
-#   $1 - Nome do servico (github, loki, wiki)
+#   $1 - Nome do servico (github, loki, wiki, repo)
 # Returns:
 #   0 se disponivel, 1 se indisponivel
 #######################################
 check_service() {
     local service="$1"
-    
+
     case "$service" in
         github)
             gh auth status >/dev/null 2>&1
+            ;;
+        repo)
+            # Verifica se estamos em repositorio GitHub valido
+            is_github_repo
             ;;
         loki)
             curl -s --connect-timeout 2 "${LOKI_URL}/ready" >/dev/null 2>&1
             ;;
         wiki)
+            # Primeiro verificar se estamos em repo GitHub
+            if ! is_github_repo; then
+                return 1
+            fi
+
             # Verificar se wiki do repo esta acessivel via git ls-remote
             local repo=$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)
             if [[ -n "$repo" ]]; then

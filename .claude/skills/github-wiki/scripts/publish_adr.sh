@@ -23,10 +23,20 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
+# Verificar se estamos em repositorio GitHub
+if ! git remote get-url origin >/dev/null 2>&1; then
+    log_error "Nao estamos em repositorio GitHub (sem remote 'origin')"
+    echo "Configure primeiro: git remote add origin <url>" >&2
+    exit 1
+fi
+
 # Obter repositorio
 REPO=$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)
 if [[ -z "$REPO" ]]; then
-    log_error "Nao foi possivel detectar repositorio"
+    log_error "Nao foi possivel detectar repositorio GitHub via gh CLI"
+    echo "Verifique:" >&2
+    echo "  - gh auth status" >&2
+    echo "  - git remote -v" >&2
     exit 1
 fi
 

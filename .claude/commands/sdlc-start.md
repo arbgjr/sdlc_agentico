@@ -40,8 +40,45 @@ Para projetos Level 2 ou superior, execute automaticamente:
 # Carregar biblioteca de fallback
 source .claude/lib/fallback.sh
 
-# Verificar pre-requisitos
-check_prerequisites github network
+# Verificar pre-requisitos basicos
+if ! check_prerequisites github network; then
+    log_with_fallback "ERROR" "Pre-requisitos basicos nao atendidos:"
+    echo "  - GitHub CLI autenticado: gh auth status"
+    echo "  - Rede disponivel: ping github.com"
+    exit 1
+fi
+
+# Verificar se estamos em repositorio GitHub
+if ! check_service repo; then
+    log_with_fallback "WARN" "Nao estamos em repositorio GitHub"
+
+    # Criar repositorio automaticamente
+    REPO_NAME=$(basename "$(pwd)")
+    log_info "Criando repositorio GitHub: $REPO_NAME"
+
+    # Perguntar visibilidade (public/private)
+    read -p "Repositorio publico ou privado? (public/private) [public]: " VISIBILITY
+    VISIBILITY=${VISIBILITY:-public}
+
+    # Criar repositorio
+    if [[ "$VISIBILITY" == "private" ]]; then
+        gh repo create "$REPO_NAME" --private --source=. --remote=origin
+    else
+        gh repo create "$REPO_NAME" --public --source=. --remote=origin
+    fi
+
+    if [[ $? -ne 0 ]]; then
+        log_error "Falha ao criar repositorio GitHub"
+        exit 1
+    fi
+
+    log_success "Repositorio GitHub criado: $REPO_NAME"
+
+    # Fazer push inicial (se houver commits)
+    if git rev-parse HEAD >/dev/null 2>&1; then
+        git push -u origin main || git push -u origin master
+    fi
+fi
 
 # Criar labels SDLC (se nao existem)
 retry_with_backoff "python3 .claude/skills/github-sync/scripts/label_manager.py ensure"

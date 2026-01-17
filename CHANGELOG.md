@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.11] - 2026-01-17
+
+### Fixed
+
+- **fallback.sh** - Adicionada validação de repositório GitHub antes de executar `gh` commands:
+  - 🐛 **Problema**: Scripts falhavam sem mensagem clara quando não há remote git configurado
+    ```
+    Traceback (most recent call last):
+      File "<string>", line 1, in <module>
+      File "/usr/lib/python3.12/json/__init__.py", line 293, in load
+    json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+    ```
+  - ✅ **Solução**: Nova função `is_github_repo()` valida remote git + gh CLI access
+  - ✅ Novo check service `repo` verifica se estamos em repositório GitHub válido
+  - ✅ Mensagens claras orientando como configurar git remote
+
+- **sdlc-start.md** - Criação automática de repositório GitHub quando não existir:
+  - ✅ Detecta se estamos em repositório GitHub via `check_service repo`
+  - ✅ **Se não estiver em repo**: cria automaticamente com `gh repo create`
+  - ✅ Pergunta visibilidade (public/private) antes de criar
+  - ✅ Usa nome do diretório atual como nome do repositório
+  - ✅ Faz push inicial se houver commits locais
+  - ✅ Continua workflow automaticamente após criação
+
+- **wiki_sync.sh** - Mensagens de erro melhoradas:
+  - ✅ Detecta ausência de remote git antes de tentar `gh repo view`
+  - ✅ Instruções claras de troubleshooting (gh auth status, git remote -v)
+
+- **publish_adr.sh** - Mesmas melhorias de validação
+
+### Added
+
+- **fallback.sh** - Nova função `is_github_repo()` para validação reutilizável
+- **check_service** - Novo serviço `repo` para validar repositório GitHub
+
+### Changed
+
+- **check_service wiki** - Agora valida repositório GitHub antes de testar wiki
+
 ## [1.7.10] - 2026-01-17
 
 ### Fixed
