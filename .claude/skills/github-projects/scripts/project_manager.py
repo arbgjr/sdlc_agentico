@@ -285,11 +285,15 @@ def create_single_select_field(project_number: int, name: str, options: list[str
             return True
 
     # Criar campo via gh project field-create
+    # Formatar opcoes como string separada por virgulas
+    options_str = ",".join(options)
+
     args = [
         "project", "field-create", str(project_number),
         "--owner", owner,
         "--name", name,
-        "--data-type", "SINGLE_SELECT"
+        "--data-type", "SINGLE_SELECT",
+        "--single-select-options", options_str
     ]
 
     result = run_gh_command(args)
@@ -298,8 +302,7 @@ def create_single_select_field(project_number: int, name: str, options: list[str
         print(f"Erro ao criar campo '{name}': {result.stderr}", file=sys.stderr)
         return False
 
-    print(f"Campo '{name}' criado")
-    # TODO: Adicionar opcoes (requer GraphQL adicional)
+    print(f"Campo '{name}' criado com {len(options)} opcoes")
     return True
 
 

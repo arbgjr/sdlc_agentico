@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.10] - 2026-01-17
+
+### Fixed
+
+- **github-projects/project_manager.py** - Corrigido criação de campos SINGLE_SELECT:
+  - 🐛 **Problema**: Comando `gh project field-create` falhava ao criar campos Phase e Priority
+    ```
+    Erro ao criar campo 'Phase': passing `--single-select-options` is required for SINGLE_SELECT data type
+    ```
+  - ✅ **Solução**: Adicionado parâmetro `--single-select-options` ao comando
+  - ✅ Formata opções como string separada por vírgulas (ex: "Backlog,In Progress,Done")
+  - ✅ Remove TODO obsoleto sobre GraphQL (gh CLI suporta nativamente)
+
+### Changed
+
+- **create_single_select_field()** agora exibe quantidade de opções criadas no log
+
 ## [1.7.9] - 2026-01-17
 
 ### Fixed
