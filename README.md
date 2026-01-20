@@ -1,5 +1,5 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.7.15-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v1.7.15)
+[![Version](https://img.shields.io/badge/version-1.7.16-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v1.7.16)
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
 [![Claude Code](https://img.shields.io/badge/Compatible%20with%20Claude%20Code-white?logo=claude)](https://code.claude.com/docs/en/sub-agents)
 [![Github Copilot](https://img.shields.io/badge/Compatible%20with%20Github%20Copilot-black?logo=githubcopilot)](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
@@ -21,18 +21,18 @@ O SDLC Agêntico é um framework que usa **34 agentes especializados** (30 orque
 │                         SDLC AGÊNTICO v2.0                              │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
-│  Ideia → [Intake] → [Discovery] → [Requirements] → [Architecture]      │
+│  Ideia → [Intake] → [Discovery] → [Requirements] → [Architecture]       │
 │                                         ↓                               │
-│  Produção ← [Release] ← [Quality] ← [Implementation] ← [Planning]      │
+│  Produção ← [Release] ← [Quality] ← [Implementation] ← [Planning]       │
 │                                                                         │
-│  34 Agentes | 9 Fases | Quality Gates | Security by Design             │
-│  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot        │
-│  Phase Commits | Session Learning | Stakeholder Reviews (v1.2.0)       │
-│  Document Processing | Frontend E2E Testing | Patterns (v1.3.0)        │
-│  Semantic Graph | Hybrid Search | Graph Visualization (v1.4.0)         │
-│  Decay Scoring | Content Freshness | Curation Triggers (v1.5.0)        │
-│  GitHub Projects | Milestones | Wiki Sync | Dashboard (v1.6.0)         │
-│  Structured Logging | Loki/Tempo/Grafana Integration (v1.7.0)          │
+│  34 Agentes | 9 Fases | Quality Gates | Security by Design              │
+│  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot         │
+│  Phase Commits | Session Learning | Stakeholder Reviews (v1.2.0)        │
+│  Document Processing | Frontend E2E Testing | Patterns (v1.3.0)         │
+│  Semantic Graph | Hybrid Search | Graph Visualization (v1.4.0)          │
+│  Decay Scoring | Content Freshness | Curation Triggers (v1.5.0)         │
+│  GitHub Projects | Milestones | Wiki Sync | Dashboard (v1.6.0)          │
+│  Structured Logging | Loki/Tempo/Grafana Integration (v1.7.0)           │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```

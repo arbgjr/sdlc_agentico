@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.16] - 2026-01-17
+
+### Added
+
+- **phase-commit/scripts/phase-commit.sh** - Script completo de commit automático:
+  - 📦 **Funcionalidade**: Faz commit **E PUSH** automaticamente ao final de cada fase
+  - ✅ Detecção automática da fase atual (manifest.yml ou project.yml)
+  - ✅ Mapeamento de tipo de commit por fase (docs/feat/test/chore)
+  - ✅ Push automático com configuração de upstream se necessário
+  - ✅ Atualização de manifest.yml com commit hash e timestamp
+  - ✅ Logs estruturados com Loki (skill="phase-commit")
+  - ✅ Tratamento de erros com rollback seguro
+
+- **Hooks de automação**:
+  - ✅ `phase-commit-reminder.sh` executado automaticamente após criar artefatos
+  - ✅ Hooks configurados para task-breakdown.yml, ADRs, specs
+  - ✅ Execução transparente sem intervenção do usuário
+
+### Changed
+
+- **phase-commit-reminder.sh**: Agora **EXECUTA** o commit automaticamente
+  - ANTES: Apenas lembrava o usuário (reminder)
+  - DEPOIS: Executa `phase-commit.sh` automaticamente
+  - Detecta PROJECT_ID e PHASE do contexto
+  - Logs de execução e resultado
+
+- **orchestrator.md**: Workflow de commit atualizado
+  - Instruções explícitas para execução automática
+  - Documentação de commit+push integrado
+  - Verificação de sucesso antes de prosseguir
+
+- **phase-commit/SKILL.md**: Documentação atualizada
+  - Skill FAZ commit E push (não apenas commit)
+  - Push detecta upstream e configura automaticamente
+  - Tratamento de erros documentado
+
+- **settings.json**: Hooks configurados
+  - `PostToolUse` para task-breakdown.yml
+  - `PostToolUse` para ADRs (adr-*.yml)
+  - `PostToolUse` para specs (*.spec.md)
+
+### Fixed
+
+- **Problema crítico**: Commits e pushes não eram feitos automaticamente
+  - Artefatos ficavam apenas no repositório local
+  - Agora executa commit+push ao final de cada fase
+  - Referência: Issue relatada no projeto satra
+
+- **Hook não configurado**: phase-commit-reminder.sh não estava em settings.json
+  - Agora configurado em PostToolUse para artefatos SDLC
+
 ## [1.7.15] - 2026-01-17
 
 ### Added
