@@ -1,0 +1,245 @@
+name: Validate Documentation
+
+on:
+  push:
+    branches: [ main, develop, feature/** ]
+    paths:
+      - 'README.md'
+      - 'CLAUDE.md'
+      - 'CHANGELOG.md'
+      - 'CONTRIBUTING.md'
+      - '.claude/agents/**'
+      - '.claude/skills/**'
+      - '.claude/commands/**'
+      - '.claude/hooks/**'
+      - '.github/workflows/validate-docs.yml'
+      - '.scripts/validate-doc-counts.sh'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'README.md'
+      - 'CLAUDE.md'
+      - 'CHANGELOG.md'
+      - 'CONTRIBUTING.md'
+      - '.claude/agents/**'
+      - '.claude/skills/**'
+      - '.claude/commands/**'
+      - '.claude/hooks/**'
+
+jobs:
+  validate:
+    name: Validate Documentation Consistency
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for accurate counts
+
+      - name: Count components
+        id: count
+        run: |
+          echo "Counting framework components..."
+
+          AGENTS=$(find .claude/agents -name "*.md" 2>/dev/null | wc -l)
+          SKILLS=$(find .claude/skills -maxdepth 1 -type d 2>/dev/null | tail -n +2 | wc -l)
+          HOOKS=$(find .claude/hooks -name "*.sh" 2>/dev/null | wc -l)
+          COMMANDS=$(find .claude/commands -name "*.md" 2>/dev/null | wc -l)
+
+          echo "agents=$AGENTS" >> $GITHUB_OUTPUT
+          echo "skills=$SKILLS" >> $GITHUB_OUTPUT
+          echo "hooks=$HOOKS" >> $GITHUB_OUTPUT
+          echo "commands=$COMMANDS" >> $GITHUB_OUTPUT
+
+          echo "✅ Component counts:"
+          echo "   - Agents: $AGENTS"
+          echo "   - Skills: $SKILLS"
+          echo "   - Hooks: $HOOKS"
+          echo "   - Commands: $COMMANDS"
+
+      - name: Validate README.md
+        env:
+          AGENTS: ${{ steps.count.outputs.agents }}
+          SKILLS: ${{ steps.count.outputs.skills }}
+          HOOKS: ${{ steps.count.outputs.hooks }}
+          COMMANDS: ${{ steps.count.outputs.commands }}
+        run: |
+          echo "Validating README.md..."
+          ERRORS=0
+
+          # Check agent count in main description (line ~17)
+          if ! grep -q "$AGENTS agentes especializados" README.md; then
+            echo "::error file=README.md,line=17::Agent count mismatch. Found $AGENTS agents but README declares different count"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          # Check agent count in ASCII diagram (line ~28)
+          if ! grep -q "$AGENTS Agentes" README.md; then
+            echo "::error file=README.md,line=28::Agent count in ASCII diagram doesn't match. Expected: $AGENTS"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          # Check counts in structure section (lines ~308-311)
+          if ! grep -q "# $AGENTS agentes especializados" README.md; then
+            echo "::error file=README.md,line=308::Agent count in structure section mismatch. Expected: $AGENTS"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          if ! grep -q "# $SKILLS skills reutilizáveis" README.md; then
+            echo "::error file=README.md,line=309::Skill count mismatch. Expected: $SKILLS"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          if ! grep -q "# $COMMANDS comandos do usuário" README.md; then
+            echo "::error file=README.md,line=310::Command count mismatch. Expected: $COMMANDS"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          if ! grep -q "# $HOOKS hooks de automação" README.md; then
+            echo "::error file=README.md,line=311::Hook count mismatch. Expected: $HOOKS"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          if [ $ERRORS -gt 0 ]; then
+            echo "::error::Found $ERRORS count mismatches in README.md"
+            exit 1
+          fi
+
+          echo "✅ README.md counts are correct"
+
+      - name: Validate CLAUDE.md
+        env:
+          AGENTS: ${{ steps.count.outputs.agents }}
+        run: |
+          echo "Validating CLAUDE.md..."
+          ERRORS=0
+
+          # Check agent count in main description (line ~7)
+          if ! grep -q "$AGENTS specialized agents" CLAUDE.md; then
+            echo "::error file=CLAUDE.md,line=7::Agent count mismatch. Expected: $AGENTS"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          # Check agent count in configuration section (line ~93)
+          if ! grep -q "$AGENTS agents organized by SDLC phase" CLAUDE.md; then
+            echo "::error file=CLAUDE.md,line=93::Agent count in configuration section mismatch. Expected: $AGENTS"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          # Check agent count in structure section (line ~102)
+          if ! grep -q "Agent specs (markdown) - $AGENTS specialized roles" CLAUDE.md; then
+            echo "::error file=CLAUDE.md,line=102::Agent count in structure mismatch. Expected: $AGENTS"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          if [ $ERRORS -gt 0 ]; then
+            echo "::error::Found $ERRORS count mismatches in CLAUDE.md"
+            exit 1
+          fi
+
+          echo "✅ CLAUDE.md counts are correct"
+
+      - name: Check for old repository name
+        run: |
+          echo "Checking for old repository name references..."
+
+          # Exclude .git, .venv, and specific allowed files
+          if grep -r "mice_dolphins" \
+            --exclude-dir=.git \
+            --exclude-dir=.venv \
+            --exclude="clean-test-repo.sh" \
+            --exclude="validate-docs.yml" \
+            --exclude="settings.local.json" \
+            . 2>/dev/null; then
+            echo "::error::Found old repository name 'mice_dolphins' in the codebase"
+            echo "::error::All references should use 'sdlc_agentico'"
+            exit 1
+          fi
+
+          echo "✅ No old repository name references found"
+
+      - name: Validate links
+        run: |
+          echo "Validating documentation links..."
+          ERRORS=0
+
+          # Check if documented files exist
+          if ! test -f .docs/guides/troubleshooting.md; then
+            echo "::error file=README.md,line=408::Referenced file .docs/guides/troubleshooting.md does not exist"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          if ! test -d .docs/engineering-playbook/manual-desenvolvimento; then
+            echo "::error file=CLAUDE.md,line=199::Referenced directory .docs/engineering-playbook/manual-desenvolvimento does not exist"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          if test -d .docs/examples; then
+            echo "::warning::Directory .docs/examples exists but is not supposed to be in repository"
+          fi
+
+          if [ $ERRORS -gt 0 ]; then
+            echo "::error::Found $ERRORS broken links"
+            exit 1
+          fi
+
+          echo "✅ All documentation links are valid"
+
+      - name: Check Python version consistency
+        run: |
+          echo "Checking Python version consistency..."
+          ERRORS=0
+
+          # Badge should say 3.11+
+          if ! grep -q "python-3\.11" README.md; then
+            echo "::error file=README.md,line=3::Python badge should declare 3.11+ (found different version)"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          # Requirements section should say 3.11+
+          if ! grep -q "Python.*3\.11+" README.md; then
+            echo "::error file=README.md,line=42::Python requirement should be 3.11+"
+            ERRORS=$((ERRORS + 1))
+          fi
+
+          if [ $ERRORS -gt 0 ]; then
+            echo "::error::Python version inconsistencies found"
+            exit 1
+          fi
+
+          echo "✅ Python version is consistent (3.11+)"
+
+      - name: Validate version references
+        run: |
+          echo "Checking for outdated version references..."
+
+          # Get current version from badge
+          CURRENT_VERSION=$(grep -oP 'version-\K[0-9]+\.[0-9]+\.[0-9]+' README.md | head -1)
+          echo "Current version: v$CURRENT_VERSION"
+
+          # Check if any v1.7.1 references remain (should all be updated to current)
+          if grep -q "v1\.7\.1" README.md CLAUDE.md; then
+            echo "::warning::Found outdated version reference v1.7.1 (current is v$CURRENT_VERSION)"
+          fi
+
+          echo "✅ Version references checked"
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "## ✅ Documentation Validation Passed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All documentation checks passed successfully:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Component counts are accurate" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ No old repository name references" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ All documentation links are valid" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Python version is consistent" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Version references are up-to-date" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Component Counts:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Agents: ${{ steps.count.outputs.agents }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Skills: ${{ steps.count.outputs.skills }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Hooks: ${{ steps.count.outputs.hooks }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commands: ${{ steps.count.outputs.commands }}" >> $GITHUB_STEP_SUMMARY
