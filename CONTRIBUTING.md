@@ -23,8 +23,8 @@ Antes de implementar, abra uma issue para discussão:
 
 ```bash
 # 1. Fork e clone
-git clone https://github.com/arbgjr/mice_dolphins.git
-cd mice_dolphins
+git clone https://github.com/arbgjr/sdlc_agentico.git
+cd sdlc_agentico
 
 # 2. Crie uma branch
 git checkout -b feat/nome-da-feature
@@ -276,8 +276,8 @@ Para mudanças significativas:
 
 ## Contato
 
-- Issues: [GitHub Issues](https://github.com/arbgjr/mice_dolphins/issues)
-- Discussões: [GitHub Discussions](https://github.com/arbgjr/mice_dolphins/discussions)
+- Issues: [GitHub Issues](https://github.com/arbgjr/sdlc_agentico/issues)
+- Discussões: [GitHub Discussions](https://github.com/arbgjr/sdlc_agentico/discussions)
 
 ## Licença
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orchestrates **34 specialized agents (30 orchestrated + 4 consultive)** through **9 development phases (0-8)**. This is a **configuration and orchestration framework**, not a traditional application codebase.
+SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orchestrates **36 specialized agents (32 orchestrated + 4 consultive)** through **9 development phases (0-8)**. This is a **configuration and orchestration framework**, not a traditional application codebase.
 
 **Key Features:**
 - Security by Design integrated in all phases
@@ -90,7 +90,7 @@ gh auth status
 
 ### Configuration-Driven Design
 All behavior is defined in `.claude/settings.json`, which configures:
-- 34 agents organized by SDLC phase (30 orchestrated + 4 consultive)
+- 36 agents organized by SDLC phase (32 orchestrated + 4 consultive)
 - Git hooks for validation and automation
 - Quality gates between phases (including Security Gate)
 - Complexity levels (0-3) that determine which phases are executed
@@ -99,7 +99,7 @@ All behavior is defined in `.claude/settings.json`, which configures:
 ### Directory Structure
 ```
 .claude/
-├── agents/           # Agent specs (markdown) - 34 specialized roles
+├── agents/           # Agent specs (markdown) - 36 specialized roles
 ├── skills/           # Reusable capabilities with scripts
 │   └── gate-evaluator/gates/  # YAML quality gate definitions (including security-gate.yml)
 ├── commands/         # Slash commands for user interaction
@@ -196,7 +196,7 @@ Agents use different models based on task complexity:
 | `.claude/skills/gate-evaluator/gates/security-gate.yml` | Security by Design gate (mandatory) |
 | `.agentic_sdlc/templates/*.yml` | Templates for ADR, spec, threat-model |
 | `.docs/playbook.md` | Development principles, standards, and practices |
-| `.docs/DESENVOLVIMENTO.md` | C# development standards and guidelines |
+| `.docs/engineering-playbook/manual-desenvolvimento/` | Development standards and guidelines |
 | `.claude/lib/python/sdlc_logging.py` | Python logging module with Loki handler (v1.7.0) |
 | `.claude/lib/shell/logging_utils.sh` | Shell logging functions (v1.7.0) |
 | `.claude/config/logging/logging.yml` | Centralized logging configuration (v1.7.0) |

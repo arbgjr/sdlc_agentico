@@ -1,6 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.7.16-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v1.7.16)
-[![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
+[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 [![Claude Code](https://img.shields.io/badge/Compatible%20with%20Claude%20Code-white?logo=claude)](https://code.claude.com/docs/en/sub-agents)
 [![Github Copilot](https://img.shields.io/badge/Compatible%20with%20Github%20Copilot-black?logo=githubcopilot)](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
 
@@ -14,7 +14,7 @@ Sistema de desenvolvimento de software orientado por agentes de IA que automatiz
 
 ## O Que É
 
-O SDLC Agêntico é um framework que usa **34 agentes especializados** (30 orquestrados + 4 consultivos) para guiar seu projeto através de **9 fases (0-8)** do ciclo de desenvolvimento, desde a ideia inicial até a operação em produção.
+O SDLC Agêntico é um framework que usa **36 agentes especializados** (32 orquestrados + 4 consultivos) para guiar seu projeto através de **9 fases (0-8)** do ciclo de desenvolvimento, desde a ideia inicial até a operação em produção.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -25,7 +25,7 @@ O SDLC Agêntico é um framework que usa **34 agentes especializados** (30 orque
 │                                         ↓                               │
 │  Produção ← [Release] ← [Quality] ← [Implementation] ← [Planning]       │
 │                                                                         │
-│  34 Agentes | 9 Fases | Quality Gates | Security by Design              │
+│  36 Agentes | 9 Fases | Quality Gates | Security by Design              │
 │  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot         │
 │  Phase Commits | Session Learning | Stakeholder Reviews (v1.2.0)        │
 │  Document Processing | Frontend E2E Testing | Patterns (v1.3.0)         │
@@ -51,7 +51,7 @@ O SDLC Agêntico é um framework que usa **34 agentes especializados** (30 orque
 
 ```bash
 # Definir versão desejada (consulte releases para última versão)
-VERSION="v1.7.1"
+VERSION="v1.7.16"
 
 # Download e extração (preserva permissões de execução)
 curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -
@@ -71,7 +71,7 @@ curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}
 curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
 
 # Versão específica
-curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.7.1
+curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.7.16
 ```
 
 Se o diretório `.claude/` já existir, o script perguntará o que fazer:
@@ -84,8 +84,8 @@ Se o diretório `.claude/` já existir, o script perguntará o que fazer:
 
 ```bash
 # Clonar repositório
-git clone https://github.com/arbgjr/mice_dolphins.git
-cd mice_dolphins
+git clone https://github.com/arbgjr/sdlc_agentico.git
+cd sdlc_agentico
 
 # Executar setup
 ./.scripts/setup-sdlc.sh
@@ -300,15 +300,21 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 | `/validate-node` | Marca node como validado |
 | `/github-dashboard` | Dashboard consolidado do GitHub |
 | `/wiki-sync` | Sincroniza documentação com Wiki |
+| `/alignment-status` | Mostra status de ODRs e trade-offs |
+| `/logs-query` | Consulta logs estruturados (Loki) |
+| `/odr-create` | Cria Organizational Decision Record |
+| `/sdlc-flags` | Gerencia feature flags do SDLC |
+| `/sdlc-version` | Mostra versão e changelog do framework |
+| `/simulate` | Simula cenários de decisão arquitetural |
 
 ## Estrutura do Projeto
 
 ```
 .claude/
-├── agents/           # 34 agentes especializados (30 + 4 consultivos)
-├── skills/           # 19 skills reutilizáveis
-├── commands/         # 12 comandos do usuário
-├── hooks/            # 13 hooks de automação
+├── agents/           # 36 agentes especializados (32 + 4 consultivos)
+├── skills/           # 23 skills reutilizáveis
+├── commands/         # 20 comandos do usuário
+├── hooks/            # 18 hooks de automação
 ├── lib/              # Bibliotecas compartilhadas (v1.7.0)
 │   ├── python/       # sdlc_logging.py, sdlc_tracing.py
 │   └── shell/        # logging_utils.sh
@@ -336,10 +342,9 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 │   ├── agents.md             # Catálogo de agentes
 │   ├── commands.md           # Referência de comandos
 │   └── overview.md           # Visão geral do framework
-├── engineering-playbook/     # Padrões de engenharia
-│   ├── manual-desenvolvimento/ # Standards, práticas, qualidade
-│   └── stacks/               # .NET, Python, Rust, DevOps
-└── examples/                 # Exemplos de uso
+└── engineering-playbook/     # Padrões de engenharia
+    ├── manual-desenvolvimento/ # Standards, práticas, qualidade
+    └── stacks/               # .NET, Python, Rust, DevOps
 ```
 
 ## Documentação
@@ -406,7 +411,7 @@ O sistema rastreia automaticamente:
 
 ## Troubleshooting
 
-Consulte [.docs/TROUBLESHOOTING.md](.docs/TROUBLESHOOTING.md) para resolução de problemas comuns.
+Consulte [.docs/guides/troubleshooting.md](.docs/guides/troubleshooting.md) para resolução de problemas comuns.
 
 ## Contribuindo
 

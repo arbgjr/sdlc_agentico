@@ -8,17 +8,17 @@
 #   ./.scripts/setup-sdlc.sh
 #
 #   # Instalacao a partir de uma release
-#   curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
+#   curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
 #
 #   # Instalacao de versao especifica
-#   curl -fsSL https://raw.githubusercontent.com/arbgjr/mice_dolphins/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.0.0
+#   curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.0.0
 #
 
 set -e
 
 # Configuracoes
 REPO_OWNER="arbgjr"
-REPO_NAME="mice_dolphins"
+REPO_NAME="sdlc_agentico"
 REPO_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}"
 
 # Cores para output
