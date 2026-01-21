@@ -280,6 +280,63 @@ python3 .claude/skills/session-analyzer/extract_learnings.py --persist
 - Deteccao de patterns e heuristica, nao 100% precisa
 - Informacoes sensiveis devem ser filtradas antes de persistir
 
+## Session Handoff Summaries (v2.0)
+
+### Propósito
+
+Gera resumos estruturados ao fim de cada sessão para facilitar continuidade entre sessões.
+Adaptado do claude-orchestrator para o SDLC Agêntico.
+
+### Uso
+
+```bash
+# Gerar handoff da sessão mais recente
+python3 .claude/skills/session-analyzer/scripts/handoff.py
+
+# Especificar projeto
+python3 .claude/skills/session-analyzer/scripts/handoff.py --project /path/to/project
+
+# Especificar arquivo de saída
+python3 .claude/skills/session-analyzer/scripts/handoff.py --output custom-summary.md
+
+# Modo silencioso (sem preview)
+python3 .claude/skills/session-analyzer/scripts/handoff.py --quiet
+```
+
+### Estrutura do Handoff
+
+```markdown
+# Session Summary: YYYY-MM-DD - repository
+
+## Session Metadata
+- Date, session file, repo, phase
+
+## Completed
+- [tasks that were completed]
+
+## Pending
+- [tasks still pending]
+
+## Context for Next Session
+- Current phase
+- Files modified
+- Tools used
+- Decisions made
+- Blockers
+- Notes
+```
+
+### Integração Automática
+
+O handoff é gerado automaticamente:
+- **Hook**: `session-analyzer.sh` invoca `handoff.py` após gate-check
+- **Timing**: Ao fim de cada fase (gate passage)
+- **Output**: `.agentic_sdlc/sessions/YYYYMMDD-HHMMSS-{repo}.md`
+
+### Exemplo
+
+Ver `.claude/skills/session-analyzer/templates/handoff-example.md`
+
 ## Checklist
 
 ### Antes da Analise
@@ -291,3 +348,4 @@ python3 .claude/skills/session-analyzer/extract_learnings.py --persist
 - [ ] Revisar learnings extraidos
 - [ ] Validar decisoes identificadas
 - [ ] Adicionar ao RAG se relevante
+- [ ] Revisar handoff summary para proxima sessao

@@ -259,6 +259,140 @@ Available skills for automation:
 | `github-sync` | Base skill for GitHub synchronization: issues, labels, milestones (v1.6.0) |
 | `github-projects` | GitHub Projects V2 management via GraphQL API (v1.6.0) |
 | `github-wiki` | GitHub Wiki synchronization via Git (v1.6.0) |
+| `parallel-workers` | Parallel task execution using git worktrees (v2.0) |
+
+## New Skills (v2.0) - Claude Orchestrator Integration
+
+### parallel-workers
+
+Executes Phase 5 (Implementation) tasks in parallel using isolated git worktrees.
+
+**Key Features:**
+- **2.5x speedup** for parallel tasks (3 workers)
+- **Zero merge conflicts** (isolated worktrees)
+- **Platform independent** (Linux-first, no macOS dependencies)
+- **Automated monitoring** via automation loop
+- **Full observability** (Loki/Grafana integration)
+
+**Usage:**
+```bash
+# Spawn single worker
+python3 .claude/skills/parallel-workers/scripts/worker_manager.py spawn \
+  --task-id "TASK-001" \
+  --description "Implement authentication" \
+  --agent "code-author"
+
+# Spawn batch from spec
+python3 .claude/skills/parallel-workers/scripts/worker_manager.py spawn-batch \
+  --spec-file tasks.yml
+
+# Start automation loop (monitors all workers)
+python3 .claude/skills/parallel-workers/scripts/loop.py
+```
+
+**Worker State Machine:**
+```
+NEEDS_INIT → WORKING → PR_OPEN → MERGED
+     ↑                     ↓
+     └─────────ERROR───────┘
+```
+
+**Components:**
+- `worker_manager.py` - Lifecycle management
+- `state_tracker.py` - State persistence
+- `worktree_manager.sh` - Git worktree operations
+- `loop.py` - Automation loop (5s polling)
+
+**Storage:**
+- Worker state: `~/.claude/worker-states/*.json`
+- Worktrees: `~/.worktrees/{project}/{task-id}/`
+
+**See:** `.claude/skills/parallel-workers/README.md`
+
+### simple-memory (memory-manager v2.0)
+
+Lightweight JSON-based working memory complementing RAG corpus.
+
+**Architecture:**
+```
+┌───────────────────┐         ┌───────────────────┐
+│  Simple Store     │         │   RAG Corpus      │
+│  (Working Memory) │◄───────►│   (Long-term)     │
+│                   │         │                   │
+│ • Facts (JSON)    │         │ • ADRs (YAML)     │
+│ • Toolchain       │         │ • Learnings       │
+│ • Repos           │         │ • Patterns        │
+│ • Quick context   │         │ • Decisions       │
+│                   │         │                   │
+│ Fast, ephemeral   │         │ Indexed, durable  │
+└───────────────────┘         └───────────────────┘
+```
+
+**Usage:**
+```bash
+# Remember quick facts
+python3 .claude/skills/memory-manager/scripts/simple_store.py add-fact \
+  "API rate limit is 1000 req/min" \
+  --tags rate-limit api
+
+# Recall facts
+python3 .claude/skills/memory-manager/scripts/simple_store.py recall "rate limit"
+
+# Add tool reference
+python3 .claude/skills/memory-manager/scripts/simple_store.py add-tool gh \
+  --repo "https://github.com/cli/cli" \
+  --version "2.40.0"
+
+# Search all memory
+python3 .claude/skills/memory-manager/scripts/simple_store.py search "database"
+```
+
+**When to Use:**
+- **Simple Store**: Quick facts, tool refs, working context (< 1 day)
+- **RAG Corpus**: Architecture decisions, learnings, patterns (forever)
+
+**Storage:** `~/.claude/simple-memory/`
+
+**See:** `.claude/skills/memory-manager/README.md`
+
+### session-handoff (session-analyzer v2.0)
+
+Generates session handoff summaries for cross-session continuity.
+
+**Output Structure:**
+```markdown
+# Session Summary: YYYY-MM-DD - repository
+
+## Completed
+- [tasks completed]
+
+## Pending
+- [tasks pending]
+
+## Context for Next Session
+- Phase, files modified, tools used, decisions, blockers
+```
+
+**Usage:**
+```bash
+# Generate handoff for latest session
+python3 .claude/skills/session-analyzer/scripts/handoff.py
+
+# Specify project
+python3 .claude/skills/session-analyzer/scripts/handoff.py --project /path/to/project
+```
+
+**Automatic Generation:**
+- **Hook**: `session-analyzer.sh` invokes after gate-check
+- **Timing**: End of each SDLC phase
+- **Output**: `.agentic_sdlc/sessions/YYYYMMDD-HHMMSS-{repo}.md`
+
+**See:** `.claude/skills/session-analyzer/SKILL.md`
+
+**ADR:** `.agentic_sdlc/corpus/nodes/decisions/ADR-claude-orchestrator-integration.yml`
+**Analysis:** `.agentic_sdlc/corpus/nodes/learnings/LEARN-claude-orchestrator-patterns.yml`
+**Epic:** Issue #33
+**Tasks:** Issues #35 (parallel-workers), #36 (simple-memory), #37 (session-handoff), #34 (automation-loop)
 
 ## New Skills (v1.3.0) - Document Processing & Frontend Testing
 

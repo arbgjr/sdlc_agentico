@@ -29,4 +29,17 @@ else
     log_with_fallback "WARN" "Script analyze.sh não encontrado" "session-analyzer-hook" 2>/dev/null
 fi
 
+# Gerar Session Handoff Summary (v2.0)
+log_with_fallback "INFO" "Gerando session handoff summary" "session-analyzer-hook" 2>/dev/null || echo "[INFO] Gerando session handoff summary"
+
+HANDOFF_SCRIPT="${PROJECT_ROOT}/skills/session-analyzer/scripts/handoff.py"
+
+if [[ -f "$HANDOFF_SCRIPT" ]]; then
+    python3 "$HANDOFF_SCRIPT" --quiet 2>/dev/null || {
+        log_with_fallback "WARN" "Falha ao gerar handoff summary (não crítico)" "session-analyzer-hook" 2>/dev/null
+    }
+else
+    log_with_fallback "WARN" "Script handoff.py não encontrado" "session-analyzer-hook" 2>/dev/null
+fi
+
 exit 0
