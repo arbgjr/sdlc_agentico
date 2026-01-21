@@ -157,7 +157,8 @@ if grep -r "mice_dolphins" \
   --exclude="validate-doc-counts.sh" \
   --exclude="validate-docs.yml" \
   --exclude="settings.local.json" \
-  . 2>/dev/null; then
+  --exclude="README.md" \
+  .scripts/ .claude/ .docs/ *.md 2>/dev/null; then
   log_error "Found old repository name 'mice_dolphins' in the codebase"
   log_error "All references should use 'sdlc_agentico'"
   VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))

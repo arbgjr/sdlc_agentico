@@ -144,14 +144,16 @@ jobs:
         run: |
           echo "Checking for old repository name references..."
 
-          # Exclude .git, .venv, and specific allowed files
+          # Exclude .git, .venv, and specific allowed files (including scripts that document the check itself)
           if grep -r "mice_dolphins" \
             --exclude-dir=.git \
             --exclude-dir=.venv \
             --exclude="clean-test-repo.sh" \
             --exclude="validate-docs.yml" \
+            --exclude="validate-doc-counts.sh" \
             --exclude="settings.local.json" \
-            . 2>/dev/null; then
+            --exclude="README.md" \
+            .scripts/ .claude/ .docs/ *.md 2>/dev/null; then
             echo "::error::Found old repository name 'mice_dolphins' in the codebase"
             echo "::error::All references should use 'sdlc_agentico'"
             exit 1

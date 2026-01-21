@@ -1,8 +1,27 @@
+<!-- Core Badges -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.7.16-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v1.7.16)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
+
+<!-- AI Compatibility -->
 [![Claude Code](https://img.shields.io/badge/Compatible%20with%20Claude%20Code-white?logo=claude)](https://code.claude.com/docs/en/sub-agents)
 [![Github Copilot](https://img.shields.io/badge/Compatible%20with%20Github%20Copilot-black?logo=githubcopilot)](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
+
+<!-- CI/CD & Quality -->
+[![Doc Validation](https://github.com/arbgjr/sdlc_agentico/actions/workflows/validate-docs.yml/badge.svg)](https://github.com/arbgjr/sdlc_agentico/actions/workflows/validate-docs.yml)
+[![CI](https://github.com/arbgjr/sdlc_agentico/actions/workflows/ci.yml/badge.svg)](https://github.com/arbgjr/sdlc_agentico/actions/workflows/ci.yml)
+[![Release](https://github.com/arbgjr/sdlc_agentico/actions/workflows/release.yml/badge.svg)](https://github.com/arbgjr/sdlc_agentico/actions/workflows/release.yml)
+
+<!-- Community & Stats -->
+[![GitHub Stars](https://img.shields.io/github/stars/arbgjr/sdlc_agentico?style=social)](https://github.com/arbgjr/sdlc_agentico/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/arbgjr/sdlc_agentico?style=social)](https://github.com/arbgjr/sdlc_agentico/network/members)
+[![GitHub Issues](https://img.shields.io/github/issues/arbgjr/sdlc_agentico)](https://github.com/arbgjr/sdlc_agentico/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/arbgjr/sdlc_agentico)](https://github.com/arbgjr/sdlc_agentico/pulls)
+
+<!-- Maintenance & Activity -->
+[![Last Commit](https://img.shields.io/github/last-commit/arbgjr/sdlc_agentico)](https://github.com/arbgjr/sdlc_agentico/commits/main)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/arbgjr/sdlc_agentico/graphs/commit-activity)
+[![Contributors](https://img.shields.io/github/contributors/arbgjr/sdlc_agentico)](https://github.com/arbgjr/sdlc_agentico/graphs/contributors)
 
 <p align="center">
   <img src=".agentic_sdlc/logo.png" alt="SDLC Agêntico Logo" width="400">
