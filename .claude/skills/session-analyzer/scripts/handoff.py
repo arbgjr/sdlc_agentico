@@ -66,7 +66,7 @@ class HandoffGenerator:
 
     def parse_session(self, session_file: Path) -> Dict[str, Any]:
         """Parse session JSONL file"""
-        with log_operation(logger, f"parse_session:{session_file.name}"):
+        with log_operation(f"parse_session:{session_file.name}", logger):
             messages = []
             with open(session_file, "r") as f:
                 for line in f:
@@ -259,7 +259,7 @@ class HandoffGenerator:
         output_file: Optional[Path] = None
     ) -> Path:
         """Generate handoff summary"""
-        with log_operation(logger, "generate_handoff"):
+        with log_operation("generate_handoff", logger):
             # Find latest session
             session_file = self.find_latest_session(project_path)
             if not session_file:
