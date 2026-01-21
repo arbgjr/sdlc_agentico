@@ -58,9 +58,10 @@ class StateTracker:
                 "exists": False
             }
 
-        with log_operation(logger, f"read_state:{worker_id}"):
+        with log_operation(f"read_state:{worker_id}", logger):
             with open(state_file, "r") as f:
                 state = json.load(f)
+                state["exists"] = True
                 logger.debug("State loaded", extra={"worker_id": worker_id, "state": state})
                 return state
 
@@ -94,7 +95,7 @@ class StateTracker:
             updated["created_at"] = updated["updated_at"]
 
         # Write atomically
-        with log_operation(logger, f"write_state:{worker_id}"):
+        with log_operation(f"write_state:{worker_id}", logger):
             temp_file = state_file.with_suffix(".tmp")
             with open(temp_file, "w") as f:
                 json.dump(updated, f, indent=2)
@@ -111,7 +112,7 @@ class StateTracker:
 
     def list(self) -> list[Dict[str, Any]]:
         """List all workers"""
-        with log_operation(logger, "list_workers"):
+        with log_operation("list_workers", logger):
             workers = []
             for state_file in self.state_dir.glob("*.json"):
                 with open(state_file, "r") as f:
@@ -128,7 +129,7 @@ class StateTracker:
             logger.warning("Worker state not found", extra={"worker_id": worker_id})
             return
 
-        with log_operation(logger, f"remove_state:{worker_id}"):
+        with log_operation(f"remove_state:{worker_id}", logger):
             state_file.unlink()
             logger.info("State removed", extra={"worker_id": worker_id})
 

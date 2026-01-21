@@ -79,7 +79,7 @@ class WorkerManager:
         worker_id = f"worker-{uuid.uuid4().hex[:8]}"
         correlation_id = uuid.uuid4().hex
 
-        with log_operation(logger, f"spawn_worker:{worker_id}"):
+        with log_operation(f"spawn_worker:{worker_id}", logger):
             logger.info(
                 "Spawning worker",
                 extra={
@@ -155,7 +155,7 @@ class WorkerManager:
 
     def spawn_batch(self, spec_file: Path) -> List[Dict[str, Any]]:
         """Spawn multiple workers from spec file"""
-        with log_operation(logger, "spawn_batch"):
+        with log_operation("spawn_batch", logger):
             logger.info("Spawning batch", extra={"spec_file": str(spec_file)})
 
             # Load spec
@@ -205,7 +205,7 @@ class WorkerManager:
 
     def terminate(self, worker_id: str, force: bool = False) -> Dict[str, Any]:
         """Terminate a worker"""
-        with log_operation(logger, f"terminate_worker:{worker_id}"):
+        with log_operation(f"terminate_worker:{worker_id}", logger):
             logger.info("Terminating worker", extra={"worker_id": worker_id, "force": force})
 
             # Get worker state
@@ -240,7 +240,7 @@ class WorkerManager:
 
     def cleanup(self, state_filter: Optional[WorkerState] = None) -> Dict[str, Any]:
         """Cleanup workers by state"""
-        with log_operation(logger, "cleanup_workers"):
+        with log_operation("cleanup_workers", logger):
             workers = self.list_workers(state_filter)
 
             results = []

@@ -116,7 +116,7 @@ class AutomationLoop:
         """Handle worker in NEEDS_INIT state"""
         worker_id = worker["worker_id"]
 
-        with log_operation(logger, f"handle_needs_init:{worker_id}"):
+        with log_operation(f"handle_needs_init:{worker_id}", logger):
             logger.info(
                 "Worker needs initialization",
                 extra={
@@ -149,7 +149,7 @@ class AutomationLoop:
         pr_url = self.check_pr_status(worker)
 
         if pr_url:
-            with log_operation(logger, f"pr_detected:{worker_id}"):
+            with log_operation(f"pr_detected:{worker_id}", logger):
                 logger.info(
                     "PR detected for worker",
                     extra={
@@ -183,7 +183,7 @@ class AutomationLoop:
 
         # Check if merged
         if self.check_pr_merged(pr_url):
-            with log_operation(logger, f"pr_merged:{worker_id}"):
+            with log_operation(f"pr_merged:{worker_id}", logger):
                 logger.info(
                     "PR merged for worker",
                     extra={
@@ -206,7 +206,7 @@ class AutomationLoop:
         """Handle worker in MERGED state (cleanup)"""
         worker_id = worker["worker_id"]
 
-        with log_operation(logger, f"cleanup_merged:{worker_id}"):
+        with log_operation(f"cleanup_merged:{worker_id}", logger):
             logger.info(
                 "Cleaning up merged worker",
                 extra={"worker_id": worker_id}
@@ -295,7 +295,7 @@ class AutomationLoop:
                     )
                     break
 
-                with log_operation(logger, f"loop_iteration:{iteration}"):
+                with log_operation(f"loop_iteration:{iteration}", logger):
                     # List all workers
                     workers = self.worker_manager.list_workers()
 

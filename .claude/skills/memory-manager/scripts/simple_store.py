@@ -63,7 +63,7 @@ class SimpleStore:
         project: Optional[str] = None
     ) -> str:
         """Add a fact to memory"""
-        with log_operation(logger, "add_fact"):
+        with log_operation("add_fact", logger):
             facts = self._load_json(self.facts_file)
 
             if "facts" not in facts:
@@ -101,7 +101,7 @@ class SimpleStore:
         limit: int = 10
     ) -> List[Dict[str, Any]]:
         """Recall facts by query, tags, or project"""
-        with log_operation(logger, "recall_facts"):
+        with log_operation("recall_facts", logger):
             facts = self._load_json(self.facts_file).get("facts", [])
 
             # Filter
@@ -148,7 +148,7 @@ class SimpleStore:
 
     def delete_fact(self, fact_id: str) -> bool:
         """Delete a fact by ID"""
-        with log_operation(logger, f"delete_fact:{fact_id}"):
+        with log_operation(f"delete_fact:{fact_id}", logger):
             facts = self._load_json(self.facts_file)
 
             if "facts" not in facts:
@@ -176,7 +176,7 @@ class SimpleStore:
         docs_url: Optional[str] = None
     ) -> None:
         """Add a tool to toolchain"""
-        with log_operation(logger, f"add_tool:{name}"):
+        with log_operation(f"add_tool:{name}", logger):
             toolchain = self._load_json(self.toolchain_file)
 
             toolchain[name] = {
@@ -213,7 +213,7 @@ class SimpleStore:
         description: Optional[str] = None
     ) -> None:
         """Add a repository reference"""
-        with log_operation(logger, f"add_repo:{name}"):
+        with log_operation(f"add_repo:{name}", logger):
             repos = self._load_json(self.repos_file)
 
             repos[name] = {
@@ -247,7 +247,7 @@ class SimpleStore:
         data: Dict[str, Any]
     ) -> None:
         """Save project-specific context"""
-        with log_operation(logger, f"save_project:{project_name}"):
+        with log_operation(f"save_project:{project_name}", logger):
             project_file = self.projects_dir / f"{project_name}.json"
 
             existing = self._load_json(project_file) if project_file.exists() else {}
@@ -283,7 +283,7 @@ class SimpleStore:
 
     def search(self, query: str) -> Dict[str, List[Any]]:
         """Search across all memory types"""
-        with log_operation(logger, f"search:{query}"):
+        with log_operation(f"search:{query}", logger):
             query_lower = query.lower()
             results = {
                 "facts": [],
@@ -346,7 +346,7 @@ class SimpleStore:
 
     def export(self, output_file: Path) -> None:
         """Export all memory to single JSON file"""
-        with log_operation(logger, f"export:{output_file}"):
+        with log_operation(f"export:{output_file}", logger):
             export_data = {
                 "facts": self._load_json(self.facts_file),
                 "toolchain": self._load_json(self.toolchain_file),
