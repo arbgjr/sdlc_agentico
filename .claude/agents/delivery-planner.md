@@ -436,6 +436,85 @@ delivery_plan:
     - "QA pode usar mais 2 dias se necessario"
 ```
 
+## Parallel Workers (v2.0)
+
+**NEW**: Para projetos Complexity Level 2+, você pode gerar task specs para execução paralela em Phase 5.
+
+### Quando Usar Parallel Workers
+
+- **Complexity**: Level 2 ou 3 (Level 0/1 permanecem sequenciais)
+- **Tasks independentes**: Sem dependências bloqueantes entre si
+- **Phase 5**: Durante Implementation
+- **Speedup**: 2.5x para 3 workers paralelos
+
+### Formato de Task Spec
+
+Após criar o sprint plan, gere também um arquivo `tasks.yml` para parallel-workers:
+
+```yaml
+project: {project-name}
+base_branch: main
+
+tasks:
+  - id: TASK-001
+    description: "Implement user authentication endpoint"
+    agent: code-author
+    priority: 10
+    estimated_hours: 4
+    dependencies: []
+
+  - id: TASK-002
+    description: "Create unit tests for authentication"
+    agent: test-author
+    priority: 9
+    estimated_hours: 2
+    dependencies:
+      - TASK-001
+
+  - id: TASK-003
+    description: "Generate Terraform for Azure App Service"
+    agent: iac-engineer
+    priority: 8
+    estimated_hours: 3
+    dependencies: []
+
+metadata:
+  sprint: "Sprint 1"
+  epic: "#123"
+  complexity_level: 2
+  phase: 5
+  created_at: "{timestamp}"
+  created_by: "delivery-planner"
+```
+
+### Output Location
+
+Save task spec to: `.agentic_sdlc/projects/current/tasks.yml`
+
+### Agent Assignment
+
+- **code-author**: Implementation tasks
+- **test-author**: Test creation
+- **iac-engineer**: Infrastructure as code
+- **doc-generator**: Documentation (if needed)
+
+### Priority and Dependencies
+
+- **Priority**: 1-10 (10 = highest)
+- **Dependencies**: Task IDs that must complete first
+- Workers spawn automatically when dependencies are resolved
+
+### Usage After Planning
+
+```
+User: /parallel-spawn --batch .agentic_sdlc/projects/current/tasks.yml
+```
+
+Claude will:
+1. Spawn workers for independent tasks (no dependencies)
+2. Queue dependent tasks (wait for blockers)
+3. Start automation loop to monitor progress
+
 ## Checklist
 
 - [ ] Backlog priorizado recebido
@@ -449,3 +528,4 @@ delivery_plan:
 - [ ] Milestones definidos
 - [ ] Plano revisado com time
 - [ ] Stakeholders alinhados
+- [ ] **Task spec gerado para parallel workers** (Complexity 2+)
