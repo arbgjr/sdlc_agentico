@@ -1,0 +1,44 @@
+'session_analysis':
+  'analyzed_at': '2026-01-22T22:50:35.432687Z'
+  'blockers':
+  - 'description': 'com/arbgjr/sdlc_agentico/issues/33'
+    'resolution': !!null 'null'
+    'source': 'user'
+  - 'description': 'Vou buscar os detalhes da issue #33 e criar uma branch para a
+      implementação'
+    'resolution': !!null 'null'
+    'source': 'assistant'
+  - 'description': 'A issue #33 é um Epic que integra conceitos do claude-orchestrator
+      no SDLC Agêntico, focando em paralelização, memória persistente e automação
+      de sessões'
+    'resolution': !!null 'null'
+    'source': 'assistant'
+  - 'description': 'ela tem sub issues/tasks'
+    'resolution': !!null 'null'
+    'source': 'queue-operation'
+  - 'description': '- Error recovery e state persistence'
+    'resolution': 'Implementei com sucesso todos os 4 sub-tasks do Epic #33, integrando
+      padrões do claude-orchestrator no SDLC Agêntico:'
+    'source': 'assistant'
+  'decisions':
+  - 'confidence': 'medium'
+    'description': 'Vou usar a TodoWrite tool para rastrear o progresso:'
+    'source': 'assistant'
+    'type': 'technical'
+  'id': 'session-20260122-497ed33b'
+  'learnings':
+  - 'description': '- I realized workflow integration was missing'
+    'source': 'user'
+    'type': 'pattern'
+  - 'description': 'mas isso tem q ser feito sempre daqui pra frente'
+    'source': 'queue-operation'
+    'type': 'pattern'
+  - 'description': 'Entendido perfeitamente'
+    'source': 'assistant'
+    'type': 'pattern'
+  'project_path': '/home/armando_jr/source/repos/arbgjr/mice_dolphins'
+  'source_file': '/home/armando_jr/.claude/projects/-home-armando-jr-source-repos-arbgjr-mice-dolphins/497ed33b-9b60-4ea9-b40e-177357d7ef2d.jsonl'
+  'summary':
+    'assistant_responses': !!int '452'
+    'messages_count': !!int '662'
+    'tools_used': []
