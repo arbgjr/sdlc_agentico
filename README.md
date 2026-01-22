@@ -1,6 +1,6 @@
 <!-- Core Badges -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.7.16-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v1.7.16)
+[![Version](https://img.shields.io/badge/version-2.0.0-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v2.0.0)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 
 <!-- AI Compatibility -->
@@ -8,6 +8,7 @@
 [![Github Copilot](https://img.shields.io/badge/Compatible%20with%20Github%20Copilot-black?logo=githubcopilot)](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
 
 <!-- CI/CD & Quality -->
+[![Tests v2.0](https://github.com/arbgjr/sdlc_agentico/actions/workflows/test-v2.yml/badge.svg)](https://github.com/arbgjr/sdlc_agentico/actions/workflows/test-v2.yml)
 [![Doc Validation](https://github.com/arbgjr/sdlc_agentico/actions/workflows/validate-docs.yml/badge.svg)](https://github.com/arbgjr/sdlc_agentico/actions/workflows/validate-docs.yml)
 [![CI](https://github.com/arbgjr/sdlc_agentico/actions/workflows/ci.yml/badge.svg)](https://github.com/arbgjr/sdlc_agentico/actions/workflows/ci.yml)
 [![Release](https://github.com/arbgjr/sdlc_agentico/actions/workflows/release.yml/badge.svg)](https://github.com/arbgjr/sdlc_agentico/actions/workflows/release.yml)
@@ -52,6 +53,7 @@ O SDLC Agêntico é um framework que usa **36 agentes especializados** (32 orque
 │  Decay Scoring | Content Freshness | Curation Triggers (v1.5.0)         │
 │  GitHub Projects | Milestones | Wiki Sync | Dashboard (v1.6.0)          │
 │  Structured Logging | Loki/Tempo/Grafana Integration (v1.7.0)           │
+│  Parallel Workers | Simple Memory | Session Handoff | 2.5x Faster (v2.0) │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -70,7 +72,7 @@ O SDLC Agêntico é um framework que usa **36 agentes especializados** (32 orque
 
 ```bash
 # Definir versão desejada (consulte releases para última versão)
-VERSION="v1.7.16"
+VERSION="v2.0.0"
 
 # Download e extração (preserva permissões de execução)
 curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -
@@ -90,7 +92,7 @@ curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}
 curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
 
 # Versão específica
-curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.7.16
+curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v2.0.0
 ```
 
 Se o diretório `.claude/` já existir, o script perguntará o que fazer:
@@ -278,9 +280,44 @@ sdlc_set_context skill="git-hooks" phase="5"
 sdlc_log_info "Validating commit" "commit_hash=$COMMIT_HASH"
 ```
 
+### Parallel Workers (v2.0) ⚡ NEW
+
+Execução paralela de tarefas em Phase 5 com **2.5x speedup**:
+
+| Feature | Benefício |
+|---------|-----------|
+| **parallel-workers** | Git worktrees isolados, zero merge conflicts |
+| **simple-memory** | Working memory cache < 100ms para fatos rápidos |
+| **session-handoff** | Continuidade automática entre sessões |
+| **automation-loop** | Monitoramento e transição de estados automática |
+
+**Usage:**
+```bash
+# Automático: orchestrator detecta e spawna em Phase 4→5 (Complexity 2+)
+# Manual:
+/parallel-spawn --batch .agentic_sdlc/projects/current/tasks.yml
+
+# Monitoring:
+python3 .claude/skills/parallel-workers/scripts/loop.py --project mice_dolphins
+```
+
+**Architecture:**
+- Workers isolados em `~/.worktrees/{project}/{task-id}/`
+- State machine: NEEDS_INIT → WORKING → PR_OPEN → MERGED
+- Platform independent (Linux-first)
+- Full observability via Grafana dashboard
+
 ### Changelog
 
 Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanças.
+
+**Destaques da v2.0:**
+- **parallel-workers**: 2.5x speedup com git worktrees
+- **simple-memory**: Working cache complementando RAG
+- **session-handoff**: Resumos automáticos para continuidade
+- **automation-loop**: Monitoramento e transição automática
+- **Integração completa**: delivery-planner + orchestrator
+- **Grafana dashboard**: Monitoramento de workers em tempo real
 
 **Destaques da v1.7.0:**
 - Logging estruturado com integração Loki/Tempo/Grafana

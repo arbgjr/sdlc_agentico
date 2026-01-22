@@ -402,6 +402,118 @@ gh release create v{version} \
 - `/github-dashboard` - Ver status consolidado
 - `/wiki-sync` - Sincronizar docs com Wiki manualmente
 - `/sdlc-create-issues` - Criar issues das tasks
+- `/parallel-spawn` - Spawn parallel workers (Phase 5, Complexity 2+)
+
+## Parallel Workers (v2.0)
+
+**NEW**: Ao entrar em Phase 5 (Implementation), você pode spawnar workers paralelos para acelerar a execução.
+
+### Quando Usar
+
+- **Phase**: 5 (Implementation)
+- **Complexity**: Level 2 ou 3
+- **Condição**: Task spec existe (`.agentic_sdlc/projects/current/tasks.yml`)
+- **Benefício**: 2.5x speedup para 3 workers
+
+### Workflow Automático
+
+```
+Phase 4 (Planning) Completo
+  ↓
+Gate 4→5 Aprovado
+  ↓
+Você (orchestrator) detecta:
+  - complexity_level >= 2
+  - tasks.yml existe
+  - tasks independentes > 1
+  ↓
+Decisão: Usar parallel-workers?
+  ↓
+SIM → Spawnar workers automaticamente
+  ↓
+python3 .claude/skills/parallel-workers/scripts/worker_manager.py spawn-batch \
+  --spec-file .agentic_sdlc/projects/current/tasks.yml
+  ↓
+python3 .claude/skills/parallel-workers/scripts/loop.py --project {project-name} &
+  ↓
+Monitorar progresso via Loki/Grafana
+  ↓
+Quando todos workers MERGED → Gate 5→6
+```
+
+### Decisão: Paralelo vs Sequencial
+
+**Use paralelo quando:**
+- ✅ Complexity 2+
+- ✅ 3+ tasks independentes (sem dependências bloqueantes)
+- ✅ Team size >= 2
+- ✅ Tasks bem definidas (não ambíguas)
+
+**Use sequencial quando:**
+- ❌ Complexity 0-1
+- ❌ Tasks dependentes (caminho crítico único)
+- ❌ Tasks ambíguas (precisam descoberta)
+- ❌ Single developer
+
+### Monitoramento
+
+Durante Phase 5 com parallel workers:
+
+1. **Loki queries para rastreamento:**
+```logql
+{skill="parallel-workers", phase="5"}
+{skill="parallel-workers", state="WORKING"}
+{skill="parallel-workers", level="error"}
+```
+
+2. **State tracker para status:**
+```bash
+python3 .claude/skills/parallel-workers/scripts/state_tracker.py list
+```
+
+3. **Worker manager para intervenção:**
+```bash
+# Se worker travar
+python3 .claude/skills/parallel-workers/scripts/worker_manager.py terminate worker-abc123 --force
+
+# Respawn
+python3 .claude/skills/parallel-workers/scripts/worker_manager.py spawn ...
+```
+
+### Gate 5→6 com Workers Paralelos
+
+Antes de aprovar gate 5→6:
+
+```yaml
+checks:
+  - all_workers_state: MERGED
+  - no_open_prs: true
+  - worktrees_cleaned: true
+  - code_quality: passed
+  - tests_passed: passed
+```
+
+**Se workers ainda ativos:**
+- WAIT: "Workers ainda executando. Aguardando conclusão..."
+- MONITOR: Mostrar progresso via state tracker
+- ESCALATE: Se bloqueado > 1h, notificar usuário
+
+### Human-in-the-Loop
+
+**Quando escalar para usuário:**
+- Worker em ERROR state > 30min
+- PR criado mas não mergeado > 24h
+- Conflitos de merge detectados
+- Security gate falhou
+
+**Mensagem de escalação:**
+```
+⚠️  Parallel worker {worker-id} precisa de atenção:
+- Task: {task-id}
+- State: {state}
+- Issue: {error-description}
+- Action needed: {suggested-action}
+```
 
 ## Pontos de Pesquisa
 

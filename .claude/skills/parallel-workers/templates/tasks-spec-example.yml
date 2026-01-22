@@ -1,0 +1,53 @@
+---
+# Example task specification for parallel-workers
+# Used with: python3 worker_manager.py spawn-batch --spec-file tasks-spec-example.yml
+
+project: mice_dolphins
+base_branch: feature/epic-33-claude-orchestrator
+
+tasks:
+  - id: TASK-001
+    description: "Implement user authentication with JWT"
+    agent: code-author
+    priority: 10
+    estimated_hours: 4
+    dependencies: []
+
+  - id: TASK-002
+    description: "Create unit tests for authentication module"
+    agent: test-author
+    priority: 9
+    estimated_hours: 2
+    dependencies:
+      - TASK-001
+
+  - id: TASK-003
+    description: "Generate Terraform for Azure App Service"
+    agent: iac-engineer
+    priority: 8
+    estimated_hours: 3
+    dependencies: []
+
+  - id: TASK-004
+    description: "Implement rate limiting middleware"
+    agent: code-author
+    priority: 7
+    estimated_hours: 2
+    dependencies: []
+
+  - id: TASK-005
+    description: "Add integration tests for API endpoints"
+    agent: test-author
+    priority: 6
+    estimated_hours: 3
+    dependencies:
+      - TASK-001
+      - TASK-004
+
+metadata:
+  sprint: "Sprint 1"
+  epic: "#33"
+  complexity_level: 2
+  phase: 5
+  created_at: "2026-01-21T00:00:00Z"
+  created_by: "delivery-planner"
