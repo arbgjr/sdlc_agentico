@@ -1,0 +1,84 @@
+# Quality Gate: SDLC Import
+# Validates that sdlc-import successfully analyzed the project
+
+id: "sdlc-import-gate"
+name: "SDLC Import Validation"
+description: "Quality gate for validating sdlc-import analysis results"
+mode: "strict"
+max_warnings: 3
+
+checks:
+  # Branch validation
+  - id: "branch_created"
+    name: "Feature branch created"
+    metric: "git.current_branch"
+    operator: "starts_with"
+    value: "feature/import-"
+    severity: "error"
+    message: "Must be on feature branch (feature/import-*) before importing"
+    remediation: "Run: git checkout -b feature/import-{project-name}"
+
+  # Overall confidence
+  - id: "overall_confidence"
+    name: "Overall confidence >= 0.6"
+    metric: "confidence_summary.overall_score"
+    operator: ">="
+    value: 0.6
+    severity: "error"
+    message: "Overall analysis confidence is too low"
+    remediation: "Review low-confidence decisions and add manual ADRs if needed"
+
+  # Minimum ADR count
+  - id: "min_adr_count"
+    name: "Minimum 3 ADRs extracted"
+    metric: "decision_categories.count"
+    operator: ">="
+    value: 3
+    severity: "error"
+    message: "Too few architecture decisions extracted"
+    remediation: "Ensure project has sufficient evidence of architecture decisions"
+
+  # Critical threats check
+  - id: "critical_threats"
+    name: "Zero CRITICAL threats"
+    metric: "threat_model.severity_distribution.CRITICAL"
+    operator: "=="
+    value: 0
+    severity: "error"
+    message: "CRITICAL security threats detected - must be addressed"
+    remediation: "Review threat model and fix CRITICAL vulnerabilities before proceeding"
+
+  # Diagram generation
+  - id: "diagrams_generated"
+    name: "Minimum 2 diagrams generated"
+    metric: "diagrams.count"
+    operator: ">="
+    value: 2
+    severity: "warning"
+    message: "Fewer than 2 architecture diagrams generated"
+    remediation: "Manually create missing diagrams if needed"
+
+  # P0 tech debt
+  - id: "p0_tech_debt"
+    name: "P0 tech debt acceptable"
+    metric: "tech_debt.debt_summary.P0"
+    operator: "<="
+    value: 5
+    severity: "warning"
+    message: "High number of P0 tech debt items"
+    remediation: "Plan to address P0 tech debt items promptly"
+
+remediation_on_failure:
+  create_issue: true
+  issue_title: "[SDLC-Import] Quality Gate Failed"
+  issue_labels: ["sdlc-import", "quality-gate", "needs-review"]
+  issue_body: |
+    SDLC Import quality gate failed with the following errors:
+
+    {{failed_checks}}
+
+    **Remediation Steps:**
+    {{remediation_steps}}
+
+    **Analysis ID:** {{analysis_id}}
+    **Branch:** {{branch}}
