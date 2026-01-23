@@ -206,7 +206,8 @@
       "observability-engineer",
       "playbook-governance",
       "iac-engineer",
-      "doc-generator"
+      "doc-generator",
+      "sdlc-importer"
     ]
   },
   "skills": {
@@ -231,7 +232,8 @@
       "github-projects",
       "github-wiki",
       "alignment-workflow",
-      "doc-generator"
+      "doc-generator",
+      "sdlc-import"
     ]
   },
   "sdlc": {
@@ -241,7 +243,8 @@
         "name": "Preparation",
         "agents": [
           "intake-analyst",
-          "compliance-guardian"
+          "compliance-guardian",
+          "sdlc-importer"
         ]
       },
       {

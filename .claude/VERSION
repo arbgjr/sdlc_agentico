@@ -1,19 +1,36 @@
 # SDLC Agêntico Version
-version: "1.9.0"
+version: "2.1.0"
 build_date: "2026-01-23"
 release_notes: |
-  Document Enrichment System - Sistema automático de enriquecimento de documentos com research findings.
+  Project Import & Reverse Engineering - Sistema de engenharia reversa para projetos existentes.
 
   Features:
-  - Enriquecimento automático de documentos com research findings
-  - Algoritmo de hybrid search (similarity >= 0.6)
-  - Originais imutáveis com versões enriquecidas (.enriched.vN.md)
-  - Integração com knowledge graph (relação 'enriches')
-  - 5 agentes modificados com Step 0 pre-research pattern
-  - Quality gate: enrichment-quality.yml
-  - 37 testes (100% coverage)
+  - /sdlc-import: Comando para importar projetos existentes
+  - Detecção de 10 linguagens e 15+ frameworks
+  - Extração automática de 5-15 ADRs com confidence scoring
+  - Geração de 3-5 diagramas de arquitetura (Mermaid + DOT)
+  - STRIDE threat modeling com security-guidance plugin
+  - Detecção de tech debt (P0-P3 prioritized)
+  - Quality gate: sdlc-import-gate.yml
+  - Agent: sdlc-importer (Phase 0)
 
 changelog:
+  - version: "2.1.0"
+    date: "2026-01-23"
+    changes:
+      - "feat(sdlc-import): Sistema completo de engenharia reversa (Epic #52)"
+      - "feat(sdlc-import): Detecção de 10 linguagens (Python, JS, TS, Java, C#, Go, Ruby, PHP, Rust, Kotlin)"
+      - "feat(sdlc-import): Extração de ADRs com confidence scoring (HIGH/MEDIUM/LOW)"
+      - "feat(sdlc-import): Geração de diagramas Mermaid e DOT"
+      - "feat(sdlc-import): STRIDE threat modeling com security-guidance plugin"
+      - "feat(sdlc-import): Tech debt detection com code-review plugin"
+      - "feat(sdlc-import): Branch creation automática (feature/import-*)"
+      - "feat(sdlc-import): Quality gate com 6 validações críticas"
+      - "feat(sdlc-import): Integração com LSP plugins (pyright, typescript, jdtls, etc.)"
+      - "feat(agent): sdlc-importer agent para Phase 0 (Preparation)"
+      - "feat(command): /sdlc-import command com opções (--skip-threat-model, --create-issues, --no-llm)"
+      - "docs(sdlc-import): Documentação completa (SKILL.md, README.md, IMPLEMENTATION_SUMMARY.md)"
+      - "docs(ADR): ADR-022 Automated Legacy Project Onboarding"
   - version: "1.9.0"
     date: "2026-01-23"
     changes:
