@@ -35,6 +35,10 @@ SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orc
 - Pre-configured Grafana dashboard for SDLC observability (v1.7.0)
 - Professional documentation generator with SDLC signature (v1.8.1)
 - Auto-detection of languages, frameworks, and project structure (v1.8.1)
+- Automatic document enrichment with research findings (v1.9.0)
+- Hybrid search for document matching (keyword + text + category) (v1.9.0)
+- Versioned enriched documents with immutable originals (v1.9.0)
+- Knowledge graph integration with 'enriches' relations (v1.9.0)
 
 ## Setup Commands
 
@@ -483,6 +487,73 @@ Skills are automatically available to agents based on their phase:
 - Phase 6→7: `frontend_e2e_pass_rate`, `frontend_console_error_count` (conditional)
 
 All frontend checks are conditional (`has_frontend`) and only applied when project has frontend code.
+
+## New Skills (v1.9.0) - Document Enrichment
+
+### document-enricher
+
+Automatically enriches existing reference documents with research findings:
+
+```bash
+# Search for related documents
+/doc-search OAuth 2.1 migration
+
+# Manually enrich document
+/doc-enrich DOC-001 research.json
+```
+
+**Features:**
+- Hybrid search for document matching (keyword + text + category similarity)
+- Automatic enrichment during research phases
+- Versioned enriched documents (`.enriched.v1.md`, `.enriched.v2.md`)
+- Immutable original documents
+- Knowledge graph integration with 'enriches' relations
+- Quality gate validation (`enrichment-quality.yml`)
+
+**How It Works:**
+1. **Step 0** (new in research agents): Check for related documents
+2. If similarity > 0.6: Extract original content
+3. Execute research (web, academic, community)
+4. Merge original + research findings
+5. Create `.enriched.vN.md` + `ENRICH-{id}.yml` corpus node
+6. Update graph with 'enriches' relation
+
+**Enriched Document Format:**
+```markdown
+# {Title} - Enhanced Research Edition
+
+**Original Document**: `{path}`
+**Research Topic**: {topic}
+**Version**: v{n}
+
+## Original Content Summary
+{original}
+
+## Research Findings
+{research}
+
+### Sources
+- [{title}]({url}) - Accessed {date}
+
+## Synthesis
+{combined_analysis}
+```
+
+**Modified Agents (v1.9.0):**
+All research agents now include "Step 0: Check for Related Documents":
+- `domain-researcher` - Research academic/web sources
+- `doc-crawler` - Extract and index documentation
+- `requirements-analyst` - Analyze requirements
+- `adr-author` - Document architecture decisions
+- `threat-modeler` - Model security threats
+
+**Quality Gates:**
+- `enrichment_has_sources`: Research findings must cite sources
+- `original_preserved`: Original document unchanged (hash check)
+- `graph_relation_created`: Graph contains 'enriches' relation
+- `enrichment_version_incremented`: Versions increment sequentially
+
+**See:** `.docs/enrichment-guide.md` - Complete user guide
 
 ## New Skills (v1.4.0) - Semantic Knowledge Graph
 
