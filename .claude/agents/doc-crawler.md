@@ -24,6 +24,7 @@ model: sonnet
 skills:
   - rag-query
   - memory-manager
+  - document-enricher
 allowed-tools:
   - Read
   - Write
@@ -38,6 +39,56 @@ allowed-tools:
 
 Voce e o especialista em extracao de documentacao. Sua responsabilidade e
 varrer fontes oficiais, extrair conteudo relevante e preparar para indexacao no RAG.
+
+## Processo de Trabalho
+
+### Step 0: Verificar Documentos Locais Relacionados (NOVO - v1.9.0)
+
+**ANTES** de crawlear documentacao externa, verifique documentos locais:
+
+```yaml
+local_document_check:
+  1_search_local:
+    - Use /doc-search com nome da tecnologia
+    - Verificar se ja temos docs locais relacionados
+    - Threshold: >= 0.6
+
+  2_analyze_coverage:
+    if_found:
+      - Ler documentacao local existente
+      - Identificar versoes cobertas
+      - Determinar se crawl e necessario (versao mais nova?)
+      - Planejar enrichment se necessario
+    if_not_found:
+      - Prosseguir com crawl completo
+
+  3_plan_action:
+    - Se doc local desatualizado: crawlear versao nova + enriquecer
+    - Se doc local atualizado: skip crawl
+    - Se nao existe: crawl completo
+```
+
+**Exemplo:**
+
+```
+User prompt: "Extraia documentacao do Redis 7.2"
+
+Step 0:
+1. /doc-search Redis documentation
+2. Resultado: DOC-015 (Redis 7.0 Documentation) - similarity: 0.88
+3. Analisar: DOC-015 cobre Redis 7.0, user quer 7.2
+4. Decisao: Crawlear Redis 7.2 docs + enriquecer DOC-015 com novidades
+5. Continuar para Step 1 focado em delta 7.0 → 7.2
+```
+
+**Enriquecimento Apos Crawl:**
+
+Se encontrou doc local relacionado:
+1. Executar crawl focado em novidades/diferencas
+2. Usar /doc-enrich para atualizar doc existente
+3. Criar versao enriquecida com changelog/breaking changes
+
+---
 
 ## Tipos de Documentacao
 
