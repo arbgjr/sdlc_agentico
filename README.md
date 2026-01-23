@@ -47,15 +47,15 @@ O SDLC Agêntico é um framework que usa **37 agentes especializados** (33 orque
 │                                                                         │
 │  37 Agentes | 9 Fases | Quality Gates | Security by Design              │
 │  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot         │
-│  Phase Commits | Session Learning | Stakeholder Reviews (v1.2.0)        │
-│  Document Processing | Frontend E2E Testing | Patterns (v1.3.0)         │
-│  Semantic Graph | Hybrid Search | Graph Visualization (v1.4.0)          │
-│  Decay Scoring | Content Freshness | Curation Triggers (v1.5.0)         │
-│  GitHub Projects | Milestones | Wiki Sync | Dashboard (v1.6.0)          │
-│  Structured Logging | Loki/Tempo/Grafana Integration (v1.7.0)           │
-│  Auto-Update System | Impact Analysis | Version Checker (v1.8.0)        │
-│  Document Enrichment | Research Integration | Versioning (v1.9.0)       │
-│  Project Import | 30 Tech Detection | Language Expansion (v2.0.0)      │
+│                                                                         │
+│  📦 v2.0.0: Project Import | 30 Tech Detection | sdlc-import skill      │
+│  📚 v1.9.0: Document Enrichment | Research Integration | Versioning     │
+│  🔄 v1.8.0: Auto-Update System | Impact Analysis | Version Checker      │
+│  📊 v1.7.0: Structured Logging | Loki/Tempo/Grafana Integration        │
+│  🔗 v1.6.0: GitHub Projects V2 | Milestones | Wiki Sync                 │
+│  ⏰ v1.5.0: Decay Scoring | Content Freshness | Curation Triggers       │
+│  🔍 v1.4.0: Semantic Graph | Hybrid Search | Graph Visualization        │
+│  📄 v1.3.0: Document Processing | Frontend E2E | Anthropic Patterns     │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -313,13 +313,18 @@ python3 .claude/skills/parallel-workers/scripts/loop.py --project sdlc_agentico
 
 Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanças.
 
-**Destaques da v2.0:**
-- **parallel-workers**: 2.5x speedup com git worktrees
-- **simple-memory**: Working cache complementando RAG
-- **session-handoff**: Resumos automáticos para continuidade
-- **automation-loop**: Monitoramento e transição automática
-- **Integração completa**: delivery-planner + orchestrator
-- **Grafana dashboard**: Monitoramento de workers em tempo real
+**Destaques da v2.0.0:**
+- **sdlc-import skill**: Importação e engenharia reversa de projetos existentes
+- **Language detection expansion**: 10 → 30 tecnologias detectadas (3x aumento)
+- **Backend/Infrastructure (9 novas)**: C++, Rust enhanced, Ansible, Jenkins, Chef, Puppet, Gradle, Selenium, Bicep
+- **Frontend/Testing (6 novas)**: Playwright, TypeScript enhanced, Vue.js, Svelte, Tailwind CSS, Vite/Webpack
+- **Mobile (5 novas)**: React Native, Flutter/Dart, Swift, Kotlin enhanced, Xamarin
+- **Production ready**: 255/255 testes passando, zero regressões
+- **LSP integration**: clangd-lsp (C++), dart-lsp (Flutter), sourcekit-lsp (Swift)
+- **Disambiguation logic**: Chef/Ruby, Ansible/YAML, Gradle/Kotlin
+- **Configuration-driven**: language_patterns.yml com 669 linhas (+383)
+- **Novo agent**: sdlc-importer para Phase 0 (Preparation)
+- **Quality gate**: sdlc-import-gate.yml com 6 validações críticas
 
 **Destaques da v1.7.0:**
 - Logging estruturado com integração Loki/Tempo/Grafana

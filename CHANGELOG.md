@@ -7,93 +7,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0] - 2026-01-21
+## [2.0.0] - 2026-01-23
 
-### Added - Claude Orchestrator Integration (Epic #33)
+### Added - Legacy Project Onboarding (Epic #52)
 
-- **parallel-workers skill** (Task #35) - Execução paralela de tarefas na Phase 5:
-  - 🚀 **2.5x speedup** para 3 workers paralelos
-  - ✅ Git worktrees isolados (zero merge conflicts)
-  - ✅ State machine: NEEDS_INIT → WORKING → PR_OPEN → MERGED
-  - ✅ Automation loop com polling de 5s
-  - ✅ Platform independent (Linux-first, sem dependência macOS/iTerm2)
-  - ✅ Storage: `~/.worktrees/{project}/{task-id}/` e `~/.claude/worker-states/`
+- **sdlc-import skill** - Importação e engenharia reversa de projetos existentes:
+  - 🚀 **Language detection expansion**: 10 → 30 tecnologias (3x aumento)
+  - ✅ **Backend/Infrastructure (9 novas)**: C++, Rust enhanced, Ansible, Jenkins, Chef, Puppet, Gradle, Selenium, Bicep
+  - ✅ **Frontend/Testing (6 novas)**: Playwright, TypeScript enhanced, Vue.js, Svelte, Tailwind CSS, Vite/Webpack
+  - ✅ **Mobile (5 novas)**: React Native, Flutter/Dart, Swift, Kotlin enhanced, Xamarin
+  - ✅ **LSP integration**: clangd-lsp (C++), dart-lsp (Flutter), sourcekit-lsp (Swift)
+  - ✅ **Disambiguation logic**: Chef/Ruby (via metadata.rb), Ansible/YAML (via ansible.cfg), Gradle/Kotlin
+  - ✅ **Configuration-driven**: language_patterns.yml expandido de 286 para 669 linhas (+383 linhas)
+  - ✅ **Brace expansion**: Suporte para glob patterns como `**/*.{cpp,h,hpp}`
   - Scripts:
-    - `worker_manager.py` - Gerenciamento de lifecycle
-    - `state_tracker.py` - Persistência de estado
-    - `worktree_manager.sh` - Operações git worktree
-    - `loop.py` - Automation loop
+    - `project_analyzer.py` - Análise completa de projetos
+    - `language_detector.py` - Detecção de 30 tecnologias
+    - `decision_extractor.py` - Extração de ADRs com confidence scoring
+    - `architecture_visualizer.py` - Geração de diagramas Mermaid e DOT
+    - `threat_modeler.py` - STRIDE threat modeling
+    - `tech_debt_detector.py` - Detecção de dívida técnica (P0-P3)
 
-- **simple-memory** (Task #36) - Working memory cache complementando RAG:
-  - ⚡ **< 100ms queries** para fatos rápidos
-  - ✅ JSON-based storage: facts, toolchain, repos, project context
-  - ✅ Storage: `~/.claude/simple-memory/`
-  - ✅ Integração híbrida: Simple Store (ephemeral) + RAG Corpus (durable)
-  - Script: `simple_store.py`
+- **sdlc-importer agent** - Novo agente para Phase 0 (Preparation):
+  - Orquestra importação de projetos existentes
+  - Integração com quality gate sdlc-import-gate.yml
+  - Criação automática de branch feature/import-*
 
-- **session-handoff** (Task #37) - Continuidade entre sessões:
-  - 📝 **Geração automática** de resumos ao fim de cada fase
-  - ✅ Seções: Completed, Pending, Context for Next Session
-  - ✅ Trigger: Hook `session-analyzer.sh` após gate-check
-  - ✅ Output: `.agentic_sdlc/sessions/YYYYMMDD-HHMMSS-{repo}.md`
-  - Script: `handoff.py`
+- **Comando /sdlc-import** - Importação de projetos:
+  - Opções: `--skip-threat-model`, `--create-issues`, `--no-llm`
+  - Output: 5-15 ADRs inferidos, 3-5 diagramas, threat model STRIDE
 
-- **automation-loop** (Task #34) - Monitoramento de workers:
-  - 🤖 **Detecção automática** de PR creation/merge via gh CLI
-  - ✅ Auto-cleanup de workers merged
-  - ✅ Error recovery e state persistence
-  - ✅ Integração completa com Loki/Grafana
-
-- **Grafana Dashboard** - parallel-workers.json:
-  - 📊 Active Workers (gauge)
-  - 📊 Worker State Distribution (pie chart)
-  - 📊 Task Completion Rate (timeseries)
-  - 📊 Worker Errors (logs panel)
-
-- **Comando /parallel-spawn**:
-  - User-invocable para spawning manual
-  - Modos: single worker, batch from YAML
-  - Integração com Phase 5 workflow
+- **Quality Gate**: sdlc-import-gate.yml com 6 validações críticas:
+  - `minimum_languages`: Mínimo 1 linguagem detectada
+  - `high_confidence_decisions`: Mínimo 3 ADRs HIGH confidence
+  - `architecture_diagrams`: Mínimo 2 diagramas gerados
+  - `threat_model_exists`: Threat model STRIDE criado
+  - `tech_debt_prioritized`: Dívida técnica categorizada (P0-P3)
+  - `documentation_complete`: Todos artefatos gerados
 
 - **Documentação**:
-  - ADR: `ADR-claude-orchestrator-integration.yml`
-  - Analysis: `LEARN-claude-orchestrator-patterns.yml`
-  - READMEs: parallel-workers, memory-manager v2.0, session-analyzer v2.0
+  - ADR: `ADR-022-automated-legacy-project-onboarding.yml`
+  - SKILL.md: Documentação completa do sdlc-import skill
+  - README.md: Guia de uso com exemplos
+  - IMPLEMENTATION_SUMMARY.md: Resumo técnico da implementação
+  - BENCHMARK_VALIDATION.md: Benchmarks de detecção de linguagens
 
-### Changed - Workflow Integration
+### Changed - Language Detection
 
-- **delivery-planner agent** - Agora gera task specs para parallel execution:
-  - Formato YAML com dependencies, agent assignment, priorities
-  - Output: `.agentic_sdlc/projects/current/tasks.yml`
-  - Guia para quando usar parallel workers (Complexity 2+)
+- **language_patterns.yml** - Expansão massiva:
+  - Novas seções: `iac`, `config_mgmt_tools`, `cicd`, `frontend_frameworks`, `build_tools`, `mobile_frameworks`
+  - Frameworks multi-linguagem: Selenium (Java/Python/JS), Playwright (TypeScript/Python)
+  - Dependency files expandidos para suportar novas tecnologias
 
-- **orchestrator agent** - Detecção automática e spawn de workers:
-  - Auto-spawn em Phase 4→5 para Complexity 2+ com tasks.yml
-  - Monitoramento via state tracker
-  - Gate 5→6 valida todos workers MERGED
-  - Human-in-the-loop para escalação de erros
+- **8 novos métodos de detecção**:
+  - `_detect_iac_tools()` - Bicep, Ansible
+  - `_detect_config_mgmt_tools()` - Chef, Puppet
+  - `_detect_cicd_tools()` - Jenkins
+  - `_detect_frontend_frameworks()` - Vue.js, Svelte
+  - `_detect_build_tools()` - Vite, Webpack
+  - `_detect_mobile_frameworks()` - React Native, Flutter, Swift, Xamarin
+  - `_detect_testing_frameworks()` - Selenium, Playwright (multi-language)
+  - `_expand_braces()` - Expansão de padrões glob com chaves
 
-- **session-analyzer hook** - Agora gera handoff summaries:
-  - Invocação automática após gate-check
-  - Extração de completed/pending tasks
-  - Context para próxima sessão
+### Testing
 
-- **CLAUDE.md** - Nova seção v2.0 com parallel-workers:
-  - Documentação completa dos 3 componentes
-  - Usage examples e architecture
-  - Integration com SDLC workflow
+- **255/255 testes passando** (100% success rate):
+  - 87 integration tests (11 language stacks: Django, React, Spring, ASP.NET, Gin, Rails, C++, Flutter, Vue, Ansible, Playwright)
+  - 168 unit tests
+  - Zero regressões em funcionalidade existente
 
-### Performance
+- **5 novos integration tests**:
+  - `test_cpp_integration.py` - C++/CMake/Conan/Boost
+  - `test_flutter_integration.py` - Flutter/Dart mobile
+  - `test_vue_integration.py` - Vue.js + Vite
+  - `test_ansible_integration.py` - Ansible IaC com disambiguation
+  - `test_playwright_integration.py` - Playwright E2E testing
 
-- **Phase 5 duration**: -61% com 3 workers paralelos (2.5x speedup)
-- **RAG query load**: -30% com Simple Store cache hits
-- **Memory queries**: < 100ms (Simple Store) vs ~200ms (RAG)
+- **10 novos unit tests** em `test_language_detector.py`:
+  - C++/CMake, Bicep, Ansible, Jenkins, Vue, Svelte, Playwright, Flutter, Swift, Vite
+
+### Fixed
+
+- **Framework list overwriting**: Mudança de assignment (`=`) para `extend()` nos métodos de detecção
+- **Boost detection**: Implementação de `_expand_braces()` para suportar padrões `**/*.{cpp,h,hpp}`
+- **Testing framework detection**: Separação de frameworks legacy (pattern direto) e multi-language (dict de patterns)
 
 ### Security
 
-- Secrets isolation em workers (sanitized env)
-- Validation before merge (security-gate.yml)
-- Audit trail completo via Loki
+- **Anti-Mock Policy**: Documentação estendida no CLAUDE.md
+- **Threat modeling**: Integração com security-guidance plugin
+- **Quality gates**: Validação de todos artefatos antes de commit
 
 ### Breaking Changes
 
