@@ -144,10 +144,11 @@ jobs:
 
       - name: Create badge
         uses: schneegans/dynamic-badges-action@v1.7.0
-        if: github.ref == 'refs/heads/main'
+        if: false  # Disabled: requires gist ID configuration (see README for setup)
+        # if: github.ref == 'refs/heads/main'
         with:
           auth: ${{ secrets.GIST_SECRET }}
-          gistID: YOUR_GIST_ID_HERE
+          gistID: YOUR_GIST_ID_HERE  # Replace with actual gist ID
           filename: sdlc-agentico-tests.json
           label: tests
           message: ${{ steps.coverage.outputs.tests_passed }}/${{ steps.coverage.outputs.tests_total }} passing
