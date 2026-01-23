@@ -45,7 +45,7 @@ Spawns parallel workers for concurrent task execution in Phase 5 (Implementation
 ## Task Spec Format (YAML)
 
 ```yaml
-project: mice_dolphins
+project: sdlc_agentico
 base_branch: main
 
 tasks:
@@ -136,7 +136,7 @@ on_phase_enter:
 ### Start automation loop (recommended)
 
 ```bash
-python3 .claude/skills/parallel-workers/scripts/loop.py --project mice_dolphins
+python3 .claude/skills/parallel-workers/scripts/loop.py --project sdlc_agentico
 ```
 
 ### Manual monitoring

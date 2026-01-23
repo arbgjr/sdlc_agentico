@@ -50,7 +50,7 @@ python3 .claude/skills/parallel-workers/scripts/worker_manager.py terminate <wor
 
 **Resultado esperado:**
 - Worker criado com state NEEDS_INIT
-- Worktree criado em `~/.worktrees/mice_dolphins/TEST-001/`
+- Worktree criado em `~/.worktrees/sdlc_agentico/TEST-001/`
 - Estado salvo em `~/.claude/worker-states/<worker-id>.json`
 - Cleanup remove worktree e estado
 
@@ -61,7 +61,7 @@ python3 .claude/skills/parallel-workers/scripts/worker_manager.py terminate <wor
 python3 .claude/skills/memory-manager/scripts/simple_store.py add-fact \
   "Test parallel workers integration" \
   --tags test parallel-workers \
-  --project mice_dolphins
+  --project sdlc_agentico
 
 # Recall
 python3 .claude/skills/memory-manager/scripts/simple_store.py recall "parallel"
@@ -91,7 +91,7 @@ ls -la .agentic_sdlc/sessions/
 ```
 
 **Resultado esperado:**
-- Arquivo gerado: `.agentic_sdlc/sessions/YYYYMMDD-HHMMSS-mice_dolphins.md`
+- Arquivo gerado: `.agentic_sdlc/sessions/YYYYMMDD-HHMMSS-sdlc_agentico.md`
 - Seções: Metadata, Completed, Pending, Context
 
 ## Testes de Integração (Workflow)
@@ -101,7 +101,7 @@ ls -la .agentic_sdlc/sessions/
 ```bash
 # Criar spec de teste
 cat > /tmp/test-tasks.yml <<'EOF'
-project: mice_dolphins
+project: sdlc_agentico
 base_branch: main
 
 tasks:
@@ -135,14 +135,14 @@ python3 .claude/skills/parallel-workers/scripts/state_tracker.py list
 **Resultado esperado:**
 - 3 workers criados
 - Todos em estado NEEDS_INIT
-- 3 worktrees em `~/.worktrees/mice_dolphins/`
+- 3 worktrees em `~/.worktrees/sdlc_agentico/`
 
 ### 6. Automation Loop (Curto)
 
 ```bash
 # Iniciar loop por 30s (6 iterações)
 timeout 30 python3 .claude/skills/parallel-workers/scripts/loop.py \
-  --project mice_dolphins \
+  --project sdlc_agentico \
   --poll-interval 5 || true
 
 # Verificar transições
@@ -161,7 +161,7 @@ python3 .claude/skills/parallel-workers/scripts/state_tracker.py list
 python3 .claude/skills/parallel-workers/scripts/worker_manager.py cleanup
 
 # Verificar limpeza
-ls ~/.worktrees/mice_dolphins/ 2>/dev/null || echo "Worktrees removidos ✓"
+ls ~/.worktrees/sdlc_agentico/ 2>/dev/null || echo "Worktrees removidos ✓"
 ls ~/.claude/worker-states/ | wc -l  # Deve ser 0
 ```
 
@@ -250,7 +250,7 @@ ls -la .claude/commands/parallel-spawn.md
 ```bash
 mkdir -p .agentic_sdlc/projects/current
 cat > .agentic_sdlc/projects/current/tasks.yml <<'EOF'
-project: mice_dolphins
+project: sdlc_agentico
 base_branch: main
 
 tasks:
@@ -284,7 +284,7 @@ python3 .claude/skills/parallel-workers/scripts/worker_manager.py spawn-batch \
 
 # Iniciar loop em background
 python3 .claude/skills/parallel-workers/scripts/loop.py \
-  --project mice_dolphins \
+  --project sdlc_agentico \
   --max-iterations 20 &
 LOOP_PID=$!
 

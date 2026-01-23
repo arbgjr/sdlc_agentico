@@ -56,11 +56,11 @@ Sistema de memória híbrido combinando **deep storage (RAG)** com **working mem
 python3 scripts/simple_store.py add-fact \
   "API rate limit is 1000 req/min" \
   --tags rate-limit api \
-  --project mice_dolphins
+  --project sdlc_agentico
 
 # Recall facts
 python3 scripts/simple_store.py recall "rate limit"
-python3 scripts/simple_store.py recall --tags api --project mice_dolphins
+python3 scripts/simple_store.py recall --tags api --project sdlc_agentico
 
 # Add a tool
 python3 scripts/simple_store.py add-tool gh \
@@ -143,7 +143,7 @@ python3 ../rag-query/scripts/hybrid_search.py "database decisions"
       "text": "API rate limit is 1000 req/min",
       "added": "2026-01-21T10:30:00Z",
       "tags": ["rate-limit", "api"],
-      "project": "mice_dolphins",
+      "project": "sdlc_agentico",
       "access_count": 5
     }
   ]
@@ -181,7 +181,7 @@ python3 ../rag-query/scripts/hybrid_search.py "database decisions"
 
 ```json
 {
-  "name": "mice_dolphins",
+  "name": "sdlc_agentico",
   "current_phase": 5,
   "active_workers": ["worker-abc123", "worker-def456"],
   "last_commit": "abc123def",
@@ -205,11 +205,11 @@ store = SimpleStore()
 store.add_fact(
     "Redis connection pool size: 50",
     tags=["redis", "config"],
-    project="mice_dolphins"
+    project="sdlc_agentico"
 )
 
 # 2. Later, recall when needed
-facts = store.recall_facts(query="redis", project="mice_dolphins")
+facts = store.recall_facts(query="redis", project="sdlc_agentico")
 # → Returns: [{"text": "Redis connection pool size: 50", ...}]
 
 # 3. After testing, promote important decision to RAG
@@ -235,7 +235,7 @@ save_decision(
 store.add_fact(
     "User service uses JWT with 1h expiration",
     tags=["auth", "jwt"],
-    project="mice_dolphins"
+    project="sdlc_agentico"
 )
 
 # Phase 6: QA analyst recalls during testing
@@ -247,7 +247,7 @@ facts = store.recall_facts(query="jwt expiration")
 
 ```python
 # End of session: Save context
-store.save_project_context("mice_dolphins", {
+store.save_project_context("sdlc_agentico", {
     "current_phase": 5,
     "active_tasks": ["TASK-001", "TASK-002"],
     "blockers": ["Waiting for API key"],
@@ -255,7 +255,7 @@ store.save_project_context("mice_dolphins", {
 })
 
 # Next session: Load context
-context = store.load_project_context("mice_dolphins")
+context = store.load_project_context("sdlc_agentico")
 # → Restore state immediately
 ```
 
@@ -332,7 +332,7 @@ All operations logged to Loki:
   "operation": "add_fact",
   "fact_id": "fact-001",
   "tags": ["api", "rate-limit"],
-  "project": "mice_dolphins"
+  "project": "sdlc_agentico"
 }
 ```
 

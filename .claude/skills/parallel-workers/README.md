@@ -73,10 +73,10 @@ Git worktree operations.
 **Example:**
 ```bash
 # Create worktree
-./scripts/worktree_manager.sh create mice_dolphins task-001 main
+./scripts/worktree_manager.sh create sdlc_agentico task-001 main
 
 # Check status
-./scripts/worktree_manager.sh status mice_dolphins task-001
+./scripts/worktree_manager.sh status sdlc_agentico task-001
 ```
 
 ### loop.py
@@ -86,7 +86,7 @@ Automation loop for monitoring workers.
 **Usage:**
 ```bash
 # Start automation loop
-python3 scripts/loop.py --project mice_dolphins
+python3 scripts/loop.py --project sdlc_agentico
 
 # Custom poll interval
 python3 scripts/loop.py --poll-interval 10
@@ -108,7 +108,7 @@ python3 scripts/loop.py --max-iterations 100
 **Example:**
 ```bash
 # Terminal 1: Start loop
-python3 scripts/loop.py --project mice_dolphins
+python3 scripts/loop.py --project sdlc_agentico
 
 # Terminal 2: Spawn workers
 python3 scripts/worker_manager.py spawn-batch --spec-file tasks.yml
@@ -181,7 +181,7 @@ Worker Lifecycle
 
 ```
 ~/.worktrees/
-└── mice_dolphins/
+└── sdlc_agentico/
     ├── task-001/          # Worker 1 worktree
     │   └── feature/task-001
     ├── task-002/          # Worker 2 worktree
@@ -302,7 +302,7 @@ Integrates with:
 
 ```bash
 # Check worktree status
-./scripts/worktree_manager.sh status mice_dolphins task-001
+./scripts/worktree_manager.sh status sdlc_agentico task-001
 
 # Check logs
 tail -f ~/.claude/logs/parallel-workers.log
@@ -318,7 +318,7 @@ python3 scripts/worker_manager.py terminate worker-abc123 --force
 git worktree list
 
 # Remove manually
-git worktree remove ~/.worktrees/mice_dolphins/task-001 --force
+git worktree remove ~/.worktrees/sdlc_agentico/task-001 --force
 ```
 
 ### State Corruption

@@ -300,7 +300,7 @@ Execução paralela de tarefas em Phase 5 com **2.5x speedup**:
 /parallel-spawn --batch .agentic_sdlc/projects/current/tasks.yml
 
 # Monitoring:
-python3 .claude/skills/parallel-workers/scripts/loop.py --project mice_dolphins
+python3 .claude/skills/parallel-workers/scripts/loop.py --project sdlc_agentico
 ```
 
 **Architecture:**

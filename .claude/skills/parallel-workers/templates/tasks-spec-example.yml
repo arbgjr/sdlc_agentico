@@ -2,7 +2,7 @@
 # Example task specification for parallel-workers
 # Used with: python3 worker_manager.py spawn-batch --spec-file tasks-spec-example.yml
 
-project: mice_dolphins
+project: sdlc_agentico
 base_branch: feature/epic-33-claude-orchestrator
 
 tasks:

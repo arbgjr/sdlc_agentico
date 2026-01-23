@@ -1,10 +1,10 @@
-# Session Summary: 2026-01-21 - mice_dolphins
+# Session Summary: 2026-01-21 - sdlc_agentico
 
 ## Session Metadata
 
 - **Date**: 2026-01-21T14:30:00Z
 - **Session File**: `abc123-def456.jsonl`
-- **Repository**: mice_dolphins
+- **Repository**: sdlc_agentico
 - **SDLC Phase**: 5
 
 ## Completed
