@@ -76,7 +76,7 @@ class ProjectAnalyzer:
         Returns:
             True if valid, False otherwise
         """
-        with log_operation(logger, "validate_project"):
+        with log_operation("validate_project", logger):
             # Check path exists
             if not self.project_path.exists():
                 logger.error(
@@ -151,7 +151,7 @@ class ProjectAnalyzer:
         Returns:
             Dict with branch info
         """
-        with log_operation(logger, "create_feature_branch"):
+        with log_operation("create_feature_branch", logger):
             # Default branch name
             if branch_name is None:
                 project_name = self.project_path.name
@@ -203,7 +203,7 @@ class ProjectAnalyzer:
         Returns:
             Dict with scan statistics
         """
-        with log_operation(logger, "scan_directory"):
+        with log_operation("scan_directory", logger):
             exclude_patterns = self.config['general']['exclude_patterns']
 
             files_by_ext = {}
@@ -279,7 +279,7 @@ class ProjectAnalyzer:
         Returns:
             Dict with all analysis results
         """
-        with log_operation(logger, "analyze"):
+        with log_operation("analyze", logger):
             # Step 1: Create feature branch
             branch_info = self.create_feature_branch(branch_name)
 

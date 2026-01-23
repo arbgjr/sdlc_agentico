@@ -7,7 +7,7 @@ Creates ADRs, threat models, tech debt reports, and import summary.
 import sys
 import json
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 from datetime import datetime
 from jinja2 import Template
 import yaml
