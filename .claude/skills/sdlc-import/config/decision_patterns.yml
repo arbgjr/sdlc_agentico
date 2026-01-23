@@ -1,0 +1,248 @@
+# Decision Extraction Patterns
+# Pattern matching rules for inferring architecture decisions
+# Adapted from awesome-copilot: design-decision-extractor.prompt
+
+decision_categories:
+  database:
+    patterns:
+      postgresql:
+        - regex: "django\\.db\\.backends\\.postgresql"
+          location: ["**/settings.py", "**/config.py"]
+          evidence_quality: 1.0
+          rationale: "PostgreSQL configured as Django database backend"
+
+        - regex: "psycopg2|asyncpg"
+          location: ["requirements.txt", "pyproject.toml"]
+          evidence_quality: 0.9
+          rationale: "PostgreSQL driver detected in dependencies"
+
+        - regex: "DATABASE_URL.*postgres"
+          location: ["**/*.py", "**/*.env.example"]
+          evidence_quality: 0.8
+          rationale: "PostgreSQL connection string found"
+
+      mysql:
+        - regex: "django\\.db\\.backends\\.mysql"
+          location: ["**/settings.py"]
+          evidence_quality: 1.0
+          rationale: "MySQL configured as Django database backend"
+
+        - regex: "mysqlclient|pymysql"
+          location: ["requirements.txt"]
+          evidence_quality: 0.9
+          rationale: "MySQL driver detected"
+
+      mongodb:
+        - regex: "pymongo|mongoengine|motor"
+          location: ["requirements.txt"]
+          evidence_quality: 0.9
+          rationale: "MongoDB driver detected"
+
+        - regex: "mongodb://|mongodb\\+srv://"
+          location: ["**/*.py", "**/*.env.example"]
+          evidence_quality: 0.8
+          rationale: "MongoDB connection string found"
+
+  authentication:
+    patterns:
+      jwt:
+        - regex: "jwt\\.encode|jwt\\.decode|PyJWT"
+          location: ["**/*.py", "requirements.txt"]
+          evidence_quality: 1.0
+          rationale: "JWT encoding/decoding detected"
+
+        - regex: "jsonwebtoken"
+          location: ["package.json"]
+          evidence_quality: 1.0
+          rationale: "JWT library detected in Node.js dependencies"
+
+      oauth2:
+        - regex: "OAuth2|oauthlib|authlib"
+          location: ["**/*.py", "requirements.txt"]
+          evidence_quality: 0.9
+          rationale: "OAuth2 library detected"
+
+        - regex: "passport|express-oauth2"
+          location: ["package.json"]
+          evidence_quality: 0.9
+          rationale: "OAuth2 library detected in Node.js"
+
+      session:
+        - regex: "django\\.contrib\\.sessions|express-session"
+          location: ["**/settings.py", "package.json"]
+          evidence_quality: 0.8
+          rationale: "Session-based authentication detected"
+
+  api:
+    patterns:
+      rest:
+        - regex: "@RestController|@GetMapping|@PostMapping"
+          location: ["**/*.java"]
+          evidence_quality: 1.0
+          rationale: "Spring REST controller detected"
+
+        - regex: "rest_framework|DRF"
+          location: ["requirements.txt", "**/settings.py"]
+          evidence_quality: 1.0
+          rationale: "Django REST Framework detected"
+
+        - regex: "express\\.Router|app\\.get|app\\.post"
+          location: ["**/*.{js,ts}"]
+          evidence_quality: 0.9
+          rationale: "Express REST routes detected"
+
+      graphql:
+        - regex: "graphene|ariadne|strawberry"
+          location: ["requirements.txt"]
+          evidence_quality: 1.0
+          rationale: "Python GraphQL library detected"
+
+        - regex: "apollo-server|express-graphql"
+          location: ["package.json"]
+          evidence_quality: 1.0
+          rationale: "Node.js GraphQL server detected"
+
+      grpc:
+        - regex: "grpcio|grpc"
+          location: ["requirements.txt", "go.mod"]
+          evidence_quality: 1.0
+          rationale: "gRPC library detected"
+
+  caching:
+    patterns:
+      redis:
+        - regex: "redis|aioredis|hiredis"
+          location: ["requirements.txt"]
+          evidence_quality: 0.9
+          rationale: "Redis client library detected"
+
+        - regex: "ioredis|redis"
+          location: ["package.json"]
+          evidence_quality: 0.9
+          rationale: "Redis client detected in Node.js"
+
+        - regex: "REDIS_URL|CACHE_BACKEND.*redis"
+          location: ["**/*.py", "**/*.env.example"]
+          evidence_quality: 0.8
+          rationale: "Redis configuration detected"
+
+      memcached:
+        - regex: "python-memcached|pylibmc"
+          location: ["requirements.txt"]
+          evidence_quality: 0.9
+          rationale: "Memcached client detected"
+
+  messaging:
+    patterns:
+      rabbitmq:
+        - regex: "pika|aio-pika|kombu"
+          location: ["requirements.txt"]
+          evidence_quality: 0.9
+          rationale: "RabbitMQ client library detected"
+
+        - regex: "amqplib|amqp-connection-manager"
+          location: ["package.json"]
+          evidence_quality: 0.9
+          rationale: "AMQP/RabbitMQ library detected"
+
+      kafka:
+        - regex: "kafka-python|aiokafka|confluent-kafka"
+          location: ["requirements.txt"]
+          evidence_quality: 0.9
+          rationale: "Kafka client library detected"
+
+        - regex: "kafkajs|kafka-node"
+          location: ["package.json"]
+          evidence_quality: 0.9
+          rationale: "Kafka client detected in Node.js"
+
+      celery:
+        - regex: "celery"
+          location: ["requirements.txt", "**/celery.py"]
+          evidence_quality: 1.0
+          rationale: "Celery task queue detected"
+
+  frontend:
+    patterns:
+      react:
+        - regex: '"react"'
+          location: ["package.json"]
+          evidence_quality: 1.0
+          rationale: "React library detected"
+
+        - regex: "import.*from ['\"]react['\"]"
+          location: ["**/*.{js,jsx,ts,tsx}"]
+          evidence_quality: 0.9
+          rationale: "React imports detected"
+
+      vue:
+        - regex: '"vue"'
+          location: ["package.json"]
+          evidence_quality: 1.0
+          rationale: "Vue.js library detected"
+
+      angular:
+        - regex: '"@angular/core"'
+          location: ["package.json"]
+          evidence_quality: 1.0
+          rationale: "Angular framework detected"
+
+  deployment:
+    patterns:
+      docker:
+        - regex: "FROM |COPY |RUN "
+          location: ["Dockerfile", "**/Dockerfile"]
+          evidence_quality: 1.0
+          rationale: "Docker containerization detected"
+
+      kubernetes:
+        - regex: "apiVersion:|kind: Deployment|kind: Service"
+          location: ["**/*.{yml,yaml}"]
+          evidence_quality: 0.9
+          rationale: "Kubernetes manifests detected"
+
+      terraform:
+        - regex: "resource ['\"]|provider ['\"]"
+          location: ["**/*.tf"]
+          evidence_quality: 1.0
+          rationale: "Terraform IaC detected"
+
+  testing:
+    patterns:
+      pytest:
+        - regex: "pytest"
+          location: ["requirements.txt", "**/test_*.py", "**/*_test.py"]
+          evidence_quality: 1.0
+          rationale: "Pytest testing framework detected"
+
+      jest:
+        - regex: '"jest"'
+          location: ["package.json"]
+          evidence_quality: 1.0
+          rationale: "Jest testing framework detected"
+
+      junit:
+        - regex: "junit|@Test"
+          location: ["pom.xml", "build.gradle", "**/*.java"]
+          evidence_quality: 1.0
+          rationale: "JUnit testing framework detected"
+
+# LLM synthesis templates for low-confidence decisions
+llm_synthesis:
+  # Use when confidence < 0.5
+  fallback_threshold: 0.5
+
+  # Prompt template
+  prompt_template: |
+    Based on the following evidence, infer the architecture decision:
+
+    Category: {category}
+    Evidence: {evidence}
+
+    Generate:
+    1. Decision title
+    2. Rationale (why this choice was made)
+    3. Consequences (trade-offs, implications)
+    4. Alternatives considered (if any)
+
+    Format as ADR YAML.

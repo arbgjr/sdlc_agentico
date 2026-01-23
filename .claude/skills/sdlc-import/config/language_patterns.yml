@@ -1,0 +1,285 @@
+# Language Detection Patterns
+# Pattern matching rules for 10 programming languages
+# Adapted from awesome-copilot: language-stack-identifier.prompt
+
+languages:
+  python:
+    extensions: [".py", ".pyw"]
+
+    framework_signatures:
+      django:
+        - pattern: "django"
+          location: ["requirements.txt", "Pipfile", "pyproject.toml"]
+          weight: 1.0
+        - pattern: "django\\.conf"
+          location: ["**/*.py"]
+          weight: 0.9
+
+      flask:
+        - pattern: "flask"
+          location: ["requirements.txt", "Pipfile", "pyproject.toml"]
+          weight: 1.0
+        - pattern: "from flask import"
+          location: ["**/*.py"]
+          weight: 0.9
+
+      fastapi:
+        - pattern: "fastapi"
+          location: ["requirements.txt", "Pipfile", "pyproject.toml"]
+          weight: 1.0
+        - pattern: "from fastapi import"
+          location: ["**/*.py"]
+          weight: 0.9
+
+    dependency_files: ["requirements.txt", "Pipfile", "Pipfile.lock", "pyproject.toml", "setup.py"]
+
+    lsp_plugin: "pyright-lsp"
+
+  javascript:
+    extensions: [".js", ".jsx", ".mjs"]
+
+    framework_signatures:
+      react:
+        - pattern: '"react"'
+          location: ["package.json"]
+          weight: 1.0
+        - pattern: "import.*from ['\"]react['\"]"
+          location: ["**/*.{js,jsx}"]
+          weight: 0.9
+
+      nextjs:
+        - pattern: '"next"'
+          location: ["package.json"]
+          weight: 1.0
+        - pattern: "import.*from ['\"]next"
+          location: ["**/*.{js,jsx}"]
+          weight: 0.9
+
+      express:
+        - pattern: '"express"'
+          location: ["package.json"]
+          weight: 1.0
+        - pattern: "require\\(['\"]express['\"]\\)"
+          location: ["**/*.js"]
+          weight: 0.9
+
+    dependency_files: ["package.json", "package-lock.json", "yarn.lock"]
+
+    lsp_plugin: "typescript-lsp"
+
+  typescript:
+    extensions: [".ts", ".tsx"]
+
+    framework_signatures:
+      angular:
+        - pattern: '"@angular/core"'
+          location: ["package.json"]
+          weight: 1.0
+        - pattern: "@Component|@Injectable"
+          location: ["**/*.ts"]
+          weight: 0.9
+
+      nestjs:
+        - pattern: '"@nestjs/core"'
+          location: ["package.json"]
+          weight: 1.0
+        - pattern: "@Module|@Controller"
+          location: ["**/*.ts"]
+          weight: 0.9
+
+    dependency_files: ["package.json", "package-lock.json", "yarn.lock", "tsconfig.json"]
+
+    lsp_plugin: "typescript-lsp"
+
+  java:
+    extensions: [".java"]
+
+    framework_signatures:
+      spring:
+        - pattern: "spring-boot-starter"
+          location: ["pom.xml", "build.gradle"]
+          weight: 1.0
+        - pattern: "@SpringBootApplication|@RestController"
+          location: ["**/*.java"]
+          weight: 0.9
+
+      maven:
+        - pattern: "<project"
+          location: ["pom.xml"]
+          weight: 1.0
+
+      gradle:
+        - pattern: "apply plugin"
+          location: ["build.gradle"]
+          weight: 1.0
+
+    dependency_files: ["pom.xml", "build.gradle", "build.gradle.kts"]
+
+    lsp_plugin: "jdtls-lsp"
+
+  csharp:
+    extensions: [".cs", ".csx"]
+
+    framework_signatures:
+      aspnet:
+        - pattern: "Microsoft\\.AspNetCore"
+          location: ["**/*.csproj"]
+          weight: 1.0
+        - pattern: "using Microsoft\\.AspNetCore"
+          location: ["**/*.cs"]
+          weight: 0.9
+
+      entityframework:
+        - pattern: "Microsoft\\.EntityFrameworkCore"
+          location: ["**/*.csproj"]
+          weight: 1.0
+        - pattern: "using Microsoft\\.EntityFrameworkCore"
+          location: ["**/*.cs"]
+          weight: 0.9
+
+    dependency_files: ["*.csproj", "*.sln", "packages.config"]
+
+    lsp_plugin: "csharp-lsp"
+
+  go:
+    extensions: [".go"]
+
+    framework_signatures:
+      gin:
+        - pattern: "github\\.com/gin-gonic/gin"
+          location: ["go.mod"]
+          weight: 1.0
+        - pattern: "gin\\."
+          location: ["**/*.go"]
+          weight: 0.8
+
+      gorm:
+        - pattern: "gorm\\.io/gorm"
+          location: ["go.mod"]
+          weight: 1.0
+        - pattern: "import.*gorm"
+          location: ["**/*.go"]
+          weight: 0.8
+
+    dependency_files: ["go.mod", "go.sum"]
+
+    lsp_plugin: "gopls-lsp"
+
+  ruby:
+    extensions: [".rb", ".rake"]
+
+    framework_signatures:
+      rails:
+        - pattern: "gem ['\"]rails['\"]"
+          location: ["Gemfile"]
+          weight: 1.0
+        - pattern: "Rails\\.application|ApplicationController"
+          location: ["**/*.rb"]
+          weight: 0.9
+
+    dependency_files: ["Gemfile", "Gemfile.lock"]
+
+    lsp_plugin: "ruby-lsp"
+
+  php:
+    extensions: [".php"]
+
+    framework_signatures:
+      laravel:
+        - pattern: '"laravel/framework"'
+          location: ["composer.json"]
+          weight: 1.0
+        - pattern: "Illuminate\\\\"
+          location: ["**/*.php"]
+          weight: 0.9
+
+      symfony:
+        - pattern: '"symfony/symfony"'
+          location: ["composer.json"]
+          weight: 1.0
+        - pattern: "Symfony\\\\"
+          location: ["**/*.php"]
+          weight: 0.9
+
+    dependency_files: ["composer.json", "composer.lock"]
+
+    lsp_plugin: "php-lsp"
+
+  rust:
+    extensions: [".rs"]
+
+    framework_signatures:
+      actix:
+        - pattern: "actix-web"
+          location: ["Cargo.toml"]
+          weight: 1.0
+        - pattern: "use actix_web"
+          location: ["**/*.rs"]
+          weight: 0.9
+
+    dependency_files: ["Cargo.toml", "Cargo.lock"]
+
+    lsp_plugin: "rust-analyzer-lsp"
+
+  kotlin:
+    extensions: [".kt", ".kts"]
+
+    framework_signatures:
+      ktor:
+        - pattern: "io\\.ktor"
+          location: ["build.gradle.kts", "pom.xml"]
+          weight: 1.0
+        - pattern: "import io\\.ktor"
+          location: ["**/*.kt"]
+          weight: 0.9
+
+    dependency_files: ["build.gradle.kts", "build.gradle", "pom.xml"]
+
+    lsp_plugin: "kotlin-lsp"
+
+# Infrastructure as Code detection
+iac:
+  terraform:
+    extensions: [".tf"]
+    signature_patterns:
+      - pattern: "resource ['\"]"
+        weight: 1.0
+
+  kubernetes:
+    extensions: [".yml", ".yaml"]
+    signature_patterns:
+      - pattern: "apiVersion:|kind:"
+        weight: 0.9
+        location: ["**/*.{yml,yaml}"]
+
+# CI/CD detection
+cicd:
+  github_actions:
+    signature_patterns:
+      - pattern: "on:|jobs:|runs-on:"
+        location: [".github/workflows/*.{yml,yaml}"]
+        weight: 1.0
+
+  gitlab_ci:
+    signature_patterns:
+      - pattern: "stages:|script:"
+        location: [".gitlab-ci.yml"]
+        weight: 1.0
+
+# Testing frameworks
+testing:
+  pytest:
+    pattern: "pytest"
+    location: ["requirements.txt", "**/*test*.py"]
+
+  jest:
+    pattern: '"jest"'
+    location: ["package.json"]
+
+  junit:
+    pattern: "junit"
+    location: ["pom.xml", "build.gradle"]
+
+  mocha:
+    pattern: '"mocha"'
+    location: ["package.json"]

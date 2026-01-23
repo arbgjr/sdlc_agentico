@@ -1,0 +1,214 @@
+# sdlc-import Configuration
+# Main configuration for reverse engineering existing projects
+
+general:
+  # Output directory for generated documentation
+  output_dir: ".agentic_sdlc"
+
+  # Patterns to exclude from analysis
+  exclude_patterns:
+    - ".git"
+    - ".github"
+    - "node_modules"
+    - "__pycache__"
+    - "venv"
+    - "env"
+    - "build"
+    - "dist"
+    - "target"
+    - ".vs"
+    - ".idea"
+    - "*.pyc"
+    - "*.class"
+    - "*.o"
+
+  # Maximum project size (LOC) for full analysis
+  max_project_size: 100000
+
+  # Timeout for analysis (seconds)
+  analysis_timeout: 300
+
+language_detection:
+  # Minimum files required to detect a language
+  min_files: 3
+
+  # Minimum percentage to consider a language primary
+  min_percentage: 5.0
+
+  # Overall confidence threshold
+  confidence_threshold: 0.7
+
+  # Enable LSP plugins for deep analysis
+  lsp_enabled: true
+
+  # LSP timeout per language (seconds)
+  lsp_timeout: 30
+
+decision_extraction:
+  # Confidence thresholds
+  confidence:
+    high: 0.8    # Auto-accept
+    medium: 0.5  # Needs validation
+    low: 0.3     # Create issue for manual review
+
+  # LLM synthesis settings
+  llm:
+    enabled: true
+    model: "claude-sonnet-4-5"  # Use Sonnet for cost efficiency
+    fallback_threshold: 0.5     # Use LLM when confidence < 0.5
+    max_tokens: 2000
+
+  # Minimum ADRs required to pass quality gate
+  min_adr_count: 3
+
+  # Decision categories to extract
+  categories:
+    - database
+    - authentication
+    - api
+    - caching
+    - messaging
+    - frontend
+    - deployment
+    - testing
+
+architecture_visualization:
+  # Diagram formats to generate
+  formats:
+    - mermaid
+    - dot
+
+  # Diagram types
+  diagram_types:
+    - component      # High-level architecture
+    - dependency     # Package dependencies
+    - data_flow      # Request flow
+    - deployment     # Infrastructure (if IaC detected)
+
+  # Minimum diagrams required
+  min_diagrams: 2
+
+  # Maximum nodes per diagram (prevents clutter)
+  max_nodes_per_diagram: 20
+
+threat_modeling:
+  # Enable STRIDE analysis
+  enabled: true
+
+  # Use security-guidance plugin
+  plugin_enabled: true
+
+  # CVSS escalation threshold
+  escalation_threshold: 7.0
+
+  # Auto-escalate on these conditions
+  auto_escalate_on:
+    - pii_exposure
+    - auth_bypass
+    - crypto_issues
+    - sql_injection
+    - xss
+
+  # STRIDE categories to analyze
+  stride_categories:
+    - Spoofing
+    - Tampering
+    - Repudiation
+    - Information_Disclosure
+    - Denial_of_Service
+    - Elevation_of_Privilege
+
+  # Severity distribution thresholds
+  severity:
+    max_critical: 0  # Block on any CRITICAL
+    max_high: 5      # Block if more than 5 HIGH
+
+tech_debt:
+  # Enable tech debt detection
+  enabled: true
+
+  # Use code-review plugin
+  plugin_enabled: true
+
+  # Code smell rules
+  code_smell_rules:
+    max_function_lines: 50
+    max_cyclomatic_complexity: 10
+    max_nesting_depth: 4
+    max_file_lines: 500
+
+  # Test coverage threshold
+  coverage_threshold: 0.8
+
+  # Dependency rules
+  dependency_rules:
+    check_eol: true          # Check for EOL packages
+    check_cve: true          # Check for known CVEs
+    max_major_lag: 2         # Max major versions behind latest
+
+  # Priority mapping
+  priority:
+    P0: ["security", "eol_dependency", "blocking_bug"]
+    P1: ["reliability", "missing_critical_tests", "major_version_lag"]
+    P2: ["code_smells", "refactoring", "missing_tests"]
+    P3: ["documentation", "nice_to_have"]
+
+  # Effort estimation (hours)
+  effort_estimation:
+    security_fix: 8
+    eol_upgrade: 16
+    code_smell: 4
+    missing_test: 2
+    documentation: 1
+
+github_integration:
+  # Create GitHub issues for findings
+  create_issues: false  # Override with --create-issues flag
+
+  # Issue creation rules
+  issue_rules:
+    create_for_p0_debt: true
+    create_for_high_threats: true
+    create_for_critical_threats: true
+    create_for_low_confidence_adrs: true
+
+  # Issue labels
+  labels:
+    tech_debt: "tech-debt"
+    security: "security"
+    sdlc_import: "sdlc-import"
+    needs_review: "needs-review"
+
+branching:
+  # Auto-create feature branch
+  auto_branch: true
+
+  # Branch naming pattern
+  branch_pattern: "feature/import-{project_name}"
+
+  # Create branch from
+  base_branch: "main"
+
+logging:
+  # Structured logging configuration
+  skill: "sdlc-import"
+  phase: 0
+
+  # Log level
+  level: "INFO"
+
+  # Enable Loki shipping
+  loki_enabled: true
+
+quality_gate:
+  # Strict mode (all error-level checks must pass)
+  strict_mode: true
+
+  # Maximum warnings allowed
+  max_warnings: 3
+
+  # Overall confidence threshold
+  min_overall_confidence: 0.6
+
+  # Remediation on failure
+  create_remediation_issue: true
