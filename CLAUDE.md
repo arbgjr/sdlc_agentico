@@ -2,6 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Major Rules
+- Always follow the **Anti-Mock Policy** (CRITICAL)
+
 ## Project Overview
 
 SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orchestrates **36 specialized agents (32 orchestrated + 4 consultive)** through **9 development phases (0-8)**. This is a **configuration and orchestration framework**, not a traditional application codebase.
@@ -39,6 +42,22 @@ SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orc
 - Hybrid search for document matching (keyword + text + category) (v1.9.0)
 - Versioned enriched documents with immutable originals (v1.9.0)
 - Knowledge graph integration with 'enriches' relations (v1.9.0)
+
+## Anti-Mock Policy (CRITICAL)
+
+**Absolutely prohibited** in production code:
+
+- Mock/stub/fake/dummy implementations of external services or MCP
+- Hardcoded test data or pattern-based bypasses
+- Keywords: `mock|stub|fake|dummy|simulator|emulator|inmemory`
+- Placeholders: `lorem`, `foo`, `bar`, `TODO`, `TBD`
+
+Test doubles are **ONLY** allowed in `tests/` directories.
+
+When services are unavailable, use resilience patterns:
+
+- Timeout, retry, circuit breaker
+- Return `503 Service Unavailable` with `x-correlation-id`
 
 ## Setup Commands
 
