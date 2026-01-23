@@ -45,9 +45,30 @@ general:
     # NEW: Rust artifacts
     - "target/debug"
     - "target/release"
+    # NEW: Infrastructure as Code artifacts
+    - ".terraform"
+    - ".terraform.lock.hcl"
+    - ".terragrunt-cache"
+    - "terraform.tfstate"
+    - "terraform.tfstate.backup"
+    # .NET build artifacts
+    - "bin"
+    - "obj"
+    # EF Core generated files
+    - "Migrations"
+    - "*/Migrations/*"
+    # Documentation and docs folder
+    - ".docs"
+    - "docs"
+    # Test coverage
+    - "coverage"
+    - ".coverage"
+    # Package files
+    - "packages"
+    - "*.nupkg"
 
   # Maximum project size (LOC) for full analysis
-  max_project_size: 100000
+  max_project_size: 500000
 
   # Timeout for analysis (seconds)
   analysis_timeout: 300

@@ -1114,9 +1114,12 @@ git commit -m "fix: critical issue"
 
 ## Version History Quick Reference
 
-**Current Version**: v1.8.1 (Auto-Update System)
+**Current Version**: v2.0.1 (sdlc-import Bug Fix)
 
 **Recent Releases**:
+- v2.0.1 (2026-01-23): sdlc-import exclude patterns fix (.terraform, IaC artifacts)
+- v2.0.0 (2026-01-23): Language Detection Expansion (30 technologies, sdlc-import)
+- v1.9.0 (2026-01-23): Document Enrichment System
 - v1.8.1 (2026-01-23): Auto-Update System with impact analysis
 - v1.7.16 (2026-01-17): Phase Commit Automation
 - v1.7.0 (2026-01-16): Structured Logging with Loki/Tempo/Grafana

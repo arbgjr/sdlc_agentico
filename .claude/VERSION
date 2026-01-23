@@ -1,22 +1,25 @@
 # SDLC Agêntico Version
-version: "2.0.0"
+version: "2.0.1"
 build_date: "2026-01-23"
 release_notes: |
-  Language Detection Expansion - Expansão massiva de 10 para 30 tecnologias detectadas.
+  Bug fix: sdlc-import exclude patterns - Correção crítica para análise de projetos grandes.
 
-  Features:
-  - /sdlc-import: Comando para importar projetos existentes
-  - Detecção de 30 tecnologias (3x aumento): linguagens, frameworks, IaC, mobile
-  - Backend/Infrastructure (9 novas): C++, Rust enhanced, Ansible, Jenkins, Chef, Puppet, Gradle, Selenium, Bicep
-  - Frontend/Testing (6 novas): Playwright, TypeScript enhanced, Vue.js, Svelte, Tailwind CSS, Vite/Webpack
-  - Mobile (5 novas): React Native, Flutter/Dart, Swift, Kotlin enhanced, Xamarin
-  - LSP integration: clangd-lsp (C++), dart-lsp (Flutter), sourcekit-lsp (Swift)
-  - Disambiguation logic: Chef/Ruby, Ansible/YAML, Gradle/Kotlin
-  - Configuration-driven: 669 linhas em language_patterns.yml (+383 linhas)
-  - Test coverage: 255 tests (100% pass rate) - 168 unit + 87 integration
-  - Production ready: Zero regressions, all frameworks correctly categorized
+  Fix:
+  - fix(sdlc-import): Adiciona .terraform aos exclude_patterns (evita 1.5GB de módulos)
+  - fix(sdlc-import): Adiciona bin/obj/.NET artifacts
+  - fix(sdlc-import): Adiciona Migrations, packages, coverage, docs
+  - fix(sdlc-import): Aumenta max_project_size de 100k para 500k LOC
+  - fix(sdlc-import): Projetos grandes (1.6GB) agora analisam corretamente
 
 changelog:
+  - version: "2.0.1"
+    date: "2026-01-23"
+    changes:
+      - "fix(sdlc-import): Adiciona .terraform e artifacts IaC aos exclude_patterns"
+      - "fix(sdlc-import): Adiciona bin/obj/.NET build artifacts"
+      - "fix(sdlc-import): Adiciona Migrations, packages, coverage, docs"
+      - "fix(sdlc-import): Aumenta max_project_size de 100k para 500k LOC"
+      - "fix(sdlc-import): Projetos grandes (1.6GB, 22M LOC) agora analisam corretamente"
   - version: "2.0.0"
     date: "2026-01-23"
     changes:
