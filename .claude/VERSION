@@ -1,18 +1,38 @@
 # SDLC Agêntico Version
-version: "1.8.1"
+version: "1.9.0"
 build_date: "2026-01-23"
 release_notes: |
-  Auto-Update System - Sistema inteligente de atualização automática com análise de impacto.
+  Document Enrichment System - Sistema automático de enriquecimento de documentos com research findings.
 
   Features:
-  - Detecção automática de atualizações (GitHub releases)
-  - Análise de impacto (breaking changes, migrações, dependências, segurança)
-  - Sistema de dismissal (skip this version)
-  - Execução automatizada de updates com rollback
-  - Cache inteligente (1 hora) para evitar rate limiting
-  - Structured logging com Loki integration
+  - Enriquecimento automático de documentos com research findings
+  - Algoritmo de hybrid search (similarity >= 0.6)
+  - Originais imutáveis com versões enriquecidas (.enriched.vN.md)
+  - Integração com knowledge graph (relação 'enriches')
+  - 5 agentes modificados com Step 0 pre-research pattern
+  - Quality gate: enrichment-quality.yml
+  - 37 testes (100% coverage)
 
 changelog:
+  - version: "1.9.0"
+    date: "2026-01-23"
+    changes:
+      - "feat(document-enricher): Sistema de enriquecimento automático de documentos"
+      - "feat(document-enricher): Hybrid search com 4 fatores (keyword, title, summary, category)"
+      - "feat(document-enricher): Versionamento de enrichments (.enriched.v1.md, v2, v3...)"
+      - "feat(document-enricher): Preservação de documentos originais (imutáveis)"
+      - "feat(document-enricher): Integração com knowledge graph (relação 'enriches')"
+      - "feat(agents): Step 0 pre-research em 5 agentes (domain-researcher, doc-crawler, requirements-analyst, adr-author, threat-modeler)"
+      - "feat(commands): /doc-search e /doc-enrich para busca e enriquecimento manual"
+      - "feat(quality-gate): enrichment-quality.yml com validação de sources, integridade e versioning"
+      - "test(document-enricher): 37 testes (17 find_related + 13 enrich + 8 update_index + 3 integration)"
+      - "docs(document-enricher): Guia completo de enriquecimento (.docs/enrichment-guide.md)"
+      - "docs(ADR): ADR-019 documentando arquitetura de enriquecimento"
+  - version: "1.8.1"
+    date: "2026-01-23"
+    changes:
+      - "feat(version-checker): Sistema inteligente de auto-update"
+      - "feat(version-checker): Análise de impacto de changelogs"
   - version: "1.8.0"
     date: "2026-01-22"
     changes:
