@@ -1,0 +1,250 @@
+# Technical Debt Detection Rules
+# Rules for identifying code smells, deprecated dependencies, and gaps
+# Adapted from awesome-copilot: code-gap-audit.prompt
+
+code_smells:
+  long_functions:
+    threshold: 50  # lines
+    priority: P2
+    category: "code_smell"
+    effort_estimate: 4  # hours
+    patterns:
+      python:
+        - regex: "^def \\w+\\(.*\\):$"
+          check: "line_count"
+      javascript:
+        - regex: "function \\w+\\(.*\\) \\{"
+          check: "line_count"
+      java:
+        - regex: "\\w+ \\w+\\(.*\\) \\{"
+          check: "line_count"
+
+  high_complexity:
+    threshold: 10  # cyclomatic complexity
+    priority: P2
+    category: "code_smell"
+    effort_estimate: 6  # hours
+    message: "Function has cyclomatic complexity > 10, consider refactoring"
+
+  deep_nesting:
+    threshold: 4  # nesting levels
+    priority: P2
+    category: "code_smell"
+    effort_estimate: 4  # hours
+    message: "Deep nesting detected, consider extracting methods"
+
+  duplicated_code:
+    threshold: 20  # lines
+    priority: P2
+    category: "code_smell"
+    effort_estimate: 8  # hours
+    message: "Duplicated code block detected, consider DRY principle"
+
+  large_files:
+    threshold: 500  # lines
+    priority: P3
+    category: "code_smell"
+    effort_estimate: 8  # hours
+    message: "Large file detected, consider splitting into modules"
+
+deprecated_dependencies:
+  # Python packages with EOL versions
+  python:
+    django:
+      eol_versions: ["1.11", "2.0", "2.1", "2.2", "3.0", "3.1"]
+      priority: P0
+      effort_estimate: 16
+      message: "Django version is EOL, upgrade required"
+
+    flask:
+      eol_versions: ["0.x"]
+      priority: P1
+      effort_estimate: 8
+
+    python:
+      eol_versions: ["2.7", "3.5", "3.6", "3.7"]
+      priority: P0
+      effort_estimate: 40
+      message: "Python version is EOL, critical upgrade needed"
+
+  # Node.js packages
+  nodejs:
+    node:
+      eol_versions: ["10", "12", "14", "16"]
+      priority: P0
+      effort_estimate: 24
+      message: "Node.js version is EOL"
+
+    react:
+      deprecated_patterns:
+        - "componentWillMount"
+        - "componentWillReceiveProps"
+        - "componentWillUpdate"
+      priority: P1
+      effort_estimate: 8
+
+  # Java dependencies
+  java:
+    spring:
+      eol_versions: ["4.x"]
+      priority: P0
+      effort_estimate: 40
+      message: "Spring Framework 4.x is EOL"
+
+  # Check CVE database
+  cve_check:
+    enabled: true
+    severity_priority_map:
+      CRITICAL: P0
+      HIGH: P1
+      MEDIUM: P2
+      LOW: P3
+
+missing_tests:
+  # Coverage thresholds
+  coverage:
+    overall: 80  # %
+    critical_paths: 95  # %
+    priority_if_below: P1
+    effort_estimate: 2  # hours per missing test
+
+  # File patterns that should have tests
+  test_required_patterns:
+    python:
+      - "**/views.py"
+      - "**/models.py"
+      - "**/services.py"
+      - "**/utils.py"
+
+    javascript:
+      - "**/components/**/*.{js,jsx,ts,tsx}"
+      - "**/services/**/*.{js,ts}"
+      - "**/utils/**/*.{js,ts}"
+
+    java:
+      - "**/controller/**/*.java"
+      - "**/service/**/*.java"
+      - "**/repository/**/*.java"
+
+  # Test file naming conventions
+  test_patterns:
+    python: ["test_*.py", "*_test.py"]
+    javascript: ["*.test.{js,ts}", "*.spec.{js,ts}"]
+    java: ["*Test.java"]
+
+documentation_gaps:
+  # README.md requirements
+  readme:
+    required_sections:
+      - "Installation"
+      - "Usage"
+      - "Configuration"
+    priority_if_missing: P3
+    effort_estimate: 2
+
+  # API documentation
+  api_docs:
+    required_for:
+      - "REST endpoints"
+      - "GraphQL schema"
+      - "gRPC services"
+    priority_if_missing: P2
+    effort_estimate: 4
+
+  # Code documentation
+  docstrings:
+    required_for:
+      python: ["class", "def"]
+      javascript: ["class", "function"]
+      java: ["class", "method"]
+    priority_if_missing: P3
+    effort_estimate: 1
+
+security_issues:
+  # Hardcoded secrets patterns
+  secrets:
+    patterns:
+      - regex: "(password|secret|api_key|token)\\s*=\\s*['\"][^'\"]+['\"]"
+        priority: P0
+        effort_estimate: 2
+        message: "Hardcoded secret detected"
+
+      - regex: "-----BEGIN (RSA |DSA |EC )?PRIVATE KEY-----"
+        priority: P0
+        effort_estimate: 2
+        message: "Private key in source code"
+
+  # Insecure patterns
+  insecure_patterns:
+    sql_injection:
+      regex: "execute\\(.*%s.*\\)|execute\\(.*\\+.*\\)"
+      priority: P0
+      effort_estimate: 8
+      message: "Potential SQL injection vulnerability"
+
+    xss:
+      regex: "innerHTML|dangerouslySetInnerHTML"
+      priority: P1
+      effort_estimate: 4
+      message: "Potential XSS vulnerability"
+
+    weak_crypto:
+      regex: "md5|sha1|DES|RC4"
+      priority: P0
+      effort_estimate: 8
+      message: "Weak cryptographic algorithm detected"
+
+    insecure_random:
+      regex: "random\\(\\)|Math\\.random\\(\\)"
+      priority: P1
+      effort_estimate: 2
+      message: "Insecure random number generation"
+
+# Priority assignment rules
+priority_rules:
+  P0:
+    triggers:
+      - "security_vulnerability"
+      - "eol_dependency"
+      - "data_loss_risk"
+      - "compliance_violation"
+    severity: "CRITICAL"
+    sla: "24h"
+
+  P1:
+    triggers:
+      - "reliability_issue"
+      - "missing_critical_tests"
+      - "major_version_lag"
+      - "performance_degradation"
+    severity: "HIGH"
+    sla: "1 week"
+
+  P2:
+    triggers:
+      - "code_smell"
+      - "refactoring_needed"
+      - "missing_tests"
+      - "moderate_complexity"
+    severity: "MEDIUM"
+    sla: "1 month"
+
+  P3:
+    triggers:
+      - "documentation_gap"
+      - "nice_to_have"
+      - "minor_improvement"
+    severity: "LOW"
+    sla: "backlog"
+
+# Effort estimation formulas
+effort_estimation:
+  security_fix: 8
+  eol_upgrade_major: 40
+  eol_upgrade_minor: 16
+  code_smell_simple: 4
+  code_smell_complex: 8
+  missing_test: 2
+  documentation: 1
+  refactoring_small: 8
+  refactoring_large: 24

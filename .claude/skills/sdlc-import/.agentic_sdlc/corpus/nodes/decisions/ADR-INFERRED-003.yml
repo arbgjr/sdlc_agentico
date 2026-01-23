@@ -1,0 +1,25 @@
+category: testing
+confidence: 0.5733333333333334
+confidence_breakdown:
+  consistency: 0.417
+  evidence_quality: 1.0
+  evidence_quantity: 0.3
+  llm_bonus: 0.0
+confidence_level: medium
+date: '2026-01-23T17:36:51.684280Z'
+decision: Use Jest for testing
+evidence:
+- file: package.json
+  line: 13
+  pattern: '"jest"'
+  quality: 1.0
+  source: pattern
+evidence_count: 1
+id: ADR-INFERRED-003
+needs_validation: true
+rationale: Jest appears to be used for testing. Evidence suggests this decision was
+  made to address specific requirements. [LLM synthesis would provide deeper analysis
+  here]
+status: inferred
+synthesized_by: llm
+title: Use Jest as Testing Framework
