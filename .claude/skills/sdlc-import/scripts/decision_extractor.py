@@ -49,7 +49,7 @@ class DecisionExtractor:
 
     def extract(self, project_path: Path, language_analysis: Dict, no_llm: bool = False) -> Dict:
         """Extract architecture decisions from project"""
-        with log_operation(logger, "extract_decisions"):
+        with log_operation("extract_decisions", logger):
             decisions = []
             decision_id = 1
 
