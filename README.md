@@ -1,6 +1,6 @@
 <!-- Core Badges -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.0.1-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v2.0.1)
+[![Version](https://img.shields.io/badge/version-2.0.2-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v2.0.2)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 
 <!-- AI Compatibility -->
@@ -38,7 +38,7 @@ O SDLC Agêntico é um framework que usa **37 agentes especializados** (33 orque
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         SDLC AGÊNTICO v2.0.1                            │
+│                         SDLC AGÊNTICO v2.0.2                            │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  Ideia → [Intake] → [Discovery] → [Requirements] → [Architecture]       │
@@ -74,7 +74,7 @@ O SDLC Agêntico é um framework que usa **37 agentes especializados** (33 orque
 
 ```bash
 # Definir versão desejada (consulte releases para última versão)
-VERSION="v2.0.1"
+VERSION="v2.0.2"
 
 # Download e extração (preserva permissões de execução)
 curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -
@@ -94,7 +94,7 @@ curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}
 curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
 
 # Versão específica
-curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v2.0.1
+curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v2.0.2
 ```
 
 Se o diretório `.claude/` já existir, o script perguntará o que fazer:

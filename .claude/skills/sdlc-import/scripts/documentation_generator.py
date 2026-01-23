@@ -31,11 +31,16 @@ class DocumentationGenerator:
         """Generate all documentation"""
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
+        # FIX #7: Index original ADRs in references/
+        project_path = Path(analysis_results.get('project_path', '.'))
+        original_adrs = self._index_original_adrs(project_path)
+
         generated_files = {
             "adrs": self._generate_adrs(analysis_results.get('decisions', {})),
             "threat_model": self._generate_threat_model(analysis_results.get('threats', {})),
             "tech_debt_report": self._generate_tech_debt_report(analysis_results.get('tech_debt', {})),
-            "import_report": self._generate_import_report(analysis_results)
+            "import_report": self._generate_import_report(analysis_results),
+            "original_adrs": original_adrs  # FIX #7: Track original ADRs
         }
 
         logger.info("Documentation generation complete")
@@ -108,6 +113,75 @@ See full analysis in `.agentic_sdlc/`.
 """
         report_file.write_text(content)
         return str(report_file)
+
+    def _index_original_adrs(self, project_path: Path) -> List[str]:
+        """
+        FIX #7: Index original ADRs from project into references/.
+
+        Searches common ADR locations:
+        - docs/adr/
+        - documentation/adr/
+        - */docs/adr/
+        - adr/
+
+        Args:
+            project_path: Path to project root
+
+        Returns:
+            List of copied ADR file paths
+        """
+        import shutil
+
+        ref_dir = self.output_dir / "references" / "original-adrs"
+        ref_dir.mkdir(parents=True, exist_ok=True)
+
+        copied_adrs = []
+
+        # Common ADR locations
+        adr_patterns = [
+            "docs/adr/*.md",
+            "documentation/adr/*.md",
+            "*/docs/adr/*.md",
+            "adr/*.md",
+            "ADR/*.md",
+            "decisions/*.md"
+        ]
+
+        for pattern in adr_patterns:
+            for adr_file in project_path.glob(pattern):
+                if adr_file.is_file():
+                    # Copy preserving filename
+                    dest = ref_dir / adr_file.name
+                    shutil.copy2(adr_file, dest)
+                    copied_adrs.append(str(dest.relative_to(self.output_dir)))
+
+                    logger.debug(
+                        "Indexed original ADR",
+                        extra={"source": str(adr_file), "dest": str(dest)}
+                    )
+
+        if copied_adrs:
+            # Create index file
+            index_file = ref_dir / "INDEX.md"
+            index_content = f"""# Original ADRs Index
+
+**Total ADRs Found:** {len(copied_adrs)}
+**Indexed:** {datetime.utcnow().isoformat()}Z
+
+## Files
+
+"""
+            for adr in sorted(copied_adrs):
+                index_content += f"- [{Path(adr).name}]({adr})\n"
+
+            index_file.write_text(index_content)
+
+            logger.info(
+                "Original ADRs indexed",
+                extra={"count": len(copied_adrs), "ref_dir": str(ref_dir)}
+            )
+
+        return copied_adrs
 
 
 def main():

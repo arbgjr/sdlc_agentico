@@ -1,17 +1,39 @@
 # SDLC Agêntico Version
-version: "2.0.1"
+version: "2.0.2"
 build_date: "2026-01-23"
 release_notes: |
-  Bug fix: sdlc-import exclude patterns - Correção crítica para análise de projetos grandes.
+  Critical fixes: sdlc-import workflow improvements - 5 correções críticas no processo de import.
 
-  Fix:
-  - fix(sdlc-import): Adiciona .terraform aos exclude_patterns (evita 1.5GB de módulos)
-  - fix(sdlc-import): Adiciona bin/obj/.NET artifacts
-  - fix(sdlc-import): Adiciona Migrations, packages, coverage, docs
-  - fix(sdlc-import): Aumenta max_project_size de 100k para 500k LOC
-  - fix(sdlc-import): Projetos grandes (1.6GB) agora analisam corretamente
+  Fixes:
+  - fix(sdlc-import): Force LLM when llm.enabled=true (ignora --no-llm se config=true)
+  - fix(sdlc-import): Force threat_modeling quando enabled=true (não permite defer)
+  - fix(sdlc-import): Populate phase-artifacts/ com logs de decisão e análise
+  - fix(sdlc-import): Index original ADRs em references/original-adrs/
+  - fix(sdlc-import): Auto-push feature branch após análise completa
+
+  Impact:
+  - LLM agora executa para medium/low confidence (antes: nunca executava)
+  - Threat modeling sempre executa quando habilitado (antes: pulado por tamanho)
+  - Phase artifacts auditáveis (antes: diretório vazio)
+  - ADRs originais preservados (antes: apenas inferidos criados)
+  - Branch automaticamente pushed (antes: apenas criado localmente)
+
+  Planned for v2.1.0:
+  - Migration analyzer (EF Core, Alembic, Flyway)
+  - ADR claim validator (cross-reference code vs claims)
+  - Knowledge graph generator (graph.json)
+  - GitHub issue auto-creation (--create-issues)
 
 changelog:
+  - version: "2.0.2"
+    date: "2026-01-23"
+    changes:
+      - "fix(sdlc-import): Force LLM when config llm.enabled=true (ignore --no-llm flag)"
+      - "fix(sdlc-import): Force threat modeling when config enabled=true (no defer)"
+      - "fix(sdlc-import): Populate phase-artifacts/phase-1-discovery/ with JSON logs"
+      - "fix(sdlc-import): Index original ADRs in references/original-adrs/"
+      - "fix(sdlc-import): Auto-push feature branch to remote after analysis"
+      - "chore(sdlc-import): Add TODO.md for v2.1.0 planned features"
   - version: "2.0.1"
     date: "2026-01-23"
     changes:

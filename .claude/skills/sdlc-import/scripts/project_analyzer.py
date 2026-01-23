@@ -416,6 +416,94 @@ class ProjectAnalyzer:
 
             return docs
 
+    def _save_phase_artifacts(self, results: Dict) -> None:
+        """
+        FIX #3: Save phase artifacts for audit trail.
+
+        Args:
+            results: Complete analysis results
+        """
+        phase_dir = self.output_dir / "phase-artifacts" / "phase-1-discovery"
+        phase_dir.mkdir(parents=True, exist_ok=True)
+
+        # Save language detection
+        lang_file = phase_dir / "language-detection.json"
+        with open(lang_file, 'w') as f:
+            json.dump(results['language_analysis'], f, indent=2)
+
+        # Save decision extraction
+        decision_file = phase_dir / "decision-extraction.json"
+        with open(decision_file, 'w') as f:
+            json.dump(results['decisions'], f, indent=2)
+
+        # Save threat analysis
+        threat_file = phase_dir / "threat-analysis.json"
+        with open(threat_file, 'w') as f:
+            json.dump(results['threats'], f, indent=2)
+
+        # Save tech debt
+        debt_file = phase_dir / "tech-debt.json"
+        with open(debt_file, 'w') as f:
+            json.dump(results['tech_debt'], f, indent=2)
+
+        # Save complete scan results
+        scan_file = phase_dir / "directory-scan.json"
+        with open(scan_file, 'w') as f:
+            json.dump(results['scan'], f, indent=2)
+
+        logger.info(
+            "Phase artifacts saved",
+            extra={
+                "phase_dir": str(phase_dir),
+                "files_created": 5
+            }
+        )
+
+    def _push_feature_branch(self, branch_name: str) -> bool:
+        """
+        FIX #8: Auto-push feature branch to remote.
+
+        Args:
+            branch_name: Name of branch to push
+
+        Returns:
+            True if pushed successfully, False otherwise
+        """
+        try:
+            # Check if remote exists
+            result = subprocess.run(
+                ["git", "remote", "get-url", "origin"],
+                cwd=str(self.project_path),
+                capture_output=True,
+                text=True
+            )
+
+            if result.returncode != 0:
+                logger.warning("No remote 'origin' found, skipping push")
+                return False
+
+            # Push branch with upstream tracking
+            subprocess.run(
+                ["git", "push", "-u", "origin", branch_name],
+                cwd=str(self.project_path),
+                check=True,
+                capture_output=True,
+                text=True
+            )
+
+            logger.info(
+                "Feature branch pushed to remote",
+                extra={"branch": branch_name, "remote": "origin"}
+            )
+            return True
+
+        except subprocess.CalledProcessError as e:
+            logger.warning(
+                "Failed to push branch (continuing anyway)",
+                extra={"branch": branch_name, "error": str(e)}
+            )
+            return False
+
     def analyze(
         self,
         skip_threat_model: bool = False,
@@ -458,9 +546,22 @@ class ProjectAnalyzer:
             diagrams = self.generate_diagrams(language_analysis, decisions)
 
             # Step 7: Model threats (if not skipped)
-            if not skip_threat_model:
+            # FIX #2: Force threat modeling if config says enabled=true
+            threat_config_enabled = self.config.get('threat_modeling', {}).get('enabled', False)
+
+            if threat_config_enabled:
+                # Config says enabled - force execution even if user passed --skip-threat-model
+                if skip_threat_model:
+                    logger.warning(
+                        "Ignoring --skip-threat-model flag (config has threat_modeling.enabled=true)",
+                        extra={"config_enabled": threat_config_enabled}
+                    )
+                threats = self.model_threats(decisions)
+            elif not skip_threat_model:
+                # Config doesn't force it, but user didn't skip
                 threats = self.model_threats(decisions)
             else:
+                # Both config and user say skip
                 threats = {"status": "skipped"}
 
             # Step 8: Detect tech debt (if not skipped)
@@ -483,13 +584,20 @@ class ProjectAnalyzer:
                 "tech_debt": tech_debt
             }
 
+            # FIX #3: Save phase artifacts for auditability
+            self._save_phase_artifacts(results)
+
             # Step 9: Generate documentation
             documentation = self.generate_documentation(results)
             results["documentation"] = documentation
 
+            # FIX #8: Auto-push feature branch
+            push_result = self._push_feature_branch(branch_info['branch'])
+            results["branch_pushed"] = push_result
+
             logger.info(
                 "Analysis complete",
-                extra={"analysis_id": self.analysis_id}
+                extra={"analysis_id": self.analysis_id, "branch_pushed": push_result}
             )
 
             return results

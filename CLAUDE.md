@@ -1114,9 +1114,10 @@ git commit -m "fix: critical issue"
 
 ## Version History Quick Reference
 
-**Current Version**: v2.0.1 (sdlc-import Bug Fix)
+**Current Version**: v2.0.2 (sdlc-import Workflow Fixes)
 
 **Recent Releases**:
+- v2.0.2 (2026-01-23): sdlc-import critical workflow fixes (LLM, threat model, artifacts, ADR index, auto-push)
 - v2.0.1 (2026-01-23): sdlc-import exclude patterns fix (.terraform, IaC artifacts)
 - v2.0.0 (2026-01-23): Language Detection Expansion (30 technologies, sdlc-import)
 - v1.9.0 (2026-01-23): Document Enrichment System
