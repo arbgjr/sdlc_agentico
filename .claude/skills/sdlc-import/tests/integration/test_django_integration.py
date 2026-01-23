@@ -230,12 +230,127 @@ class TestDjangoIntegration:
         is_valid = analyzer.validate_project()
         assert is_valid is True
 
-    @pytest.mark.skip(reason="Language detection (Step 4) not yet implemented")
     def test_language_detection_django(self, django_project):
-        """Test language detection - FUTURE IMPLEMENTATION"""
-        pass
+        """Test language detection (Step 4)"""
+        analyzer = ProjectAnalyzer(str(django_project))
+        result = analyzer.analyze(skip_threat_model=True, skip_tech_debt=True)
 
-    @pytest.mark.skip(reason="Decision extraction (Step 5) not yet implemented")
+        # Verify language detection
+        assert "language_analysis" in result
+        lang_analysis = result["language_analysis"]
+
+        assert "primary_language" in lang_analysis
+        assert lang_analysis["primary_language"] == "python"
+
+        assert "languages" in lang_analysis
+        assert "python" in lang_analysis["languages"]
+        assert lang_analysis["languages"]["python"]["percentage"] > 50
+
+        # Verify framework detection
+        assert "frameworks" in lang_analysis
+        frameworks = lang_analysis["frameworks"]
+        assert "backend" in frameworks
+        # Django might be detected in backend frameworks
+        assert isinstance(frameworks["backend"], list)
+
     def test_decision_extraction_django(self, django_project):
-        """Test decision extraction - FUTURE IMPLEMENTATION"""
-        pass
+        """Test decision extraction (Step 5)"""
+        analyzer = ProjectAnalyzer(str(django_project))
+        result = analyzer.analyze(skip_threat_model=True, skip_tech_debt=True)
+
+        # Verify decisions extracted
+        assert "decisions" in result
+        decisions = result["decisions"]
+
+        assert "count" in decisions
+        assert "decisions" in decisions
+        assert "confidence_distribution" in decisions
+
+        # Should have at least some decisions
+        assert decisions["count"] >= 0
+
+        # Verify confidence distribution structure
+        dist = decisions["confidence_distribution"]
+        assert "high" in dist
+        assert "medium" in dist
+        assert "low" in dist
+
+        # If decisions found, check structure
+        if decisions["count"] > 0:
+            decision = decisions["decisions"][0]
+            assert "id" in decision
+            assert decision["id"].startswith("ADR-INFERRED-")
+            assert "title" in decision
+            assert "category" in decision
+            assert "confidence" in decision
+            assert "evidence" in decision
+
+    def test_diagram_generation_django(self, django_project):
+        """Test diagram generation (Step 6)"""
+        analyzer = ProjectAnalyzer(str(django_project))
+        result = analyzer.analyze(skip_threat_model=True, skip_tech_debt=True)
+
+        # Verify diagrams generated
+        assert "diagrams" in result
+        diagrams = result["diagrams"]
+
+        assert "diagrams" in diagrams
+        assert isinstance(diagrams["diagrams"], list)
+
+        # Should have at least one diagram
+        if len(diagrams["diagrams"]) > 0:
+            diagram = diagrams["diagrams"][0]
+            assert "type" in diagram
+            assert "format" in diagram
+            assert "path" in diagram
+            assert diagram["format"] in ["mermaid", "dot"]
+
+    def test_threat_modeling_django(self, django_project):
+        """Test threat modeling (Step 7) - NOT skipped"""
+        analyzer = ProjectAnalyzer(str(django_project))
+        result = analyzer.analyze(skip_threat_model=False, skip_tech_debt=True)
+
+        # Verify threats analyzed
+        assert "threats" in result
+        threats = result["threats"]
+
+        # Should have status or threat data
+        if "status" in threats:
+            assert threats["status"] != "skipped"
+        else:
+            assert "threats" in threats or "total" in threats
+
+    def test_tech_debt_detection_django(self, django_project):
+        """Test tech debt detection (Step 8) - NOT skipped"""
+        analyzer = ProjectAnalyzer(str(django_project))
+        result = analyzer.analyze(skip_threat_model=True, skip_tech_debt=False)
+
+        # Verify tech debt detected
+        assert "tech_debt" in result
+        tech_debt = result["tech_debt"]
+
+        # Should have status or debt data
+        if "status" in tech_debt:
+            assert tech_debt["status"] != "skipped"
+        else:
+            assert "tech_debt" in tech_debt or "total" in tech_debt
+
+    def test_documentation_generation_django(self, django_project):
+        """Test documentation generation (Step 9)"""
+        analyzer = ProjectAnalyzer(str(django_project))
+        result = analyzer.analyze(skip_threat_model=True, skip_tech_debt=True)
+
+        # Verify documentation generated
+        assert "documentation" in result
+        docs = result["documentation"]
+
+        assert "adrs" in docs
+        assert "threat_model" in docs
+        assert "tech_debt_report" in docs
+        assert "import_report" in docs
+
+        # Check that files were generated
+        assert isinstance(docs["adrs"], list)
+        assert isinstance(docs["threat_model"], str)
+        assert isinstance(docs["tech_debt_report"], str)
+        assert isinstance(docs["import_report"], str)

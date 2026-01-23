@@ -17,12 +17,13 @@ Thresholds:
 
 import sys
 import logging
+from pathlib import Path
 from typing import Dict, List, Any
 from dataclasses import dataclass
 from enum import Enum
 
-# Add logging utilities
-sys.path.insert(0, '.claude/lib/python')
+# Add logging utilities (absolute path from project root)
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "lib/python"))
 from sdlc_logging import get_logger
 
 logger = get_logger(__name__, skill="sdlc-import", phase=0)

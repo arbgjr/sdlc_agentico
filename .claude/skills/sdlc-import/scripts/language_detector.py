@@ -30,7 +30,8 @@ from collections import defaultdict
 import yaml
 
 # Add logging utilities
-sys.path.insert(0, '.claude/lib/python')
+# Add logging utilities (absolute path from project root)
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "lib/python"))
 from sdlc_logging import get_logger, log_operation
 
 logger = get_logger(__name__, skill="sdlc-import", phase=0)

@@ -27,9 +27,17 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 import yaml
 
-# Add logging utilities
-sys.path.insert(0, '.claude/lib/python')
+# Add logging utilities (absolute path from project root)
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "lib/python"))
 from sdlc_logging import get_logger, log_operation
+
+# Import analysis components
+from language_detector import LanguageDetector
+from decision_extractor import DecisionExtractor
+from architecture_visualizer import ArchitectureVisualizer
+from threat_modeler import ThreatModeler
+from tech_debt_detector import TechDebtDetector
+from documentation_generator import DocumentationGenerator
 
 logger = get_logger(__name__, skill="sdlc-import", phase=0)
 
@@ -49,6 +57,14 @@ class ProjectAnalyzer:
         self.config = self._load_config(config_path)
         self.output_dir = self.project_path / self.config['general']['output_dir']
         self.analysis_id = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+
+        # Initialize analysis components
+        self.language_detector = LanguageDetector(self.config)
+        self.decision_extractor = DecisionExtractor(self.config)
+        self.architecture_visualizer = ArchitectureVisualizer(self.config)
+        self.threat_modeler = ThreatModeler(self.config)
+        self.tech_debt_detector = TechDebtDetector(self.config)
+        self.documentation_generator = DocumentationGenerator(self.config)
 
         logger.info(
             "Initialized ProjectAnalyzer",
@@ -258,6 +274,148 @@ class ProjectAnalyzer:
 
             return scan_results
 
+    def detect_languages(self) -> Dict:
+        """
+        Detect programming languages and frameworks.
+
+        Returns:
+            Dict with language analysis results
+        """
+        with log_operation("detect_languages", logger):
+            language_analysis = self.language_detector.detect(self.project_path)
+
+            logger.info(
+                "Language detection complete",
+                extra={
+                    "primary_language": language_analysis.get("primary_language"),
+                    "languages_count": len(language_analysis.get("languages", {}))
+                }
+            )
+
+            return language_analysis
+
+    def extract_decisions(self, language_analysis: Dict, no_llm: bool = False) -> Dict:
+        """
+        Extract architecture decisions from codebase.
+
+        Args:
+            language_analysis: Language detection results
+            no_llm: Disable LLM synthesis
+
+        Returns:
+            Dict with extracted decisions
+        """
+        with log_operation("extract_decisions", logger):
+            decisions = self.decision_extractor.extract(
+                self.project_path,
+                language_analysis,
+                no_llm=no_llm
+            )
+
+            logger.info(
+                "Decision extraction complete",
+                extra={
+                    "decisions_count": decisions.get("count", 0),
+                    "high_confidence": decisions.get("high_confidence", 0)
+                }
+            )
+
+            return decisions
+
+    def generate_diagrams(self, language_analysis: Dict, decisions: Dict) -> Dict:
+        """
+        Generate architecture diagrams.
+
+        Args:
+            language_analysis: Language detection results
+            decisions: Extracted decisions
+
+        Returns:
+            Dict with diagram paths
+        """
+        with log_operation("generate_diagrams", logger):
+            diagrams = self.architecture_visualizer.generate(
+                self.project_path,
+                language_analysis,
+                decisions
+            )
+
+            logger.info(
+                "Diagram generation complete",
+                extra={"diagrams_count": len(diagrams.get("diagrams", {}))}
+            )
+
+            return diagrams
+
+    def model_threats(self, decisions: Dict) -> Dict:
+        """
+        Perform STRIDE threat modeling.
+
+        Args:
+            decisions: Extracted decisions
+
+        Returns:
+            Dict with threat analysis
+        """
+        with log_operation("model_threats", logger):
+            threats = self.threat_modeler.analyze(self.project_path, decisions)
+
+            logger.info(
+                "Threat modeling complete",
+                extra={
+                    "threats_count": threats.get("total", 0),
+                    "critical": threats.get("critical", 0),
+                    "high": threats.get("high", 0)
+                }
+            )
+
+            return threats
+
+    def detect_tech_debt(self) -> Dict:
+        """
+        Detect technical debt.
+
+        Returns:
+            Dict with tech debt analysis
+        """
+        with log_operation("detect_tech_debt", logger):
+            tech_debt = self.tech_debt_detector.scan(self.project_path)
+
+            logger.info(
+                "Tech debt detection complete",
+                extra={
+                    "total": tech_debt.get("total", 0),
+                    "p0": tech_debt.get("p0", 0),
+                    "p1": tech_debt.get("p1", 0)
+                }
+            )
+
+            return tech_debt
+
+    def generate_documentation(self, analysis_results: Dict) -> Dict:
+        """
+        Generate SDLC documentation.
+
+        Args:
+            analysis_results: Complete analysis results
+
+        Returns:
+            Dict with generated file paths
+        """
+        with log_operation("generate_documentation", logger):
+            docs = self.documentation_generator.generate(analysis_results)
+
+            logger.info(
+                "Documentation generation complete",
+                extra={
+                    "adrs_count": len(docs.get("adrs", [])),
+                    "threat_model": docs.get("threat_model"),
+                    "tech_debt_report": docs.get("tech_debt_report")
+                }
+            )
+
+            return docs
+
     def analyze(
         self,
         skip_threat_model: bool = False,
@@ -290,39 +448,44 @@ class ProjectAnalyzer:
             # Step 3: Scan directory
             scan_results = self.scan_directory()
 
-            # TODO: Implement remaining steps when components are ready
             # Step 4: Detect languages
-            # language_analysis = self.detect_languages()
+            language_analysis = self.detect_languages()
 
             # Step 5: Extract decisions
-            # decisions = self.extract_decisions(no_llm=no_llm)
+            decisions = self.extract_decisions(language_analysis, no_llm=no_llm)
 
             # Step 6: Generate diagrams
-            # diagrams = self.generate_diagrams(language_analysis, decisions)
+            diagrams = self.generate_diagrams(language_analysis, decisions)
 
-            # Step 7: Model threats
-            # threats = self.model_threats(decisions) if not skip_threat_model else {}
+            # Step 7: Model threats (if not skipped)
+            if not skip_threat_model:
+                threats = self.model_threats(decisions)
+            else:
+                threats = {"status": "skipped"}
 
-            # Step 8: Detect tech debt
-            # tech_debt = self.detect_tech_debt() if not skip_tech_debt else {}
+            # Step 8: Detect tech debt (if not skipped)
+            if not skip_tech_debt:
+                tech_debt = self.detect_tech_debt()
+            else:
+                tech_debt = {"status": "skipped"}
 
-            # Step 9: Generate documentation
-            # docs = self.generate_documentation(...)
-
-            # For now, return skeleton results
+            # Build complete results before documentation generation
             results = {
                 "analysis_id": self.analysis_id,
                 "timestamp": datetime.utcnow().isoformat() + "Z",
                 "project_path": str(self.project_path),
                 "branch": branch_info,
                 "scan": scan_results,
-                "language_analysis": {"status": "pending"},
-                "decisions": {"status": "pending"},
-                "diagrams": {"status": "pending"},
-                "threats": {"status": "skipped" if skip_threat_model else "pending"},
-                "tech_debt": {"status": "skipped" if skip_tech_debt else "pending"},
-                "documentation": {"status": "pending"}
+                "language_analysis": language_analysis,
+                "decisions": decisions,
+                "diagrams": diagrams,
+                "threats": threats,
+                "tech_debt": tech_debt
             }
+
+            # Step 9: Generate documentation
+            documentation = self.generate_documentation(results)
+            results["documentation"] = documentation
 
             logger.info(
                 "Analysis complete",

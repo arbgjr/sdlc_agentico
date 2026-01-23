@@ -1,0 +1,25 @@
+category: authentication
+confidence: 0.49333333333333335
+confidence_breakdown:
+  consistency: 0.417
+  evidence_quality: 0.8
+  evidence_quantity: 0.3
+  llm_bonus: 0.0
+confidence_level: low
+date: '2026-01-23T17:21:23.098104Z'
+decision: Use Session for authentication
+evidence:
+- file: myproject/settings.py
+  line: 12
+  pattern: django\.contrib\.sessions|express-session
+  quality: 0.8
+  source: pattern
+evidence_count: 1
+id: ADR-INFERRED-002
+needs_validation: true
+rationale: Session appears to be used for authentication. Evidence suggests this decision
+  was made to address specific requirements. [LLM synthesis would provide deeper analysis
+  here]
+status: inferred
+synthesized_by: llm
+title: Use Session as Authentication Method

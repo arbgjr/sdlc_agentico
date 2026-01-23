@@ -16,7 +16,8 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 import yaml
 
-sys.path.insert(0, '.claude/lib/python')
+# Add logging utilities (absolute path from project root)
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "lib/python"))
 from sdlc_logging import get_logger, log_operation
 
 # Import confidence scorer

@@ -1,0 +1,30 @@
+category: caching
+confidence: 0.6066666666666668
+confidence_breakdown:
+  consistency: 0.583
+  evidence_quality: 0.85
+  evidence_quantity: 0.5
+  llm_bonus: 0.0
+confidence_level: medium
+date: '2026-01-23T17:21:23.103605Z'
+decision: Use Redis for caching
+evidence:
+- file: requirements.txt
+  line: 3
+  pattern: redis|aioredis|hiredis
+  quality: 0.9
+  source: pattern
+- file: myproject/settings.py
+  line: 29
+  pattern: REDIS_URL|CACHE_BACKEND.*redis
+  quality: 0.8
+  source: pattern
+evidence_count: 2
+id: ADR-INFERRED-003
+needs_validation: true
+rationale: Redis appears to be used for caching. Evidence suggests this decision was
+  made to address specific requirements. [LLM synthesis would provide deeper analysis
+  here]
+status: inferred
+synthesized_by: llm
+title: Use Redis as Caching Strategy

@@ -1,0 +1,30 @@
+category: database
+confidence: 0.6466666666666667
+confidence_breakdown:
+  consistency: 0.583
+  evidence_quality: 0.95
+  evidence_quantity: 0.5
+  llm_bonus: 0.0
+confidence_level: medium
+date: '2026-01-23T17:21:23.095867Z'
+decision: Use Postgresql for database
+evidence:
+- file: myproject/settings.py
+  line: 17
+  pattern: django\.db\.backends\.postgresql
+  quality: 1.0
+  source: pattern
+- file: requirements.txt
+  line: 2
+  pattern: psycopg2|asyncpg
+  quality: 0.9
+  source: pattern
+evidence_count: 2
+id: ADR-INFERRED-001
+needs_validation: true
+rationale: Postgresql appears to be used for database. Evidence suggests this decision
+  was made to address specific requirements. [LLM synthesis would provide deeper analysis
+  here]
+status: inferred
+synthesized_by: llm
+title: Use Postgresql as Primary Database
