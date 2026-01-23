@@ -368,8 +368,8 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 ```
 .claude/
 ├── agents/           # 36 agentes especializados (32 + 4 consultivos)
-├── skills/           # 23 skills reutilizáveis
-├── commands/         # 20 comandos do usuário
+├── skills/           # 27 skills reutilizáveis
+├── commands/         # 22 comandos do usuário
 ├── hooks/            # 18 hooks de automação
 ├── lib/              # Bibliotecas compartilhadas (v1.7.0)
 │   ├── python/       # sdlc_logging.py, sdlc_tracing.py
