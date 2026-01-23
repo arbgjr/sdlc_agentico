@@ -146,7 +146,7 @@ jobs:
         uses: schneegans/dynamic-badges-action@v1.7.0
         if: github.ref == 'refs/heads/main'
         with:
-          auth: ${{ secrets.GITHUB_TOKEN }}
+          auth: ${{ secrets.GIST_SECRET }}
           gistID: 679b9b3ca43676d5b33f13ce918ee67f
           filename: sdlc-agentico-tests.json
           label: tests
