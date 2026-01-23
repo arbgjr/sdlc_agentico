@@ -336,7 +336,7 @@ def main():
     parser = argparse.ArgumentParser(description="Worker Automation Loop")
     parser.add_argument(
         "--project",
-        default="mice_dolphins",
+        default="sdlc_agentico",
         help="Project name"
     )
     parser.add_argument(

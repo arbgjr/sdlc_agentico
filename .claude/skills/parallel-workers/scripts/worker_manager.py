@@ -274,7 +274,7 @@ def main():
     parser = argparse.ArgumentParser(description="Worker Manager")
     parser.add_argument(
         "--project",
-        default="mice_dolphins",
+        default="sdlc_agentico",
         help="Project name"
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
