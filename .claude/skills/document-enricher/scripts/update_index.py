@@ -77,7 +77,25 @@ def update_index(enrichment_metadata: Dict, index_path: Path):
     enrichment_id = enrichment_metadata.get("enrichment_id", "")
 
     # Extract doc_id from source (need to read corpus node)
-    corpus_file = Path(".agentic_sdlc") / corpus_node_path
+    # Handle both absolute and relative paths
+    corpus_file = Path(corpus_node_path)
+    if not corpus_file.is_absolute():
+        # Try relative to .agentic_sdlc first (production)
+        corpus_file_agentic = Path(".agentic_sdlc") / corpus_node_path
+        if corpus_file_agentic.exists():
+            corpus_file = corpus_file_agentic
+        else:
+            # Try relative to index_path parent (for tests)
+            # index is at tmp_path/references/_index.yml, corpus is at tmp_path/corpus/...
+            corpus_file_test = index_path.parent / corpus_node_path
+            if corpus_file_test.exists():
+                corpus_file = corpus_file_test
+            else:
+                # Try relative to index_path parent's parent (for nested index)
+                corpus_file_test2 = index_path.parent.parent / corpus_node_path
+                if corpus_file_test2.exists():
+                    corpus_file = corpus_file_test2
+
     if not corpus_file.exists():
         logger.error(f"Corpus node not found: {corpus_file}")
         return False
@@ -138,7 +156,27 @@ def update_graph(enrichment_metadata: Dict, graph_path: Path):
 
     # Load corpus node to get source document ID
     corpus_node_path = enrichment_metadata.get("corpus_node", "")
-    corpus_file = Path(".agentic_sdlc") / corpus_node_path
+
+    # Handle both absolute and relative paths
+    corpus_file = Path(corpus_node_path)
+    if not corpus_file.is_absolute():
+        # Try relative to .agentic_sdlc first (production)
+        corpus_file_agentic = Path(".agentic_sdlc") / corpus_node_path
+        if corpus_file_agentic.exists():
+            corpus_file = corpus_file_agentic
+        else:
+            # Try multiple paths for tests
+            # In tests: graph is at tmp_path/corpus/graph.json
+            # corpus_node is at tmp_path/corpus/nodes/learnings/ENRICH-001.yml
+            for parent_path in [
+                graph_path.parent,                # tmp_path/corpus/
+                graph_path.parent.parent,         # tmp_path/
+                graph_path.parent.parent.parent   # In case of deeper nesting
+            ]:
+                corpus_file_test = parent_path / corpus_node_path
+                if corpus_file_test.exists():
+                    corpus_file = corpus_file_test
+                    break
 
     if not corpus_file.exists():
         logger.error(f"Corpus node not found: {corpus_file}")

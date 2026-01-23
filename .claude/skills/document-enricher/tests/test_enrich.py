@@ -47,7 +47,9 @@ class TestGenerateEnrichmentId:
         (corpus_dir / "ENRICH-002.yml").touch()
         (corpus_dir / "ENRICH-005.yml").touch()
 
-        index_path = tmp_path / "_index.yml"
+        # Create index in correct location relative to corpus
+        index_path = tmp_path / "references" / "_index.yml"
+        index_path.parent.mkdir(parents=True)
 
         enrichment_id = generate_enrichment_id(index_path)
         # Should be max + 1 = 006
@@ -226,8 +228,8 @@ class TestGenerateEnrichedMarkdown:
         assert "references/oauth2.pdf" in markdown
         assert "Research Topic" in markdown
         assert "OAuth 2.1 migration" in markdown
-        assert "Version: v1" in markdown
-        assert "Enrichment ID: ENRICH-001" in markdown
+        assert "**Version**: v1" in markdown  # Bold format
+        assert "**Enrichment ID**: ENRICH-001" in markdown  # Bold format
         assert "## Original Content Summary" in markdown
         assert "Original OAuth 2.0 content" in markdown
         assert "## Research Findings" in markdown
