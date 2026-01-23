@@ -79,7 +79,7 @@ class LanguageDetector:
         Returns:
             Dict with language analysis
         """
-        with log_operation(logger, "detect_languages"):
+        with log_operation("detect_languages", logger):
             # Step 1: Count files by extension
             file_stats = self._count_files_by_extension(project_path)
 
@@ -263,8 +263,10 @@ class LanguageDetector:
                     with open(file, 'r', encoding='utf-8', errors='ignore') as f:
                         content = f.read()
                         if re.search(pattern, content):
+                            logger.debug(f"Pattern '{pattern}' found in {file.name}")
                             return True
-                except Exception:
+                except Exception as e:
+                    logger.debug(f"Error checking {file}: {e}")
                     continue
 
         return False
@@ -334,21 +336,41 @@ class LanguageDetector:
         return lsp_results
 
     def _calculate_confidence(self, language_stats: Dict, frameworks: Dict) -> float:
-        """Calculate overall detection confidence"""
+        """
+        Calculate overall detection confidence.
+
+        Realistic thresholds:
+        - 1 primary language = base 0.5 confidence
+        - 1+ framework = +0.2
+        - 2+ frameworks = +0.3
+        - Testing/DevOps tools = +0.1 each
+        """
         if not language_stats:
             return 0.0
 
-        # Base confidence from language detection
-        lang_confidence = min(len(language_stats) / 3.0, 1.0)  # 1-3 languages = full confidence
+        # Base confidence from primary language (50%)
+        lang_confidence = 0.5
 
-        # Framework detection bonus
+        # Multiple languages bonus (up to +0.2)
+        if len(language_stats) >= 2:
+            lang_confidence += 0.2
+        elif len(language_stats) >= 3:
+            lang_confidence = 1.0
+
+        # Framework detection bonus (up to +0.3)
         framework_count = sum(len(f) for f in frameworks.values())
-        framework_confidence = min(framework_count / 5.0, 1.0)  # 5+ frameworks = full bonus
+        if framework_count >= 1:
+            lang_confidence += 0.2
+        if framework_count >= 2:
+            lang_confidence += 0.1
 
-        # Weighted average
-        confidence = 0.7 * lang_confidence + 0.3 * framework_confidence
+        # Testing/DevOps bonus (up to +0.1)
+        if frameworks.get('testing'):
+            lang_confidence += 0.05
+        if any(len(frameworks.get(k, [])) > 0 for k in ['database', 'cache', 'messaging']):
+            lang_confidence += 0.05
 
-        return round(confidence, 3)
+        return round(min(lang_confidence, 1.0), 3)
 
 
 def main():

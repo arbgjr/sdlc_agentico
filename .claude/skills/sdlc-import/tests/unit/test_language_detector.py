@@ -58,10 +58,11 @@ class TestLanguageDetector:
 
     def test_detect_javascript_react(self, config, temp_project):
         """Test JavaScript/React detection"""
-        # Create JS files
+        # Create JS files (need 3+ for min_files threshold)
         create_file(temp_project / "package.json", '{"dependencies": {"react": "^18.0.0", "react-dom": "^18.0.0"}}')
         create_file(temp_project / "src/App.js", "import React from 'react';\n\nfunction App() {\n  return <div>Hello</div>;\n}")
         create_file(temp_project / "src/index.js", "import React from 'react';\nimport ReactDOM from 'react-dom';\nimport App from './App';")
+        create_file(temp_project / "src/components/Header.js", "import React from 'react';\nexport const Header = () => <header>Header</header>;")
 
         detector = LanguageDetector(config)
         result = detector.detect(temp_project)
@@ -72,8 +73,11 @@ class TestLanguageDetector:
 
     def test_detect_typescript_angular(self, config, temp_project):
         """Test TypeScript/Angular detection"""
+        # Create TS files (need 3+ for min_files threshold)
         create_file(temp_project / "package.json", '{"dependencies": {"@angular/core": "^15.0.0"}}')
         create_file(temp_project / "src/app.component.ts", "import { Component } from '@angular/core';\n\n@Component({\n  selector: 'app-root',\n  template: '<h1>Hello</h1>'\n})\nexport class AppComponent {}")
+        create_file(temp_project / "src/app.module.ts", "import { NgModule } from '@angular/core';\n\n@NgModule({\n  declarations: []\n})\nexport class AppModule {}")
+        create_file(temp_project / "src/main.ts", "import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';")
 
         detector = LanguageDetector(config)
         result = detector.detect(temp_project)
@@ -83,6 +87,7 @@ class TestLanguageDetector:
 
     def test_detect_java_spring(self, config, temp_project):
         """Test Java/Spring detection"""
+        # Create Java files (need 3+ for min_files threshold)
         create_file(temp_project / "pom.xml", """
             <project>
                 <dependencies>
@@ -102,6 +107,20 @@ class TestLanguageDetector:
                 public static void main(String[] args) {
                     SpringApplication.run(App.class, args);
                 }
+            }
+        """)
+        create_file(temp_project / "src/main/java/Controller.java", """
+            import org.springframework.web.bind.annotation.RestController;
+
+            @RestController
+            public class Controller {
+            }
+        """)
+        create_file(temp_project / "src/main/java/Service.java", """
+            import org.springframework.stereotype.Service;
+
+            @Service
+            public class Service {
             }
         """)
 
@@ -190,10 +209,11 @@ class TestLanguageDetector:
 
     def test_confidence_calculation(self, config, temp_project):
         """Test confidence score calculation"""
-        # Create well-defined project
+        # Create well-defined project (need 3+ JS files for min_files threshold)
         create_file(temp_project / "package.json", '{"dependencies": {"react": "^18.0.0", "express": "^4.18.0"}}')
         create_file(temp_project / "src/App.js", "import React from 'react';")
         create_file(temp_project / "server.js", "const express = require('express');")
+        create_file(temp_project / "routes/api.js", "module.exports = router;")
         create_file(temp_project / "Dockerfile", "FROM node:18")
 
         detector = LanguageDetector(config)
