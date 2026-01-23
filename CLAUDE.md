@@ -33,6 +33,8 @@ SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orc
 - Structured logging with Loki/Tempo/Grafana integration (v1.7.0)
 - Python and Shell logging utilities with correlation IDs (v1.7.0)
 - Pre-configured Grafana dashboard for SDLC observability (v1.7.0)
+- Professional documentation generator with SDLC signature (v1.8.1)
+- Auto-detection of languages, frameworks, and project structure (v1.8.1)
 
 ## Setup Commands
 
@@ -260,6 +262,7 @@ Available skills for automation:
 | `github-projects` | GitHub Projects V2 management via GraphQL API (v1.6.0) |
 | `github-wiki` | GitHub Wiki synchronization via Git (v1.6.0) |
 | `parallel-workers` | Parallel task execution using git worktrees (v2.0) |
+| `doc-generator` | Generates CLAUDE.md and README.md with SDLC Agêntico signature (v1.8.1) |
 
 ## New Skills (v2.0) - Claude Orchestrator Integration
 
@@ -698,6 +701,67 @@ GitHub Wiki synchronization:
 - Phase 0: Creates Project V2 + Milestone
 - Phase transitions: Updates Project fields
 - Phase 7: Closes Milestone + Syncs Wiki
+
+## New Skills (v1.8.1) - Documentation Generation
+
+### doc-generator
+
+Automatically generates professional documentation for projects by analyzing the codebase:
+
+```bash
+# Generate CLAUDE.md and README.md
+/doc-generate
+
+# Or run script directly
+python3 .claude/skills/doc-generator/scripts/generate_docs.py
+
+# Force overwrite existing files
+python3 .claude/skills/doc-generator/scripts/generate_docs.py --force
+
+# Generate in specific directory
+python3 .claude/skills/doc-generator/scripts/generate_docs.py --output-dir /path/to/project
+```
+
+**What it Generates:**
+- `CLAUDE.md` - Guidance for Claude Code with tech stack, architecture, directory structure, development workflow
+- `README.md` - Project documentation with features, tech stack, getting started, usage, deployment
+- **SDLC Agêntico Signature** - Both files include: `🤖 Generated with SDLC Agêntico by @arbgjr`
+
+**Automatic Detection:**
+- **Languages**: Python, JavaScript, TypeScript, Java, C#, Go, Rust, Ruby (by file extensions)
+- **Frameworks**: Django, Flask, FastAPI, React, Next.js, Vue, Angular, Express, .NET, Maven, Gradle
+- **Project Structure**: Directory tree (max 3 levels, excludes node_modules, .git, venv, etc.)
+- **Tests**: Test files and directories (pytest, jest, mocha patterns)
+- **Docker**: Dockerfile presence
+- **CI/CD**: GitHub Actions workflows
+
+**Language-Specific Commands:**
+The generator provides smart defaults based on detected stack:
+
+| Stack | Install | Run | Test |
+|-------|---------|-----|------|
+| **Python/Django** | `pip install -r requirements.txt` | `python manage.py runserver` | `pytest` |
+| **Python/Flask** | `pip install -r requirements.txt` | `python main.py` | `pytest` |
+| **Node.js/React** | `npm install` | `npm start` | `npm test` |
+| **Java/Maven** | `mvn install` | - | `mvn test` |
+
+**Integration with Orchestrator:**
+- **Phase 0 (Intake)**: Generate initial docs for new projects
+- **Phase 7 (Release)**: Update docs before release with latest stack changes
+- **On-Demand**: Via `/doc-generate` command anytime
+
+**Template Customization:**
+Templates are located in `.claude/skills/doc-generator/templates/`:
+- `CLAUDE.md.template` - Claude Code guidance template
+- `README.md.template` - Project README template
+
+Use `{{placeholder}}` syntax for variable substitution. Generated docs are starting points - always review and enhance with project-specific details.
+
+**Post-Generation Workflow:**
+1. Review generated files for accuracy
+2. Customize placeholders (features list, usage examples)
+3. Add project-specific architecture diagrams or API docs
+4. Commit with: `docs: generate CLAUDE.md and README.md with SDLC signature`
 
 ## New Agents (v2.0)
 

@@ -229,7 +229,8 @@
       "github-sync",
       "github-projects",
       "github-wiki",
-      "alignment-workflow"
+      "alignment-workflow",
+      "doc-generator"
     ]
   },
   "sdlc": {

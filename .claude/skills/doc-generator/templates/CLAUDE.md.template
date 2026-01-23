@@ -1,0 +1,89 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code when working with code in this repository.
+
+## Project Overview
+
+{{project_name}} - {{project_description}}
+
+**Key Technologies:**
+{{technologies}}
+
+**Main Components:**
+{{components}}
+
+## Architecture
+
+{{architecture_description}}
+
+### Directory Structure
+```
+{{directory_structure}}
+```
+
+## Development Setup
+
+### Prerequisites
+
+{{prerequisites}}
+
+### Installation
+
+```bash
+{{installation_commands}}
+```
+
+### Configuration
+
+{{configuration_instructions}}
+
+## Development Workflow
+
+### Running the Application
+
+```bash
+{{run_commands}}
+```
+
+### Running Tests
+
+```bash
+{{test_commands}}
+```
+
+### Building for Production
+
+```bash
+{{build_commands}}
+```
+
+## Code Standards
+
+### File Organization
+{{file_organization}}
+
+### Naming Conventions
+{{naming_conventions}}
+
+### Code Style
+{{code_style}}
+
+## Testing Strategy
+
+{{testing_strategy}}
+
+## Deployment
+
+{{deployment_instructions}}
+
+## Common Tasks
+
+{{common_tasks}}
+
+## Troubleshooting
+
+{{troubleshooting_tips}}
+
+---
+
+🤖 *Generated with [SDLC Agêntico](https://github.com/arbgjr/sdlc_agentico) by [@arbgjr](https://github.com/arbgjr)*

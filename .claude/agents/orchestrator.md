@@ -48,6 +48,7 @@ skills:
   - github-projects
   - github-wiki
   - github-sync
+  - doc-generator
 ---
 
 # Orchestrator Agent
@@ -371,18 +372,60 @@ python3 .claude/skills/github-projects/scripts/project_manager.py update-field \
 Ao aprovar gate de release:
 
 ```bash
-# 1. Fechar Milestone do sprint atual
+# 1. Gerar documentacao profissional (se nao existir ou precisar atualizar)
+python3 .claude/skills/doc-generator/scripts/generate_docs.py
+
+# 2. Fechar Milestone do sprint atual
 python3 .claude/skills/github-sync/scripts/milestone_sync.py close \
   --title "{current_sprint}"
 
-# 2. Sincronizar documentacao com Wiki
+# 3. Sincronizar documentacao com Wiki
 .claude/skills/github-wiki/scripts/wiki_sync.sh
 
-# 3. Se tag existir, criar GitHub Release
+# 4. Se tag existir, criar GitHub Release
 gh release create v{version} \
   --title "Release v{version}" \
   --notes-file CHANGELOG.md
 ```
+
+### Geracao de Documentacao (doc-generator)
+
+**Quando Gerar:**
+- Inicio de novo projeto (Phase 0 ou 1)
+- Antes de release (Phase 7)
+- Mudancas significativas na stack tecnologica
+- Sob demanda via `/doc-generate`
+
+**O que Gera:**
+- `CLAUDE.md` - Guia para Claude Code com stack, arquitetura, comandos
+- `README.md` - Documentacao do projeto com features, instalacao, uso
+- **Assinatura automatica**: `🤖 Generated with SDLC Agêntico by @arbgjr`
+
+**Deteccao Automatica:**
+- Linguagens (Python, JS, TS, Java, C#, Go, Rust, Ruby)
+- Frameworks (Django, Flask, React, Next.js, Vue, Angular, Express, .NET)
+- Estrutura de diretorios (arvore de ate 3 niveis)
+- Testes (detecta test files e test directories)
+- Docker (detecta Dockerfile)
+- CI/CD (detecta GitHub Actions)
+
+**Invocacao:**
+```bash
+# Via comando direto
+python3 .claude/skills/doc-generator/scripts/generate_docs.py
+
+# Forcar sobrescrita de arquivos existentes
+python3 .claude/skills/doc-generator/scripts/generate_docs.py --force
+
+# Gerar em diretorio especifico
+python3 .claude/skills/doc-generator/scripts/generate_docs.py --output-dir /path/to/project
+```
+
+**Pos-Geracao:**
+- Revisar arquivos gerados
+- Customizar placeholders (features, exemplos de uso)
+- Adicionar detalhes especificos do projeto
+- Commit com mensagem: `docs: generate CLAUDE.md and README.md with SDLC signature`
 
 ### Mapeamento Fase -> Coluna do Project
 
@@ -403,6 +446,7 @@ gh release create v{version} \
 - `/wiki-sync` - Sincronizar docs com Wiki manualmente
 - `/sdlc-create-issues` - Criar issues das tasks
 - `/parallel-spawn` - Spawn parallel workers (Phase 5, Complexity 2+)
+- `/doc-generate` - Gerar CLAUDE.md e README.md com assinatura SDLC Agêntico
 
 ## Parallel Workers (v2.0)
 

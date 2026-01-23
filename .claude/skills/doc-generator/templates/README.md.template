@@ -1,0 +1,93 @@
+# {{project_name}}
+
+{{project_tagline}}
+
+## Overview
+
+{{project_overview}}
+
+## Features
+
+{{features_list}}
+
+## Tech Stack
+
+{{tech_stack}}
+
+## Getting Started
+
+### Prerequisites
+
+{{prerequisites}}
+
+### Installation
+
+```bash
+{{installation_steps}}
+```
+
+### Configuration
+
+{{configuration_steps}}
+
+### Running the Application
+
+```bash
+{{run_steps}}
+```
+
+## Usage
+
+{{usage_examples}}
+
+## API Documentation
+
+{{api_documentation}}
+
+## Architecture
+
+{{architecture_diagram}}
+
+{{architecture_description}}
+
+## Development
+
+### Project Structure
+
+```
+{{project_structure}}
+```
+
+### Running Tests
+
+```bash
+{{test_commands}}
+```
+
+### Code Style
+
+{{code_style_guide}}
+
+## Deployment
+
+{{deployment_guide}}
+
+## Contributing
+
+{{contributing_guidelines}}
+
+## License
+
+{{license_info}}
+
+## Support
+
+{{support_info}}
+
+## Changelog
+
+{{changelog_link}}
+
+---
+
+🤖 *Generated with [SDLC Agêntico](https://github.com/arbgjr/sdlc_agentico) by [@arbgjr](https://github.com/arbgjr)*
