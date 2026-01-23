@@ -1,6 +1,6 @@
 # SDLC Agêntico Version
-version: "1.8.0"
-build_date: "2026-01-22"
+version: "1.8.1"
+build_date: "2026-01-23"
 release_notes: |
   Auto-Update System - Sistema inteligente de atualização automática com análise de impacto.
 
