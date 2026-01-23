@@ -1,6 +1,6 @@
 # sdlc-import Skill
 
-**Version:** 2.1.0
+**Version:** 2.0.0
 
 Automatically reverse engineer existing codebases and generate complete SDLC Ag√™ntico documentation.
 
@@ -17,7 +17,7 @@ Automatically reverse engineer existing codebases and generate complete SDLC Ag√
 ## What It Does
 
 1. **Creates feature branch** - `feature/import-{project-name}` for clean git history
-2. **Detects languages** - **30 languages + frameworks** using LSP plugins (v2.1.0)
+2. **Detects languages** - **30 languages + frameworks** using LSP plugins (v2.0.0)
 3. **Extracts decisions** - 5-15 ADRs with confidence scores
 4. **Generates diagrams** - 3-5 architecture diagrams (Mermaid + DOT)
 5. **Models threats** - STRIDE analysis with security-guidance plugin
@@ -26,7 +26,7 @@ Automatically reverse engineer existing codebases and generate complete SDLC Ag√
 
 ## Supported Technologies
 
-**v2.1.0 - Massive Expansion: 30 Technologies**
+**v2.0.0 - Massive Expansion: 30 Technologies**
 
 **Programming Languages (14):**
 - **Original (10):** Python, JavaScript, TypeScript, Java, C#, Go, Ruby, PHP, Rust, Kotlin

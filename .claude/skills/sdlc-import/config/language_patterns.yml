@@ -1,7 +1,7 @@
 # Language Detection Patterns
 # Pattern matching rules for 30 programming languages and frameworks
 # Adapted from awesome-copilot: language-stack-identifier.prompt
-# Version: 2.1.0 - Expanded with 20 new technologies
+# Version: 2.0.0 - Expanded with 20 new technologies
 
 languages:
   python:

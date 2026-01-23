@@ -280,13 +280,21 @@ class LanguageDetector:
                 if self._check_framework_signatures(project_path, signatures):
                     # Categorize framework
                     category = self._categorize_framework(framework_name, lang_name)
+                    logger.debug(f"Framework '{framework_name}' categorized as: {category}")
                     if category and framework_name not in frameworks[category]:
                         frameworks[category].append(framework_name.title())
+                        logger.debug(f"Added '{framework_name}' to category '{category}'")
 
-        # Detect testing frameworks
+        # Detect testing frameworks (legacy format: pytest, jest, junit, mocha)
         for test_name, test_config in self.language_patterns.get('testing', {}).items():
-            if self._check_pattern(project_path, test_config['pattern'], test_config.get('location', ['**/*'])):
-                frameworks['testing'].append(test_name)
+            # Skip multi-language frameworks (handled separately)
+            if test_name in ['selenium', 'playwright']:
+                continue
+
+            # Legacy format has 'pattern' and 'location' directly
+            if 'pattern' in test_config:
+                if self._check_pattern(project_path, test_config['pattern'], test_config.get('location', ['**/*'])):
+                    frameworks['testing'].append(test_name)
 
         # NEW: Detect IaC tools
         frameworks['iac'] = self._detect_iac_tools(project_path)
@@ -297,16 +305,25 @@ class LanguageDetector:
         # NEW: Detect CI/CD tools
         frameworks['cicd'] = self._detect_cicd_tools(project_path)
 
+        # NEW: Detect IaC tools (after main loop to avoid overwriting)
+        frameworks['iac'].extend(self._detect_iac_tools(project_path))
+
+        # NEW: Detect configuration management tools
+        frameworks['config_mgmt'].extend(self._detect_config_mgmt_tools(project_path))
+
+        # NEW: Detect CI/CD tools
+        frameworks['cicd'].extend(self._detect_cicd_tools(project_path))
+
         # NEW: Detect frontend frameworks
         frameworks['frontend'].extend(self._detect_frontend_frameworks(project_path))
 
         # NEW: Detect build tools
-        frameworks['build_tools'] = self._detect_build_tools(project_path)
+        frameworks['build_tools'].extend(self._detect_build_tools(project_path))
 
-        # NEW: Detect mobile frameworks
-        frameworks['mobile'] = self._detect_mobile_frameworks(project_path)
+        # NEW: Detect mobile frameworks (React Native, Xamarin from frontend_frameworks)
+        frameworks['mobile'].extend(self._detect_mobile_frameworks(project_path))
 
-        # NEW: Detect testing frameworks (multi-language)
+        # NEW: Detect testing frameworks (multi-language: Selenium, Playwright)
         frameworks['testing'].extend(self._detect_testing_frameworks(project_path, language_stats))
 
         return frameworks
@@ -455,8 +472,8 @@ class LanguageDetector:
     def _categorize_framework(self, framework_name: str, lang_name: str) -> Optional[str]:
         """Categorize framework into backend/frontend/etc"""
         frontend_frameworks = ['react', 'vue', 'angular', 'nextjs', 'svelte']
-        backend_frameworks = ['django', 'flask', 'fastapi', 'spring', 'aspnet', 'express', 'nestjs', 'gin', 'rails', 'laravel', 'symfony', 'actix', 'ktor', 'tokio', 'async_std']
-        mobile_frameworks = ['react_native', 'flutter', 'swiftui', 'uikit', 'android', 'jetpack_compose', 'xamarin']
+        backend_frameworks = ['django', 'flask', 'fastapi', 'spring', 'aspnet', 'express', 'nestjs', 'gin', 'rails', 'laravel', 'symfony', 'actix', 'ktor', 'tokio', 'async_std', 'cmake', 'conan', 'vcpkg', 'boost', 'workspace']
+        mobile_frameworks = ['react_native', 'flutter', 'flutter_widgets', 'swiftui', 'uikit', 'android', 'jetpack_compose', 'xamarin']
 
         if framework_name.lower() in frontend_frameworks:
             return 'frontend'
@@ -474,26 +491,53 @@ class LanguageDetector:
             locations = signature.get('location', ['**/*'])
 
             if self._check_pattern(project_path, pattern, locations):
+                logger.debug(f"Framework signature matched: {pattern}")
                 return True
 
         return False
 
+    def _expand_braces(self, pattern: str) -> List[str]:
+        """Expand brace patterns like **/*.{cpp,h,hpp} into multiple patterns"""
+        if '{' not in pattern or '}' not in pattern:
+            return [pattern]
+
+        # Extract the part with braces
+        import re as regex_module
+        brace_pattern = regex_module.search(r'\{([^}]+)\}', pattern)
+        if not brace_pattern:
+            return [pattern]
+
+        # Split the comma-separated extensions
+        options = brace_pattern.group(1).split(',')
+
+        # Generate all patterns
+        expanded = []
+        for option in options:
+            expanded_pattern = pattern.replace(brace_pattern.group(0), option)
+            expanded.append(expanded_pattern)
+
+        return expanded
+
     def _check_pattern(self, project_path: Path, pattern: str, locations: List[str]) -> bool:
         """Check if pattern exists in specified locations"""
         for location in locations:
-            for file in project_path.glob(location):
-                if not file.is_file():
-                    continue
+            # Expand brace patterns (e.g., **/*.{cpp,h,hpp} -> **/*.cpp, **/*.h, **/*.hpp)
+            expanded_locations = self._expand_braces(location)
 
-                try:
-                    with open(file, 'r', encoding='utf-8', errors='ignore') as f:
-                        content = f.read()
-                        if re.search(pattern, content):
-                            logger.debug(f"Pattern '{pattern}' found in {file.name}")
-                            return True
-                except Exception as e:
-                    logger.debug(f"Error checking {file}: {e}")
-                    continue
+            for expanded_location in expanded_locations:
+                for file in project_path.glob(expanded_location):
+                    if not file.is_file():
+                        continue
+
+                    try:
+                        with open(file, 'r', encoding='utf-8', errors='ignore') as f:
+                            content = f.read()
+                            if re.search(pattern, content):
+                                logger.debug(f"Pattern '{pattern}' found in {file.name}")
+                                return True
+                    except Exception as e:
+                        logger.debug(f"Error checking {file}: {e}")
+                        continue
 
         return False
 

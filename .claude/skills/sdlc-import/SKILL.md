@@ -1,6 +1,6 @@
 # SKILL: sdlc-import
 
-**Version:** 2.1.0
+**Version:** 2.0.0
 **Status:** Active
 **Category:** Automation
 **Phase:** 0 (Preparation)
@@ -13,7 +13,7 @@
 Reverse engineer existing codebases (not necessarily legacy - can be modern projects without SDLC artifacts) and automatically generate complete SDLC Agêntico documentation structure.
 
 **Key Capabilities:**
-- Detect **30 programming languages and frameworks** (v2.1.0 - expanded from 10)
+- Detect **30 programming languages and frameworks** (v2.0.0 - expanded from 10)
 - Extract 5-15 architecture decisions with confidence scores
 - Generate 3-5 architecture diagrams (Mermaid + DOT)
 - Perform STRIDE threat modeling
@@ -115,7 +115,7 @@ Reverse engineer existing codebases (not necessarily legacy - can be modern proj
 
 ---
 
-## Supported Technologies (v2.1.0)
+## Supported Technologies (v2.0.0)
 
 **30 languages, frameworks, and tools across multiple categories:**
 
@@ -164,7 +164,7 @@ Reverse engineer existing codebases (not necessarily legacy - can be modern proj
 **claude-plugins-official Plugins:**
 - **LSP Plugins** - Deep language analysis
   - **Original:** pyright-lsp, typescript-lsp, jdtls-lsp, csharp-lsp, gopls-lsp, rust-analyzer-lsp
-  - **NEW (v2.1.0):** clangd-lsp (C++), dart-lsp (Flutter), sourcekit-lsp (Swift)
+  - **NEW (v2.0.0):** clangd-lsp (C++), dart-lsp (Flutter), sourcekit-lsp (Swift)
 - **security-guidance** - Vulnerability scanning, STRIDE templates
 - **code-review** - Code quality, tech debt detection
 - **claude-md-management** - ADR/README generation

@@ -223,7 +223,7 @@ class TestLanguageDetector:
         assert result["confidence"] >= 0.7
 
 
-    # NEW TESTS FOR v2.1.0 - 20 New Technologies
+    # NEW TESTS FOR v2.0.0 - 20 New Technologies
 
     def test_detect_cpp_cmake(self, config, temp_project):
         """Test C++/CMake detection"""
