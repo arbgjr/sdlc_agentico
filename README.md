@@ -370,7 +370,7 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 ```
 .claude/
 ├── agents/           # 37 agentes especializados (33 + 4 consultivos)
-├── skills/           # 27 skills reutilizáveis
+├── skills/           # 28 skills reutilizáveis
 ├── commands/         # 23 comandos do usuário
 ├── hooks/            # 18 hooks de automação
 ├── lib/              # Bibliotecas compartilhadas (v1.7.0)
