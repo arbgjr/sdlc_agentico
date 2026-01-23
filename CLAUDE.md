@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orchestrates **36 specialized agents (32 orchestrated + 4 consultive)** through **9 development phases (0-8)**. This is a **configuration and orchestration framework**, not a traditional application codebase.
+SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orchestrates **37 specialized agents (33 orchestrated + 4 consultive)** through **9 development phases (0-8)**. This is a **configuration and orchestration framework**, not a traditional application codebase.
 
 **Key Features:**
 - Security by Design integrated in all phases
@@ -115,7 +115,7 @@ gh auth status
 
 ### Configuration-Driven Design
 All behavior is defined in `.claude/settings.json`, which configures:
-- 36 agents organized by SDLC phase (32 orchestrated + 4 consultive)
+- 37 agents organized by SDLC phase (33 orchestrated + 4 consultive)
 - Git hooks for validation and automation
 - Quality gates between phases (including Security Gate)
 - Complexity levels (0-3) that determine which phases are executed
@@ -124,7 +124,7 @@ All behavior is defined in `.claude/settings.json`, which configures:
 ### Directory Structure
 ```
 .claude/
-├── agents/           # Agent specs (markdown) - 36 specialized roles
+├── agents/           # Agent specs (markdown) - 37 specialized roles
 ├── skills/           # Reusable capabilities with scripts
 │   └── gate-evaluator/gates/  # YAML quality gate definitions (including security-gate.yml)
 ├── commands/         # Slash commands for user interaction
@@ -207,7 +207,7 @@ Agents use different models based on task complexity:
 
 | Type | Count | Description |
 |------|-------|-------------|
-| **Orchestrated** | 30 | Full agents with 200-500 lines, complete instructions |
+| **Orchestrated** | 33 | Full agents with 200-500 lines, complete instructions |
 | **Consultive (Lightweight)** | 4 | Minimal agents (~20 lines) that delegate to skills |
 
 **Lightweight agents**: `failure-analyst`, `interview-simulator`, `requirements-interrogator`, `tradeoff-challenger`. These are intentionally minimal and rely on the `system-design-decision-engine` skill for their logic.
