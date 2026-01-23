@@ -1,6 +1,6 @@
 # SKILL: sdlc-import
 
-**Version:** 1.0.0
+**Version:** 2.1.0
 **Status:** Active
 **Category:** Automation
 **Phase:** 0 (Preparation)
@@ -13,7 +13,7 @@
 Reverse engineer existing codebases (not necessarily legacy - can be modern projects without SDLC artifacts) and automatically generate complete SDLC Agêntico documentation structure.
 
 **Key Capabilities:**
-- Detect 10 programming languages and frameworks
+- Detect **30 programming languages and frameworks** (v2.1.0 - expanded from 10)
 - Extract 5-15 architecture decisions with confidence scores
 - Generate 3-5 architecture diagrams (Mermaid + DOT)
 - Perform STRIDE threat modeling
@@ -115,10 +115,56 @@ Reverse engineer existing codebases (not necessarily legacy - can be modern proj
 
 ---
 
+## Supported Technologies (v2.1.0)
+
+**30 languages, frameworks, and tools across multiple categories:**
+
+**Programming Languages (14):**
+- Python, JavaScript, TypeScript, Java, C#, Go, Ruby, PHP, Rust, Kotlin
+- **NEW:** C++, Gradle (build scripts), Dart (Flutter), Swift (iOS)
+
+**Backend Frameworks:**
+- Django, Flask, FastAPI, Spring, ASP.NET, Express, NestJS, Gin, Rails, Laravel, Symfony, Actix, Ktor
+- **NEW:** CMake, Conan, vcpkg, Boost, Tokio, async-std
+
+**Frontend Frameworks:**
+- React, Angular, Next.js
+- **NEW:** Vue.js, Svelte, Tailwind CSS
+
+**Mobile Frameworks:**
+- **NEW:** React Native, Flutter, SwiftUI/UIKit, Jetpack Compose, Xamarin
+
+**Infrastructure as Code:**
+- Terraform, Kubernetes
+- **NEW:** Bicep (Azure), Ansible
+
+**Configuration Management:**
+- **NEW:** Chef, Puppet
+
+**CI/CD Tools:**
+- GitHub Actions, GitLab CI
+- **NEW:** Jenkins
+
+**Testing Frameworks:**
+- pytest, jest, junit, mocha
+- **NEW:** Selenium (multi-language), Playwright (multi-language)
+
+**Build Tools:**
+- **NEW:** Vite, Webpack
+
+**Disambiguation Features:**
+- Chef vs Ruby detection (via metadata.rb marker)
+- Ansible vs YAML detection (via ansible.cfg marker)
+- Gradle vs Kotlin detection (file-based)
+
+---
+
 ## Integration
 
 **claude-plugins-official Plugins:**
-- **LSP Plugins** - Deep language analysis (pyright-lsp, typescript-lsp, jdtls-lsp, csharp-lsp, gopls-lsp, rust-analyzer-lsp)
+- **LSP Plugins** - Deep language analysis
+  - **Original:** pyright-lsp, typescript-lsp, jdtls-lsp, csharp-lsp, gopls-lsp, rust-analyzer-lsp
+  - **NEW (v2.1.0):** clangd-lsp (C++), dart-lsp (Flutter), sourcekit-lsp (Swift)
 - **security-guidance** - Vulnerability scanning, STRIDE templates
 - **code-review** - Code quality, tech debt detection
 - **claude-md-management** - ADR/README generation

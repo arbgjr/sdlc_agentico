@@ -1,5 +1,7 @@
 # sdlc-import Skill
 
+**Version:** 2.1.0
+
 Automatically reverse engineer existing codebases and generate complete SDLC AgÃªntico documentation.
 
 ## Quick Start
@@ -15,26 +17,54 @@ Automatically reverse engineer existing codebases and generate complete SDLC AgÃ
 ## What It Does
 
 1. **Creates feature branch** - `feature/import-{project-name}` for clean git history
-2. **Detects languages** - 10 languages + frameworks using LSP plugins
+2. **Detects languages** - **30 languages + frameworks** using LSP plugins (v2.1.0)
 3. **Extracts decisions** - 5-15 ADRs with confidence scores
 4. **Generates diagrams** - 3-5 architecture diagrams (Mermaid + DOT)
 5. **Models threats** - STRIDE analysis with security-guidance plugin
 6. **Identifies tech debt** - 10-50 items with P0-P3 priorities
 7. **Creates documentation** - Complete `.agentic_sdlc/` structure
 
-## Supported Languages
+## Supported Technologies
 
-**Phase 1 (v1.0.0):**
-1. Python (Django, Flask, FastAPI)
-2. JavaScript (React, Next.js, Express)
-3. TypeScript (Angular, NestJS)
-4. Java (Spring, Maven, Gradle)
-5. C# (ASP.NET, Entity Framework)
-6. Go (Gin, GORM)
-7. Ruby (Rails)
-8. PHP (Laravel, Symfony)
-9. Rust (Actix)
-10. Kotlin (Ktor)
+**v2.1.0 - Massive Expansion: 30 Technologies**
+
+**Programming Languages (14):**
+- **Original (10):** Python, JavaScript, TypeScript, Java, C#, Go, Ruby, PHP, Rust, Kotlin
+- **NEW (4):** C++, Gradle, Dart (Flutter), Swift (iOS)
+
+**Backend Frameworks:**
+- **Original:** Django, Flask, FastAPI, Spring, ASP.NET, Express, NestJS, Gin, Rails, Laravel, Symfony, Actix, Ktor
+- **NEW:** CMake, Conan, vcpkg, Boost (C++), Tokio, async-std (Rust)
+
+**Frontend Frameworks:**
+- **Original:** React, Angular, Next.js
+- **NEW:** Vue.js, Svelte, Tailwind CSS
+
+**Mobile Development:**
+- **NEW:** React Native, Flutter, SwiftUI/UIKit, Jetpack Compose (Android), Xamarin
+
+**Infrastructure as Code:**
+- **Original:** Terraform, Kubernetes
+- **NEW:** Bicep (Azure), Ansible
+
+**Configuration Management:**
+- **NEW:** Chef, Puppet
+
+**CI/CD:**
+- **Original:** GitHub Actions, GitLab CI
+- **NEW:** Jenkins
+
+**Testing:**
+- **Original:** pytest, jest, junit, mocha
+- **NEW:** Selenium (multi-language), Playwright (multi-language)
+
+**Build Tools:**
+- **NEW:** Vite, Webpack
+
+**Disambiguation:**
+- Chef vs Ruby (via metadata.rb)
+- Ansible vs YAML (via ansible.cfg)
+- Gradle vs Kotlin (file-based)
 
 ## Architecture
 

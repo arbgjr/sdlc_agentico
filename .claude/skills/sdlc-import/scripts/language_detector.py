@@ -84,8 +84,8 @@ class LanguageDetector:
             # Step 1: Count files by extension
             file_stats = self._count_files_by_extension(project_path)
 
-            # Step 2: Calculate language percentages
-            language_stats = self._calculate_language_stats(file_stats)
+            # Step 2: Calculate language percentages (with disambiguation)
+            language_stats = self._calculate_language_stats(file_stats, project_path)
 
             # Step 3: Detect frameworks
             frameworks = self._detect_frameworks(project_path, language_stats)
@@ -156,17 +156,30 @@ class LanguageDetector:
 
         return dict(file_stats)
 
-    def _calculate_language_stats(self, file_stats: Dict) -> Dict:
-        """Calculate language statistics from file counts"""
+    def _calculate_language_stats(self, file_stats: Dict, project_path: Path = None) -> Dict:
+        """Calculate language statistics from file counts with disambiguation"""
         language_stats = {}
         total_loc = sum(stats["loc"] for stats in file_stats.values())
 
         if total_loc == 0:
             return {}
 
+        # Check for disambiguation markers
+        has_chef_markers = self._has_chef_markers(project_path) if project_path else False
+        has_ansible_markers = self._has_ansible_markers(project_path) if project_path else False
+
         # Map extensions to languages
         for lang_name, lang_config in self.language_patterns['languages'].items():
             extensions = lang_config['extensions']
+
+            # Handle disambiguation for overlapping extensions
+            if lang_name == 'ruby' and has_chef_markers:
+                # Skip Ruby if Chef markers are present
+                continue
+            elif lang_name == 'chef' and not has_chef_markers:
+                # Skip Chef if no Chef markers
+                continue
+
             lang_loc = sum(
                 file_stats.get(ext, {}).get("loc", 0)
                 for ext in extensions
@@ -192,6 +205,48 @@ class LanguageDetector:
 
         return language_stats
 
+    def _has_chef_markers(self, project_path: Path) -> bool:
+        """Check if project has Chef markers"""
+        if not project_path:
+            return False
+
+        config_mgmt = self.language_patterns.get('config_mgmt_tools', {})
+        chef_config = config_mgmt.get('chef', {})
+
+        if not chef_config:
+            return False
+
+        # Check for marker files
+        disambiguation = chef_config.get('disambiguation', {})
+        marker_files = disambiguation.get('marker_files', [])
+
+        for marker in marker_files:
+            if (project_path / marker).exists():
+                return True
+
+        return False
+
+    def _has_ansible_markers(self, project_path: Path) -> bool:
+        """Check if project has Ansible markers"""
+        if not project_path:
+            return False
+
+        iac_config = self.language_patterns.get('iac', {})
+        ansible_config = iac_config.get('ansible', {})
+
+        if not ansible_config:
+            return False
+
+        # Check for marker files
+        disambiguation = ansible_config.get('disambiguation', {})
+        marker_files = disambiguation.get('marker_files', [])
+
+        for marker in marker_files:
+            if (project_path / marker).exists():
+                return True
+
+        return False
+
     def _get_primary_language(self, language_stats: Dict) -> Optional[str]:
         """Get primary language (highest percentage)"""
         if not language_stats:
@@ -206,7 +261,12 @@ class LanguageDetector:
             "database": [],
             "cache": [],
             "messaging": [],
-            "testing": []
+            "testing": [],
+            "iac": [],
+            "config_mgmt": [],
+            "cicd": [],
+            "build_tools": [],
+            "mobile": []
         }
 
         for lang_name in language_stats.keys():
@@ -228,17 +288,182 @@ class LanguageDetector:
             if self._check_pattern(project_path, test_config['pattern'], test_config.get('location', ['**/*'])):
                 frameworks['testing'].append(test_name)
 
+        # NEW: Detect IaC tools
+        frameworks['iac'] = self._detect_iac_tools(project_path)
+
+        # NEW: Detect configuration management tools
+        frameworks['config_mgmt'] = self._detect_config_mgmt_tools(project_path)
+
+        # NEW: Detect CI/CD tools
+        frameworks['cicd'] = self._detect_cicd_tools(project_path)
+
+        # NEW: Detect frontend frameworks
+        frameworks['frontend'].extend(self._detect_frontend_frameworks(project_path))
+
+        # NEW: Detect build tools
+        frameworks['build_tools'] = self._detect_build_tools(project_path)
+
+        # NEW: Detect mobile frameworks
+        frameworks['mobile'] = self._detect_mobile_frameworks(project_path)
+
+        # NEW: Detect testing frameworks (multi-language)
+        frameworks['testing'].extend(self._detect_testing_frameworks(project_path, language_stats))
+
         return frameworks
+
+    def _detect_iac_tools(self, project_path: Path) -> List[str]:
+        """Detect Infrastructure as Code tools"""
+        iac_tools = []
+        iac_config = self.language_patterns.get('iac', {})
+
+        for tool_name, tool_config in iac_config.items():
+            if self._check_tool_signatures(project_path, tool_config):
+                iac_tools.append(tool_name.title())
+
+        return iac_tools
+
+    def _detect_config_mgmt_tools(self, project_path: Path) -> List[str]:
+        """Detect Configuration Management tools (Chef, Puppet)"""
+        tools = []
+        config_mgmt = self.language_patterns.get('config_mgmt_tools', {})
+
+        for tool_name, tool_config in config_mgmt.items():
+            if self._check_tool_signatures(project_path, tool_config):
+                tools.append(tool_name.title())
+
+        return tools
+
+    def _detect_cicd_tools(self, project_path: Path) -> List[str]:
+        """Detect CI/CD tools"""
+        tools = []
+        cicd_config = self.language_patterns.get('cicd', {})
+
+        for tool_name, tool_config in cicd_config.items():
+            if self._check_tool_signatures(project_path, tool_config):
+                tools.append(tool_name.replace('_', ' ').title())
+
+        return tools
+
+    def _detect_frontend_frameworks(self, project_path: Path) -> List[str]:
+        """Detect frontend frameworks (Vue, Svelte, React Native, etc.)"""
+        frameworks = []
+        frontend_config = self.language_patterns.get('frontend_frameworks', {})
+
+        for framework_name, framework_config in frontend_config.items():
+            if self._check_tool_signatures(project_path, framework_config):
+                frameworks.append(framework_name.replace('_', ' ').title())
+
+        return frameworks
+
+    def _detect_build_tools(self, project_path: Path) -> List[str]:
+        """Detect build tools (Vite, Webpack)"""
+        tools = []
+        build_config = self.language_patterns.get('build_tools', {})
+
+        for tool_name, tool_config in build_config.items():
+            if self._check_tool_signatures(project_path, tool_config):
+                tools.append(tool_name.title())
+
+        return tools
+
+    def _detect_mobile_frameworks(self, project_path: Path) -> List[str]:
+        """Detect mobile frameworks from frontend_frameworks config"""
+        mobile_frameworks = []
+        frontend_config = self.language_patterns.get('frontend_frameworks', {})
+
+        mobile_framework_names = ['react_native', 'xamarin']
+
+        for framework_name in mobile_framework_names:
+            if framework_name in frontend_config:
+                framework_config = frontend_config[framework_name]
+                if self._check_tool_signatures(project_path, framework_config):
+                    mobile_frameworks.append(framework_name.replace('_', ' ').title())
+
+        return mobile_frameworks
+
+    def _detect_testing_frameworks(self, project_path: Path, languages: List[str]) -> List[str]:
+        """Detect testing frameworks (Selenium, Playwright) for detected languages"""
+        frameworks = []
+        testing_config = self.language_patterns.get('testing', {})
+
+        multi_lang_frameworks = ['selenium', 'playwright']
+
+        for framework_name in multi_lang_frameworks:
+            if framework_name not in testing_config:
+                continue
+
+            framework_config = testing_config[framework_name]
+
+            # Check signatures for detected languages
+            for lang in languages:
+                if lang in framework_config:
+                    lang_signatures = framework_config[lang]
+                    if self._check_framework_signatures(project_path, lang_signatures):
+                        frameworks.append(framework_name.title())
+                        break
+
+        return frameworks
+
+    def _check_tool_signatures(self, project_path: Path, tool_config: Dict) -> bool:
+        """Check if tool signature patterns are present"""
+        signature_patterns = tool_config.get('signature_patterns', [])
+
+        for signature in signature_patterns:
+            pattern = signature.get('pattern')
+            locations = signature.get('location', ['**/*'])
+            weight = signature.get('weight', 1.0)
+
+            if self._check_pattern(project_path, pattern, locations):
+                return True
+
+        return False
+
+    def _disambiguate_ruby_chef(self, project_path: Path, file_path: Path) -> str:
+        """Determine if .rb file is Ruby or Chef"""
+        # Check for Chef metadata.rb
+        if (project_path / "metadata.rb").exists():
+            return "chef"
+
+        # Check for Chef-specific keywords in file
+        try:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+                if re.search(r'\b(cookbook_file|template|package|service)\s+["\']', content):
+                    return "chef"
+        except Exception:
+            pass
+
+        return "ruby"
+
+    def _disambiguate_yaml_ansible(self, project_path: Path, file_path: Path) -> str:
+        """Determine if .yml file is Ansible"""
+        # Check for ansible.cfg
+        if (project_path / "ansible.cfg").exists():
+            return "ansible"
+
+        # Check for Ansible keywords
+        try:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+                if re.search(r'^---\s*\n.*(hosts|tasks|roles|plays):', content, re.MULTILINE):
+                    return "ansible"
+        except Exception:
+            pass
+
+        return "yaml"
 
     def _categorize_framework(self, framework_name: str, lang_name: str) -> Optional[str]:
         """Categorize framework into backend/frontend/etc"""
-        frontend_frameworks = ['react', 'vue', 'angular', 'nextjs']
-        backend_frameworks = ['django', 'flask', 'fastapi', 'spring', 'aspnet', 'express', 'nestjs', 'gin', 'rails', 'laravel', 'symfony', 'actix', 'ktor']
+        frontend_frameworks = ['react', 'vue', 'angular', 'nextjs', 'svelte']
+        backend_frameworks = ['django', 'flask', 'fastapi', 'spring', 'aspnet', 'express', 'nestjs', 'gin', 'rails', 'laravel', 'symfony', 'actix', 'ktor', 'tokio', 'async_std']
+        mobile_frameworks = ['react_native', 'flutter', 'swiftui', 'uikit', 'android', 'jetpack_compose', 'xamarin']
 
         if framework_name.lower() in frontend_frameworks:
             return 'frontend'
         elif framework_name.lower() in backend_frameworks:
             return 'backend'
+        elif framework_name.lower() in mobile_frameworks:
+            return 'mobile'
 
         return None
 

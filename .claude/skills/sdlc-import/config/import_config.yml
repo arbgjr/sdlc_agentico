@@ -21,6 +21,30 @@ general:
     - "*.pyc"
     - "*.class"
     - "*.o"
+    # NEW: C++ build artifacts
+    - "cmake-build-debug"
+    - "cmake-build-release"
+    - ".conan"
+    - "vcpkg_installed"
+    # NEW: Gradle artifacts
+    - ".gradle"
+    # NEW: Chef/Puppet artifacts
+    - ".chef"
+    - "cookbooks"
+    - ".librarian"
+    # NEW: Mobile artifacts
+    - "Pods"
+    - "DerivedData"
+    - ".expo"
+    - ".expo-shared"
+    # NEW: Frontend build artifacts
+    - ".next"
+    - ".nuxt"
+    - ".svelte-kit"
+    - ".output"
+    # NEW: Rust artifacts
+    - "target/debug"
+    - "target/release"
 
   # Maximum project size (LOC) for full analysis
   max_project_size: 100000

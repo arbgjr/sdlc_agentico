@@ -1,6 +1,7 @@
 # Language Detection Patterns
-# Pattern matching rules for 10 programming languages
+# Pattern matching rules for 30 programming languages and frameworks
 # Adapted from awesome-copilot: language-stack-identifier.prompt
+# Version: 2.1.0 - Expanded with 20 new technologies
 
 languages:
   python:
@@ -86,6 +87,17 @@ languages:
         - pattern: "@Module|@Controller"
           location: ["**/*.ts"]
           weight: 0.9
+
+      # NEW: Enhanced TypeScript patterns
+      decorators:
+        - pattern: "@[A-Z][a-zA-Z]*\\("
+          location: ["**/*.ts"]
+          weight: 0.8
+
+      generics:
+        - pattern: "<[A-Z][a-zA-Z]*>"
+          location: ["**/*.ts"]
+          weight: 0.7
 
     dependency_files: ["package.json", "package-lock.json", "yarn.lock", "tsconfig.json"]
 
@@ -217,6 +229,28 @@ languages:
           location: ["**/*.rs"]
           weight: 0.9
 
+      # NEW: Enhanced Rust patterns
+      tokio:
+        - pattern: "tokio"
+          location: ["Cargo.toml"]
+          weight: 1.0
+        - pattern: "#\\[tokio::main\\]|use tokio::"
+          location: ["**/*.rs"]
+          weight: 0.9
+
+      async_std:
+        - pattern: "async-std"
+          location: ["Cargo.toml"]
+          weight: 1.0
+        - pattern: "use async_std::"
+          location: ["**/*.rs"]
+          weight: 0.9
+
+      workspace:
+        - pattern: "\\[workspace\\]"
+          location: ["Cargo.toml"]
+          weight: 1.0
+
     dependency_files: ["Cargo.toml", "Cargo.lock"]
 
     lsp_plugin: "rust-analyzer-lsp"
@@ -233,24 +267,210 @@ languages:
           location: ["**/*.kt"]
           weight: 0.9
 
+      # NEW: Android patterns
+      android:
+        - pattern: "com\\.android\\.application"
+          location: ["build.gradle", "build.gradle.kts"]
+          weight: 1.0
+        - pattern: "import androidx\\.|import android\\."
+          location: ["**/*.kt"]
+          weight: 0.9
+
+      jetpack_compose:
+        - pattern: "androidx\\.compose"
+          location: ["build.gradle", "build.gradle.kts"]
+          weight: 1.0
+        - pattern: "@Composable"
+          location: ["**/*.kt"]
+          weight: 0.9
+
     dependency_files: ["build.gradle.kts", "build.gradle", "pom.xml"]
 
     lsp_plugin: "kotlin-lsp"
 
+  # NEW: C++ (with CMake, Conan, vcpkg, Boost)
+  cpp:
+    extensions: [".cpp", ".cc", ".cxx", ".c", ".h", ".hpp", ".hxx"]
+
+    framework_signatures:
+      cmake:
+        - pattern: "cmake_minimum_required"
+          location: ["CMakeLists.txt"]
+          weight: 1.0
+        - pattern: "find_package|add_executable|add_library"
+          location: ["CMakeLists.txt"]
+          weight: 0.9
+
+      conan:
+        - pattern: "\\[requires\\]|\\[generators\\]"
+          location: ["conanfile.txt", "conanfile.py"]
+          weight: 1.0
+
+      vcpkg:
+        - pattern: '"dependencies":'
+          location: ["vcpkg.json"]
+          weight: 1.0
+
+      boost:
+        - pattern: "#include <boost/"
+          location: ["**/*.{cpp,h,hpp}"]
+          weight: 0.8
+
+    dependency_files: ["CMakeLists.txt", "conanfile.txt", "conanfile.py", "vcpkg.json"]
+
+    lsp_plugin: "clangd-lsp"
+
+  # NEW: Gradle (as primary language for build scripts)
+  gradle:
+    extensions: [".gradle", ".gradle.kts"]
+
+    framework_signatures:
+      gradle_plugins:
+        - pattern: "plugins \\{|apply plugin:"
+          location: ["build.gradle", "build.gradle.kts"]
+          weight: 1.0
+        - pattern: "dependencies \\{"
+          location: ["build.gradle", "build.gradle.kts"]
+          weight: 0.9
+
+      gradle_wrapper:
+        - pattern: "distributionUrl="
+          location: ["gradle/wrapper/gradle-wrapper.properties"]
+          weight: 1.0
+
+    dependency_files: ["build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts"]
+
+    lsp_plugin: null
+
+  # NEW: Flutter/Dart
+  dart:
+    extensions: [".dart"]
+
+    framework_signatures:
+      flutter:
+        - pattern: "flutter:"
+          location: ["pubspec.yaml"]
+          weight: 1.0
+        - pattern: "import 'package:flutter/"
+          location: ["**/*.dart"]
+          weight: 0.9
+
+      flutter_widgets:
+        - pattern: "StatelessWidget|StatefulWidget"
+          location: ["**/*.dart"]
+          weight: 0.8
+
+    dependency_files: ["pubspec.yaml", "pubspec.lock"]
+
+    lsp_plugin: "dart-lsp"
+
+  # NEW: Swift (iOS)
+  swift:
+    extensions: [".swift"]
+
+    framework_signatures:
+      swiftui:
+        - pattern: "import SwiftUI"
+          location: ["**/*.swift"]
+          weight: 1.0
+        - pattern: "@State|@Binding|@ObservedObject"
+          location: ["**/*.swift"]
+          weight: 0.9
+
+      uikit:
+        - pattern: "import UIKit"
+          location: ["**/*.swift"]
+          weight: 1.0
+        - pattern: "UIViewController|UIView"
+          location: ["**/*.swift"]
+          weight: 0.9
+
+    dependency_files: ["Package.swift", "Podfile", "Podfile.lock"]
+
+    lsp_plugin: "sourcekit-lsp"
+
 # Infrastructure as Code detection
 iac:
   terraform:
-    extensions: [".tf"]
+    extensions: [".tf", ".tfvars"]
     signature_patterns:
-      - pattern: "resource ['\"]"
+      - pattern: "resource |data |module |variable |output "
+        location: ["**/*.tf"]
         weight: 1.0
 
   kubernetes:
     extensions: [".yml", ".yaml"]
     signature_patterns:
       - pattern: "apiVersion:|kind:"
-        weight: 0.9
         location: ["**/*.{yml,yaml}"]
+        weight: 0.9
+
+  # NEW: Bicep (Azure IaC)
+  bicep:
+    extensions: [".bicep"]
+    signature_patterns:
+      - pattern: "^resource |^param |^var |^output "
+        location: ["**/*.bicep"]
+        weight: 1.0
+      - pattern: "@description|@minLength|@secure"
+        location: ["**/*.bicep"]
+        weight: 0.9
+
+    dependency_files: ["bicepconfig.json"]
+
+  # NEW: Ansible
+  ansible:
+    extensions: [".yml", ".yaml"]
+    signature_patterns:
+      - pattern: "^---\\s*\\n.*hosts:|^.*tasks:|^.*roles:|^.*plays:"
+        location: ["**/*.yml", "**/*.yaml"]
+        weight: 1.0
+      - pattern: "ansible\\.builtin\\.|ansible\\.posix\\."
+        location: ["**/*.yml", "**/*.yaml"]
+        weight: 0.9
+      - pattern: "ansible"
+        location: ["requirements.txt", "requirements.yml"]
+        weight: 0.8
+
+    dependency_files: ["ansible.cfg", "requirements.yml"]
+
+    # Disambiguation: Check for ansible.cfg to distinguish from generic YAML
+    disambiguation:
+      marker_files: ["ansible.cfg"]
+      patterns: ["hosts:|tasks:|roles:|plays:"]
+
+# Configuration Management Tools
+config_mgmt_tools:
+  # NEW: Chef
+  chef:
+    extensions: [".rb"]  # Overlaps with Ruby
+    signature_patterns:
+      - pattern: "^cookbook_name|^recipe\\s|^depends\\s"
+        location: ["metadata.rb"]
+        weight: 1.0
+      - pattern: "^cookbook_file|^template|^package|^service"
+        location: ["recipes/**/*.rb"]
+        weight: 0.9
+
+    dependency_files: ["metadata.rb", "Berksfile", "Policyfile.rb"]
+
+    # Disambiguation: Check for metadata.rb to distinguish from generic Ruby
+    disambiguation:
+      marker_files: ["metadata.rb"]
+      patterns: ["cookbook_name|recipe|depends"]
+
+  # NEW: Puppet
+  puppet:
+    extensions: [".pp"]
+    signature_patterns:
+      - pattern: "^class|^define|^node"
+        location: ["**/*.pp"]
+        weight: 1.0
+      - pattern: "package \\{|service \\{|file \\{|exec \\{"
+        location: ["**/*.pp"]
+        weight: 0.9
+
+    dependency_files: ["metadata.json", "Puppetfile"]
 
 # CI/CD detection
 cicd:
@@ -265,6 +485,19 @@ cicd:
       - pattern: "stages:|script:"
         location: [".gitlab-ci.yml"]
         weight: 1.0
+
+  # NEW: Jenkins
+  jenkins:
+    extensions: [".groovy", ".jenkins"]
+    signature_patterns:
+      - pattern: "^pipeline \\{|^node \\{|^stage\\("
+        location: ["Jenkinsfile", "*.groovy", "*.jenkins"]
+        weight: 1.0
+      - pattern: "agent |steps \\{|post \\{"
+        location: ["Jenkinsfile", "*.groovy"]
+        weight: 0.9
+
+    dependency_files: ["Jenkinsfile"]
 
 # Testing frameworks
 testing:
@@ -283,3 +516,153 @@ testing:
   mocha:
     pattern: '"mocha"'
     location: ["package.json"]
+
+  # NEW: Selenium (multi-language)
+  selenium:
+    python:
+      - pattern: "selenium"
+        location: ["requirements.txt", "Pipfile"]
+        weight: 1.0
+      - pattern: "from selenium import|import selenium"
+        location: ["**/*.py"]
+        weight: 0.9
+
+    java:
+      - pattern: "selenium-java|selenium-server"
+        location: ["pom.xml", "build.gradle"]
+        weight: 1.0
+      - pattern: "import org\\.openqa\\.selenium"
+        location: ["**/*.java"]
+        weight: 0.9
+
+    javascript:
+      - pattern: '"selenium-webdriver"|"webdriverio"'
+        location: ["package.json"]
+        weight: 1.0
+      - pattern: "require\\('selenium-webdriver'\\)"
+        location: ["**/*.js"]
+        weight: 0.9
+
+  # NEW: Playwright (multi-language)
+  playwright:
+    python:
+      - pattern: "playwright"
+        location: ["requirements.txt", "Pipfile"]
+        weight: 1.0
+      - pattern: "from playwright\\.(sync_api|async_api) import"
+        location: ["**/*.py"]
+        weight: 0.9
+
+    javascript:
+      - pattern: '"@playwright/test"|"playwright"'
+        location: ["package.json"]
+        weight: 1.0
+      - pattern: "import .* from '@playwright/test'"
+        location: ["**/*.{js,ts}"]
+        weight: 0.9
+
+    typescript:
+      - pattern: '"@playwright/test"'
+        location: ["package.json"]
+        weight: 1.0
+      - pattern: "import \\{ test, expect \\} from '@playwright/test'"
+        location: ["**/*.ts"]
+        weight: 0.9
+
+# Frontend Frameworks
+frontend_frameworks:
+  # NEW: Vue.js
+  vue:
+    extensions: [".vue"]
+    signature_patterns:
+      - pattern: '"vue":'
+        location: ["package.json"]
+        weight: 1.0
+      - pattern: "import .* from 'vue'|<template>|<script setup>"
+        location: ["**/*.{js,ts,vue}"]
+        weight: 0.9
+      - pattern: "createApp|defineComponent"
+        location: ["**/*.{js,ts}"]
+        weight: 0.8
+
+    dependency_files: ["package.json", "vite.config.js", "vite.config.ts"]
+
+  # NEW: Svelte
+  svelte:
+    extensions: [".svelte"]
+    signature_patterns:
+      - pattern: '"svelte":'
+        location: ["package.json"]
+        weight: 1.0
+      - pattern: "<script>|<style>|\\$:"
+        location: ["**/*.svelte"]
+        weight: 0.9
+
+    dependency_files: ["package.json", "svelte.config.js"]
+
+  # NEW: React Native
+  react_native:
+    extensions: [".jsx", ".tsx"]
+    signature_patterns:
+      - pattern: '"react-native":'
+        location: ["package.json"]
+        weight: 1.0
+      - pattern: "import .* from 'react-native'"
+        location: ["**/*.{js,jsx,ts,tsx}"]
+        weight: 0.9
+      - pattern: '"expo":'
+        location: ["package.json", "app.json"]
+        weight: 0.8
+
+    dependency_files: ["package.json", "app.json", "metro.config.js"]
+
+  # NEW: Xamarin
+  xamarin:
+    extensions: [".xaml"]
+    signature_patterns:
+      - pattern: "Xamarin\\.Forms|Xamarin\\.Essentials"
+        location: ["*.csproj"]
+        weight: 1.0
+      - pattern: 'xmlns="http://xamarin.com/schemas/'
+        location: ["**/*.xaml"]
+        weight: 0.9
+
+    dependency_files: ["*.csproj", "packages.config"]
+
+  # NEW: Tailwind CSS
+  tailwind:
+    signature_patterns:
+      - pattern: '"tailwindcss":'
+        location: ["package.json"]
+        weight: 1.0
+      - pattern: "@tailwind|@apply|@layer"
+        location: ["**/*.css"]
+        weight: 0.9
+
+    dependency_files: ["tailwind.config.js", "tailwind.config.ts"]
+
+# Build Tools
+build_tools:
+  # NEW: Vite
+  vite:
+    signature_patterns:
+      - pattern: '"vite":'
+        location: ["package.json"]
+        weight: 1.0
+      - pattern: "import \\{ defineConfig \\} from 'vite'"
+        location: ["vite.config.{js,ts}"]
+        weight: 0.9
+
+    dependency_files: ["vite.config.js", "vite.config.ts"]
+
+  # NEW: Webpack
+  webpack:
+    signature_patterns:
+      - pattern: '"webpack":'
+        location: ["package.json"]
+        weight: 1.0
+      - pattern: "module\\.exports|plugins:|loaders:"
+        location: ["webpack.config.js", "webpack.config.ts"]
+        weight: 0.9
+
+    dependency_files: ["webpack.config.js", "webpack.config.ts"]
