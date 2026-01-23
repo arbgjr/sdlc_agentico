@@ -1,0 +1,113 @@
+gate_id: enrichment-quality
+name: "Enrichment Quality Gate"
+description: "Validates quality of document enrichments with research findings"
+
+applies_to:
+  - phase: [1, 2, 3]
+    condition: "enrichments_created > 0"
+
+checks:
+  - name: enrichment_has_sources
+    severity: critical
+    description: "Research findings must cite sources"
+    validation:
+      type: "file_content"
+      pattern: "sources:"
+      files: ".agentic_sdlc/corpus/nodes/learnings/ENRICH-*.yml"
+    error_message: "Enrichment corpus nodes must include sources for research findings"
+
+  - name: original_preserved
+    severity: critical
+    description: "Original document must be unchanged (hash check)"
+    validation:
+      type: "file_integrity"
+      files: ".agentic_sdlc/references/**/*"
+      exclude_patterns:
+        - "*.enriched.*.md"
+        - "_index.yml"
+    error_message: "Original documents must not be modified during enrichment"
+
+  - name: graph_relation_created
+    severity: critical
+    description: "Graph must contain 'enriches' relation"
+    validation:
+      type: "graph_structure"
+      graph_file: ".agentic_sdlc/corpus/graph.json"
+      required_edge_type: "enriches"
+    error_message: "Graph must include 'enriches' relation for all enrichments"
+
+  - name: enrichment_version_incremented
+    severity: warning
+    description: "Version must be incremented correctly (v1 → v2 → ...)"
+    validation:
+      type: "version_sequence"
+      index_file: ".agentic_sdlc/references/_index.yml"
+    error_message: "Enrichment versions must increment sequentially"
+
+  - name: synthesis_quality
+    severity: warning
+    description: "Synthesis must combine original + research coherently"
+    validation:
+      type: "content_quality"
+      min_length: 100
+      required_sections:
+        - "original_summary"
+        - "research_findings"
+        - "synthesis"
+    error_message: "Enrichment must include all required sections with substantial content"
+
+  - name: markdown_well_formatted
+    severity: minor
+    description: "Enriched Markdown files must be properly formatted"
+    validation:
+      type: "markdown_lint"
+      files: ".agentic_sdlc/references/**/*.enriched.*.md"
+      rules:
+        - "MD001"  # Header levels
+        - "MD003"  # Header style
+        - "MD022"  # Headers spacing
+        - "MD032"  # Lists spacing
+    error_message: "Enriched Markdown files must pass linting checks"
+
+  - name: no_duplicate_enrichments
+    severity: warning
+    description: "Same research topic should not be enriched multiple times within 30 days"
+    validation:
+      type: "temporal_uniqueness"
+      field: "research_context.prompt"
+      window_days: 30
+    error_message: "Duplicate enrichment detected for same topic within 30 days"
+
+bypass:
+  allowed_roles:
+    - "orchestrator"
+    - "human-override"
+  conditions:
+    - "emergency_release"
+    - "manual_enrichment"
+
+remediation:
+  enrichment_has_sources:
+    - "Add source URLs and titles to corpus node"
+    - "Include accessed_at timestamps for all sources"
+
+  original_preserved:
+    - "Restore original document from git history"
+    - "Never modify original documents during enrichment"
+
+  graph_relation_created:
+    - "Run: python3 .claude/skills/document-enricher/scripts/update_index.py --validate"
+    - "Manually add 'enriches' edge in graph.json if needed"
+
+  synthesis_quality:
+    - "Expand synthesis section with more detailed analysis"
+    - "Ensure original content and research findings are both represented"
+
+metadata:
+  created_at: "2026-01-22"
+  version: "1.9.0"
+  owner: "document-enricher"
+  related_skills:
+    - "document-enricher"
+    - "graph-navigator"
+    - "rag-query"

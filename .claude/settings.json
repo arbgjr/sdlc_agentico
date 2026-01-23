@@ -224,6 +224,7 @@
       "phase-commit",
       "session-analyzer",
       "document-processor",
+      "document-enricher",
       "frontend-testing",
       "decay-scoring",
       "github-sync",
