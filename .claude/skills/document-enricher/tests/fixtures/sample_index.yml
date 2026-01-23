@@ -1,0 +1,24 @@
+documents:
+  - id: DOC-001
+    path: "references/technical/oauth2-spec.pdf"
+    title: "OAuth 2.0 Specification"
+    keywords: ["oauth", "authentication", "security", "authorization"]
+    summary: "OAuth 2.0 authorization framework specification for secure delegated access"
+    category: "technical"
+    created_at: "2024-01-15T10:00:00Z"
+
+  - id: DOC-002
+    path: "references/business/data-privacy-policy.pdf"
+    title: "Data Privacy Policy"
+    keywords: ["privacy", "gdpr", "lgpd", "compliance"]
+    summary: "Company data privacy policy compliant with GDPR and LGPD regulations"
+    category: "legal"
+    created_at: "2024-02-20T14:30:00Z"
+
+  - id: DOC-003
+    path: "references/technical/kubernetes-deployment-guide.pdf"
+    title: "Kubernetes Deployment Best Practices"
+    keywords: ["kubernetes", "k8s", "deployment", "devops"]
+    summary: "Guide to deploying applications on Kubernetes with best practices"
+    category: "technical"
+    created_at: "2024-03-10T09:15:00Z"

@@ -1,0 +1,46 @@
+id: {{enrichment_id}}
+type: enrichment
+title: "{{doc_title}} - Enhanced with {{research_topic}}"
+created_at: "{{created_at}}"
+agent: "{{agent}}"
+
+source_document:
+  id: {{doc_id}}
+  path: "{{doc_path}}"
+
+research_context:
+  prompt: |
+    {{research_prompt}}
+  phase: {{phase}}
+  similarity: {{similarity}}
+
+content:
+  original_summary: |
+    {{original_summary}}
+
+  research_findings: |
+    {{research_findings}}
+
+  synthesis: |
+    {{synthesis}}
+
+  sources:
+    {{#each sources}}
+    - url: "{{url}}"
+      title: "{{title}}"
+      accessed_at: "{{accessed_at}}"
+    {{/each}}
+
+relations:
+  - type: enriches
+    target: {{doc_id}}
+
+decay_metadata:
+  last_validated_at: "{{validated_at}}"
+  decay_score: 1.0
+  decay_status: fresh
+
+tags:
+  {{#each tags}}
+  - {{this}}
+  {{/each}}

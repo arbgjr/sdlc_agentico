@@ -1,0 +1,18 @@
+{
+  "prompt": "Research OAuth 2.1 migration best practices",
+  "topic": "OAuth 2.1 migration",
+  "findings": "OAuth 2.1 consolidates best practices from OAuth 2.0 and includes:\n\n- Mandatory use of PKCE (Proof Key for Code Exchange)\n- Removal of Implicit Flow (security concerns)\n- Removal of Resource Owner Password Credentials flow\n- Enhanced security recommendations for token handling\n\nKey migration steps:\n1. Implement PKCE for all authorization code flows\n2. Migrate away from Implicit Flow to Authorization Code + PKCE\n3. Update token validation and refresh token rotation\n4. Review and update client registration for security\n\nBackward compatibility considerations:\n- Existing OAuth 2.0 implementations can gradually adopt changes\n- PKCE support should be added before deprecating other flows",
+  "sources": [
+    {
+      "url": "https://oauth.net/2.1/",
+      "title": "OAuth 2.1 Authorization Framework Draft",
+      "accessed_at": "2026-01-22T14:30:00Z"
+    },
+    {
+      "url": "https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-09",
+      "title": "IETF OAuth 2.1 Draft Specification",
+      "accessed_at": "2026-01-22T14:35:00Z"
+    }
+  ],
+  "keywords": ["oauth", "oauth2.1", "migration", "pkce", "security"]
+}
