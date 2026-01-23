@@ -306,3 +306,92 @@ class TestDecisionExtractor:
                 assert "pattern" in evidence
                 assert "quality" in evidence
                 assert "source" in evidence
+
+    def test_generate_llm_rationale_llm_disabled(self, config):
+        """Test LLM rationale generation when LLM is disabled"""
+        config["decision_extraction"]["llm"]["enabled"] = False
+        extractor = DecisionExtractor(config)
+
+        evidence = [
+            Evidence("settings.py", 45, "django.db.backends.postgresql", 1.0, "pattern"),
+            Evidence("requirements.txt", 3, "psycopg2", 0.9, "pattern"),
+        ]
+
+        rationale = extractor._generate_llm_rationale("database", "postgresql", evidence)
+
+        # Should fall back to pattern rationale
+        assert "PostgreSQL" in rationale or "postgresql" in rationale
+        assert "settings.py" in rationale
+
+    def test_generate_llm_rationale_llm_enabled(self, config):
+        """Test LLM rationale generation when LLM is enabled"""
+        config["decision_extraction"]["llm"]["enabled"] = True
+        extractor = DecisionExtractor(config)
+
+        evidence = [
+            Evidence("settings.py", 45, "django.db.backends.postgresql", 1.0, "pattern"),
+        ]
+
+        rationale = extractor._generate_llm_rationale("database", "postgresql", evidence)
+
+        # Should return LLM placeholder (case-insensitive)
+        assert "postgresql" in rationale.lower()
+        assert "database" in rationale.lower()
+
+    def test_find_evidence_with_directory(self, config, temp_project):
+        """Test that glob directories are skipped"""
+        # Create file with PostgreSQL evidence
+        create_file(temp_project / "settings.py", "ENGINE = 'django.db.backends.postgresql'\n")
+
+        # Create a directory with same pattern (should be skipped)
+        (temp_project / "postgresql").mkdir()
+
+        extractor = DecisionExtractor(config)
+        patterns = extractor.decision_patterns['decision_categories']['database']['patterns']['postgresql']
+        evidence = extractor._find_evidence(temp_project, patterns)
+
+        # Should find evidence in file, but skip directory
+        assert len(evidence) >= 1
+        assert all(e.source == "pattern" for e in evidence)
+
+    def test_find_evidence_with_unreadable_file(self, config, temp_project):
+        """Test that file read errors are handled gracefully"""
+        # Create a normal file with PostgreSQL evidence
+        create_file(temp_project / "settings.py", "ENGINE = 'django.db.backends.postgresql'\n")
+
+        # Create a binary file that will cause decode errors (should be skipped)
+        binary_file = temp_project / "binary.dat"
+        binary_file.write_bytes(b'\x00\x01\x02\xFF')
+
+        extractor = DecisionExtractor(config)
+        patterns = extractor.decision_patterns['decision_categories']['database']['patterns']['postgresql']
+
+        # Should not crash, just skip unreadable files
+        evidence = extractor._find_evidence(temp_project, patterns)
+
+        # Should find evidence in readable file
+        assert len(evidence) >= 1
+
+    def test_main_cli_basic(self, config, temp_project, monkeypatch, capsys):
+        """Test CLI main() function with basic arguments"""
+        # Create test project with PostgreSQL evidence
+        create_file(
+            temp_project / "settings.py",
+            "DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql'}}\n"
+        )
+
+        # Mock sys.argv to simulate CLI call
+        import sys
+        test_args = ["decision_extractor.py", str(temp_project), "--no-llm"]
+        monkeypatch.setattr(sys, "argv", test_args)
+
+        # Import and call main()
+        from decision_extractor import main
+
+        # Should execute without errors
+        main()
+
+        # Verify output
+        captured = capsys.readouterr()
+        assert "decisions" in captured.out
+        assert "count" in captured.out
