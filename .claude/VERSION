@@ -1,18 +1,40 @@
 # SDLC Agêntico Version
-version: "1.0.0"
-build_date: "2026-01-16"
+version: "1.8.0"
+build_date: "2026-01-22"
 release_notes: |
-  Primeira versão estável do SDLC Agêntico.
-  
+  Auto-Update System - Sistema inteligente de atualização automática com análise de impacto.
+
   Features:
-  - Framework completo de 8 fases
-  - Integração com GitHub (Projects, Wiki, Issues)
-  - Sistema de quality gates
-  - RAG corpus para conhecimento
-  - Session analyzer para learnings
-  - Feature flags para experimentação
+  - Detecção automática de atualizações (GitHub releases)
+  - Análise de impacto (breaking changes, migrações, dependências, segurança)
+  - Sistema de dismissal (skip this version)
+  - Execução automatizada de updates com rollback
+  - Cache inteligente (1 hora) para evitar rate limiting
+  - Structured logging com Loki integration
 
 changelog:
+  - version: "1.8.0"
+    date: "2026-01-22"
+    changes:
+      - "feat(version-checker): Sistema inteligente de auto-update"
+      - "feat(version-checker): Análise de impacto de changelogs"
+      - "feat(version-checker): Detecção de breaking changes e migrações"
+      - "feat(version-checker): Sistema de dismissal para versões"
+      - "feat(version-checker): Execução automatizada via git com rollback"
+      - "feat(version-checker): Cache inteligente de releases (1h TTL)"
+      - "test(version-checker): 93 testes com 90%+ coverage"
+      - "docs(version-checker): Documentação completa com exemplos"
+  - version: "1.7.16"
+    date: "2026-01-17"
+    changes:
+      - "feat(phase-commit): Commit E push automático ao final de cada fase"
+      - "feat(phase-commit): Detecção automática da fase via manifest/project"
+      - "feat(phase-commit): Mapeamento de tipo de commit por fase"
+      - "feat(phase-commit): Atualização de manifest.yml com commit hash"
+      - "feat(hooks): phase-commit-reminder.sh executa commit automaticamente"
+      - "feat(logging): Logs estruturados com Loki (skill=phase-commit)"
+      - "fix(phase-commit): Tratamento de erros com rollback seguro"
+
   - version: "1.0.0"
     date: "2026-01-16"
     changes:
@@ -24,13 +46,6 @@ changelog:
       - "feat: Hooks automáticos por fase"
       - "fix: Fallbacks robustos para serviços externos"
       - "docs: Documentação completa de skills e comandos"
-
-  - version: "0.9.0"
-    date: "2026-01-14"
-    changes:
-      - "feat: Estrutura base do SDLC"
-      - "feat: Agentes para todas as fases"
-      - "feat: Skills iniciais"
 
 compatibility:
   min_claude_version: "1.0.0"
