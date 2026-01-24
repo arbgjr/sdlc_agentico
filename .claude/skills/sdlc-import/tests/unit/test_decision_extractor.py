@@ -307,7 +307,7 @@ class TestDecisionExtractor:
                 assert "quality" in evidence
                 assert "source" in evidence
 
-    def test_generate_llm_rationale_llm_disabled(self, config):
+    def test_generate_llm_rationale_llm_disabled(self, config, temp_project):
         """Test LLM rationale generation when LLM is disabled"""
         config["decision_extraction"]["llm"]["enabled"] = False
         extractor = DecisionExtractor(config)
@@ -317,13 +317,13 @@ class TestDecisionExtractor:
             Evidence("requirements.txt", 3, "psycopg2", 0.9, "pattern"),
         ]
 
-        rationale = extractor._generate_llm_rationale("database", "postgresql", evidence)
+        rationale = extractor._generate_llm_rationale("database", "postgresql", evidence, temp_project)
 
         # Should fall back to pattern rationale
         assert "PostgreSQL" in rationale or "postgresql" in rationale
         assert "settings.py" in rationale
 
-    def test_generate_llm_rationale_llm_enabled(self, config):
+    def test_generate_llm_rationale_llm_enabled(self, config, temp_project):
         """Test LLM rationale generation when LLM is enabled"""
         config["decision_extraction"]["llm"]["enabled"] = True
         extractor = DecisionExtractor(config)
@@ -332,7 +332,7 @@ class TestDecisionExtractor:
             Evidence("settings.py", 45, "django.db.backends.postgresql", 1.0, "pattern"),
         ]
 
-        rationale = extractor._generate_llm_rationale("database", "postgresql", evidence)
+        rationale = extractor._generate_llm_rationale("database", "postgresql", evidence, temp_project)
 
         # Should return LLM placeholder (case-insensitive)
         assert "postgresql" in rationale.lower()

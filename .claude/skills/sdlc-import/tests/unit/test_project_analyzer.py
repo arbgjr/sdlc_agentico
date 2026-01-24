@@ -281,10 +281,10 @@ class TestProjectAnalyzer:
 
     def test_validate_project_exceeds_max_size(self, temp_project):
         """Test validation when project exceeds max size"""
-        # Create many files to exceed max_project_size (default 100000 LOC)
-        # Create a file with 100001 lines
+        # Create many files to exceed max_project_size (config: 500000 LOC)
+        # Create a file with 500001 lines
         large_file = temp_project / "large.py"
-        large_content = "\n".join([f"line{i}" for i in range(100001)])
+        large_content = "\n".join([f"line{i}" for i in range(500001)])
         large_file.write_text(large_content)
 
         analyzer = ProjectAnalyzer(str(temp_project))
@@ -329,6 +329,8 @@ class TestProjectAnalyzer:
         subprocess.run(["git", "commit", "-m", "initial"], cwd=str(temp_project), check=True, capture_output=True)
 
         analyzer = ProjectAnalyzer(str(temp_project))
+        # Override config to disable threat modeling (config precedence > flags)
+        analyzer.config['threat_modeling']['enabled'] = False
         result = analyzer.analyze(skip_threat_model=True)
 
         # Threats should be skipped
