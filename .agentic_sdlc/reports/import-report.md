@@ -1,12 +1,12 @@
 # Import Analysis Report
 
-**Analysis ID:** 20260123-172123
-**Date:** 2026-01-23T17:21:23.110907Z
+**Analysis ID:** 20260124-033720
+**Date:** 2026-01-24T03:37:20.668601Z
 
 ## Summary
 
-- **Primary Language:** python
-- **Decisions Extracted:** 4
+- **Primary Language:** None
+- **Decisions Extracted:** 0
 - **Threats Identified:** 0
 - **Tech Debt Items:** 0
 

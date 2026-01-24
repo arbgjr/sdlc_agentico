@@ -38,6 +38,10 @@ from architecture_visualizer import ArchitectureVisualizer
 from threat_modeler import ThreatModeler
 from tech_debt_detector import TechDebtDetector
 from documentation_generator import DocumentationGenerator
+from graph_generator import GraphGenerator
+from issue_creator import IssueCreator
+from migration_analyzer import MigrationAnalyzer
+from adr_validator import ADRValidator
 
 logger = get_logger(__name__, skill="sdlc-import", phase=0)
 
@@ -65,6 +69,10 @@ class ProjectAnalyzer:
         self.threat_modeler = ThreatModeler(self.config)
         self.tech_debt_detector = TechDebtDetector(self.config)
         self.documentation_generator = DocumentationGenerator(self.config)
+        self.graph_generator = GraphGenerator(self.config)
+        self.issue_creator = IssueCreator(self.config)
+        self.migration_analyzer = MigrationAnalyzer(self.config)
+        self.adr_validator = ADRValidator(self.config)
 
         logger.info(
             "Initialized ProjectAnalyzer",
@@ -436,6 +444,18 @@ class ProjectAnalyzer:
         with open(decision_file, 'w') as f:
             json.dump(results['decisions'], f, indent=2)
 
+        # Save migration analysis (if available)
+        if 'decisions' in results and 'migration_analysis' in results['decisions']:
+            migration_file = phase_dir / "migration-analysis.json"
+            with open(migration_file, 'w') as f:
+                json.dump(results['decisions']['migration_analysis'], f, indent=2)
+
+        # Save ADR validation (if available)
+        if 'adr_validation' in results and results['adr_validation']:
+            validation_file = phase_dir / "adr-validation.json"
+            with open(validation_file, 'w') as f:
+                json.dump(results['adr_validation'], f, indent=2)
+
         # Save threat analysis
         threat_file = phase_dir / "threat-analysis.json"
         with open(threat_file, 'w') as f:
@@ -451,11 +471,27 @@ class ProjectAnalyzer:
         with open(scan_file, 'w') as f:
             json.dump(results['scan'], f, indent=2)
 
+        files_created = 5
+
+        # Save knowledge graph results (if available)
+        if 'knowledge_graph' in results and results['knowledge_graph']:
+            graph_file = phase_dir / "knowledge-graph.json"
+            with open(graph_file, 'w') as f:
+                json.dump(results['knowledge_graph'], f, indent=2)
+            files_created += 1
+
+        # Save GitHub issues results (if available)
+        if 'github_issues' in results and results['github_issues']:
+            issues_file = phase_dir / "github-issues.json"
+            with open(issues_file, 'w') as f:
+                json.dump(results['github_issues'], f, indent=2)
+            files_created += 1
+
         logger.info(
             "Phase artifacts saved",
             extra={
                 "phase_dir": str(phase_dir),
-                "files_created": 5
+                "files_created": files_created
             }
         )
 
@@ -542,6 +578,27 @@ class ProjectAnalyzer:
             # Step 5: Extract decisions
             decisions = self.extract_decisions(language_analysis, no_llm=no_llm)
 
+            # FIX #4: Analyze database migrations
+            migration_decisions = []
+            if self.config.get('migration_analysis', {}).get('enabled', True):
+                migration_analysis = self.migration_analyzer.analyze(self.project_path)
+                migration_decisions = migration_analysis.get('decisions', [])
+
+                # Merge with other decisions
+                decisions['decisions'].extend(migration_decisions)
+                decisions['count'] += len(migration_decisions)
+                decisions['migration_analysis'] = migration_analysis
+
+            # FIX #5: Validate ADR claims against codebase
+            validation_results = {}
+            if self.config.get('adr_validation', {}).get('enabled', True):
+                extracted_adrs = decisions.get('decisions', [])
+                if len(extracted_adrs) > 0:
+                    validation_results = self.adr_validator.validate(self.project_path, extracted_adrs)
+                else:
+                    logger.warning("No ADRs found - skipping claim validation")
+                    validation_results = {"status": "skipped", "reason": "no_adrs"}
+
             # Step 6: Generate diagrams
             diagrams = self.generate_diagrams(language_analysis, decisions)
 
@@ -570,6 +627,23 @@ class ProjectAnalyzer:
             else:
                 tech_debt = {"status": "skipped"}
 
+            # FIX #6: Generate knowledge graph
+            graph_result = {}
+            if self.config.get('graph_generation', {}).get('enabled', True):
+                corpus_dir = self.output_dir / "corpus"
+                extracted_adrs = decisions.get('decisions', [])
+                if len(extracted_adrs) > 0:
+                    graph_result = self.graph_generator.generate(corpus_dir, extracted_adrs)
+                else:
+                    logger.warning("No ADRs found - skipping graph generation")
+                    graph_result = {"status": "skipped", "reason": "no_adrs"}
+
+            # FIX #9: Create GitHub issues for tech debt
+            github_issues = {}
+            if create_issues:
+                tech_debt_items = tech_debt.get('items', [])
+                github_issues = self.issue_creator.create_issues(tech_debt_items, self.project_path)
+
             # Build complete results before documentation generation
             results = {
                 "analysis_id": self.analysis_id,
@@ -581,7 +655,10 @@ class ProjectAnalyzer:
                 "decisions": decisions,
                 "diagrams": diagrams,
                 "threats": threats,
-                "tech_debt": tech_debt
+                "tech_debt": tech_debt,
+                "adr_validation": validation_results,
+                "knowledge_graph": graph_result,
+                "github_issues": github_issues
             }
 
             # FIX #3: Save phase artifacts for auditability

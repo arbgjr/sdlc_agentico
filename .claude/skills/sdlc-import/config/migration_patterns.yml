@@ -1,0 +1,70 @@
+# Migration pattern configurations
+
+frameworks:
+  ef_core:
+    file_pattern: "**/Migrations/*.cs"
+    language: "csharp"
+    patterns:
+      table_creation:
+        regex: "migrationBuilder\\.CreateTable\\(\\s*name:\\s*\"(\\w+)\""
+        decision_template: "Create table {table_name} via migration"
+        confidence: 0.95
+
+      index_creation:
+        regex: "migrationBuilder\\.CreateIndex\\(.*name:\\s*\"(\\w+)\""
+        decision_template: "Create index {index_name} for performance"
+        confidence: 0.90
+
+      rls_policy:
+        regex: "CREATE POLICY|ENABLE ROW LEVEL SECURITY"
+        decision_template: "Implement Row-Level Security for multi-tenancy"
+        confidence: 1.0
+
+  alembic:
+    file_pattern: "**/alembic/versions/*.py"
+    language: "python"
+    patterns:
+      table_creation:
+        regex: "op\\.create_table\\(['\"]([\\w_]+)['\"]"
+        decision_template: "Create table {table_name} via migration"
+        confidence: 0.95
+
+      index_creation:
+        regex: "op\\.create_index\\(['\"]([\\w_]+)['\"]"
+        decision_template: "Create index {index_name} for performance"
+        confidence: 0.90
+
+  flyway:
+    file_pattern: "**/db/migration/*.sql"
+    language: "sql"
+    patterns:
+      table_creation:
+        regex: "CREATE TABLE\\s+(IF NOT EXISTS\\s+)?([\\w_]+)"
+        decision_template: "Create table {table_name} via migration"
+        confidence: 0.95
+
+      index_creation:
+        regex: "CREATE\\s+(UNIQUE\\s+)?INDEX\\s+([\\w_]+)"
+        decision_template: "Create index {index_name} for performance"
+        confidence: 0.90
+
+      rls_policy:
+        regex: "CREATE POLICY\\s+([\\w_]+)"
+        decision_template: "Implement Row-Level Security policy {policy_name}"
+        confidence: 1.0
+
+decision_mapping:
+  table_creation:
+    category: "data_model"
+    adr_title_template: "Database Schema: {table_name} entity"
+    confidence_base: 0.95
+
+  index_creation:
+    category: "performance"
+    adr_title_template: "Performance Optimization: {index_name} index"
+    confidence_base: 0.90
+
+  rls_policy:
+    category: "security"
+    adr_title_template: "Security Architecture: Row-Level Security"
+    confidence_base: 1.0

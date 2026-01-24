@@ -210,6 +210,9 @@ github_integration:
   # Create GitHub issues for findings
   create_issues: false  # Override with --create-issues flag
 
+  # FIX #9: Minimum priority for issue creation
+  min_priority: "P1"    # Only create issues for P0 and P1 by default
+
   # Issue creation rules
   issue_rules:
     create_for_p0_debt: true
@@ -244,6 +247,45 @@ logging:
 
   # Enable Loki shipping
   loki_enabled: true
+
+# FIX #4: Migration Analysis Configuration
+migration_analysis:
+  # Enable migration analysis
+  enabled: true
+
+  # Supported frameworks
+  frameworks:
+    - ef_core
+    - alembic
+    - flyway
+
+  # Minimum migrations required for analysis
+  min_migrations: 1
+
+  # Confidence threshold for migration decisions
+  confidence_threshold: 0.8
+
+# FIX #5: ADR Validation Configuration
+adr_validation:
+  # Enable ADR claim validation
+  enabled: true
+
+  # Coverage claim tolerance (percentage points)
+  coverage_tolerance: 10
+
+  # Minimum confidence for validation
+  min_confidence: 0.5
+
+# FIX #6: Knowledge Graph Configuration
+graph_generation:
+  # Enable knowledge graph generation
+  enabled: true
+
+  # Minimum ADRs required to build graph
+  min_nodes: 3
+
+  # Auto-infer semantic relations between ADRs
+  auto_infer_relations: true
 
 quality_gate:
   # Strict mode (all error-level checks must pass)

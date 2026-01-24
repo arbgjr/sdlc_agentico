@@ -1,0 +1,57 @@
+# ADR Validation Rules
+
+validation_types:
+  coverage_claims:
+    lgpd:
+      method_pattern: "(RequestDataDeletion|RequestDataPortability|RevokeConsent|RequestDataAccess)"
+      file_patterns:
+        - "*DataSubjectRight*.cs"
+        - "*LGPDCompliance*.cs"
+        - "*ConsentManagement*.cs"
+      expected_methods: 8  # LGPD Art. 18 rights
+      tolerance_percentage: 10
+
+    iso_27001:
+      file_patterns:
+        - "*Security*.cs"
+        - "*Audit*.cs"
+        - "*AccessControl*.cs"
+      expected_controls: 114  # ISO 27001 Annex A
+      tolerance_percentage: 15
+
+    soc_2:
+      file_patterns:
+        - "*Monitoring*.cs"
+        - "*Logging*.cs"
+        - "*IncidentResponse*.cs"
+      expected_controls: 64  # SOC 2 trust principles
+      tolerance_percentage: 20
+
+  technology_claims:
+    rls:
+      patterns:
+        - "CREATE POLICY"
+        - "ENABLE ROW LEVEL SECURITY"
+        - "ALTER TABLE.*ROW LEVEL SECURITY"
+      file_patterns:
+        - "**/*.sql"
+        - "**/Migrations/*.cs"
+      minimum_occurrences: 1
+
+    jwt:
+      patterns:
+        - "jwt\\.encode|jwt\\.decode"
+        - "JwtSecurityTokenHandler"
+      file_patterns:
+        - "**/*.cs"
+        - "**/*.py"
+      minimum_occurrences: 1
+
+    multi_tenancy:
+      patterns:
+        - "tenant_id|TenantId"
+        - "X-Tenant-Id"
+      file_patterns:
+        - "**/*.cs"
+        - "**/*.py"
+      minimum_occurrences: 5
