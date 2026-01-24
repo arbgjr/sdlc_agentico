@@ -1,34 +1,44 @@
 # SDLC Agêntico Version
-version: "2.0.3"
+version: "2.0.4"
 build_date: "2026-01-24"
 release_notes: |
-  Auto-Update System v2.0.3 - Production Ready Enhancement
+  sdlc-import v2.1.0 - Advanced Analysis & Testing
 
   Features:
-  - feat(version-checker): Integração automática com orchestrator (Phase 0)
-  - feat(version-checker): Validação rigorosa de migration scripts (security hardening)
-  - feat(version-checker): Telemetria completa de adoção (Loki/Grafana)
-  - feat(version-checker): AskUserQuestion integration (4 opções: update/changelog/skip/later)
-  - feat(version-checker): Rollback automático em falhas de migration
-
-  Security:
-  - sec(version-checker): Detecção de padrões perigosos em migrations (rm -rf /, dd, mkfs, fdisk)
-  - sec(version-checker): Validação de shebang obrigatória (#!/bin/bash)
-  - sec(version-checker): Timeout enforcement (300s) em migration scripts
-  - sec(version-checker): Exit code validation (não-zero = rollback crítico)
+  - feat(sdlc-import): ADR Validator - Valida LGPD, RLS, JWT, multi-tenancy patterns
+  - feat(sdlc-import): Graph Generator - Cria knowledge graph com relações semânticas
+  - feat(sdlc-import): Issue Creator - Cria issues no GitHub a partir de análise
+  - feat(sdlc-import): Migration Analyzer - Analisa EF Core, Alembic, Flyway migrations
+  - feat(sdlc-import): Graph integrity quality gate (graph-integrity.yml)
+  - feat(sdlc-import): ADR validation rules (adr_validation_rules.yml)
+  - feat(sdlc-import): Migration patterns detection (migration_patterns.yml)
 
   Testing:
-  - test(version-checker): 103 testes (+10 novos), 100% pass rate
-  - test(version-checker): Cobertura 90%+ em update_executor (antes 85%)
-  - test(version-checker): 5 testes de validação + 3 testes de telemetria + 2 testes de integração
+  - test(sdlc-import): 306 testes ADRValidator (LGPD, RLS, JWT, multi-tenancy)
+  - test(sdlc-import): 234 testes GraphGenerator (structure, concepts, adjacency)
+  - test(sdlc-import): 184 testes IssueCreator (priority, GitHub CLI, formatting)
+  - test(sdlc-import): 275 testes MigrationAnalyzer (EF Core, Alembic, Flyway)
+  - test(sdlc-import): Total 999 novos testes unitários (+2844 linhas)
 
   Impact:
-  - Autoupdate agora é verdadeiramente automático (antes: manual)
-  - Migration failures são críticas com rollback (antes: warnings ignorados)
-  - Métricas de adoção disponíveis no Grafana (antes: sem telemetria)
-  - Security hardening completo (antes: sem validação de scripts)
+  - Validação automática de ADRs contra boas práticas (LGPD, segurança)
+  - Knowledge graph gerado automaticamente do código
+  - Issues criados automaticamente no GitHub Projects
+  - Migrations analisadas para detectar patterns e tech debt
 
 changelog:
+  - version: "2.0.4"
+    date: "2026-01-24"
+    changes:
+      - "feat(sdlc-import): ADRValidator com validação LGPD, RLS, JWT, multi-tenancy"
+      - "feat(sdlc-import): GraphGenerator com knowledge graph e relações semânticas"
+      - "feat(sdlc-import): IssueCreator com criação automática de issues no GitHub"
+      - "feat(sdlc-import): MigrationAnalyzer para EF Core, Alembic, Flyway"
+      - "feat(sdlc-import): Quality gate graph-integrity.yml"
+      - "feat(sdlc-import): Config adr_validation_rules.yml e migration_patterns.yml"
+      - "test(sdlc-import): 999 novos testes unitários (306+234+184+275)"
+      - "test(sdlc-import): 100% coverage em validators, generators, analyzers"
+      - "docs(sdlc-import): IMPLEMENTATION_SUMMARY_v2.1.0.md completo"
   - version: "2.0.3"
     date: "2026-01-24"
     changes:

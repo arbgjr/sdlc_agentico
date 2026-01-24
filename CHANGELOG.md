@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.4] - 2026-01-24
+
+### Added - sdlc-import v2.1.0 Advanced Analysis & Testing
+
+- **ADR Validator** - Validação automática de Architecture Decision Records:
+  - ✅ LGPD compliance checking (data privacy, consent, retention)
+  - ✅ RLS (Row-Level Security) technology validation
+  - ✅ JWT authentication pattern detection
+  - ✅ Multi-tenancy pattern validation
+  - ✅ Configuration: `adr_validation_rules.yml`
+
+- **Graph Generator** - Knowledge graph automation:
+  - ✅ Semantic graph generation from codebase
+  - ✅ Concept extraction with confidence scoring
+  - ✅ Adjacency matrix for fast traversal
+  - ✅ Quality gate: `graph-integrity.yml`
+
+- **Issue Creator** - GitHub integration:
+  - ✅ Automatic issue creation from analysis
+  - ✅ Priority-based filtering (P0-P3)
+  - ✅ GitHub CLI integration
+  - ✅ Markdown formatting with metadata
+
+- **Migration Analyzer** - Database migration analysis:
+  - ✅ EF Core migrations (C#/.NET)
+  - ✅ Alembic migrations (Python)
+  - ✅ Flyway migrations (Java/SQL)
+  - ✅ Table/index detection
+  - ✅ RLS policy detection
+  - ✅ Configuration: `migration_patterns.yml`
+
+### Testing
+
+- **999 new unit tests** across 4 modules:
+  - 306 tests: ADRValidator (LGPD, RLS, JWT, multi-tenancy)
+  - 234 tests: GraphGenerator (structure, concepts, adjacency)
+  - 184 tests: IssueCreator (priority, GitHub CLI, formatting)
+  - 275 tests: MigrationAnalyzer (EF Core, Alembic, Flyway)
+- **100% coverage** in validators, generators, analyzers
+- **2,844 lines** of test code added
+
+### Documentation
+
+- IMPLEMENTATION_SUMMARY_v2.1.0.md - Complete v2.1.0 feature documentation
+- Configuration files with validation rules and patterns
+
 ## [2.0.3] - 2026-01-24
 
 ### Added - Auto-Update System Enhancements
