@@ -1118,9 +1118,10 @@ git commit -m "fix: critical issue"
 
 ## Version History Quick Reference
 
-**Current Version**: v2.0.4 (sdlc-import v2.1.0 - Advanced Analysis & Testing)
+**Current Version**: v2.0.5 (sdlc-import - Large Project Support 900k LOC)
 
 **Recent Releases**:
+- v2.0.5 (2026-01-24): sdlc-import max_project_size 500k→900k LOC (monorepos, enterprise legacy)
 - v2.0.4 (2026-01-24): sdlc-import v2.1.0 with 999 tests (ADR validator, graph generator, issue creator, migration analyzer)
 - v2.0.3 (2026-01-24): Auto-update orchestrator integration, migration validation, telemetry (103 tests, security hardening)
 - v2.0.2 (2026-01-23): sdlc-import critical workflow fixes (LLM, threat model, artifacts, ADR index, auto-push)

@@ -1,32 +1,24 @@
 # SDLC Agêntico Version
-version: "2.0.4"
+version: "2.0.5"
 build_date: "2026-01-24"
 release_notes: |
-  sdlc-import v2.1.0 - Advanced Analysis & Testing
+  sdlc-import - Large Project Support Enhancement
 
-  Features:
-  - feat(sdlc-import): ADR Validator - Valida LGPD, RLS, JWT, multi-tenancy patterns
-  - feat(sdlc-import): Graph Generator - Cria knowledge graph com relações semânticas
-  - feat(sdlc-import): Issue Creator - Cria issues no GitHub a partir de análise
-  - feat(sdlc-import): Migration Analyzer - Analisa EF Core, Alembic, Flyway migrations
-  - feat(sdlc-import): Graph integrity quality gate (graph-integrity.yml)
-  - feat(sdlc-import): ADR validation rules (adr_validation_rules.yml)
-  - feat(sdlc-import): Migration patterns detection (migration_patterns.yml)
-
-  Testing:
-  - test(sdlc-import): 306 testes ADRValidator (LGPD, RLS, JWT, multi-tenancy)
-  - test(sdlc-import): 234 testes GraphGenerator (structure, concepts, adjacency)
-  - test(sdlc-import): 184 testes IssueCreator (priority, GitHub CLI, formatting)
-  - test(sdlc-import): 275 testes MigrationAnalyzer (EF Core, Alembic, Flyway)
-  - test(sdlc-import): Total 999 novos testes unitários (+2844 linhas)
+  Fix:
+  - fix(sdlc-import): Increase max_project_size from 500,000 to 900,000 LOC
 
   Impact:
-  - Validação automática de ADRs contra boas práticas (LGPD, segurança)
-  - Knowledge graph gerado automaticamente do código
-  - Issues criados automaticamente no GitHub Projects
-  - Migrations analisadas para detectar patterns e tech debt
+  - Suporta projetos muito grandes (até 900k LOC) para análise completa
+  - Projetos entre 500k-900k LOC agora recebem análise full ao invés de sampled
+  - Melhora qualidade de ADRs e threat models em projetos enterprise
+  - Permite importação de monorepos e sistemas legados grandes
 
 changelog:
+  - version: "2.0.5"
+    date: "2026-01-24"
+    changes:
+      - "fix(sdlc-import): Increase max_project_size from 500k to 900k LOC"
+      - "enhancement(sdlc-import): Support for very large projects (monorepos, enterprise legacy)"
   - version: "2.0.4"
     date: "2026-01-24"
     changes:

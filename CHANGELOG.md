@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.5] - 2026-01-24
+
+### Fixed - Large Project Support
+
+- **sdlc-import**: Increased max_project_size from 500,000 to 900,000 LOC
+  - Supports very large projects (monorepos, enterprise legacy systems)
+  - Projects 500k-900k LOC now get full analysis instead of sampled
+  - Improves ADR and threat model quality for enterprise projects
+
 ## [2.0.4] - 2026-01-24
 
 ### Added - sdlc-import v2.1.0 Advanced Analysis & Testing
