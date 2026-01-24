@@ -76,13 +76,31 @@ def execute_update(release_tag: str) -> Dict:
 
             if migration_script:
                 logger.info(f"Found migration script: {migration_script}")
+
+                # Validate migration script before execution
+                if not validate_migration_script(migration_script):
+                    errors.append(f"Migration script validation failed: {migration_script}")
+                    logger.error("Invalid migration script, rolling back")
+                    rollback(rollback_ref)
+                    return build_error_result(errors, rollback_ref)
+
                 try:
+                    # Execute with strict checking and timeout
                     run_command([str(migration_script)], "Running migration script")
                     migrations_run.append(migration_script.name)
+                    logger.info(f"Migration script completed successfully: {migration_script.name}")
                 except subprocess.CalledProcessError as e:
-                    # Migrations are non-critical, log but continue
-                    logger.warning(f"Migration script failed: {e}")
-                    errors.append(f"Migration failed (non-critical): {e}")
+                    # Migration failures are now CRITICAL - rollback
+                    logger.error(f"Migration script failed with exit code {e.returncode}: {e}")
+                    errors.append(f"Migration failed: {migration_script.name} (exit {e.returncode})")
+                    logger.error("Migration critical failure, rolling back")
+                    rollback(rollback_ref)
+                    return build_error_result(errors, rollback_ref)
+                except subprocess.TimeoutExpired:
+                    errors.append(f"Migration timeout: {migration_script.name}")
+                    logger.error("Migration timeout, rolling back")
+                    rollback(rollback_ref)
+                    return build_error_result(errors, rollback_ref)
 
         # Step 4: Verify installation
         with log_operation("verify_installation", logger):
@@ -94,6 +112,20 @@ def execute_update(release_tag: str) -> Dict:
 
         # Success!
         logger.info(f"Update to {release_tag} completed successfully")
+
+        # Telemetry: Log successful update with metrics
+        logger.info(
+            "Update completed successfully",
+            extra={
+                "event": "update_completed_successfully",
+                "from_version": get_version_from_commit(rollback_ref),
+                "to_version": version,
+                "migrations_executed": len(migrations_run),
+                "migration_scripts": migrations_run,
+                "had_errors": len(errors) > 0,
+                "error_count": len(errors)
+            }
+        )
 
         return {
             "success": True,
@@ -293,6 +325,121 @@ def build_error_result(errors: List[str], rollback_ref: str) -> Dict:
         "rollback_available": rollback_ref is not None,
         "rollback_ref": rollback_ref
     }
+
+
+def validate_migration_script(script_path: Path) -> bool:
+    """
+    Validate migration script before execution.
+
+    Checks:
+    1. File exists and is readable
+    2. File is executable
+    3. Shebang is present (#!/bin/bash or #!/usr/bin/env bash)
+    4. No obvious dangerous patterns (rm -rf /, dd, etc.)
+
+    Args:
+        script_path: Path to migration script
+
+    Returns:
+        bool: True if script passes validation
+    """
+    logger.info(f"Validating migration script: {script_path}")
+
+    # Check 1: File exists and readable
+    if not script_path.exists():
+        logger.error(f"Migration script does not exist: {script_path}")
+        return False
+
+    if not script_path.is_file():
+        logger.error(f"Migration script is not a file: {script_path}")
+        return False
+
+    # Check 2: Executable permission
+    if not (script_path.stat().st_mode & 0o111):
+        logger.error(f"Migration script is not executable: {script_path}")
+        return False
+
+    # Check 3: Shebang validation
+    try:
+        with open(script_path, 'r') as f:
+            first_line = f.readline().strip()
+
+            if not first_line.startswith("#!"):
+                logger.error("Migration script missing shebang")
+                return False
+
+            if "bash" not in first_line and "sh" not in first_line:
+                logger.warning(f"Unexpected shebang: {first_line}")
+                # Allow but warn
+
+    except Exception as e:
+        logger.error(f"Failed to read migration script: {e}")
+        return False
+
+    # Check 4: Scan for dangerous patterns (basic safety check)
+    try:
+        with open(script_path, 'r') as f:
+            content = f.read()
+
+            # Dangerous patterns that should never appear in migration scripts
+            dangerous_patterns = [
+                "rm -rf /",
+                "rm -rf /*",
+                "> /dev/sda",
+                "dd if=",
+                "mkfs.",
+                "fdisk",
+                "parted"
+            ]
+
+            for pattern in dangerous_patterns:
+                if pattern in content:
+                    logger.error(f"Dangerous pattern detected in migration script: {pattern}")
+                    return False
+
+    except Exception as e:
+        logger.error(f"Failed to scan migration script: {e}")
+        return False
+
+    logger.info("Migration script validation passed")
+    return True
+
+
+def get_version_from_commit(commit_ref: str) -> str:
+    """
+    Get version from a specific commit by reading .claude/VERSION file.
+
+    Args:
+        commit_ref: Git commit SHA
+
+    Returns:
+        str: Version string (e.g., "2.0.2") or "unknown"
+    """
+    try:
+        result = subprocess.run(
+            ["git", "show", f"{commit_ref}:.claude/VERSION"],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=10
+        )
+
+        # Parse YAML-like content for version field
+        for line in result.stdout.split("\n"):
+            if line.strip().startswith("version:"):
+                # Extract version: "2.0.2" -> 2.0.2
+                version = line.split(":", 1)[1].strip().strip('"').strip("'")
+                return version
+
+        logger.warning(f"Version field not found in .claude/VERSION at {commit_ref}")
+        return "unknown"
+
+    except subprocess.CalledProcessError:
+        logger.warning(f"Failed to read .claude/VERSION at commit {commit_ref}")
+        return "unknown"
+    except Exception as e:
+        logger.warning(f"Error getting version from commit: {e}")
+        return "unknown"
 
 
 if __name__ == "__main__":

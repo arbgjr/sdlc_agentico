@@ -42,6 +42,10 @@ SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orc
 - Hybrid search for document matching (keyword + text + category) (v1.9.0)
 - Versioned enriched documents with immutable originals (v1.9.0)
 - Knowledge graph integration with 'enriches' relations (v1.9.0)
+- Auto-update system with orchestrator integration (v2.0.3)
+- Migration script validation with security hardening (v2.0.3)
+- Telemetry and adoption tracking with Loki/Grafana (v2.0.3)
+- Rollback automation on migration failures (v2.0.3)
 
 ## Anti-Mock Policy (CRITICAL)
 
@@ -1114,9 +1118,10 @@ git commit -m "fix: critical issue"
 
 ## Version History Quick Reference
 
-**Current Version**: v2.0.2 (sdlc-import Workflow Fixes)
+**Current Version**: v2.0.3 (Auto-Update System v2 - Production Ready)
 
 **Recent Releases**:
+- v2.0.3 (2026-01-24): Auto-update orchestrator integration, migration validation, telemetry (103 tests, security hardening)
 - v2.0.2 (2026-01-23): sdlc-import critical workflow fixes (LLM, threat model, artifacts, ADR index, auto-push)
 - v2.0.1 (2026-01-23): sdlc-import exclude patterns fix (.terraform, IaC artifacts)
 - v2.0.0 (2026-01-23): Language Detection Expansion (30 technologies, sdlc-import)

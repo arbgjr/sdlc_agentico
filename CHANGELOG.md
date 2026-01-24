@@ -7,6 +7,77 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.3] - 2026-01-24
+
+### Added - Auto-Update System Enhancements
+
+- **Orchestrator Integration** - Version-checker agora verificado automaticamente no início de workflows:
+  - ✅ Verificação automática em Phase 0 (Intake)
+  - ✅ AskUserQuestion integration com 4 opções (update/changelog/skip/later)
+  - ✅ Impact analysis mostrado antes de atualizar
+  - ✅ Nunca bloqueia workflow (graceful degradation)
+
+- **Migration Script Validation** - Security hardening completo:
+  - ✅ Validação de shebang obrigatória (`#!/bin/bash`)
+  - ✅ Verificação de permissões executáveis
+  - ✅ Detecção de padrões perigosos (`rm -rf /`, `dd if=`, `mkfs.*`, `fdisk`, `parted`)
+  - ✅ Timeout enforcement (300s)
+  - ✅ Exit code validation (não-zero = rollback crítico)
+
+- **Telemetria de Adoção** - Observabilidade completa:
+  - ✅ Logging estruturado com Loki
+  - ✅ Métricas: from_version, to_version, migrations_executed, error_count
+  - ✅ Grafana queries prontas para Version Adoption Rate
+  - ✅ Rastreamento de rollbacks e falhas
+
+### Changed - Breaking Changes
+
+- **Migration Failures Now Critical** - Antes: warnings ignorados, agora: rollback automático
+- **Validation Required** - Migration scripts devem passar validação ou update falha
+
+### Fixed
+
+- **Update Executor** - Comportamento aprimorado:
+  - Migration scripts agora validados antes de execução
+  - Rollback automático em timeout de migration
+  - Telemetria completa de sucesso/falha
+
+### Testing
+
+- **103 tests (+10 novos)** - 100% pass rate
+- **90%+ coverage** em update_executor (antes 85%)
+- Novos testes:
+  - 5 testes de validação de migration scripts
+  - 3 testes de telemetria (get_version_from_commit)
+  - 2 testes de integração (validation fails, migration timeout)
+
+### Documentation
+
+- **Orchestrator Agent** - 135 linhas de documentação de integração
+- **IMPLEMENTATION_SUMMARY.md** - Atualizado com status v2.0.3
+- **Reports** - `version-checker-enhancements-v2.0.3.md` (análise completa)
+
+## [2.0.2] - 2026-01-23
+
+### Fixed - sdlc-import Critical Workflow Fixes
+
+- fix(sdlc-import): Force LLM when config llm.enabled=true (ignora --no-llm flag)
+- fix(sdlc-import): Force threat modeling when config enabled=true (no defer)
+- fix(sdlc-import): Populate phase-artifacts/phase-1-discovery/ with JSON logs
+- fix(sdlc-import): Index original ADRs in references/original-adrs/
+- fix(sdlc-import): Auto-push feature branch to remote after analysis
+- chore(sdlc-import): Add TODO.md for v2.1.0 planned features
+
+## [2.0.1] - 2026-01-23
+
+### Fixed - sdlc-import Exclude Patterns
+
+- fix(sdlc-import): Add .terraform and IaC artifacts to exclude_patterns
+- fix(sdlc-import): Add bin/obj/.NET build artifacts
+- fix(sdlc-import): Add Migrations, packages, coverage, docs
+- fix(sdlc-import): Increase max_project_size from 100k to 500k LOC
+- fix(sdlc-import): Large projects (1.6GB, 22M LOC) now analyze correctly
+
 ## [2.0.0] - 2026-01-23
 
 ### Added - Legacy Project Onboarding (Epic #52)

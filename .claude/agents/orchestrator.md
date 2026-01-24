@@ -182,11 +182,169 @@ level_3_enterprise:
 
 ## Checklist Pre-Execucao
 
+- [ ] **Verificar atualizacoes disponiveis (version-checker)**
 - [ ] Contexto do projeto carregado do memory-manager
 - [ ] Fase atual identificada
 - [ ] Artefatos da fase anterior verificados
 - [ ] Nivel de complexidade detectado
 - [ ] Agentes necessarios identificados
+
+## Verificacao de Atualizacoes (Phase 0)
+
+**IMPORTANTE:** No inicio de CADA workflow SDLC, o orchestrator DEVE verificar se ha atualizacoes disponiveis do framework.
+
+### Quando Verificar
+
+- Inicio de `/sdlc-start`
+- Inicio de `/quick-fix`
+- Inicio de `/new-feature`
+- Transicao para Phase 0 (Intake)
+
+### Workflow de Atualizacao
+
+```python
+# 1. Verificar atualizacao disponivel
+import subprocess
+import json
+
+result = subprocess.run(
+    ["python3", ".claude/skills/version-checker/scripts/check_updates.py"],
+    capture_output=True,
+    text=True,
+    timeout=10
+)
+
+update_info = json.loads(result.stdout)
+
+# 2. Se update disponivel e nao dismissed
+if update_info.get("update_available") and not update_info.get("dismissed"):
+    # Apresentar opcoes ao usuario via AskUserQuestion
+    response = AskUserQuestion({
+        "questions": [{
+            "question": "Nova versao disponivel do SDLC Agentico. O que deseja fazer?",
+            "header": "Update",
+            "multiSelect": False,
+            "options": [
+                {
+                    "label": "Update now (Recomendado)",
+                    "description": f"Atualizar para v{update_info['latest']} agora"
+                },
+                {
+                    "label": "Show full changelog",
+                    "description": "Ver changelog completo antes de decidir"
+                },
+                {
+                    "label": "Skip this version",
+                    "description": "Nao atualizar esta versao (nao pergunta novamente)"
+                },
+                {
+                    "label": "Remind me later",
+                    "description": "Perguntar novamente no proximo workflow"
+                }
+            ]
+        }]
+    })
+
+    # 3. Processar resposta
+    if response["Update"] == "Update now (Recomendado)":
+        # Executar update automaticamente
+        logger.info(f"Executando update para v{update_info['latest']}")
+
+        update_result = subprocess.run(
+            ["python3", ".claude/skills/version-checker/scripts/check_updates.py", "--execute"],
+            capture_output=True,
+            text=True,
+            timeout=300
+        )
+
+        exec_result = json.loads(update_result.stdout)
+
+        if exec_result.get("success"):
+            logger.info("Update completed successfully")
+            # Workflow deve PARAR aqui - usuario precisa reiniciar sessao
+            return {
+                "status": "update_completed",
+                "message": "SDLC Agentico atualizado com sucesso. Por favor, reinicie a sessao."
+            }
+        else:
+            logger.error(f"Update failed: {exec_result.get('error')}")
+            # Continuar workflow com versao atual
+
+    elif response["Update"] == "Show full changelog":
+        # Mostrar notification completa
+        print(update_info["notification"])
+        # Re-apresentar opcoes
+
+    elif response["Update"] == "Skip this version":
+        # Dismiss permanentemente
+        subprocess.run(
+            ["python3", ".claude/skills/version-checker/scripts/check_updates.py",
+             "--dismiss", update_info["latest"]],
+            timeout=5
+        )
+        logger.info(f"Versao {update_info['latest']} dismissed pelo usuario")
+
+    # "Remind me later" = no-op, proxima execucao pergunta novamente
+```
+
+### Tratamento de Erros
+
+Se `check_updates.py` falhar (GitHub inacessivel, etc):
+
+```python
+except subprocess.TimeoutExpired:
+    logger.warning("Update check timeout - continuing workflow")
+    # Continuar workflow normalmente
+except Exception as e:
+    logger.warning(f"Update check failed: {e} - continuing workflow")
+    # Continuar workflow normalmente
+```
+
+**REGRA CRITICA:** Falha na verificacao de updates NUNCA deve bloquear o workflow.
+
+### Integracao com Impact Analysis
+
+Antes de executar update, SEMPRE mostrar ao usuario:
+
+1. **Breaking Changes** - Lista completa
+2. **Migrations Required** - Scripts que serao executados
+3. **Security Fixes** - CVEs corrigidos
+4. **Dependency Updates** - Mudancas de versao
+
+Exemplo de notificacao:
+
+```markdown
+🟡 Update Disponivel: v2.1.0
+
+**Upgrade type:** MINOR
+**Released:** 2026-01-24
+
+## Impact Analysis
+
+⚠️  **2 BREAKING CHANGES:**
+  - Graph schema v2 incompatible with v1 (line 45)
+  - API endpoint /analyze removed (line 78)
+
+🔧 **1 MIGRATION REQUIRED:**
+  - Run: .scripts/migrate-graph-v2.sh (line 52)
+
+🔒 **1 SECURITY FIX:**
+  - CVE-2026-1234: XSS in documentation_generator (line 105)
+
+📦 **3 DEPENDENCY UPDATES:**
+  - Python: 3.11 → 3.12
+  - pytest: 8.0 → 8.4
+  - pyyaml: 6.0 → 6.0.2
+```
+
+### Rollback Automatico
+
+Se update falhar durante execucao:
+
+1. `update_executor.py` faz rollback automatico
+2. Usuario e notificado do erro
+3. Workflow continua com versao anterior
+4. Erro e logado no Loki para investigacao
 
 ## Checklist Pos-Execucao
 

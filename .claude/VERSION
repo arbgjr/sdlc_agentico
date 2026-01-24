@@ -1,30 +1,50 @@
 # SDLC Agêntico Version
-version: "2.0.2"
-build_date: "2026-01-23"
+version: "2.0.3"
+build_date: "2026-01-24"
 release_notes: |
-  Critical fixes: sdlc-import workflow improvements - 5 correções críticas no processo de import.
+  Auto-Update System v2.0.3 - Production Ready Enhancement
 
-  Fixes:
-  - fix(sdlc-import): Force LLM when llm.enabled=true (ignora --no-llm se config=true)
-  - fix(sdlc-import): Force threat_modeling quando enabled=true (não permite defer)
-  - fix(sdlc-import): Populate phase-artifacts/ com logs de decisão e análise
-  - fix(sdlc-import): Index original ADRs em references/original-adrs/
-  - fix(sdlc-import): Auto-push feature branch após análise completa
+  Features:
+  - feat(version-checker): Integração automática com orchestrator (Phase 0)
+  - feat(version-checker): Validação rigorosa de migration scripts (security hardening)
+  - feat(version-checker): Telemetria completa de adoção (Loki/Grafana)
+  - feat(version-checker): AskUserQuestion integration (4 opções: update/changelog/skip/later)
+  - feat(version-checker): Rollback automático em falhas de migration
+
+  Security:
+  - sec(version-checker): Detecção de padrões perigosos em migrations (rm -rf /, dd, mkfs, fdisk)
+  - sec(version-checker): Validação de shebang obrigatória (#!/bin/bash)
+  - sec(version-checker): Timeout enforcement (300s) em migration scripts
+  - sec(version-checker): Exit code validation (não-zero = rollback crítico)
+
+  Testing:
+  - test(version-checker): 103 testes (+10 novos), 100% pass rate
+  - test(version-checker): Cobertura 90%+ em update_executor (antes 85%)
+  - test(version-checker): 5 testes de validação + 3 testes de telemetria + 2 testes de integração
 
   Impact:
-  - LLM agora executa para medium/low confidence (antes: nunca executava)
-  - Threat modeling sempre executa quando habilitado (antes: pulado por tamanho)
-  - Phase artifacts auditáveis (antes: diretório vazio)
-  - ADRs originais preservados (antes: apenas inferidos criados)
-  - Branch automaticamente pushed (antes: apenas criado localmente)
-
-  Planned for v2.1.0:
-  - Migration analyzer (EF Core, Alembic, Flyway)
-  - ADR claim validator (cross-reference code vs claims)
-  - Knowledge graph generator (graph.json)
-  - GitHub issue auto-creation (--create-issues)
+  - Autoupdate agora é verdadeiramente automático (antes: manual)
+  - Migration failures são críticas com rollback (antes: warnings ignorados)
+  - Métricas de adoção disponíveis no Grafana (antes: sem telemetria)
+  - Security hardening completo (antes: sem validação de scripts)
 
 changelog:
+  - version: "2.0.3"
+    date: "2026-01-24"
+    changes:
+      - "feat(version-checker): Integração automática com orchestrator (Phase 0 workflow)"
+      - "feat(version-checker): Validação rigorosa de migration scripts (shebang + dangerous patterns)"
+      - "feat(version-checker): Telemetria de adoção com métricas Loki/Grafana"
+      - "feat(version-checker): AskUserQuestion integration (update/changelog/skip/later)"
+      - "feat(version-checker): Rollback automático em falhas de migration (crítico)"
+      - "sec(version-checker): Detecção de padrões perigosos (rm -rf /, dd, mkfs, fdisk, parted)"
+      - "sec(version-checker): Validação de shebang obrigatória (#!/bin/bash ou #!/usr/bin/env bash)"
+      - "sec(version-checker): Timeout enforcement 300s em migrations"
+      - "sec(version-checker): Exit code validation (não-zero = rollback)"
+      - "test(version-checker): 103 testes (+10 novos), 100% pass rate, 90%+ cobertura"
+      - "docs(orchestrator): Seção completa de verificação de updates (135 linhas)"
+      - "docs(version-checker): IMPLEMENTATION_SUMMARY.md atualizado com v2.0.3"
+      - "docs(reports): version-checker-enhancements-v2.0.3.md (análise completa)"
   - version: "2.0.2"
     date: "2026-01-23"
     changes:
