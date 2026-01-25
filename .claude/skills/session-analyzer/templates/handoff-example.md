@@ -34,7 +34,7 @@
 - `.claude/skills/memory-manager/scripts/simple_store.py`
 - `.claude/skills/memory-manager/README.md`
 - `.claude/skills/session-analyzer/scripts/handoff.py`
-- `.agentic_sdlc/corpus/nodes/learnings/LEARN-claude-orchestrator-patterns.yml`
+- `.project/corpus/nodes/learnings/LEARN-claude-orchestrator-patterns.yml`
 
 **Tools Used**: Bash, Edit, Read, TodoWrite, WebFetch, Write
 

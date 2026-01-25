@@ -284,6 +284,6 @@ New panels added to `.claude/config/logging/dashboards/sdlc-overview.json`:
 ## References
 
 - Source: [claude-orchestrator](https://github.com/reshashi/claude-orchestrator)
-- Analysis: `.agentic_sdlc/corpus/nodes/learnings/LEARN-claude-orchestrator-patterns.yml`
+- Analysis: `.project/corpus/nodes/learnings/LEARN-claude-orchestrator-patterns.yml`
 - Epic: Issue #33
 - Task: Issue #35

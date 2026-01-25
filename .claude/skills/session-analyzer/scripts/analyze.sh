@@ -24,8 +24,8 @@ fi
 PERSIST=false
 EXTRACT_LEARNINGS=false
 PROJECT_PATH=$(pwd)
-OUTPUT_DIR="${PROJECT_ROOT}/.agentic_sdlc/sessions"
-CORPUS_DIR="${PROJECT_ROOT}/.agentic_sdlc/corpus/learnings"
+OUTPUT_DIR="${PROJECT_ROOT}/.project/sessions"
+CORPUS_DIR="${PROJECT_ROOT}/.project/corpus/learnings"
 
 # Parse argumentos
 while [[ $# -gt 0 ]]; do

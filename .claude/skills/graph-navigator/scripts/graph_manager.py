@@ -138,10 +138,10 @@ class GraphManager:
         Initialize GraphManager.
 
         Args:
-            corpus_path: Path to corpus directory. Defaults to .agentic_sdlc/corpus
+            corpus_path: Path to corpus directory. Defaults to .project/corpus
         """
         if corpus_path is None:
-            corpus_path = Path(".agentic_sdlc/corpus")
+            corpus_path = Path(".project/corpus")
 
         self.corpus_path = Path(corpus_path)
         self.graph_file = self.corpus_path / "graph.json"
@@ -661,7 +661,7 @@ def main():
     )
     parser.add_argument(
         "--corpus",
-        default=".agentic_sdlc/corpus",
+        default=".project/corpus",
         help="Path to corpus directory"
     )
 

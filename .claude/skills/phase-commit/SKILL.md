@@ -92,14 +92,14 @@ phase_commit_process:
 ```
 .agentic_sdlc/intake/**
 .agentic_sdlc/projects/*/manifest.yml
-.agentic_sdlc/corpus/decisions/compliance-*.yml
+.project/corpus/decisions/compliance-*.yml
 ```
 
 ### Fase 1 - Discovery
 ```
-.agentic_sdlc/corpus/research/**
-.agentic_sdlc/corpus/docs/**
-.agentic_sdlc/references/**
+.project/corpus/research/**
+.project/corpus/docs/**
+.project/references/**
 ```
 
 ### Fase 2 - Requirements
@@ -113,7 +113,7 @@ phase_commit_process:
 ```
 .agentic_sdlc/projects/*/decisions/adr-*.yml
 .agentic_sdlc/projects/*/security/threat-model*.yml
-.agentic_sdlc/corpus/decisions/**
+.project/corpus/decisions/**
 docs/architecture/**
 ```
 

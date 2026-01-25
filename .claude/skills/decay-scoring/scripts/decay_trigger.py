@@ -250,7 +250,7 @@ def main():
     parser.add_argument(
         "--decay-index",
         type=Path,
-        default=Path(".agentic_sdlc/corpus/decay_index.json"),
+        default=Path(".project/corpus/decay_index.json"),
         help="Path to decay index JSON",
     )
     parser.add_argument(

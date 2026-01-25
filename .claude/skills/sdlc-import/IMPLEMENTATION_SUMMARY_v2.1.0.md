@@ -244,8 +244,8 @@ github_integration:
 2. **adr-validation.json** - Claim validation results
 3. **knowledge-graph.json** - Generation metadata
 4. **github-issues.json** - Created issues (if --create-issues used)
-5. **.agentic_sdlc/corpus/graph.json** - Full semantic graph
-6. **.agentic_sdlc/corpus/adjacency.json** - Fast traversal index
+5. **.project/corpus/graph.json** - Full semantic graph
+6. **.project/corpus/adjacency.json** - Fast traversal index
 
 ---
 

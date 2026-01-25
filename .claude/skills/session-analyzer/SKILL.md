@@ -22,7 +22,7 @@ Esta skill analisa sessoes do Claude Code para:
 
 1. **Extrair decisoes** - Identificar escolhas feitas durante a sessao
 2. **Capturar bloqueios** - Registrar problemas encontrados e como foram resolvidos
-3. **Persistir learnings** - Salvar conhecimento em `.agentic_sdlc/sessions/`
+3. **Persistir learnings** - Salvar conhecimento em `.project/sessions/`
 4. **Alimentar RAG** - Adicionar ao corpus para consultas futuras
 
 ## Scripts Disponíveis
@@ -87,7 +87,7 @@ Learnings são persistidos automaticamente:
 
 ```yaml
 on_learning_found:
-  - persist_to: .agentic_sdlc/corpus/learnings/
+  - persist_to: .project/corpus/learnings/
   - update: rag_index
 ```
 
@@ -151,7 +151,7 @@ session_analysis_process:
     - Listar learnings identificados
 
   5_persist_results:
-    - Salvar em .agentic_sdlc/sessions/
+    - Salvar em .project/sessions/
     - Atualizar RAG corpus se relevante
     - Vincular ao projeto/fase
 ```
@@ -159,7 +159,7 @@ session_analysis_process:
 ## Formato de Output
 
 ```yaml
-# .agentic_sdlc/sessions/session-{date}-{uuid-short}.yml
+# .project/sessions/session-{date}-{uuid-short}.yml
 session_analysis:
   id: string
   analyzed_at: datetime
@@ -246,7 +246,7 @@ on_phase_complete:
 ### Com Memory Manager
 ```yaml
 on_learning_found:
-  - persist_to: .agentic_sdlc/corpus/learnings/
+  - persist_to: .project/corpus/learnings/
   - update: rag_index
 ```
 
@@ -331,7 +331,7 @@ python3 .claude/skills/session-analyzer/scripts/handoff.py --quiet
 O handoff é gerado automaticamente:
 - **Hook**: `session-analyzer.sh` invoca `handoff.py` após gate-check
 - **Timing**: Ao fim de cada fase (gate passage)
-- **Output**: `.agentic_sdlc/sessions/YYYYMMDD-HHMMSS-{repo}.md`
+- **Output**: `.project/sessions/YYYYMMDD-HHMMSS-{repo}.md`
 
 ### Exemplo
 

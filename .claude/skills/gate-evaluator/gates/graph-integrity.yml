@@ -26,7 +26,7 @@ checks:
     severity: critical
     type: file_exists
     config:
-      path: .agentic_sdlc/corpus/graph.json
+      path: .project/corpus/graph.json
 
   - id: graph_file_valid_json
     name: Graph file is valid JSON
@@ -39,7 +39,7 @@ checks:
         import json
         from pathlib import Path
 
-        graph_file = Path(".agentic_sdlc/corpus/graph.json")
+        graph_file = Path(".project/corpus/graph.json")
         if not graph_file.exists():
             raise AssertionError("graph.json does not exist")
 
@@ -57,7 +57,7 @@ checks:
     severity: critical
     type: file_exists
     config:
-      path: .agentic_sdlc/corpus/adjacency.json
+      path: .project/corpus/adjacency.json
 
   # ==================== High Severity Checks ====================
 
@@ -72,7 +72,7 @@ checks:
         import json
         from pathlib import Path
 
-        with open(".agentic_sdlc/corpus/graph.json") as f:
+        with open(".project/corpus/graph.json") as f:
             graph = json.load(f)
 
         node_ids = {n["id"] for n in graph.get("nodes", [])}
@@ -98,9 +98,9 @@ checks:
       script: |
         import json
 
-        with open(".agentic_sdlc/corpus/graph.json") as f:
+        with open(".project/corpus/graph.json") as f:
             graph = json.load(f)
-        with open(".agentic_sdlc/corpus/adjacency.json") as f:
+        with open(".project/corpus/adjacency.json") as f:
             adj_data = json.load(f)
 
         adjacency = adj_data.get("adjacency", {})
@@ -133,7 +133,7 @@ checks:
       script: |
         import json
 
-        with open(".agentic_sdlc/corpus/graph.json") as f:
+        with open(".project/corpus/graph.json") as f:
             graph = json.load(f)
 
         invalid_nodes = []
@@ -166,7 +166,7 @@ checks:
             "relatedTo", "dependsOn", "usedIn", "isA", "partOf"
         }
 
-        with open(".agentic_sdlc/corpus/graph.json") as f:
+        with open(".project/corpus/graph.json") as f:
             graph = json.load(f)
 
         invalid_relations = []
@@ -194,7 +194,7 @@ checks:
       script: |
         import json
 
-        with open(".agentic_sdlc/corpus/graph.json") as f:
+        with open(".project/corpus/graph.json") as f:
             graph = json.load(f)
 
         nodes = graph.get("nodes", [])
@@ -222,7 +222,7 @@ checks:
       script: |
         import json
 
-        with open(".agentic_sdlc/corpus/adjacency.json") as f:
+        with open(".project/corpus/adjacency.json") as f:
             adj_data = json.load(f)
 
         adjacency = adj_data.get("adjacency", {})
@@ -250,7 +250,7 @@ checks:
       script: |
         import json
 
-        with open(".agentic_sdlc/corpus/graph.json") as f:
+        with open(".project/corpus/graph.json") as f:
             graph = json.load(f)
 
         self_loops = [

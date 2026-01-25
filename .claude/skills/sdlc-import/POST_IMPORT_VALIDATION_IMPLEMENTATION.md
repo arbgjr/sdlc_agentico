@@ -62,7 +62,7 @@ Implemented automatic validation and correction system for sdlc-import artifacts
    - Load validation config
    - Execute PostImportValidator
    - Generate quality report
-   - Save to `.agentic_sdlc/reports/post_import_quality_report.md`
+   - Save to `.project/reports/post_import_quality_report.md`
 
 2. **Step 11: User Approval**
    - Auto-accept if score >= 85% (no critical issues)
@@ -204,19 +204,19 @@ After running `/sdlc-import`, verify:
 
 ✅ **Tech debt report has full details**
 ```bash
-grep -c "^###" .agentic_sdlc/reports/tech-debt-inferred.md
+grep -c "^###" .project/reports/tech-debt-inferred.md
 # Should show all P0/P1/P2/P3 items
 ```
 
 ✅ **False positive ADRs removed**
 ```bash
-grep -l "test_" .agentic_sdlc/corpus/nodes/decisions/*.yml | wc -l
+grep -l "test_" .project/corpus/nodes/decisions/*.yml | wc -l
 # Should be 0 (no ADRs with test evidence)
 ```
 
 ✅ **Quality report generated**
 ```bash
-cat .agentic_sdlc/reports/post_import_quality_report.md | head -10
+cat .project/reports/post_import_quality_report.md | head -10
 # Should show project name, score, status
 ```
 
@@ -251,7 +251,7 @@ cd /path/to/project
 #    - User prompted (or auto-accepted if score >= 85%)
 
 # 3. Verify:
-#    - Check .agentic_sdlc/reports/post_import_quality_report.md
+#    - Check .project/reports/post_import_quality_report.md
 #    - Check tech debt report has full item list
 #    - Check ADRs don't have test evidence
 ```

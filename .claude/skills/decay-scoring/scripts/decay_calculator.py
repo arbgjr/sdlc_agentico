@@ -404,7 +404,7 @@ def main():
     parser.add_argument(
         "--corpus",
         type=Path,
-        default=Path(".agentic_sdlc/corpus"),
+        default=Path(".project/corpus"),
         help="Path to corpus directory",
     )
     parser.add_argument(

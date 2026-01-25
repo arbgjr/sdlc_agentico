@@ -258,7 +258,7 @@ def main():
     parser.add_argument("--persist", action="store_true", help="Salvar analise em disco")
     parser.add_argument("--project", help="Path do projeto", default=os.getcwd())
     parser.add_argument("--output-dir", help="Diretorio de output",
-                        default=".agentic_sdlc/sessions")
+                        default=".project/sessions")
     args = parser.parse_args()
 
     project_path = os.path.abspath(args.project)

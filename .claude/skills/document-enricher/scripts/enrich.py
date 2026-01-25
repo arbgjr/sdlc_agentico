@@ -260,7 +260,7 @@ def enrich_document(
 
     # Generate enrichment ID
     if index_path is None:
-        index_path = Path(".agentic_sdlc/references/_index.yml")
+        index_path = Path(".project/references/_index.yml")
 
     enrichment_id = generate_enrichment_id(index_path)
     version = get_next_version(doc_id, index_path)
@@ -401,7 +401,7 @@ def main():
     parser.add_argument("research_json", help="Path to research results JSON file")
     parser.add_argument(
         "--index",
-        default=".agentic_sdlc/references/_index.yml",
+        default=".project/references/_index.yml",
         help="Path to _index.yml"
     )
     parser.add_argument("--agent", default="domain-researcher", help="Agent name")

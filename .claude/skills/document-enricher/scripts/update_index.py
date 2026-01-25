@@ -275,12 +275,12 @@ def main():
     )
     parser.add_argument(
         "--index",
-        default=".agentic_sdlc/references/_index.yml",
+        default=".project/references/_index.yml",
         help="Path to _index.yml"
     )
     parser.add_argument(
         "--graph",
-        default=".agentic_sdlc/corpus/graph.json",
+        default=".project/corpus/graph.json",
         help="Path to graph.json"
     )
     parser.add_argument(

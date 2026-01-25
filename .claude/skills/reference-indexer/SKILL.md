@@ -25,7 +25,7 @@ Esta skill gerencia documentos de referencia externa, indexando-os para uso no R
 Adiciona documento ao indice de referencias:
 
 ```bash
-/ref-add .agentic_sdlc/references/legal/lei-13775-2018.pdf
+/ref-add .project/references/legal/lei-13775-2018.pdf
 ```
 
 Acoes:
@@ -66,7 +66,7 @@ Mostra:
 Remove documento do indice:
 
 ```bash
-/ref-remove .agentic_sdlc/references/legal/documento-antigo.pdf
+/ref-remove .project/references/legal/documento-antigo.pdf
 ```
 
 ## Formatos Suportados
@@ -82,7 +82,7 @@ Remove documento do indice:
 ## Estrutura de Referencias
 
 ```
-.agentic_sdlc/references/
+.project/references/
 ├── legal/              # Leis, regulamentos, normas
 ├── technical/          # RFCs, especificacoes tecnicas
 ├── business/           # Regras de negocio, manuais
@@ -206,7 +206,7 @@ No `settings.json`:
 ```json
 {
   "memory": {
-    "rag_corpus": ".agentic_sdlc/corpus",
+    "rag_corpus": ".project/corpus",
     "max_document_size_mb": 50,
     "chunk_size": 1000,
     "chunk_overlap": 200

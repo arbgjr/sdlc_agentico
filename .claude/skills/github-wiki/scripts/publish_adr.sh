@@ -124,8 +124,8 @@ EOF
 if [[ "$1" == "--all" ]]; then
     echo "Publicando todos os ADRs..."
 
-    for adr in .agentic_sdlc/corpus/nodes/decisions/*.yml \
-               .agentic_sdlc/corpus/nodes/decisions/*.yaml \
+    for adr in .project/corpus/nodes/decisions/*.yml \
+               .project/corpus/nodes/decisions/*.yaml \
                .agentic_sdlc/projects/*/decisions/*.yml \
                .agentic_sdlc/projects/*/decisions/*.yaml 2>/dev/null; do
         if [[ -f "$adr" ]]; then

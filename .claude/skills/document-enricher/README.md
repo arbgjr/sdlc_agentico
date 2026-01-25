@@ -157,7 +157,7 @@ Finds documents related to a research topic using hybrid search.
 python3 scripts/find_related.py "OAuth 2.1 migration" --min-similarity 0.6
 
 # Options:
-#   --index PATH             Path to _index.yml (default: .agentic_sdlc/references/_index.yml)
+#   --index PATH             Path to _index.yml (default: .project/references/_index.yml)
 #   --min-similarity FLOAT   Minimum similarity threshold (default: 0.6)
 #   --top-k INT              Maximum results (default: 5)
 #   --output FORMAT          Output format: json|yaml|text (default: text)
@@ -309,7 +309,7 @@ pytest .claude/skills/document-enricher/tests/test_find_related.py -v
 ✅ Indexed: ENRICH-001.yml
 
 # Result
-.agentic_sdlc/references/technical/
+.project/references/technical/
 ├── oauth2-spec.pdf              # Original (unchanged)
 └── oauth2-spec.enriched.v1.md   # Enriched with 2.1 info
 ```

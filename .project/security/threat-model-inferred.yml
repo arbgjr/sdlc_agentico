@@ -1,0 +1,15 @@
+critical: 0
+high: 0
+severity_distribution:
+  CRITICAL: 0
+  HIGH: 0
+  LOW: 0
+  MEDIUM: 0
+threats:
+  denial_of_service: []
+  elevation_of_privilege: []
+  information_disclosure: []
+  repudiation: []
+  spoofing: []
+  tampering: []
+total: 0

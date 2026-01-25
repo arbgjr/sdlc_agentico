@@ -336,4 +336,4 @@ python3 scripts/state_tracker.py set worker-abc123 UNKNOWN
 - Epic: Issue #33
 - Task: Issue #35
 - Source: [claude-orchestrator](https://github.com/reshashi/claude-orchestrator)
-- Analysis: `.agentic_sdlc/corpus/nodes/learnings/LEARN-claude-orchestrator-patterns.yml`
+- Analysis: `.project/corpus/nodes/learnings/LEARN-claude-orchestrator-patterns.yml`

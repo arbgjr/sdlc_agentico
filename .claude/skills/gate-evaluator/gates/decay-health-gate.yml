@@ -53,7 +53,7 @@ validation_script: |
   #!/bin/bash
   # Validate decay health gate
 
-  DECAY_INDEX=".agentic_sdlc/corpus/decay_index.json"
+  DECAY_INDEX=".project/corpus/decay_index.json"
 
   if [ ! -f "$DECAY_INDEX" ]; then
     echo "WARN: Decay index not found. Run decay_calculator.py first."

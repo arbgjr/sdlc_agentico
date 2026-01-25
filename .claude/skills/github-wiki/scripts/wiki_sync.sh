@@ -191,7 +191,7 @@ copy_adrs() {
     ADR_COUNT=0
 
     # ADRs no corpus
-    for adr in .agentic_sdlc/corpus/nodes/decisions/*.yml .agentic_sdlc/corpus/nodes/decisions/*.yaml 2>/dev/null; do
+    for adr in .project/corpus/nodes/decisions/*.yml .project/corpus/nodes/decisions/*.yaml 2>/dev/null; do
         if [[ -f "$adr" ]]; then
             convert_adr_to_md "$adr"
             ((ADR_COUNT++))

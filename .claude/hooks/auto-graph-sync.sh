@@ -24,7 +24,7 @@ if [[ -f "${SCRIPT_DIR}/../lib/shell/logging_utils.sh" ]]; then
 fi
 
 # Configuration
-CORPUS_NODES_PATH=".agentic_sdlc/corpus/nodes"
+CORPUS_NODES_PATH=".project/corpus/nodes"
 LEGACY_DECISIONS_PATH=".agentic_sdlc/decisions"
 LEGACY_PROJECTS_PATH=".agentic_sdlc/projects"
 GRAPH_BUILDER=".claude/skills/graph-navigator/scripts/graph_builder.py"

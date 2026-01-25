@@ -35,7 +35,7 @@ fi
 sdlc_log_debug "Consultando learnings para Phase $CURRENT_PHASE" "phase=$CURRENT_PHASE"
 
 # Consultar corpus RAG por learnings da fase
-CORPUS_LEARNINGS_DIR=".agentic_sdlc/corpus/nodes/learnings"
+CORPUS_LEARNINGS_DIR=".project/corpus/nodes/learnings"
 
 if [[ ! -d "$CORPUS_LEARNINGS_DIR" ]]; then
     sdlc_log_debug "Corpus learnings não encontrado, pulando" ""

@@ -71,7 +71,7 @@ class GraphVisualizer:
     def __init__(self, corpus_path: Optional[Path] = None):
         """Initialize visualizer."""
         if corpus_path is None:
-            corpus_path = Path(".agentic_sdlc/corpus")
+            corpus_path = Path(".project/corpus")
 
         self.corpus_path = Path(corpus_path)
         self.graph_file = corpus_path / "graph.json"
@@ -414,7 +414,7 @@ def main():
     )
     parser.add_argument(
         "--corpus",
-        default=".agentic_sdlc/corpus",
+        default=".project/corpus",
         help="Path to corpus directory"
     )
     parser.add_argument(

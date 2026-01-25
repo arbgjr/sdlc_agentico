@@ -17,7 +17,7 @@ if [[ -f "${SCRIPT_DIR}/../lib/shell/logging_utils.sh" ]]; then
     sdlc_set_context skill="rag-query"
 fi
 
-CORPUS_PATH=".agentic_sdlc/corpus"
+CORPUS_PATH=".project/corpus"
 TRACKER_SCRIPT=".claude/skills/decay-scoring/scripts/decay_tracker.py"
 
 # Skip if tracker script doesn't exist

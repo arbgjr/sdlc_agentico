@@ -2,8 +2,8 @@
 # Main configuration for reverse engineering existing projects
 
 general:
-  # Output directory for generated documentation
-  output_dir: ".agentic_sdlc"
+  # Output directory for generated documentation (project-specific artifacts)
+  output_dir: ".project"
 
   # Patterns to exclude from analysis
   exclude_patterns:
