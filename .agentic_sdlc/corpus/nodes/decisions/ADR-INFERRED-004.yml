@@ -1,25 +1,31 @@
-category: messaging
-confidence: 0.5733333333333334
+category: authentication
+confidence: 0.6266666666666667
 confidence_breakdown:
-  consistency: 0.417
-  evidence_quality: 1.0
-  evidence_quantity: 0.3
+  consistency: 0.583
+  evidence_quality: 0.9
+  evidence_quantity: 0.5
   llm_bonus: 0.0
 confidence_level: medium
-date: '2026-01-23T17:21:23.105169Z'
-decision: Use Celery for messaging
+date: '2026-01-25T04:27:01.842189Z'
+decision: Use Oauth2 for authentication
 evidence:
-- file: requirements.txt
-  line: 4
-  pattern: celery
-  quality: 1.0
+- file: .venv/lib/python3.12/site-packages/pandas/io/gbq.py
+  line: 79
+  pattern: OAuth2|oauthlib|authlib
+  quality: 0.9
   source: pattern
-evidence_count: 1
+- file: .venv/lib/python3.12/site-packages/pandas/core/frame.py
+  line: 2246
+  pattern: OAuth2|oauthlib|authlib
+  quality: 0.9
+  source: pattern
+evidence_count: 2
 id: ADR-INFERRED-004
 needs_validation: true
-rationale: Celery appears to be used for messaging. Evidence suggests this decision
-  was made to address specific requirements. [LLM synthesis would provide deeper analysis
-  here]
+rationale: 'Oauth2 was selected for authentication based on analysis of 2 files. Key
+  evidence found in: .venv/lib/python3.12/site-packages/pandas/io/gbq.py, .venv/lib/python3.12/site-packages/pandas/core/frame.py.
+  This decision aligns with project architecture patterns. [Note: Full LLM synthesis
+  requires API integration - see decision_extractor.py:_generate_llm_rationale]'
 status: inferred
 synthesized_by: llm
-title: Use Celery as Message Queue
+title: Use Oauth2 as Authentication Method

@@ -1,4 +1,4 @@
-category: authentication
+category: database
 confidence: 0.49333333333333335
 confidence_breakdown:
   consistency: 0.417
@@ -6,20 +6,21 @@ confidence_breakdown:
   evidence_quantity: 0.3
   llm_bonus: 0.0
 confidence_level: low
-date: '2026-01-23T17:21:23.098104Z'
-decision: Use Session for authentication
+date: '2026-01-25T04:26:59.797917Z'
+decision: Use Mongodb for database
 evidence:
-- file: myproject/settings.py
-  line: 12
-  pattern: django\.contrib\.sessions|express-session
+- file: .claude/skills/sdlc-import/scripts/validators/adr_evidence_fixer.py
+  line: 52
+  pattern: mongodb://|mongodb\+srv://
   quality: 0.8
   source: pattern
 evidence_count: 1
 id: ADR-INFERRED-002
 needs_validation: true
-rationale: Session appears to be used for authentication. Evidence suggests this decision
-  was made to address specific requirements. [LLM synthesis would provide deeper analysis
-  here]
+rationale: 'Mongodb was selected for database based on analysis of 1 files. Key evidence
+  found in: .claude/skills/sdlc-import/scripts/validators/adr_evidence_fixer.py. This
+  decision aligns with project architecture patterns. [Note: Full LLM synthesis requires
+  API integration - see decision_extractor.py:_generate_llm_rationale]'
 status: inferred
 synthesized_by: llm
-title: Use Session as Authentication Method
+title: Use Mongodb as Primary Database

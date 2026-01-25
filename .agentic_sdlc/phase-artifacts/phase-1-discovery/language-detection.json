@@ -1,0 +1,30 @@
+{
+  "primary_language": null,
+  "languages": {},
+  "frameworks": {
+    "backend": [],
+    "frontend": [],
+    "database": [],
+    "cache": [],
+    "messaging": [],
+    "testing": [
+      "pytest"
+    ],
+    "iac": [
+      "Kubernetes",
+      "Kubernetes"
+    ],
+    "config_mgmt": [],
+    "cicd": [
+      "Github Actions",
+      "Github Actions"
+    ],
+    "build_tools": [],
+    "mobile": []
+  },
+  "devops": [
+    "GitHub Actions"
+  ],
+  "lsp_analysis": {},
+  "confidence": 0.0
+}

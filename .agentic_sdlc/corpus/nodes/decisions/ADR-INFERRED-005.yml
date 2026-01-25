@@ -1,0 +1,26 @@
+category: caching
+confidence: 0.49333333333333335
+confidence_breakdown:
+  consistency: 0.417
+  evidence_quality: 0.8
+  evidence_quantity: 0.3
+  llm_bonus: 0.0
+confidence_level: low
+date: '2026-01-25T04:27:02.994742Z'
+decision: Use Redis for caching
+evidence:
+- file: .claude/skills/sdlc-import/tests/integration/test_django_integration.py
+  line: 84
+  pattern: REDIS_URL|CACHE_BACKEND.*redis
+  quality: 0.8
+  source: pattern
+evidence_count: 1
+id: ADR-INFERRED-005
+needs_validation: true
+rationale: 'Redis was selected for caching based on analysis of 1 files. Key evidence
+  found in: .claude/skills/sdlc-import/tests/integration/test_django_integration.py.
+  This decision aligns with project architecture patterns. [Note: Full LLM synthesis
+  requires API integration - see decision_extractor.py:_generate_llm_rationale]'
+status: inferred
+synthesized_by: llm
+title: Use Redis as Caching Strategy

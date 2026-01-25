@@ -1,15 +1,45 @@
-critical: 0
-high: 0
+critical: 4
+high: 1
 severity_distribution:
-  CRITICAL: 0
-  HIGH: 0
+  CRITICAL: 4
+  HIGH: 1
   LOW: 0
   MEDIUM: 0
 threats:
   denial_of_service: []
   elevation_of_privilege: []
-  information_disclosure: []
+  information_disclosure:
+  - cvss_score: 9.0
+    file: /home/armando_jr/source/repos/arbgjr/mice_dolphins/.claude/skills/sdlc-import/tests/unit/test_tech_debt_detector.py
+    id: THREAT-INFO-001
+    mitigation: Move secrets to environment variables
+    severity: CRITICAL
+    title: Hardcoded Secret Detected
+  - cvss_score: 9.0
+    file: /home/armando_jr/source/repos/arbgjr/mice_dolphins/.claude/skills/sdlc-import/tests/unit/test_threat_modeler.py
+    id: THREAT-INFO-002
+    mitigation: Move secrets to environment variables
+    severity: CRITICAL
+    title: Hardcoded Secret Detected
+  - cvss_score: 9.0
+    file: /home/armando_jr/source/repos/arbgjr/mice_dolphins/.venv/lib/python3.12/site-packages/pdfplumber-0.11.9.dist-info/METADATA
+    id: THREAT-INFO-003
+    mitigation: Move secrets to environment variables
+    severity: CRITICAL
+    title: Hardcoded Secret Detected
+  - cvss_score: 9.0
+    file: /home/armando_jr/source/repos/arbgjr/mice_dolphins/.venv/lib/python3.12/site-packages/pip/_internal/utils/misc.py
+    id: THREAT-INFO-004
+    mitigation: Move secrets to environment variables
+    severity: CRITICAL
+    title: Hardcoded Secret Detected
   repudiation: []
-  spoofing: []
+  spoofing:
+  - cvss_score: 7.5
+    file: /home/armando_jr/source/repos/arbgjr/mice_dolphins/.claude/skills/sdlc-import/tests/unit/test_threat_modeler.py
+    id: THREAT-SPOOF-001
+    mitigation: Enable JWT signature verification
+    severity: HIGH
+    title: JWT Signature Verification Disabled
   tampering: []
-total: 0
+total: 5

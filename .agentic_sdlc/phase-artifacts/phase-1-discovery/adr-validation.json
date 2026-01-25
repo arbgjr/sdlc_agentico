@@ -1,0 +1,69 @@
+{
+  "results": [
+    {
+      "adr_id": "ADR-INFERRED-006",
+      "title": "Use Pytest as Testing Framework",
+      "claims_count": 0,
+      "validated_count": 0,
+      "validation_rate": 0,
+      "claims": []
+    },
+    {
+      "adr_id": "ADR-INFERRED-003",
+      "title": "Use Jwt as Authentication Method",
+      "claims_count": 1,
+      "validated_count": 0,
+      "validation_rate": 0.0,
+      "claims": [
+        {
+          "claim": {
+            "type": "technology",
+            "technology": "JWT",
+            "text": "Use Jwt"
+          },
+          "is_valid": false,
+          "evidence_files": [],
+          "confidence": 0.2
+        }
+      ]
+    },
+    {
+      "adr_id": "ADR-INFERRED-004",
+      "title": "Use Oauth2 as Authentication Method",
+      "claims_count": 0,
+      "validated_count": 0,
+      "validation_rate": 0,
+      "claims": []
+    },
+    {
+      "adr_id": "ADR-INFERRED-001",
+      "title": "Use Postgresql as Primary Database",
+      "claims_count": 0,
+      "validated_count": 0,
+      "validation_rate": 0,
+      "claims": []
+    },
+    {
+      "adr_id": "ADR-INFERRED-002",
+      "title": "Use Mongodb as Primary Database",
+      "claims_count": 0,
+      "validated_count": 0,
+      "validation_rate": 0,
+      "claims": []
+    },
+    {
+      "adr_id": "ADR-INFERRED-005",
+      "title": "Use Redis as Caching Strategy",
+      "claims_count": 0,
+      "validated_count": 0,
+      "validation_rate": 0,
+      "claims": []
+    }
+  ],
+  "summary": {
+    "total_adrs": 6,
+    "total_claims": 1,
+    "validated_claims": 0,
+    "validation_rate": 0.0
+  }
+}

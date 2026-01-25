@@ -1,0 +1,100 @@
+{
+  "version": "2.1.0",
+  "generated_by": "sdlc-import",
+  "updated_at": "2026-01-25T04:27:07.429295Z",
+  "nodes": [
+    {
+      "id": "ADR-INFERRED-006",
+      "type": "Decision",
+      "title": "Use Pytest as Testing Framework",
+      "status": "inferred",
+      "confidence": 0.85,
+      "category": "testing",
+      "tags": [],
+      "concepts": [
+        "testing"
+      ]
+    },
+    {
+      "id": "ADR-INFERRED-003",
+      "type": "Decision",
+      "title": "Use Jwt as Authentication Method",
+      "status": "inferred",
+      "confidence": 0.805,
+      "category": "authentication",
+      "tags": [],
+      "concepts": [
+        "authentication"
+      ]
+    },
+    {
+      "id": "ADR-INFERRED-004",
+      "type": "Decision",
+      "title": "Use Oauth2 as Authentication Method",
+      "status": "inferred",
+      "confidence": 0.6266666666666667,
+      "category": "authentication",
+      "tags": [],
+      "concepts": [
+        "authentication"
+      ]
+    },
+    {
+      "id": "ADR-INFERRED-001",
+      "type": "Decision",
+      "title": "Use Postgresql as Primary Database",
+      "status": "inferred",
+      "confidence": 0.49333333333333335,
+      "category": "database",
+      "tags": [],
+      "concepts": [
+        "database"
+      ]
+    },
+    {
+      "id": "ADR-INFERRED-002",
+      "type": "Decision",
+      "title": "Use Mongodb as Primary Database",
+      "status": "inferred",
+      "confidence": 0.49333333333333335,
+      "category": "database",
+      "tags": [],
+      "concepts": [
+        "database"
+      ]
+    },
+    {
+      "id": "ADR-INFERRED-005",
+      "type": "Decision",
+      "title": "Use Redis as Caching Strategy",
+      "status": "inferred",
+      "confidence": 0.49333333333333335,
+      "category": "caching",
+      "tags": [],
+      "concepts": [
+        "caching"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "ADR-INFERRED-003",
+      "relation": "relatedTo",
+      "target": "ADR-INFERRED-004",
+      "reason": "Both related to authentication"
+    },
+    {
+      "source": "ADR-INFERRED-001",
+      "relation": "relatedTo",
+      "target": "ADR-INFERRED-002",
+      "reason": "Both related to database"
+    }
+  ],
+  "metadata": {
+    "node_count": 6,
+    "edge_count": 2,
+    "relation_types": [
+      "relatedTo"
+    ]
+  }
+}
