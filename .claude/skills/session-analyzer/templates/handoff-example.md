@@ -18,7 +18,7 @@
 
 - Criar automation loop para monitoramento de workers (Task #34)
 - Criar ADR documentando decisões arquiteturais
-- Atualizar documentação em .docs/
+- Atualizar documentação em \.agentic_sdlc/docs/
 - Integrar com observabilidade (Loki/Grafana)
 - Criar testes de integração
 
@@ -48,7 +48,7 @@
 - All three tasks (#35, #36, #37) completed successfully
 - Next: Implement automation loop (#34) which depends on #35
 - Need to create ADR documenting architectural decisions
-- Documentation updates pending for .docs/
+- Documentation updates pending for \.agentic_sdlc/docs/
 
 ---
 

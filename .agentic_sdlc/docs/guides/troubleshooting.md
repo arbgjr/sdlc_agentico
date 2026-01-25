@@ -304,9 +304,9 @@ ls -la .claude/skills/gate-evaluator/gates/
 
 Se o problema persistir:
 
-1. **Verifique a documentacao**: `.docs/` contem guias detalhados
-2. **Consulte o playbook**: `.docs/playbook.md` tem principios e padroes
-3. **Veja exemplos**: `.docs/SIMULATION-DUPLICATAS.md` mostra um caso real
+1. **Verifique a documentacao**: `\.agentic_sdlc/docs/` contem guias detalhados
+2. **Consulte o playbook**: `\.agentic_sdlc/docs/playbook.md` tem principios e padroes
+3. **Veja exemplos**: `\.agentic_sdlc/docs/SIMULATION-DUPLICATAS.md` mostra um caso real
 4. **Reporte issue**: Documente o problema com logs e contexto
 
 ---

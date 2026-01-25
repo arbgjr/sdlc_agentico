@@ -36,7 +36,7 @@ VERSION="v1.7.1"
 curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -
 
 # Execute o setup
-./.scripts/setup-sdlc.sh
+./\.agentic_sdlc/scripts/setup-sdlc.sh
 ```
 
 ### Alternativa: Clone do Repositório
@@ -44,7 +44,7 @@ curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}
 ```bash
 git clone https://github.com/arbgjr/sdlc_agentico.git
 cd sdlc_agentico
-./.scripts/setup-sdlc.sh
+./\.agentic_sdlc/scripts/setup-sdlc.sh
 ```
 
 O script instala automaticamente:

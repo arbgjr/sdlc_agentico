@@ -31,7 +31,7 @@ allowed-tools:
   - Grep
   - Bash
 references:
-  - path: .docs/engineering-playbook/stacks/devops/observability.md
+  - path: \.agentic_sdlc/docs/engineering-playbook/stacks/devops/observability.md
     purpose: Padroes de monitoramento, logs, metricas, alertas
 ---
 

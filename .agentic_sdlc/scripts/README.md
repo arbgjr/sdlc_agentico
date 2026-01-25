@@ -19,7 +19,7 @@ Valida que as contagens de componentes na documentação estão corretas e consi
 
 **Uso:**
 ```bash
-./.scripts/validate-doc-counts.sh [--verbose]
+./\.agentic_sdlc/scripts/validate-doc-counts.sh [--verbose]
 ```
 
 **O que valida:**
@@ -60,7 +60,7 @@ Atualiza automaticamente as contagens de componentes na documentação.
 
 **Uso:**
 ```bash
-./.scripts/update-doc-counts.sh [--dry-run] [--verbose]
+./\.agentic_sdlc/scripts/update-doc-counts.sh [--dry-run] [--verbose]
 ```
 
 **Opções:**
@@ -81,10 +81,10 @@ Atualiza automaticamente as contagens de componentes na documentação.
 **Workflow recomendado:**
 ```bash
 # 1. Ver o que seria mudado
-./.scripts/update-doc-counts.sh --dry-run
+./\.agentic_sdlc/scripts/update-doc-counts.sh --dry-run
 
 # 2. Aplicar as mudanças
-./.scripts/update-doc-counts.sh
+./\.agentic_sdlc/scripts/update-doc-counts.sh
 
 # 3. Revisar as mudanças
 git diff README.md CLAUDE.md
@@ -154,7 +154,7 @@ Script de instalação principal do SDLC Agêntico.
 
 **Uso:**
 ```bash
-./.scripts/setup-sdlc.sh [--from-release] [--version VERSION]
+./\.agentic_sdlc/scripts/setup-sdlc.sh [--from-release] [--version VERSION]
 ```
 
 ### `install-security-tools.sh`
@@ -163,7 +163,7 @@ Instala ferramentas de segurança opcionais (Semgrep, Trivy, Gitleaks).
 
 **Uso:**
 ```bash
-./.scripts/install-security-tools.sh [--all|--semgrep|--trivy|--gitleaks]
+./\.agentic_sdlc/scripts/install-security-tools.sh [--all|--semgrep|--trivy|--gitleaks]
 ```
 
 ---
@@ -185,10 +185,10 @@ Sempre que você adicionar:
 # ... crie o arquivo ...
 
 # 2. Atualizar contagens automaticamente
-./.scripts/update-doc-counts.sh
+./\.agentic_sdlc/scripts/update-doc-counts.sh
 
 # 3. Validar que está correto
-./.scripts/validate-doc-counts.sh
+./\.agentic_sdlc/scripts/validate-doc-counts.sh
 
 # 4. Commitar tudo junto
 git add .
@@ -206,7 +206,7 @@ Para executar validação automaticamente antes de cada commit:
 ```bash
 # .git/hooks/pre-commit
 #!/bin/bash
-./.scripts/validate-doc-counts.sh
+./\.agentic_sdlc/scripts/validate-doc-counts.sh
 exit $?
 ```
 
@@ -218,17 +218,17 @@ exit $?
 
 ```bash
 # Execute o script de atualização
-./.scripts/update-doc-counts.sh
+./\.agentic_sdlc/scripts/update-doc-counts.sh
 
 # Depois valide novamente
-./.scripts/validate-doc-counts.sh
+./\.agentic_sdlc/scripts/validate-doc-counts.sh
 ```
 
 ### Script diz "Permission denied"
 
 ```bash
 # Tornar scripts executáveis
-chmod +x .scripts/*.sh
+chmod +x \.agentic_sdlc/scripts/*.sh
 ```
 
 ### Referências ao nome antigo do repositório

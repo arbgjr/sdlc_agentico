@@ -90,7 +90,7 @@ project:
 ### Organizational Decision Record (ODR)
 
 ODRs documentam decisões organizacionais/negócio, diferente de ADRs que são técnicos.
-Veja `.docs/guides/adr-vs-odr.md` para guia completo.
+Veja `\.agentic_sdlc/docs/guides/adr-vs-odr.md` para guia completo.
 
 ```yaml
 # decisions/odr-NNN.yml

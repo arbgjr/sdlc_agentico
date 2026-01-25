@@ -17,7 +17,7 @@
 #   1 - Uma ou mais validações falharam
 #
 # Exemplo:
-#   ./.scripts/validate-doc-counts.sh
+#   ./\.agentic_sdlc/scripts/validate-doc-counts.sh
 #
 
 set -euo pipefail
@@ -158,7 +158,7 @@ if grep -r "mice_dolphins" \
   --exclude="validate-docs.yml" \
   --exclude="settings.local.json" \
   --exclude="README.md" \
-  .scripts/ .claude/ .docs/ *.md 2>/dev/null; then
+  \.agentic_sdlc/scripts/ .claude/ \.agentic_sdlc/docs/ *.md 2>/dev/null; then
   log_error "Found old repository name 'mice_dolphins' in the codebase"
   log_error "All references should use 'sdlc_agentico'"
   VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
@@ -170,18 +170,18 @@ echo ""
 # Validate links
 log_info "Validating documentation links..."
 
-if ! test -f .docs/guides/troubleshooting.md; then
-  log_error "Referenced file .docs/guides/troubleshooting.md does not exist"
+if ! test -f \.agentic_sdlc/docs/guides/troubleshooting.md; then
+  log_error "Referenced file \.agentic_sdlc/docs/guides/troubleshooting.md does not exist"
   VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
 fi
 
-if ! test -d .docs/engineering-playbook/manual-desenvolvimento; then
-  log_error "Referenced directory .docs/engineering-playbook/manual-desenvolvimento does not exist"
+if ! test -d \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento; then
+  log_error "Referenced directory \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento does not exist"
   VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
 fi
 
-if test -d .docs/examples; then
-  log_error "Directory .docs/examples exists but should not be in repository"
+if test -d \.agentic_sdlc/docs/examples; then
+  log_error "Directory \.agentic_sdlc/docs/examples exists but should not be in repository"
   VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
 fi
 
@@ -224,7 +224,7 @@ else
   echo -e "${RED}✗ Found $VALIDATION_ERRORS validation error(s)${NC}"
   echo ""
   echo "To fix automatically, run:"
-  echo "  ./.scripts/update-doc-counts.sh"
+  echo "  ./\.agentic_sdlc/scripts/update-doc-counts.sh"
   echo ""
   exit 1
 fi

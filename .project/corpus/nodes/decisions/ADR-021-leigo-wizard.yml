@@ -319,7 +319,7 @@ migration_path: |
   - Comando /leigo-start independente
   - Templates em diretório separado
   - Agentes reutilizados (sem modificação)
-  - Docs em namespace separado (.docs/leigo/)
+  - Docs em namespace separado (\.agentic_sdlc/docs/leigo/)
 
   Rollback: Simplesmente git revert (RTO < 5min)
 

@@ -4,7 +4,7 @@
 # Valida se uma fase do SDLC foi completada corretamente
 #
 # Uso:
-#   ./.scripts/validate-sdlc-phase.sh [PROJECT_PATH] [PHASE_NUMBER]
+#   ./\.agentic_sdlc/scripts/validate-sdlc-phase.sh [PROJECT_PATH] [PHASE_NUMBER]
 #
 
 set -e

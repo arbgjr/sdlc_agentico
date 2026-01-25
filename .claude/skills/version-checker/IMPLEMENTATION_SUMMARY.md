@@ -250,7 +250,7 @@ The orchestrator now invokes `check_updates.py` at the start of workflows (Phase
 ### Phase 7: Documentation Updates
 - [ ] Update `CHANGELOG.md` with v1.8.0 entry
 - [ ] Update `CLAUDE.md` with version-checker info
-- [ ] Update `.docs/playbook.md` with auto-update section
+- [ ] Update `\.agentic_sdlc/docs/playbook.md` with auto-update section
 - [ ] Create ADR for auto-update architecture
 
 ### Phase 8: Quality Assurance

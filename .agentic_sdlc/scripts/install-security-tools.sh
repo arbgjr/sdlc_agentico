@@ -4,7 +4,7 @@
 # Estas ferramentas sao usadas pelo security-gate e security-scanner
 #
 # Uso:
-#   ./.scripts/install-security-tools.sh [--all | --semgrep | --trivy | --gitleaks]
+#   ./\.agentic_sdlc/scripts/install-security-tools.sh [--all | --semgrep | --trivy | --gitleaks]
 #
 
 set -e

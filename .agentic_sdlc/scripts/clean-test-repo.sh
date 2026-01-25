@@ -4,7 +4,7 @@
 # Limpa um repositório de teste, mantendo apenas LICENSE e README.md
 #
 # Uso:
-#   ./.scripts/clean-test-repo.sh [REPO_PATH]
+#   ./\.agentic_sdlc/scripts/clean-test-repo.sh [REPO_PATH]
 #
 # Se REPO_PATH não for fornecido, usa o diretório atual.
 #

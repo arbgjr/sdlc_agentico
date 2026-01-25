@@ -130,7 +130,7 @@ When executing an update:
 1. **Save State**: Record current commit SHA for rollback
 2. **Fetch**: Run `git fetch --tags`
 3. **Checkout**: Run `git checkout v{version}`
-4. **Migrations**: Execute `.scripts/migrate-to-v{version}.sh` if exists
+4. **Migrations**: Execute `\.agentic_sdlc/scripts/migrate-to-v{version}.sh` if exists
 5. **Verify**: Check VERSION file, directories, run setup verification
 6. **Rollback**: If any step fails, rollback to saved commit
 

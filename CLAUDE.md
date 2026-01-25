@@ -67,7 +67,7 @@ When services are unavailable, use resilience patterns:
 
 ```bash
 # Install all dependencies (Python 3.11+, uv, Node.js 18+, Claude Code, Spec Kit, gh)
-./.scripts/setup-sdlc.sh
+./\.agentic_sdlc/scripts/setup-sdlc.sh
 
 # Verify installation
 specify check
@@ -147,8 +147,8 @@ All behavior is defined in `.claude/settings.json`, which configures:
 ├── corpus/           # RAG knowledge corpus
 └── sessions/         # Session history
 
-.docs/                # User documentation and playbook
-.scripts/             # Installation automation
+\.agentic_sdlc/docs/                # User documentation and playbook
+\.agentic_sdlc/scripts/             # Installation automation
 ```
 
 ### Phase Flow
@@ -224,8 +224,8 @@ Agents use different models based on task complexity:
 | `.claude/skills/gate-evaluator/gates/*.yml` | Quality gate definitions per phase transition |
 | `.claude/skills/gate-evaluator/gates/security-gate.yml` | Security by Design gate (mandatory) |
 | `.agentic_sdlc/templates/*.yml` | Templates for ADR, spec, threat-model |
-| `.docs/playbook.md` | Development principles, standards, and practices |
-| `.docs/engineering-playbook/manual-desenvolvimento/` | Development standards and guidelines |
+| `\.agentic_sdlc/docs/playbook.md` | Development principles, standards, and practices |
+| `\.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/` | Development standards and guidelines |
 | `.claude/lib/python/sdlc_logging.py` | Python logging module with Loki handler (v1.7.0) |
 | `.claude/lib/shell/logging_utils.sh` | Shell logging functions (v1.7.0) |
 | `.claude/config/logging/logging.yml` | Centralized logging configuration (v1.7.0) |
@@ -449,7 +449,7 @@ Processes enterprise documents with production-grade quality:
 
 **Dependencies (optional):**
 ```bash
-./.scripts/setup-sdlc.sh --install-optional
+./\.agentic_sdlc/scripts/setup-sdlc.sh --install-optional
 # Or manually: pip install pdfplumber openpyxl python-docx
 # System: apt install poppler-utils tesseract-ocr libreoffice
 ```
@@ -576,7 +576,7 @@ All research agents now include "Step 0: Check for Related Documents":
 - `graph_relation_created`: Graph contains 'enriches' relation
 - `enrichment_version_incremented`: Versions increment sequentially
 
-**See:** `.docs/enrichment-guide.md` - Complete user guide
+**See:** `\.agentic_sdlc/docs/enrichment-guide.md` - Complete user guide
 
 ## New Skills (v1.4.0) - Semantic Knowledge Graph
 

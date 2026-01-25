@@ -16,10 +16,10 @@
 #
 # Exemplo:
 #   # Ver o que seria mudado
-#   ./.scripts/update-doc-counts.sh --dry-run
+#   ./\.agentic_sdlc/scripts/update-doc-counts.sh --dry-run
 #
 #   # Aplicar as mudanças
-#   ./.scripts/update-doc-counts.sh
+#   ./\.agentic_sdlc/scripts/update-doc-counts.sh
 #
 
 set -euo pipefail

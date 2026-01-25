@@ -196,9 +196,9 @@ def find_migration_script(version: str) -> Path:
     Find migration script for specific version.
 
     Looks for:
-    - .scripts/migrate-to-v{version}.sh
-    - .scripts/migrate-to-{version}.sh
-    - .scripts/migrate-v{old}-to-v{new}.sh
+    - \.agentic_sdlc/scripts/migrate-to-v{version}.sh
+    - \.agentic_sdlc/scripts/migrate-to-{version}.sh
+    - \.agentic_sdlc/scripts/migrate-v{old}-to-v{new}.sh
 
     Args:
         version: Version string (e.g., "2.1.0")
@@ -262,7 +262,7 @@ def verify_installation() -> bool:
             return False
 
     # Try running setup verification if available
-    setup_script = Path(".scripts/setup-sdlc.sh")
+    setup_script = Path("\.agentic_sdlc/scripts/setup-sdlc.sh")
     if setup_script.exists():
         try:
             subprocess.run(

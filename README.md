@@ -82,7 +82,7 @@ VERSION="v2.0.7"
 curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -
 
 # Executar setup
-./.scripts/setup-sdlc.sh
+./\.agentic_sdlc/scripts/setup-sdlc.sh
 ```
 
 > **WSL2**: Use os mesmos comandos acima. O tar.gz preserva as permissões Unix corretamente.
@@ -93,10 +93,10 @@ curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}
 
 ```bash
 # Última versão (one-liner)
-curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
+curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release
 
 # Versão específica
-curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v2.0.7
+curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release --version v2.0.7
 ```
 
 Se o diretório `.claude/` já existir, o script perguntará o que fazer:
@@ -113,7 +113,7 @@ git clone https://github.com/arbgjr/sdlc_agentico.git
 cd sdlc_agentico
 
 # Executar setup
-./.scripts/setup-sdlc.sh
+./\.agentic_sdlc/scripts/setup-sdlc.sh
 ```
 
 ### Ferramentas de Segurança (Opcional)
@@ -122,12 +122,12 @@ Para usar os recursos de security scanning (`/security-scan`, security gates):
 
 ```bash
 # Instalar todas as ferramentas
-./.scripts/install-security-tools.sh --all
+./\.agentic_sdlc/scripts/install-security-tools.sh --all
 
 # Ou instalar individualmente
-./.scripts/install-security-tools.sh --semgrep   # SAST
-./.scripts/install-security-tools.sh --trivy     # SCA/Container
-./.scripts/install-security-tools.sh --gitleaks  # Secret Scanner
+./\.agentic_sdlc/scripts/install-security-tools.sh --semgrep   # SAST
+./\.agentic_sdlc/scripts/install-security-tools.sh --trivy     # SCA/Container
+./\.agentic_sdlc/scripts/install-security-tools.sh --gitleaks  # Secret Scanner
 ```
 
 ### Instalação Manual
@@ -143,7 +143,7 @@ gh auth login
 
 ```bash
 # 1. Instalar dependências
-./.scripts/setup-sdlc.sh
+./\.agentic_sdlc/scripts/setup-sdlc.sh
 
 # 2. Iniciar Claude Code
 claude
@@ -394,11 +394,11 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 ├── corpus/           # Corpus de conhecimento RAG
 └── sessions/         # Histórico de sessões
 
-.scripts/
+\.agentic_sdlc/scripts/
 ├── setup-sdlc.sh             # Script de instalação
 └── install-security-tools.sh # Ferramentas de segurança opcionais
 
-.docs/
+\.agentic_sdlc/docs/
 ├── guides/                   # Guias de uso
 │   ├── quickstart.md         # Guia rápido
 │   ├── infrastructure.md     # Setup e integração
@@ -416,11 +416,11 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 
 | Documento | Descrição |
 |-----------|-----------|
-| [quickstart.md](.docs/guides/quickstart.md) | Guia rápido de início |
-| [infrastructure.md](.docs/guides/infrastructure.md) | Setup e integração |
-| [agents.md](.docs/sdlc/agents.md) | Catálogo de agentes |
-| [commands.md](.docs/sdlc/commands.md) | Referência de comandos |
-| [engineering-playbook](.docs/engineering-playbook/) | Padrões de engenharia |
+| [quickstart.md](\.agentic_sdlc/docs/guides/quickstart.md) | Guia rápido de início |
+| [infrastructure.md](\.agentic_sdlc/docs/guides/infrastructure.md) | Setup e integração |
+| [agents.md](\.agentic_sdlc/docs/sdlc/agents.md) | Catálogo de agentes |
+| [commands.md](\.agentic_sdlc/docs/sdlc/commands.md) | Referência de comandos |
+| [engineering-playbook](\.agentic_sdlc/docs/engineering-playbook/) | Padrões de engenharia |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Como contribuir |
 
 ## Exemplo de Uso
@@ -463,7 +463,7 @@ O sistema rastreia automaticamente:
 - **Claude Code CLI**: Requer conta Anthropic ativa com acesso ao Claude Code
 - **Spec Kit**: Opcional, mas necessário para comandos de especificação
 - **GitHub CLI (gh)**: Necessário para integração com GitHub e Copilot Coding Agent
-- **Ferramentas de Segurança**: gitleaks, semgrep, trivy são opcionais (instaláveis via `.scripts/install-security-tools.sh`)
+- **Ferramentas de Segurança**: gitleaks, semgrep, trivy são opcionais (instaláveis via `\.agentic_sdlc/scripts/install-security-tools.sh`)
 
 ### Funcionalidades
 - **Lightweight Agents**: 4 agentes (failure-analyst, interview-simulator, requirements-interrogator, tradeoff-challenger) são minimalistas e dependem da skill `system-design-decision-engine`
@@ -476,7 +476,7 @@ O sistema rastreia automaticamente:
 
 ## Troubleshooting
 
-Consulte [.docs/guides/troubleshooting.md](.docs/guides/troubleshooting.md) para resolução de problemas comuns.
+Consulte [\.agentic_sdlc/docs/guides/troubleshooting.md](\.agentic_sdlc/docs/guides/troubleshooting.md) para resolução de problemas comuns.
 
 ## Contribuindo
 

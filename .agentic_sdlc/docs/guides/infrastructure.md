@@ -34,8 +34,8 @@
 │   └── pending/
 └── sessions/         # Histórico de sessões
 
-.docs/                # Documentação do usuário
-.scripts/             # Scripts de instalação
+\.agentic_sdlc/docs/                # Documentação do usuário
+\.agentic_sdlc/scripts/             # Scripts de instalação
 ```
 
 ---
@@ -65,7 +65,7 @@
 
 ```bash
 # Baixar e executar
-curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash
+curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash
 ```
 
 Ou manualmente:

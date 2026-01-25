@@ -32,7 +32,7 @@ allowed-tools:
   - Grep
   - Bash
 references:
-  - path: .docs/engineering-playbook/manual-desenvolvimento/standards.md
+  - path: \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/standards.md
     purpose: Regras de qualidade, versionamento, merge blockers
 ---
 

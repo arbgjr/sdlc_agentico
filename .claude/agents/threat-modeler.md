@@ -26,7 +26,7 @@ skills:
   - memory-manager
   - document-enricher
 references:
-  - path: .docs/engineering-playbook/stacks/devops/security.md
+  - path: \.agentic_sdlc/docs/engineering-playbook/stacks/devops/security.md
     purpose: Padroes de seguranca, STRIDE, escalation triggers
 ---
 

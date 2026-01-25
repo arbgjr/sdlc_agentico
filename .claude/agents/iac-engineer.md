@@ -33,7 +33,7 @@ skills:
   - iac-generator
   - security-scanner
 references:
-  - path: .docs/engineering-playbook/stacks/devops/ci-cd.md
+  - path: \.agentic_sdlc/docs/engineering-playbook/stacks/devops/ci-cd.md
     purpose: Padroes de pipeline e deploy
 ---
 

@@ -5,13 +5,13 @@
 #
 # Uso:
 #   # Instalacao completa do zero (requer repositorio clonado)
-#   ./.scripts/setup-sdlc.sh
+#   ./\.agentic_sdlc/scripts/setup-sdlc.sh
 #
 #   # Instalacao a partir de uma release
-#   curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release
+#   curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release
 #
 #   # Instalacao de versao especifica
-#   curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.0.0
+#   curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.0.0
 #
 
 set -e
@@ -99,13 +99,13 @@ show_usage() {
     echo ""
     echo "Exemplos:"
     echo "  # Instalacao local (apos clonar repo)"
-    echo "  ./.scripts/setup-sdlc.sh"
+    echo "  ./\.agentic_sdlc/scripts/setup-sdlc.sh"
     echo ""
     echo "  # Instalacao remota (ultima release)"
-    echo "  curl -fsSL ${REPO_URL}/raw/main/.scripts/setup-sdlc.sh | bash -s -- --from-release"
+    echo "  curl -fsSL ${REPO_URL}/raw/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release"
     echo ""
     echo "  # Instalacao de versao especifica"
-    echo "  curl -fsSL ${REPO_URL}/raw/main/.scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.0.0"
+    echo "  curl -fsSL ${REPO_URL}/raw/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.0.0"
     echo ""
 }
 
@@ -526,8 +526,8 @@ make_scripts_executable() {
     log_info "Configurando permissoes de scripts..."
 
     if [[ -d ".scripts" ]]; then
-        chmod +x .scripts/*.sh 2>/dev/null || true
-        log_success "Scripts em .scripts/ configurados"
+        chmod +x \.agentic_sdlc/scripts/*.sh 2>/dev/null || true
+        log_success "Scripts em \.agentic_sdlc/scripts/ configurados"
     fi
 
     if [[ -d ".claude/hooks" ]]; then
@@ -659,16 +659,16 @@ print_summary() {
     echo ""
     echo "Ferramentas opcionais:"
     echo "  # Seguranca:"
-    echo "  ./.scripts/install-security-tools.sh --all"
+    echo "  ./\.agentic_sdlc/scripts/install-security-tools.sh --all"
     echo ""
     echo "  # Skills (document-processor, frontend-testing):"
-    echo "  ./.scripts/setup-sdlc.sh --check-optional    # Verificar"
-    echo "  ./.scripts/setup-sdlc.sh --install-optional  # Instalar"
+    echo "  ./\.agentic_sdlc/scripts/setup-sdlc.sh --check-optional    # Verificar"
+    echo "  ./\.agentic_sdlc/scripts/setup-sdlc.sh --install-optional  # Instalar"
     echo ""
     echo "Documentacao:"
-    echo "  - .docs/QUICKSTART.md"
-    echo "  - .docs/INFRASTRUCTURE.md"
-    echo "  - .docs/playbook.md"
+    echo "  - \.agentic_sdlc/docs/QUICKSTART.md"
+    echo "  - \.agentic_sdlc/docs/INFRASTRUCTURE.md"
+    echo "  - \.agentic_sdlc/docs/playbook.md"
     echo ""
 }
 

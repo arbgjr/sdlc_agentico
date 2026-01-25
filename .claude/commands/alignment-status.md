@@ -256,4 +256,4 @@ Este comando é usado por:
 
 - Criar ODR: `/odr-create`
 - Template: `.agentic_sdlc/templates/odr-template.yml`
-- Guia: `.docs/guides/adr-vs-odr.md`
+- Guia: `\.agentic_sdlc/docs/guides/adr-vs-odr.md`

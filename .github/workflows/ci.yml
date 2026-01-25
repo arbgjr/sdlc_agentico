@@ -108,7 +108,7 @@ jobs:
 
       - name: Lint documentation
         run: |
-          markdownlint README.md CLAUDE.md .docs/*.md --disable MD013 MD033 MD041 || true
+          markdownlint README.md CLAUDE.md \.agentic_sdlc/docs/*.md --disable MD013 MD033 MD041 || true
         continue-on-error: true
 
   shellcheck:

@@ -242,6 +242,6 @@ ODRs são verificados automaticamente nos gates:
 
 ## Referências
 
-- Guia ADR vs ODR: `.docs/guides/adr-vs-odr.md`
+- Guia ADR vs ODR: `\.agentic_sdlc/docs/guides/adr-vs-odr.md`
 - Template ODR: `.agentic_sdlc/templates/odr-template.yml`
 - Schema: `.claude/skills/memory-manager/SKILL.md`
