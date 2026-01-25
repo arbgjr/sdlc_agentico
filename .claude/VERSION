@@ -1,29 +1,44 @@
 # SDLC Agêntico Version
-version: "2.0.6"
-build_date: "2026-01-24"
+version: "2.0.7"
+build_date: "2026-01-25"
 release_notes: |
-  sdlc-import - Post-Import Validation & Auto-Correction System
+  sdlc-import - Infrastructure Preservation Fix
 
-  Features:
-  - feat(sdlc-import): Post-import validation system with automatic correction
-  - feat(sdlc-import): ADR evidence fixer (removes false positives from .claude/, tests/)
-  - feat(sdlc-import): Tech debt report enhancement (full item details, not just summary)
-  - feat(sdlc-import): Quality report generator with scoring system
-  - feat(sdlc-import): User approval workflow (auto-accept >= 85%, prompt < 85%)
-  - feat(sdlc-import): 4 validators (ADR, tech debt, diagrams, artifact completeness)
+  Critical Bug Fix:
+  - fix(sdlc-import): Implement infrastructure preservation to prevent deletion of framework files
+  - InfrastructurePreserver backs up and restores framework documentation
+  - Preserves templates, framework ADRs (001-099), learnings, sessions, .gitkeep, logo.png
+
+  Problem Solved:
+  - sdlc-import was deleting ALL existing .agentic_sdlc/ content
+  - Framework documentation (ADR-019 to ADR-022) was being removed
+  - Templates directory disappeared, breaking subsequent SDLC workflows
+  - Infrastructure files (.gitkeep, logo.png) required manual restoration
+
+  Solution:
+  - Automatic backup of existing infrastructure before doc generation
+  - Pattern-based detection of framework vs. imported files
+  - Restoration of preserved files after doc generation
+  - Comprehensive integration tests (4 tests covering all scenarios)
 
   Impact:
-  - Tech debt reports now show ALL items (e.g., 580 items listed, not just summary)
-  - False positive ADRs automatically removed (>70% evidence from tests/config)
-  - Quality checkpoint before user receives artifacts (score 0.0-1.0)
-  - Auto-accepts high quality imports (>= 85%), prompts for review if lower
-  - Users can accept/re-run/abort based on quality report
+  - ✅ Framework documentation preserved during import
+  - ✅ Templates available for subsequent SDLC workflows
+  - ✅ No manual restoration needed
+  - ✅ Existing ADRs, learnings, sessions maintained
 
   Files:
-  - 10 new files (~1,266 lines): validators, orchestrator, quality report generator
-  - 2 modified files (~230 lines): documentation_generator.py, project_analyzer.py
+  - 1 new file (315 lines): infrastructure_preserver.py
+  - 1 modified file (10 lines): project_analyzer.py
+  - 1 test file (120 lines): test_infrastructure_preservation.py
 
 changelog:
+  - version: "2.0.7"
+    date: "2026-01-25"
+    changes:
+      - "fix(sdlc-import): Infrastructure preservation to prevent deletion of framework files"
+      - "feat(sdlc-import): InfrastructurePreserver class with backup/restore logic"
+      - "test(sdlc-import): Comprehensive integration tests for preservation (4 tests)"
   - version: "2.0.6"
     date: "2026-01-24"
     changes:
