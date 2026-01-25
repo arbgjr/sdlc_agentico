@@ -38,12 +38,30 @@ from architecture_visualizer import ArchitectureVisualizer
 from threat_modeler import ThreatModeler
 from tech_debt_detector import TechDebtDetector
 from documentation_generator import DocumentationGenerator
+from post_import_validator import PostImportValidator
+from quality_report_generator import QualityReportGenerator
 from graph_generator import GraphGenerator
 from issue_creator import IssueCreator
 from migration_analyzer import MigrationAnalyzer
 from adr_validator import ADRValidator
 
 logger = get_logger(__name__, skill="sdlc-import", phase=0)
+
+
+# Exceptions
+class ImportAbortedError(Exception):
+    """Raised when import is aborted by user"""
+    pass
+
+
+# Enums
+from enum import Enum
+
+class UserDecision(Enum):
+    """User decision on import quality"""
+    ACCEPT = "accept"
+    RERUN = "rerun"
+    ABORT = "abort"
 
 
 class ProjectAnalyzer:
@@ -61,6 +79,11 @@ class ProjectAnalyzer:
         self.config = self._load_config(config_path)
         self.output_dir = self.project_path / self.config['general']['output_dir']
         self.analysis_id = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+
+        # Add dynamic config fields
+        self.config['project_name'] = self.project_path.name
+        self.config['analysis_id'] = self.analysis_id
+        self.config['project_path'] = str(self.project_path)
 
         # Initialize analysis components
         self.language_detector = LanguageDetector(self.config)
@@ -540,6 +563,122 @@ class ProjectAnalyzer:
             )
             return False
 
+    def _load_validation_config(self) -> Dict:
+        """
+        Load post-import validation configuration.
+
+        Returns:
+            Validation config dict
+        """
+        validation_config_path = Path(__file__).parent.parent / "config" / "post_import_validation_rules.yml"
+
+        if validation_config_path.exists():
+            with open(validation_config_path) as f:
+                config = yaml.safe_load(f)
+                return config.get('post_import_validation', {})
+        else:
+            # Default config
+            logger.warning("Validation config not found, using defaults")
+            return {
+                'enabled': True,
+                'auto_accept_threshold': 0.85,
+                'pass_threshold': 0.70,
+                'adr_validation': {'enabled': True, 'max_suspicious_ratio': 0.70},
+                'tech_debt_validation': {'enabled': True},
+                'diagram_validation': {'enabled': True},
+                'completeness_validation': {'enabled': True}
+            }
+
+    def _generate_quality_report(
+        self,
+        validation_result,
+        project_name: str,
+        correlation_id: str
+    ) -> str:
+        """
+        Generate quality report markdown.
+
+        Args:
+            validation_result: ValidationResult from PostImportValidator
+            project_name: Project name
+            correlation_id: Correlation ID
+
+        Returns:
+            Markdown content
+        """
+        templates_dir = Path(__file__).parent.parent / "templates"
+        generator = QualityReportGenerator(templates_dir)
+
+        return generator.generate(
+            validation_result=validation_result,
+            project_name=project_name,
+            correlation_id=correlation_id
+        )
+
+    def _prompt_user_approval(
+        self,
+        quality_report: str,
+        validation_result,
+        correlation_id: str
+    ) -> UserDecision:
+        """
+        Prompt user for decision on import quality.
+
+        Args:
+            quality_report: Quality report markdown
+            validation_result: ValidationResult
+            correlation_id: Correlation ID
+
+        Returns:
+            UserDecision (ACCEPT, RERUN, ABORT)
+        """
+        # Auto-accept if score >= 0.85 and no critical issues
+        auto_accept_threshold = self.config.get('post_import_validation', {}).get('auto_accept_threshold', 0.85)
+        has_critical = any(
+            issue['severity'] == 'critical'
+            for issue in validation_result.issues_detected
+        )
+
+        if validation_result.overall_score >= auto_accept_threshold and not has_critical:
+            logger.info(
+                "Auto-accepting import (high quality)",
+                extra={'correlation_id': correlation_id, 'score': validation_result.overall_score}
+            )
+            print(f"\n✅ Import auto-accepted (quality score: {validation_result.overall_score:.1%})")
+            print(f"📄 Quality report: {self.output_dir}/reports/post_import_quality_report.md\n")
+            return UserDecision.ACCEPT
+
+        # Show report and prompt
+        print("\n" + "="*80)
+        print("POST-IMPORT VALIDATION REPORT")
+        print("="*80 + "\n")
+        print(quality_report)
+        print("\n" + "="*80)
+        print(f"Quality Score: {validation_result.overall_score:.1%}")
+        print(f"Corrections Applied: {len(validation_result.corrections_applied)}")
+        print(f"Issues Detected: {len(validation_result.issues_detected)}")
+        print("="*80 + "\n")
+
+        print("What would you like to do?")
+        print("  1. ✅ Accept (continue with corrected artifacts)")
+        print("  2. 🔄 Re-run import (start over)")
+        print("  3. ❌ Abort import")
+
+        while True:
+            choice = input("\nEnter choice (1-3): ").strip()
+
+            if choice == '1':
+                logger.info("User accepted import", extra={'correlation_id': correlation_id})
+                return UserDecision.ACCEPT
+            elif choice == '2':
+                logger.info("User requested re-run", extra={'correlation_id': correlation_id})
+                return UserDecision.RERUN
+            elif choice == '3':
+                logger.info("User aborted import", extra={'correlation_id': correlation_id})
+                return UserDecision.ABORT
+            else:
+                print("Invalid choice. Please enter 1, 2, or 3.")
+
     def analyze(
         self,
         skip_threat_model: bool = False,
@@ -667,6 +806,64 @@ class ProjectAnalyzer:
             # Step 9: Generate documentation
             documentation = self.generate_documentation(results)
             results["documentation"] = documentation
+
+            # Step 10: POST-IMPORT VALIDATION & AUTO-FIX
+            if self.config.get('post_import_validation', {}).get('enabled', True):
+                logger.info(
+                    "Running post-import validation and auto-fix",
+                    extra={'correlation_id': self.analysis_id}
+                )
+
+                # Load validation config
+                validation_config = self._load_validation_config()
+
+                # Execute validation + correction
+                validator = PostImportValidator(validation_config)
+                validation_result = validator.validate_and_fix(
+                    import_results=results,
+                    project_path=str(self.project_path),
+                    output_dir=self.output_dir,
+                    correlation_id=self.analysis_id
+                )
+
+                # Generate quality report
+                quality_report = self._generate_quality_report(
+                    validation_result=validation_result,
+                    project_name=self.project_path.name,
+                    correlation_id=self.analysis_id
+                )
+
+                # Save quality report
+                quality_report_path = self.output_dir / "reports" / "post_import_quality_report.md"
+                quality_report_path.parent.mkdir(parents=True, exist_ok=True)
+                quality_report_path.write_text(quality_report)
+
+                # Step 11: USER APPROVAL
+                user_decision = self._prompt_user_approval(
+                    quality_report=quality_report,
+                    validation_result=validation_result,
+                    correlation_id=self.analysis_id
+                )
+
+                # Update results with validation
+                results['post_import_validation'] = {
+                    'status': user_decision.value,
+                    'score': validation_result.overall_score,
+                    'corrections_applied': validation_result.corrections_applied,
+                    'issues_detected': validation_result.issues_detected,
+                    'report_path': str(quality_report_path.relative_to(self.project_path))
+                }
+
+                # Abort if user rejected
+                if user_decision == UserDecision.ABORT:
+                    raise ImportAbortedError(
+                        f"Import aborted by user. Quality score: {validation_result.overall_score:.2%}"
+                    )
+
+                # Re-run if requested
+                if user_decision == UserDecision.RERUN:
+                    logger.warning("User requested re-run, aborting current import")
+                    raise ImportAbortedError("User requested re-run of import")
 
             # FIX #8: Auto-push feature branch
             push_result = self._push_feature_branch(branch_info['branch'])

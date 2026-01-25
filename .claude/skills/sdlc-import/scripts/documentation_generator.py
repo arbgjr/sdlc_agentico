@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 from typing import Dict, List
 from datetime import datetime
-from jinja2 import Template
+from jinja2 import Template, Environment, FileSystemLoader
 import yaml
 
 # Add logging utilities (absolute path from project root)
@@ -26,6 +26,13 @@ class DocumentationGenerator:
         self.config = config
         self.output_dir = Path(config['general']['output_dir'])
         self.templates_dir = Path(__file__).parent.parent / "templates"
+
+        # Configure Jinja2 environment
+        self.jinja_env = Environment(
+            loader=FileSystemLoader(str(self.templates_dir)),
+            trim_blocks=True,
+            lstrip_blocks=True
+        )
 
     def generate(self, analysis_results: Dict) -> Dict:
         """Generate all documentation"""
@@ -68,28 +75,87 @@ class DocumentationGenerator:
         return str(threat_file)
 
     def _generate_tech_debt_report(self, tech_debt: Dict) -> str:
-        """Generate tech debt report"""
+        """Generate detailed tech debt report using Jinja2 template"""
         report_file = self.output_dir / "reports/tech-debt-inferred.md"
         report_file.parent.mkdir(parents=True, exist_ok=True)
 
-        content = f"""# Technical Debt Report
+        # Load template
+        template = self.jinja_env.get_template('tech_debt_report.md')
 
-**Date:** {datetime.utcnow().isoformat()}Z
-**Total Items:** {tech_debt.get('total', 0)}
-**Total Effort:** {tech_debt.get('total_effort', 0)}h
+        # Extract items by priority
+        debt_items = tech_debt.get('tech_debt', [])
+        p0_items = [item for item in debt_items if item.get('priority') == 'P0']
+        p1_items = [item for item in debt_items if item.get('priority') == 'P1']
+        p2_items = [item for item in debt_items if item.get('priority') == 'P2']
+        p3_items = [item for item in debt_items if item.get('priority') == 'P3']
 
-## Summary
+        # Calculate effort by priority
+        p0_effort = sum(item.get('effort_estimate', 0) for item in p0_items)
+        p1_effort = sum(item.get('effort_estimate', 0) for item in p1_items)
+        p2_effort = sum(item.get('effort_estimate', 0) for item in p2_items)
+        p3_effort = sum(item.get('effort_estimate', 0) for item in p3_items)
 
-- P0 (CRITICAL): {tech_debt.get('p0', 0)} items
-- P1 (HIGH): {tech_debt.get('p1', 0)} items
-- P2 (MEDIUM): {tech_debt.get('p2', 0)} items
-- P3 (LOW): {tech_debt.get('p3', 0)} items
+        # Group by category
+        categories_dict = {}
+        for item in debt_items:
+            cat = item.get('category', 'uncategorized')
+            if cat not in categories_dict:
+                categories_dict[cat] = {'count': 0, 'effort': 0}
+            categories_dict[cat]['count'] += 1
+            categories_dict[cat]['effort'] += item.get('effort_estimate', 0)
 
-See full analysis in `.agentic_sdlc/`.
+        categories = [
+            {'name': name, 'count': data['count'], 'effort': data['effort']}
+            for name, data in sorted(categories_dict.items())
+        ]
 
-**Generated with SDLC Agêntico by @arbgjr**
-"""
+        # Prepare context
+        context = {
+            'project_name': self.config.get('project_name', 'Unknown'),
+            'analysis_id': self.config.get('analysis_id', 'unknown'),
+            'date': datetime.utcnow().isoformat() + 'Z',
+            'project_path': self.config.get('project_path', '.'),
+            'summary': {
+                'total': len(debt_items),
+                'total_effort': sum(item.get('effort_estimate', 0) for item in debt_items),
+                'p0': len(p0_items),
+                'p1': len(p1_items),
+                'p2': len(p2_items),
+                'p3': len(p3_items),
+                'p0_effort': p0_effort,
+                'p1_effort': p1_effort,
+                'p2_effort': p2_effort,
+                'p3_effort': p3_effort
+            },
+            'p0_items': p0_items,
+            'p1_items': p1_items,
+            'p2_items': p2_items,
+            'p3_items': p3_items,
+            'categories': categories,
+            'recommendations': {
+                'immediate': 'Address all P0 items immediately',
+                'short_term': 'Plan P1 items for next sprint',
+                'medium_term': 'Schedule P2 items for next quarter',
+                'backlog': 'Track P3 items in backlog'
+            },
+            'github_issues': []
+        }
+
+        # Render template
+        content = template.render(**context)
         report_file.write_text(content)
+
+        logger.info(
+            "Tech debt report generated",
+            extra={
+                'total_items': len(debt_items),
+                'p0': len(p0_items),
+                'p1': len(p1_items),
+                'p2': len(p2_items),
+                'p3': len(p3_items)
+            }
+        )
+
         return str(report_file)
 
     def _generate_import_report(self, analysis_results: Dict) -> str:

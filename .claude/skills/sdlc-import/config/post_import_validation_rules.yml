@@ -1,0 +1,66 @@
+# Post-Import Validation Configuration
+# Automatic validation and correction rules for sdlc-import artifacts
+
+post_import_validation:
+  enabled: true  # Enable/disable post-import validation
+  auto_accept_threshold: 0.85  # Auto-accept if score >= 85%
+  pass_threshold: 0.70  # Minimum score to pass validation
+
+  # ADR Evidence Validation
+  adr_validation:
+    enabled: true
+    max_suspicious_ratio: 0.70  # Remove ADRs if >70% evidence is suspicious
+
+    # Paths that indicate evidence is from test/config, not production code
+    suspicious_paths:
+      - ".claude/"
+      - ".agentic_sdlc/"
+      - "tests/fixtures/"
+      - "tests/integration/"
+      - "test/fixtures/"
+      - "test/integration/"
+      - "examples/"
+      - "templates/"
+      - "docs/examples/"
+      - "__pycache__/"
+      - "node_modules/"
+      - ".git/"
+
+    cross_validate_technologies: true  # Verify technology exists in codebase
+
+  # Tech Debt Report Validation
+  tech_debt_validation:
+    enabled: true
+    min_details_ratio: 0.80  # Report should have >= 80% of items rendered
+    regenerate_if_incomplete: true  # Auto-regenerate if report is incomplete
+
+  # Diagram Quality Validation
+  diagram_validation:
+    enabled: true
+    min_nodes: 5  # Minimum nodes in architecture diagram
+    min_edges: 4  # Minimum edges in architecture diagram
+    regenerate_if_generic: true  # Auto-regenerate if diagram is too simple
+
+  # Artifact Completeness Validation
+  completeness_validation:
+    enabled: true
+
+    # Required artifacts that must be present
+    required_artifacts:
+      - "corpus/nodes/decisions/adr_index.md"
+      - "reports/tech-debt-inferred.md"
+      - "architecture/component-diagram.mmd"
+      - "security/threat-model-inferred.yml"
+
+# Scoring Weights (used to calculate overall quality score)
+scoring:
+  adr_removal_penalty: 0.05  # Penalty per ADR removed
+  tech_debt_incomplete_penalty: 0.10  # Penalty if tech debt report is incomplete
+  diagram_regeneration_penalty: 0.05  # Penalty per diagram regenerated
+  missing_artifact_penalty: 0.05  # Penalty per missing artifact
+
+# User Decision Flow
+user_decision:
+  auto_accept_on_high_score: true  # Auto-accept if score >= auto_accept_threshold
+  prompt_on_low_score: true  # Prompt user if score < auto_accept_threshold
+  show_detailed_report: true  # Show full quality report before prompting
