@@ -1,19 +1,44 @@
 # SDLC Agêntico Version
-version: "2.0.5"
+version: "2.0.6"
 build_date: "2026-01-24"
 release_notes: |
-  sdlc-import - Large Project Support Enhancement
+  sdlc-import - Post-Import Validation & Auto-Correction System
 
-  Fix:
-  - fix(sdlc-import): Increase max_project_size from 500,000 to 900,000 LOC
+  Features:
+  - feat(sdlc-import): Post-import validation system with automatic correction
+  - feat(sdlc-import): ADR evidence fixer (removes false positives from .claude/, tests/)
+  - feat(sdlc-import): Tech debt report enhancement (full item details, not just summary)
+  - feat(sdlc-import): Quality report generator with scoring system
+  - feat(sdlc-import): User approval workflow (auto-accept >= 85%, prompt < 85%)
+  - feat(sdlc-import): 4 validators (ADR, tech debt, diagrams, artifact completeness)
 
   Impact:
-  - Suporta projetos muito grandes (até 900k LOC) para análise completa
-  - Projetos entre 500k-900k LOC agora recebem análise full ao invés de sampled
-  - Melhora qualidade de ADRs e threat models em projetos enterprise
-  - Permite importação de monorepos e sistemas legados grandes
+  - Tech debt reports now show ALL items (e.g., 580 items listed, not just summary)
+  - False positive ADRs automatically removed (>70% evidence from tests/config)
+  - Quality checkpoint before user receives artifacts (score 0.0-1.0)
+  - Auto-accepts high quality imports (>= 85%), prompts for review if lower
+  - Users can accept/re-run/abort based on quality report
+
+  Files:
+  - 10 new files (~1,266 lines): validators, orchestrator, quality report generator
+  - 2 modified files (~230 lines): documentation_generator.py, project_analyzer.py
 
 changelog:
+  - version: "2.0.6"
+    date: "2026-01-24"
+    changes:
+      - "feat(sdlc-import): Post-import validation system with auto-correction"
+      - "feat(sdlc-import): ADREvidenceFixer - remove ADRs with suspicious evidence"
+      - "feat(sdlc-import): TechDebtFixer - validate report completeness"
+      - "feat(sdlc-import): DiagramQualityFixer - validate diagram complexity"
+      - "feat(sdlc-import): ArtifactCompletenessFixer - ensure required artifacts"
+      - "feat(sdlc-import): PostImportValidator orchestrator with quality scoring"
+      - "feat(sdlc-import): QualityReportGenerator with Jinja2 templates"
+      - "feat(sdlc-import): User approval workflow (Accept/Re-run/Abort)"
+      - "fix(sdlc-import): Tech debt report now renders ALL items (not just summary)"
+      - "fix(sdlc-import): Documentation generator uses Jinja2 for tech debt reports"
+      - "config(sdlc-import): post_import_validation_rules.yml with thresholds"
+      - "docs(sdlc-import): POST_IMPORT_VALIDATION_IMPLEMENTATION.md complete guide"
   - version: "2.0.5"
     date: "2026-01-24"
     changes:
