@@ -48,7 +48,14 @@ class DiagramQualityFixer:
 
         for diagram in diagrams:
             diagram_type = diagram.get('type', 'unknown')
-            content = diagram.get('content', '')
+
+            # Read content from file path (diagrams have 'path' not 'content')
+            diagram_path = Path(diagram.get('path', ''))
+            if not diagram_path.exists():
+                logger.warning(f"Diagram file not found: {diagram_path}")
+                continue
+
+            content = diagram_path.read_text()
 
             # Count nodes and edges in Mermaid diagram
             nodes = self._count_mermaid_nodes(content)

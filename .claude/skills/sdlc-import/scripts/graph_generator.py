@@ -50,6 +50,9 @@ class GraphGenerator:
                 }
             }
 
+            # Ensure corpus directory exists
+            corpus_dir.mkdir(parents=True, exist_ok=True)
+
             # Save to corpus
             graph_file = corpus_dir / "graph.json"
             with open(graph_file, 'w') as f:

@@ -52,8 +52,7 @@ The imported artifacts have significant quality issues that require review or re
 - **Corrected**: Regenerated with actual architecture
 - **Reason**: {{ corrections_applied.diagram_regeneration.reason }}
 {% endif %}
-
-{% if not corrections_applied %}
+{% else %}
 ✅ **No corrections needed** - All artifacts were generated correctly on first attempt.
 {% endif %}
 

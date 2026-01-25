@@ -130,8 +130,12 @@ class PostImportValidator:
 
         # 3. Fix Diagrams (validate quality)
         if self.config.get('diagram_validation', {}).get('enabled', True):
+            # Extract diagrams list from the diagrams dict (contains {"diagrams": [...], "count": N})
+            diagrams_dict = import_results.get('diagrams', {})
+            diagrams_list = diagrams_dict.get('diagrams', []) if isinstance(diagrams_dict, dict) else []
+
             diagram_result = self.fixers['diagrams'].fix(
-                diagrams=import_results.get('diagrams', []),
+                diagrams=diagrams_list,
                 language_analysis=import_results.get('language_analysis', {}),
                 output_dir=output_dir
             )
