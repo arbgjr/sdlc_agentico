@@ -1,0 +1,288 @@
+---
+id: LEARN-claude-orchestrator-patterns
+title: "Claude Orchestrator Patterns Analysis"
+type: learning
+category: architecture
+created_at: "2026-01-21T00:00:00Z"
+phase: 5
+tags:
+  - parallelization
+  - memory
+  - automation
+  - integration
+source:
+  repo: https://github.com/reshashi/claude-orchestrator
+  version: "2.4"
+  analyzed_by: sdlc-agentico
+  issue: "#33"
+
+summary: |
+  Análise de padrões arquiteturais do claude-orchestrator para integração
+  seletiva no SDLC Agêntico, focando em paralelização, memória e automação.
+
+learnings:
+  worker_parallelization:
+    pattern: "Git worktrees + separate processes"
+    implementation:
+      - "Each worker in isolated git worktree (~/.worktrees/project/worker-name/)"
+      - "Separate Claude CLI instances (iTerm tabs in original)"
+      - "State machine: NEEDS_INIT → WORKING → PR_OPEN → MERGED"
+      - "No blocking between workers"
+
+    benefits:
+      - "True parallel execution"
+      - "No merge conflicts (isolated branches)"
+      - "Independent progress per worker"
+
+    adaptations_needed:
+      platform_independence:
+        original: "iTerm2 AppleScript (macOS-only)"
+        sdlc_agentico: "tmux/screen or background processes (Linux-compatible)"
+
+      integration:
+        - "Use existing sdlc_logging.py for structured logs"
+        - "Add Loki labels: skill, phase, worker_id"
+        - "Integrate with Phase 5 (Implementation) agents"
+
+  memory_system:
+    pattern: "File-based JSON with categories"
+    structure:
+      storage_location: "~/.claude/memory/"
+      files:
+        - "toolchain.json - Cross-project tools/CLIs"
+        - "repos.json - Repository references"
+        - "facts.json - General context with timestamps/tags"
+        - "projects/{name}.json - Per-project context"
+
+    query_mechanism:
+      - "Keyword-based search: /assistant recall 'keyword'"
+      - "Tag filtering for organization"
+      - "Timestamp-based prioritization"
+
+    benefits:
+      - "Human-readable (plain JSON)"
+      - "Script-accessible (jq queries)"
+      - "No external database required"
+      - "Cross-session persistence"
+
+    adaptations_needed:
+      integration_with_rag:
+        approach: "Complement, not replace"
+        strategy: |
+          - Simple memory: Fast facts, tool references, quick context
+          - RAG corpus: Deep knowledge, decisions (ADRs), patterns
+          - Use simple memory as "working memory cache"
+          - Sync relevant facts to RAG corpus for long-term storage
+
+  session_handoff:
+    pattern: "Markdown summaries with structured sections"
+    template: |
+      # Session Summary: [DATE] - [REPO]
+
+      ## Completed
+      - [tasks accomplished]
+
+      ## Pending
+      - [future work]
+
+      ## Context for Next Session
+      - [critical state info]
+
+    automation:
+      command: "/assistant session-end"
+      output: "sessions/{date}-{repo}.md"
+      trigger: "Manual or end-of-phase hook"
+
+    benefits:
+      - "Clear continuity between sessions"
+      - "Prevents context loss"
+      - "Structured format for parsing"
+
+    adaptations_needed:
+      integration:
+        - "Generate at end of each SDLC phase"
+        - "Store in .agentic_sdlc/sessions/"
+        - "Link to phase-commit skill"
+        - "Extract to RAG corpus as LEARN-session-{id}"
+
+  automation_loop:
+    pattern: "Polling-based state machine"
+    implementation:
+      frequency: "5-second poll interval"
+      workflow:
+        - "Read worker output/state"
+        - "Detect state via regex/API checks"
+        - "Execute state-appropriate actions"
+        - "Persist state to files"
+        - "Sleep and repeat"
+
+    states:
+      - "UNKNOWN: Initial/error state"
+      - "NEEDS_INIT: Requires initialization prompt"
+      - "WORKING: Task in progress"
+      - "PR_OPEN: Pull request created"
+      - "MERGED: Task completed"
+
+    quality_gates:
+      pre_pr:
+        - "type-check"
+        - "lint"
+        - "test"
+      review_pipeline:
+        - "QA Guardian (architecture/tests)"
+        - "DevOps Engineer (conditional, infra changes)"
+        - "Code Simplifier (large PRs)"
+
+    adaptations_needed:
+      integration:
+        - "Use existing gate-evaluator.yml gates"
+        - "Trigger phase transitions on state changes"
+        - "Log to Loki with correlation IDs"
+        - "Support both parallel and sequential modes"
+
+decisions:
+  what_to_integrate:
+    parallel_workers:
+      decision: "✅ INTEGRATE"
+      rationale: "SDLC currently sequential; parallelization reduces Phase 5 time"
+      scope: "Task #35 - parallel-workers skill"
+
+    simple_memory:
+      decision: "✅ COMPLEMENT"
+      rationale: "RAG for long-term, simple memory for working context"
+      scope: "Task #36 - Extend memory-manager with simple layer"
+
+    session_handoff:
+      decision: "✅ INTEGRATE"
+      rationale: "Improves cross-session continuity"
+      scope: "Task #37 - Auto-generate at phase transitions"
+
+    automation_loop:
+      decision: "✅ ADAPT"
+      rationale: "Useful for worker monitoring, but needs platform independence"
+      scope: "Task #34 - Create sdlc-compatible loop"
+
+  what_not_to_integrate:
+    quality_gates:
+      decision: "❌ KEEP CURRENT"
+      rationale: "SDLC has 11 YAML gates vs 3-4 basic gates"
+      current_system: "Superior gate-evaluator with security-gate.yml"
+
+    observability:
+      decision: "❌ KEEP CURRENT"
+      rationale: "Loki/Grafana stack more robust than basic logging"
+      current_system: "v1.7.0 structured logging with dashboards"
+
+    platform_dependency:
+      decision: "⚠️ REPLACE"
+      rationale: "iTerm2/macOS locks to single platform"
+      replacement: "tmux/screen or background processes (Linux-first)"
+
+implementation_plan:
+  phase_1_parallel:
+    tasks:
+      - id: "#35"
+        title: "parallel-workers skill"
+        priority: "HIGH"
+        dependencies: []
+        deliverables:
+          - ".claude/skills/parallel-workers/"
+          - "scripts/worker_manager.py"
+          - "scripts/worktree_manager.sh"
+          - "Worker state machine implementation"
+
+      - id: "#36"
+        title: "simple-memory integration"
+        priority: "HIGH"
+        dependencies: []
+        deliverables:
+          - "Extend .claude/skills/memory-manager/"
+          - "Add simple_store.py (JSON backend)"
+          - "Memory query CLI"
+
+      - id: "#37"
+        title: "session-handoff summaries"
+        priority: "MEDIUM"
+        dependencies: []
+        deliverables:
+          - ".claude/skills/session-analyzer/handoff.py"
+          - "Hook: post-phase-transition.sh"
+          - "Template: session-summary.md"
+
+  phase_2_sequential:
+    tasks:
+      - id: "#34"
+        title: "automation-loop"
+        priority: "MEDIUM"
+        dependencies: ["#35"]
+        deliverables:
+          - ".claude/skills/parallel-workers/loop.py"
+          - "State monitoring dashboard"
+          - "Integration with orchestrator agent"
+
+security_considerations:
+  secrets_isolation:
+    - "Workers must not share .env files"
+    - "Each worktree gets sanitized environment"
+    - "No secrets in git worktree commits"
+
+  validation_before_merge:
+    - "Automation loop validates commits pre-merge"
+    - "security-gate.yml must pass"
+    - "Secrets scanning mandatory"
+
+  log_sanitization:
+    - "sdlc_logging.py sanitizes secrets"
+    - "Loki logs must not contain credentials"
+    - "Worker output filtered before storage"
+
+observability_integration:
+  loki_labels:
+    required:
+      - "skill: parallel-workers"
+      - "phase: 5"
+      - "worker_id: {uuid}"
+    optional:
+      - "task_id: {task_ref}"
+      - "state: {WORKING|PR_OPEN|etc}"
+
+  grafana_dashboard:
+    new_panels:
+      - "Active Workers (gauge)"
+      - "Worker State Distribution (pie chart)"
+      - "Task Completion Rate (timeseries)"
+      - "Worker Errors (logs)"
+
+  tracing:
+    correlation_id: "Shared across worker spawn → merge"
+    spans:
+      - "worker_lifecycle"
+      - "worktree_create"
+      - "pr_create"
+      - "merge_complete"
+
+next_steps:
+  immediate:
+    - "Create ADR for integration decisions"
+    - "Scaffold skill directories"
+    - "Write worker state machine"
+
+  validation:
+    - "Test worktree isolation"
+    - "Benchmark parallel vs sequential"
+    - "Security audit of worker spawning"
+
+metadata:
+  confidence_level: "HIGH"
+  validation_status: "Analysis complete, ready for implementation"
+  reviewed_by: "orchestrator"
+  approved_for_phase: 5
+
+relations:
+  - type: "implements"
+    target: "EPIC-33"
+  - type: "addresses"
+    target: "#35, #36, #37, #34"
+  - type: "complements"
+    target: "memory-manager, phase-commit, orchestrator"
+---

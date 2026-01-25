@@ -1,0 +1,598 @@
+id: ADR-022
+type: decision
+title: "Legacy Project Onboarding via Reverse Engineering"
+status: accepted
+date: "2026-01-23"
+supersedes: null
+deprecated_by: null
+
+context: |
+  O SDLC Agêntico é focado em projetos greenfield (novos), mas a realidade é que
+  80% das empresas possuem codebases legados que precisam de manutenção e modernização.
+
+  Problema 1: Projetos legados não podem se beneficiar do SDLC sem documentação manual extensa
+  Problema 2: Engenharia reversa manual é demorada (1-2 semanas) e propensa a erros
+  Problema 3: Decisões arquiteturais implícitas são perdidas ao longo do tempo
+  Problema 4: Tech debt não é rastreado sistematicamente
+  Problema 5: Onboarding de novos desenvolvedores é lento sem documentação adequada
+  Problema 6: Threat modeling de sistemas legados raramente é feito
+
+  Cenários comuns:
+  - Empresa herdou codebase sem documentação
+  - Sistema crítico desenvolvido por ex-funcionário (knowledge loss)
+  - Monolito legado precisa ser modernizado
+  - Open-source project sem CLAUDE.md/README adequados
+  - Aquisição de empresa - due diligence técnica necessária
+
+  Custo atual:
+  - 1-2 semanas de engenheiro senior para documentar projeto médio
+  - $5k-$10k em consulting para threat model
+  - Decisões implícitas nunca capturadas (lost forever)
+
+decision: |
+  Implementar comando /onboard-legacy que realiza engenharia reversa automatizada:
+
+  1. LANGUAGE DETECTION: Scan de diretório detecta linguagens/frameworks (10+)
+  2. DECISION EXTRACTION: Inferência de decisões arquiteturais via code patterns
+  3. ARCHITECTURE VISUALIZATION: Geração automática de diagramas (Mermaid/DOT)
+  4. THREAT MODELING: Scan de vulnerabilidades STRIDE com severity levels
+  5. TECH DEBT DETECTION: Identificação de code smells, deprecated deps, gaps
+  6. DOCUMENTATION GENERATION: CLAUDE.md, README.md, ARCHITECTURE.md
+  7. BACKLOG CREATION: GitHub issues para tech debt e melhorias
+
+  Pipeline:
+  Directory Scan → Language Analysis →
+  Architecture Inference → Decision Extraction →
+  Security Analysis (STRIDE) → Tech Debt Detection →
+  Documentation Generation → Issue Creation
+
+  Output:
+  - 5-15 ADRs inferidos (com confidence scores)
+  - 3-5 diagramas de arquitetura
+  - 1 threat model (STRIDE categories)
+  - 10-50 tech debt items (prioritized backlog)
+  - Documentação completa (.agentic_sdlc/ structure)
+
+alternatives:
+  - option: "Opção 1: Manual documentation apenas"
+    pros:
+      - "100% accuracy (human expert)"
+      - "Sem risco de inferências incorretas"
+    cons:
+      - "Custo alto (1-2 semanas)"
+      - "Não escalável"
+      - "Dependente de availability de expert"
+    rejected_reason: "ROI negativo - break-even após ~10 projetos com automação"
+
+  - option: "Opção 2: LLM-only analysis (zero structure)"
+    pros:
+      - "Simplicidade máxima"
+      - "Flexibilidade total"
+    cons:
+      - "Resultados inconsistentes"
+      - "Sem validação estruturada"
+      - "Difícil de testar"
+      - "Hallucinations possíveis"
+    rejected_reason: "Falta de guarantees de qualidade"
+
+  - option: "Opção 3: Static analysis tools integration apenas"
+    pros:
+      - "Alta accuracy para code smells"
+      - "Ferramentas maduras (SonarQube, etc)"
+    cons:
+      - "Não extrai decisões arquiteturais"
+      - "Não gera documentação narrativa"
+      - "Múltiplas ferramentas necessárias (complexidade)"
+    rejected_reason: "Cobre apenas parte do problema (tech debt)"
+
+  - option: "Opção 4: Hybrid (pattern extraction + LLM synthesis + static analysis)"
+    pros:
+      - "Melhor dos mundos - structure + flexibility"
+      - "Validação multi-layer"
+      - "Confidence scoring natural"
+    cons:
+      - "Complexidade moderada"
+      - "Requer integração de múltiplos componentes"
+    chosen_reason: "Balanceia accuracy, scalability e auditability"
+
+consequences:
+  positive:
+    - "Economiza 1-2 semanas de engenharia reversa manual (~$5k-$10k)"
+    - "Break-even após ~10 projetos"
+    - "Habilita onboarding rápido de projetos legados (2h vs 2 semanas)"
+    - "Captura decisões implícitas antes de serem perdidas"
+    - "Gera roadmap de modernização automaticamente"
+    - "Threat modeling sistemático (80% empresas não fazem)"
+    - "Democratiza due diligence técnica (M&A scenarios)"
+
+  negative:
+    - "Accuracy não é 100% - inferências podem ser incorretas"
+    - "Requer human review de ADRs inferidos (especialmente low-confidence)"
+    - "Suporte multi-linguagem incremental (10 linguagens Fase 1)"
+    - "Edge cases (polyglot repos, microservices) podem ser complexos"
+
+  neutral:
+    - "Novo quality gate (legacy-onboard-gate.yml)"
+    - "Documentação adicional necessária"
+
+trade_offs:
+  - aspect: "Accuracy vs. Speed"
+    chosen: "Speed com confidence scoring - human review para low-confidence"
+    rationale: "80% accuracy em 2h > 100% accuracy em 2 semanas para maioria dos casos"
+
+  - aspect: "Completude vs. Simplicidade"
+    chosen: "Fase 1 com top 10 linguagens, expansão gradual"
+    rationale: "Cobre 90%+ projetos, evita over-engineering"
+
+  - aspect: "Automated vs. Assisted"
+    chosen: "Automated com human-in-the-loop para decisões críticas"
+    rationale: "Auto-gera tudo, mas flagga itens que precisam review"
+
+  - aspect: "Depth vs. Breadth"
+    chosen: "Breadth (multiple artifacts) com depth moderado"
+    rationale: "Melhor ter 80% de ADRs + threat model + tech debt que 100% de apenas um"
+
+implementation_notes:
+  language_detection: |
+    Heurísticas por linguagem (Fase 1 - top 10):
+
+    Python:
+    - Files: *.py, requirements.txt, setup.py, pyproject.toml
+    - Frameworks: Django (models.py, views.py), Flask (app.py), FastAPI (main.py)
+    - Patterns: Class-based views, decorators, async/await
+
+    JavaScript/TypeScript:
+    - Files: *.js, *.ts, *.jsx, *.tsx, package.json
+    - Frameworks: React (useState, useEffect), Next.js (pages/, app/), Express (app.listen)
+    - Patterns: Hooks, components, routes
+
+    Java:
+    - Files: *.java, pom.xml, build.gradle
+    - Frameworks: Spring (annotations), Maven (pom structure)
+    - Patterns: Annotations, dependency injection
+
+    C#:
+    - Files: *.cs, *.csproj, *.sln
+    - Frameworks: ASP.NET (Controllers), Entity Framework (DbContext)
+    - Patterns: LINQ, async/await, attributes
+
+    Go:
+    - Files: *.go, go.mod
+    - Frameworks: Gin (router), GORM (ORM)
+    - Patterns: Goroutines, channels, interfaces
+
+    Ruby, PHP, Rust, Kotlin, Swift: Similar heuristics
+
+  decision_extraction: |
+    10+ decision patterns detectados:
+
+    Database:
+    - PostgreSQL: import psycopg2 / using Npgsql
+    - MySQL: import mysql.connector / using MySql.Data
+    - MongoDB: from pymongo / using MongoDB.Driver
+    Confidence: HIGH (>0.8)
+
+    Authentication:
+    - Django Auth: from django.contrib.auth
+    - JWT: import jwt
+    - OAuth2: from authlib
+    Confidence: MEDIUM-HIGH (0.7-0.8)
+
+    API Design:
+    - REST: @app.route, [HttpGet]
+    - GraphQL: from graphene / using HotChocolate
+    - gRPC: from grpc
+    Confidence: HIGH (>0.8)
+
+    Caching:
+    - Redis: import redis / using StackExchange.Redis
+    - Memcached: import memcache
+    Confidence: MEDIUM (0.6-0.7)
+
+    Message Queue:
+    - RabbitMQ: import pika
+    - Kafka: from kafka
+    Confidence: MEDIUM (0.6-0.7)
+
+    Output:
+    - High confidence (>0.8): Auto-generate ADR
+    - Medium (0.5-0.8): Generate with "inferred" tag
+    - Low (<0.5): Add to "Possible Decisions to Review" section
+
+  iac_devops_qa_detection: |
+    Infrastructure as Code (IaC):
+    - Terraform: *.tf files, terraform.tfstate, .terraform/
+    - Bicep: *.bicep files, bicepconfig.json
+    - CloudFormation: *.yaml with AWSTemplateFormatVersion
+    - Kubernetes: *.yaml with kind: Deployment/Service/ConfigMap
+    - Helm: Chart.yaml, values.yaml, templates/
+    - Pulumi: Pulumi.yaml, Pulumi.*.yaml
+    - Ansible: playbook.yml, roles/, inventory
+    Confidence: HIGH (>0.8)
+    ADR Generated: "Infrastructure as Code Strategy - {tool}"
+
+    CI/CD Pipelines:
+    - GitHub Actions: .github/workflows/*.yml
+    - GitLab CI: .gitlab-ci.yml
+    - Jenkins: Jenkinsfile
+    - Azure Pipelines: azure-pipelines.yml
+    - CircleCI: .circleci/config.yml
+    - Travis CI: .travis.yml
+    Confidence: HIGH (>0.9)
+    ADR Generated: "CI/CD Pipeline Configuration - {platform}"
+
+    Containerization:
+    - Docker: Dockerfile, docker-compose.yml, .dockerignore
+    - Podman: Containerfile
+    - Container registry config: .docker/config.json
+    Confidence: HIGH (>0.9)
+    ADR Generated: "Container Strategy - Docker/Podman"
+
+    Testing Infrastructure:
+    - Python: pytest.ini, tox.ini, .coveragerc, conftest.py
+    - JavaScript: jest.config.js, .mocharc.json, karma.conf.js
+    - E2E: playwright.config.ts, cypress.json, .testcaferc.json
+    - Coverage: .coveragerc, codecov.yml, .lcovrc
+    - Test directories: tests/, test/, __tests__/, spec/
+    Confidence: HIGH (>0.8)
+    ADR Generated: "Testing Strategy - {framework} + Coverage"
+
+    Quality & Linting:
+    - Python: .pylintrc, .flake8, .mypy.ini, pyproject.toml [tool.black]
+    - JavaScript: .eslintrc.*, .prettierrc.*, tsconfig.json
+    - General: .editorconfig, .pre-commit-config.yaml
+    Confidence: MEDIUM-HIGH (0.7-0.8)
+    Tech Debt Item: "Code quality tooling present"
+
+    Monitoring & Observability:
+    - Prometheus: prometheus.yml, alert rules
+    - Grafana: provisioning/, dashboards/
+    - OpenTelemetry: otel-collector-config.yaml
+    - Logging: fluent-bit.conf, logstash.conf
+    Confidence: MEDIUM (0.6-0.7)
+    ADR Generated: "Observability Stack - {tools}"
+
+    Secrets Management:
+    - .env.example (indicates secrets used)
+    - vault/ directory (HashiCorp Vault)
+    - sealed-secrets/ (Kubernetes sealed secrets)
+    - aws-secrets-manager references in code
+    Confidence: MEDIUM (0.6-0.7)
+    Security Note: "Secrets management detected - verify no secrets in repo"
+
+    Database Migrations:
+    - Alembic: alembic.ini, migrations/
+    - Flyway: flyway.conf, db/migration/
+    - Liquibase: liquibase.properties, changelog/
+    - Django: migrations/ directories
+    - Entity Framework: Migrations/
+    Confidence: HIGH (>0.8)
+    ADR Generated: "Database Migration Strategy - {tool}"
+
+    API Documentation:
+    - OpenAPI/Swagger: openapi.yaml, swagger.json
+    - AsyncAPI: asyncapi.yaml
+    - GraphQL: schema.graphql, *.graphql
+    - Postman: *.postman_collection.json
+    Confidence: HIGH (>0.8)
+    Documentation Note: "API documentation present"
+
+    Output additions:
+    - IaC ADRs: 1-3 ADRs (Terraform/K8s/Docker strategy)
+    - DevOps ADRs: 1-2 ADRs (CI/CD pipeline, deployment strategy)
+    - QA ADRs: 1-2 ADRs (Testing framework, coverage targets)
+    - Tech Debt: Missing IaC, missing tests, missing CI/CD flagged
+    - ARCHITECTURE.md section: "DevOps & Infrastructure" added
+
+  architecture_visualization: |
+    Diagram types gerados:
+
+    1. Component Diagram (Mermaid):
+       graph TD
+         Frontend --> API
+         API --> Database
+         API --> Cache
+
+    2. Dependency Graph (DOT):
+       digraph {
+         auth -> database
+         api -> auth
+         frontend -> api
+       }
+
+    3. Data Flow Diagram:
+       User -> Controller -> Service -> Repository -> Database
+
+    4. Deployment Diagram:
+       Containers, networks, volumes
+
+    Component detection:
+    - Directories sob src/ → Components
+    - API endpoints (routes) → Services
+    - Database models → Data layer
+    - Templates/components → Presentation layer
+
+    Layer detection (4-tier):
+    - Presentation (UI, templates)
+    - Application (controllers, routes)
+    - Domain (business logic, services)
+    - Infrastructure (database, external APIs)
+
+  threat_modeling: |
+    STRIDE categories com detection patterns:
+
+    Spoofing (Identity):
+    - No authentication: No @login_required, [Authorize]
+    - Weak passwords: No password validation
+    - No rate limiting: No throttle decorators
+    Severity: HIGH-CRITICAL
+
+    Tampering (Data):
+    - No input validation: No form validation
+    - SQL injection: String concatenation in queries
+    - No CSRF protection: No csrf_token
+    Severity: CRITICAL
+
+    Repudiation (Logging):
+    - No logging: No logger.info calls
+    - No audit trail: No created_by/updated_by fields
+    Severity: MEDIUM
+
+    Information Disclosure:
+    - Hardcoded secrets: API_KEY = "abc123"
+    - Debug mode: DEBUG = True
+    - Verbose errors: Full stack traces
+    Severity: HIGH-CRITICAL
+
+    Denial of Service:
+    - No rate limiting
+    - No pagination: No page/limit params
+    - Unbound queries: SELECT * without LIMIT
+    Severity: MEDIUM-HIGH
+
+    Elevation of Privilege:
+    - Missing auth checks: Public endpoints
+    - IDOR: No ownership validation
+    - Exposed admin: /admin without protection
+    Severity: CRITICAL
+
+    Output: threat-model.yml com:
+    - Threat ID, category, severity, description
+    - Affected files/lines
+    - Suggested mitigation
+    - Priority (P0-P3)
+
+  tech_debt_detection: |
+    Categories com detection:
+
+    Code Smells:
+    - Long functions: >50 lines
+    - Deep nesting: >4 levels
+    - Duplicated code: Similar blocks (diff tools)
+    - Magic numbers: Hardcoded constants
+    Severity: LOW-MEDIUM
+
+    Deprecated Dependencies:
+    - Outdated packages: pip list --outdated
+    - Security vulnerabilities: npm audit, pip-audit
+    - EOL frameworks: Django 1.x, Flask 0.x
+    Severity: MEDIUM-HIGH
+
+    Missing Tests:
+    - Coverage <50%: pytest --cov
+    - No critical path tests
+    - No integration tests
+    Severity: MEDIUM
+
+    Documentation Gaps:
+    - No README
+    - No API docs
+    - No architecture docs
+    Severity: LOW-MEDIUM
+
+    Security Issues:
+    - Hardcoded secrets
+    - Outdated dependencies with CVEs
+    - Missing security headers
+    Severity: HIGH-CRITICAL
+
+    Prioritization:
+    - P0 (CRITICAL): Security, data integrity risks
+    - P1 (HIGH): Performance bottlenecks, deprecated deps
+    - P2 (MEDIUM): Code smells, missing tests
+    - P3 (LOW): Documentation gaps
+
+  quality_gate: |
+    legacy-onboard-gate.yml valida:
+    - CRITICAL: minimum_adrs (>= 5 ADRs gerados)
+    - CRITICAL: threat_model_present (STRIDE coverage)
+    - CRITICAL: architecture_diagram (Mermaid/DOT válido)
+    - WARNING: claude_md_generated (tech stack documentado)
+    - WARNING: tech_debt_identified (>= 1 item)
+    - WARNING: documentation_quality (seções requeridas)
+
+    Passing score: 0.85 (5/6 critical + 2/3 warnings)
+
+  error_handling: |
+    - Language detection fails → Fallback to generic analysis
+    - Decision extraction low accuracy → Flag for human review
+    - Diagram generation fails → Skip diagram, continue analysis
+    - Threat scan timeout → Partial results, continue
+    - GitHub API rate limit → Suggest manual issue creation
+    - Insufficient permissions → Graceful degradation
+
+    Philosophy: Partial success > complete failure
+
+testing_coverage: |
+  Testes unitários:
+  - test_language_detector.py: 15 tests (10 linguagens + edge cases)
+  - test_decision_extractor.py: 20 tests (patterns, confidence scoring)
+  - test_architecture_visualizer.py: 12 tests (diagrams, layer detection)
+  - test_threat_modeler.py: 18 tests (STRIDE categories, severity)
+  - test_debt_detector.py: 15 tests (smells, deps, priorities)
+
+  Integration tests:
+  - test_onboard_legacy_e2e.py: 6 tests (1 por tipo de projeto)
+    - Django app
+    - Flask API
+    - Next.js frontend
+    - Spring Boot backend
+    - .NET Core API
+    - Go microservice
+
+scalability_considerations: |
+  - Codebase size: Suporta até 100k LOC sem degradação (<5min)
+  - Concorrente: Pode processar múltiplos repos em paralelo
+  - Caching: Resultados cached por repo SHA (evita re-scan)
+  - Incremental: Future - scan apenas diff desde último onboard
+
+security_considerations: |
+  - Read-only analysis (não modifica código)
+  - Secrets detection (não expõe secrets em outputs)
+  - Sanitização de outputs (remove sensitive paths)
+  - Audit trail completo (quem rodou quando)
+
+dependencies:
+  - tree-sitter: Code parsing (multi-linguagem)
+  - graphviz: Diagram generation
+  - bandit/semgrep: Security scanning (optional)
+  - pypandoc: Markdown generation
+
+implementation_references:
+  awesome_copilot_repo: |
+    Repository: https://github.com/github/awesome-copilot
+
+    IMPORTANTE: Ao criar skills, agents, commands e detectors, SEMPRE consultar
+    awesome-copilot primeiro. O repositório já possui várias implementações prontas
+    que funcionam e devem ser usadas como base e exemplos.
+
+    Exemplos relevantes para Legacy Onboarding:
+    - Code analysis prompts e chatmodes
+    - Language detection patterns
+    - Architecture diagram generators
+    - Tech debt detection scripts
+    - Documentation generation templates
+    - Security scanning integrations
+    - Framework/library detection heuristics
+
+    Casos de uso específicos:
+    - reverse-project-analysis.prompt: Análise reversa de projetos
+    - architecture-blueprint-generator.prompt: Geração de diagramas
+    - code-gap-audit.prompt: Detecção de tech debt
+    - threat-modeling patterns: STRIDE analysis
+    - documentation generators: README, ARCHITECTURE
+
+  claude_plugins_official: |
+    Repository: https://github.com/anthropics/claude-plugins-official
+
+    IMPORTANTE: Repositório oficial de plugins do Claude/Anthropic. Consultar
+    para padrões oficiais de análise de código, reverse engineering e integrações.
+
+    Exemplos relevantes para Legacy Onboarding:
+    - Code analysis plugins (official patterns)
+    - AST parsing integrations
+    - Language detection plugins
+    - Security scanning integrations (official)
+    - Diagram generation plugins (Mermaid/DOT)
+    - Documentation generation (official templates)
+    - Static analysis tool integrations
+    - Official SDK usage for code analysis
+
+  workflow_recomendado: |
+    1. Buscar em awesome-copilot por análise e detecção existente
+    2. Buscar em claude-plugins-official por padrões oficiais de code analysis
+    3. Analisar prompts, scripts e plugins em ambos repos
+    4. Adaptar para detection engines do SDLC Agêntico
+    5. Citar fontes no código:
+       # Adapted from awesome-copilot: <URL>
+       # Based on claude-plugins-official: <URL>
+    6. Contribuir melhorias de volta (se aplicável)
+
+    Prioridade:
+    - claude-plugins-official para code analysis patterns e AST parsing
+    - awesome-copilot para prompts refinados e detection heuristics
+
+  beneficios: |
+    - Evita reinventar a roda
+    - Aproveita community-tested detection patterns (awesome-copilot)
+    - Segue padrões oficiais Anthropic (claude-plugins-official)
+    - Maior accuracy em detecção (prompts refinados + patterns oficiais)
+    - Acelera desenvolvimento (~40-50% time saving)
+    - Integração nativa com Claude API
+
+migration_path: |
+  Legacy onboarding é aditivo - sem impacto em SDLC existente:
+  - Comando /onboard-legacy independente
+  - Operação read-only (não modifica projeto)
+  - Output em .agentic_sdlc/ (estrutura padrão)
+  - Pode ser rodado múltiplas vezes (idempotente)
+
+  Rollback: git revert (RTO < 5min)
+
+rollback_strategy: |
+  Se onboarding gerar outputs incorretos:
+  1. Deletar .agentic_sdlc/ gerado
+  2. Deletar issues criados (se aplicável)
+  3. Rodar novamente com flags de ajuste
+
+  RTO: < 5 minutos
+  RPO: 0 (read-only operation)
+
+future_enhancements:
+  v2_0:
+    - "ML-powered decision extraction (accuracy >90%)"
+    - "Suporte para 30+ linguagens"
+    - "Dependency graph completo (package-level)"
+  v2_1:
+    - "Incremental onboarding (scan apenas mudanças)"
+    - "Historical analysis (git history mining)"
+    - "Technical debt trends (tracking ao longo do tempo)"
+  v2_2:
+    - "Modernization roadmap generator"
+    - "Cost estimation para refactoring"
+    - "Auto-fix sugestões (não apenas detection)"
+  v3_0:
+    - "Continuous onboarding (CI/CD integration)"
+    - "Real-time architecture drift detection"
+    - "Compliance checking (GDPR, SOC2, etc)"
+
+related_decisions:
+  - "ADR-019: Document Enrichment (similar pattern extraction)"
+  - "ADR-012: Semantic Knowledge Graph (ADR relationships)"
+  - "ADR-threat-modeling: Threat Modeling Standards"
+
+tags:
+  - legacy-systems
+  - reverse-engineering
+  - technical-debt
+  - threat-modeling
+  - onboarding
+  - documentation-generation
+
+validation:
+  test_coverage: "Target 85%+ (TBD)"
+  code_review: "Required before merge"
+  accuracy_benchmark: "Test on 10 open-source projects, validate ADR accuracy >80%"
+  quality_gate: "legacy-onboard-gate.yml passing"
+  integration: "Successfully onboard 6 different language projects"
+
+accuracy_benchmarking: |
+  Test suite com 10 projetos open-source conhecidos:
+  - Django CMS (Python)
+  - Next.js Commerce (TypeScript)
+  - Spring PetClinic (Java)
+  - ASP.NET eShop (C#)
+  - Gin Example (Go)
+  - Rails Blog (Ruby)
+
+  Métricas:
+  - ADR accuracy: % de ADRs corretamente inferidos
+  - Threat detection recall: % de vulnerabilidades encontradas
+  - Diagram completeness: % de componentes capturados
+  - Tech debt precision: % de items legítimos vs falsos positivos
+
+  Target:
+  - ADR accuracy: >80%
+  - Threat recall: >70%
+  - Diagram completeness: >85%
+  - Tech debt precision: >75%
