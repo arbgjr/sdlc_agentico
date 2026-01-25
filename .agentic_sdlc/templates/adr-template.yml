@@ -1,0 +1,55 @@
+# Architecture Decision Record Template
+# Copie este arquivo e preencha os campos
+
+decision:
+  id: adr-XXX  # Gerado automaticamente
+  type: architectural  # architectural | technical | process | tool
+  title: ""
+  created_at: ""  # ISO 8601 timestamp
+  status: proposed  # proposed | accepted | rejected | superseded | deprecated
+
+  # Contexto que levou a esta decisao
+  context: |
+    Descreva o contexto e o problema que esta decisao resolve.
+    Inclua restricoes, requisitos e fatores relevantes.
+
+  # A decisao tomada
+  decision: |
+    Descreva a decisao de forma clara e objetiva.
+    Inclua o que sera feito e como.
+
+  # Consequencias da decisao
+  consequences:
+    positive:
+      - "Beneficio 1"
+      - "Beneficio 2"
+    negative:
+      - "Trade-off 1"
+      - "Custo 1"
+    risks:
+      - "Risco 1 e como mitigar"
+
+  # Alternativas consideradas
+  alternatives:
+    - name: "Alternativa A"
+      description: "Descricao"
+      rejected_because: "Motivo da rejeicao"
+    - name: "Alternativa B"
+      description: "Descricao"
+      rejected_because: "Motivo da rejeicao"
+
+  # Metadados
+  phase: 0  # Fase do SDLC em que foi tomada
+  author: ""
+  approvers: []
+  related_decisions: []
+
+  metadata:
+    complexity: medium  # low | medium | high
+    reversible: true  # Pode ser desfeita facilmente?
+    cost_impact: ""  # Impacto em custo/recursos
+    security_impact: ""  # Impacto em seguranca
+    performance_impact: ""  # Impacto em performance
+
+  # Se esta decisao substitui outra
+  supersedes: null  # ID do ADR que esta sendo substituido

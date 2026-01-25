@@ -1,0 +1,172 @@
+# Threat Model Template (STRIDE)
+# Baseado em Microsoft Threat Modeling
+
+threat_model:
+  id: ""
+  project_id: ""
+  created_at: ""
+  updated_at: ""
+  status: draft  # draft | in_review | approved
+
+  # Escopo do threat model
+  scope:
+    system_name: ""
+    description: ""
+    version: ""
+    boundary: ""  # O que esta dentro/fora do escopo
+
+  # Ativos a proteger
+  assets:
+    - id: ASSET-001
+      name: ""
+      type: data | service | infrastructure
+      classification: public | internal | confidential | restricted
+      owner: ""
+
+  # Atores e trust levels
+  actors:
+    - id: ACTOR-001
+      name: ""
+      trust_level: untrusted | partial | trusted | privileged
+      description: ""
+
+  # Componentes do sistema
+  components:
+    - id: COMP-001
+      name: ""
+      type: web_app | api | database | queue | external_service
+      technology: ""
+      trust_zone: internet | dmz | internal | restricted
+      entry_points:
+        - name: ""
+          protocol: ""
+          authentication: ""
+
+  # Fluxos de dados
+  data_flows:
+    - id: FLOW-001
+      name: ""
+      source: ""  # component id
+      destination: ""  # component id
+      data_classification: ""
+      protocol: ""
+      encrypted: true
+
+  # Ameacas identificadas (STRIDE)
+  threats:
+    # Spoofing - Fingir ser outra pessoa/sistema
+    spoofing:
+      - id: S-001
+        description: ""
+        affected_component: ""
+        attack_vector: ""
+        impact: ""
+        risk_level: low | medium | high | critical
+        dread_score:
+          damage: 0  # 0-10
+          reproducibility: 0
+          exploitability: 0
+          affected_users: 0
+          discoverability: 0
+          total: 0
+        mitigation:
+          description: ""
+          status: proposed | in_progress | implemented | accepted_risk
+          controls: []
+
+    # Tampering - Modificar dados/codigo
+    tampering:
+      - id: T-001
+        description: ""
+        affected_component: ""
+        attack_vector: ""
+        impact: ""
+        risk_level: low | medium | high | critical
+        mitigation:
+          description: ""
+          status: proposed
+          controls: []
+
+    # Repudiation - Negar acoes
+    repudiation:
+      - id: R-001
+        description: ""
+        affected_component: ""
+        attack_vector: ""
+        impact: ""
+        risk_level: low | medium | high | critical
+        mitigation:
+          description: ""
+          status: proposed
+          controls: []
+
+    # Information Disclosure - Vazamento de dados
+    information_disclosure:
+      - id: I-001
+        description: ""
+        affected_component: ""
+        attack_vector: ""
+        impact: ""
+        risk_level: low | medium | high | critical
+        mitigation:
+          description: ""
+          status: proposed
+          controls: []
+
+    # Denial of Service - Indisponibilidade
+    denial_of_service:
+      - id: D-001
+        description: ""
+        affected_component: ""
+        attack_vector: ""
+        impact: ""
+        risk_level: low | medium | high | critical
+        mitigation:
+          description: ""
+          status: proposed
+          controls: []
+
+    # Elevation of Privilege - Escalar privilegios
+    elevation_of_privilege:
+      - id: E-001
+        description: ""
+        affected_component: ""
+        attack_vector: ""
+        impact: ""
+        risk_level: low | medium | high | critical
+        mitigation:
+          description: ""
+          status: proposed
+          controls: []
+
+  # Controles de seguranca existentes
+  existing_controls:
+    - id: CTRL-001
+      name: ""
+      type: preventive | detective | corrective
+      description: ""
+      covers_threats: []
+
+  # Resumo de riscos
+  risk_summary:
+    critical: 0
+    high: 0
+    medium: 0
+    low: 0
+    accepted: 0
+
+  # Proximos passos
+  action_items:
+    - id: ACTION-001
+      description: ""
+      owner: ""
+      due_date: ""
+      status: pending | in_progress | completed
+
+  # Aprovacoes
+  approvals:
+    - role: security_lead
+      name: ""
+      date: ""
+      status: pending | approved | rejected
+      comments: ""
