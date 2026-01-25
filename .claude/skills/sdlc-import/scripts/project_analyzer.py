@@ -44,6 +44,7 @@ from graph_generator import GraphGenerator
 from issue_creator import IssueCreator
 from migration_analyzer import MigrationAnalyzer
 from adr_validator import ADRValidator
+from infrastructure_preserver import InfrastructurePreserver
 
 logger = get_logger(__name__, skill="sdlc-import", phase=0)
 
@@ -96,6 +97,7 @@ class ProjectAnalyzer:
         self.issue_creator = IssueCreator(self.config)
         self.migration_analyzer = MigrationAnalyzer(self.config)
         self.adr_validator = ADRValidator(self.config)
+        self.infrastructure_preserver = InfrastructurePreserver(self.output_dir)
 
         logger.info(
             "Initialized ProjectAnalyzer",
@@ -803,9 +805,20 @@ class ProjectAnalyzer:
             # FIX #3: Save phase artifacts for auditability
             self._save_phase_artifacts(results)
 
+            # CRITICAL FIX: Backup existing infrastructure before generating docs
+            logger.info("Backing up existing infrastructure")
+            backup_stats = self.infrastructure_preserver.backup_existing_infrastructure()
+            logger.info(f"Backup complete: {backup_stats}")
+
             # Step 9: Generate documentation
             documentation = self.generate_documentation(results)
             results["documentation"] = documentation
+
+            # CRITICAL FIX: Restore preserved infrastructure after generating docs
+            logger.info("Restoring preserved infrastructure")
+            restore_stats = self.infrastructure_preserver.restore_infrastructure()
+            logger.info(f"Restoration complete: {restore_stats}")
+            results["infrastructure_restored"] = restore_stats
 
             # Step 10: POST-IMPORT VALIDATION & AUTO-FIX
             if self.config.get('post_import_validation', {}).get('enabled', True):
