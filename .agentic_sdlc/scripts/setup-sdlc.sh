@@ -634,6 +634,13 @@ install_optional_deps() {
 
 # Resumo final
 print_summary() {
+    # Mostrar splash screen se disponível
+    if [[ -f ".agentic_sdlc/splash.py" ]]; then
+        echo ""
+        python3 .agentic_sdlc/splash.py --no-animate 2>/dev/null || true
+        sleep 1
+    fi
+
     echo ""
     echo "========================================"
     echo "   Setup Completo!"

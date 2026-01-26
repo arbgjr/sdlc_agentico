@@ -19,39 +19,23 @@ DIM = "\033[2m"
 RESET = "\033[0m"
 
 LOGO_ASCII = r'''
-                                       __
-                                  _.-~  )
-                       _..--~~~~,'   ,-/     _
-                    .-'. . . .'   ,-','    ,' )
-                  ,'. . . _   ,--~,-'__..-'  ,'
-                ,'. . .  (@)' ---~~~~      ,'
-               /. . . . '~~             ,-'
-              /. . . . .             ,-'
-             ; . . . .  - .        ,'
-            : . . . .       _     /
-           . . . . .          `-.:
-          . . . ./  - .          )
-         .  . . |  _____..---.._/ _____
-   ~---~~~~----~~~~             ~~
-'''
-
-MOUSE_ASCII = r'''
-                _                       __
-              /   \                  /      \
-             '      \              /          \
-            |       |Oo          o|            |
-            `    \  |OOOo......oOO|   /        |
-             `    \\OOOOOOOOOOOOOOO\//        /
-               \ _o\OOOOOOOOOOOOOOOO//. ___ /
-            --- OO'* `OOOOOOOOOO'*  `OOOOO--
-                `OOOooOOOOOOOOOooooOOOOOO'OOOo
-              .OO "OOOOOOOOOOOOOOOOOOOO"OOOOOOOo
-           OOOOO^OOOO0`(mice)/"OOOOOOOOOOOOO^OOOOOO
-           `OOOOO 0000000000000000 QQQQ "OOOOOOO"
-             "OOOOOOO00000000000000000OOOOOOOOOO"
-  .ooooOOOOOOOo"OOOOOOO000000000000OOOOOOOOOOO"
-.OOO"""""""""".oOOOOOOOOOOOOOOOOOOOOOOOOOOOOo
-  `"OOOOOOOOOOOOoooooooo.
+                           __                             _                       __
+                      _.-~  )                           /   \                  /      \
+           _..--~~~~,'   ,-/     _                     '      \              /          \
+        .-'. . . .'   ,-','    ,' )                   |       |Oo          o|            |
+      ,'. . . _   ,--~,-'__..-'  ,'                   `    \  |OOOo......oOO|   /        |
+    ,'. . .  (@)' ---~~~~      ,'                      `    \\OOOOOOOOOOOOOOO\//        /
+   /. . . . '~~             ,-'                          \ _o\OOOOOOOOOOOOOOOO//. ___ /
+  /. . . . .             ,-'                          --- OO'* `OOOOOOOOOO'*  `OOOOO--
+ ; . . . .  - .        ,'                                 `OOOooOOOOOOOOOooooOOOOOO'OOOo
+: . . . .       _     /                                 .OO "OOOOOOOOOOOOOOOOOOOO"OOOOOOOo
+. . . . .          `-.:                              OOOOO^OOOO0`(mice)/"OOOOOOOOOOOOO^OOOO
+ . . ./  - .          )                              `OOOOO 0000000000000000 QQQQ "OOOOOOO"
+.  . |  _____..---.._/ _____                           "OOOOOOO00000000000000000OOOOOOOOOO"
+ ~---~~~~----~~~~             ~~             .ooooOOOOOOOo"OOOOOOO000000000000OOOOOOOOOOO"
+                                           .OOO"""""""""".oOOOOOOOOOOOOOOOOOOOOOOOOOOOOo
+                                             `"OOOOOOOOOOOOoooooooo.
+       🐬 Dolphins                                      🐭 Mice
 '''
 
 TITLE = r"""
@@ -68,13 +52,20 @@ def clear_screen():
 
 def print_colored_logo():
     """Imprime o logo com cores - golfinho em ciano, camundongo em branco."""
-    # Golfinho em ciano
-    for line in LOGO_ASCII.strip().split('\n'):
-        print(f"{CYAN}{line}{RESET}")
+    lines = LOGO_ASCII.strip().split('\n')
     
-    # Camundongo em branco
-    for line in MOUSE_ASCII.strip().split('\n'):
-        print(f"{WHITE}{line}{RESET}")
+    for i, line in enumerate(lines):
+        if i < len(lines) - 1:
+            # Dividir a linha - golfinho à esquerda (ciano), camundongo à direita (branco)
+            if len(line) > 45:
+                left = line[:45]
+                right = line[45:]
+                print(f"{CYAN}{left}{RESET}{WHITE}{right}{RESET}")
+            else:
+                print(f"{CYAN}{line}{RESET}")
+        else:
+            # Última linha com os labels
+            print(f"{BOLD}{line}{RESET}")
 
 def print_title():
     """Imprime o título estilizado."""
@@ -83,14 +74,14 @@ def print_title():
 
 def print_info():
     """Imprime informações do projeto."""
-    print(f"\n{DIM}{'─' * 68}{RESET}")
+    print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{WHITE}  🚀 {BOLD}Framework de Orquestração de Desenvolvimento{RESET}")
     print(f"{WHITE}     {BOLD}Orientado por Agentes de IA{RESET}")
     print(f"{DIM}     Cobrindo todas as fases do ciclo de vida de software{RESET}")
     print(f"\n{GREEN}  ▸ {WHITE}Repositório: {CYAN}github.com/arbgjr/sdlc_agentico{RESET}")
-    print(f"{GREEN}  ▸ {WHITE}Versão:      {YELLOW}1.0.0{RESET}")
+    print(f"{GREEN}  ▸ {WHITE}Versão:      {YELLOW}2.0.7{RESET}")
     print(f"{GREEN}  ▸ {WHITE}Licença:     {MAGENTA}MIT{RESET}")
-    print(f"\n{DIM}{'─' * 68}{RESET}")
+    print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{DIM}  Comandos principais:{RESET}")
     print(f"  {CYAN}/sdlc-start{WHITE}         Inicia novo workflow{RESET}")
     print(f"  {CYAN}/sdlc-create-issues{WHITE} Cria issues no GitHub{RESET}")
