@@ -167,6 +167,10 @@
           {
             "type": "command",
             "command": ".claude/hooks/detect-documents.sh"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/validate-framework-structure.sh"
           }
         ]
       }
