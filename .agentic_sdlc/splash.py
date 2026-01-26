@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Splash Screen - SDLC Agêntico
-Arte ASCII gerada a partir do logo do projeto
+Arte ASCII com mice à esquerda e dolphins à direita
 """
 
 import sys
@@ -18,32 +18,34 @@ BOLD = "\033[1m"
 DIM = "\033[2m"
 RESET = "\033[0m"
 
+# ASCII Art - MICE à esquerda (branco), DOLPHINS à direita (ciano)
+# Manualmente invertido para posicionar mice à esquerda e dolphins à direita
 LOGO_ASCII = r'''
-                           __                             _                       __
-                      _.-~  )                           /   \                  /      \
-           _..--~~~~,'   ,-/     _                     '      \              /          \
-        .-'. . . .'   ,-','    ,' )                   |       |Oo          o|            |
-      ,'. . . _   ,--~,-'__..-'  ,'                   `    \  |OOOo......oOO|   /        |
-    ,'. . .  (@)' ---~~~~      ,'                      `    \\OOOOOOOOOOOOOOO\//        /
-   /. . . . '~~             ,-'                          \ _o\OOOOOOOOOOOOOOOO//. ___ /
-  /. . . . .             ,-'                          --- OO'* `OOOOOOOOOO'*  `OOOOO--
- ; . . . .  - .        ,'                                 `OOOooOOOOOOOOOooooOOOOOO'OOOo
-: . . . .       _     /                                 .OO "OOOOOOOOOOOOOOOOOOOO"OOOOOOOo
-. . . . .          `-.:                              OOOOO^OOOO0`(mice)/"OOOOOOOOOOOOO^OOOO
- . . ./  - .          )                              `OOOOO 0000000000000000 QQQQ "OOOOOOO"
-.  . |  _____..---.._/ _____                           "OOOOOOO00000000000000000OOOOOOOOOO"
- ~---~~~~----~~~~             ~~             .ooooOOOOOOOo"OOOOOOO000000000000OOOOOOOOOOO"
-                                           .OOO"""""""""".oOOOOOOOOOOOOOOOOOOOOOOOOOOOOo
-                                             `"OOOOOOOOOOOOoooooooo.
+          __                             _                                   __
+      /      \                  /   \                           _.-~  )
+     /          \              /      \                     _..--~~~~,'   ,-/     _
+    |            |o          oO|       |                .-'. . . .'   ,-','    ,' )
+    |        /   |OOo......oOO|  \    `              ,'. . . _   ,--~,-'__..-'  ,'
+     \        //\OOOOOOOOOOOOOOO\    `                ,'. . .  (@)' ---~~~~      ,'
+      \ ___ //.\\OOOOOOOOOOOOOOOO\o_ \                /. . . . '~~             ,-'
+   --OOOOO`  *'OOOOOOOOOO'* OO ---                   /. . . . .             ,-'
+  oOOO'OOOOOOooooOOOOOOOOOooOOO`                    ; . . . .  - .        ,'
+ oOOOOOOO"OOOOOOOOOOOOOOOOOO"OO .                  : . . . .       _     /
+OOOO^OOOO0`(mice)/"OOOOOOOOOOOOO^OOOOO            . . . . .          `-.:
+"OOOOOOO" QQQQ 0000000000000000 OOOOO`             . . ./  - .          )
+"OOOOOOOOOOOOOO00000000000000OOO"                 .  . |  _____..---.._/ _____
+"OOOOOOOOOOOOO000000OOOOOOO"oOOOOOOOoooo.        ~---~~~~----~~~~             ~~
+oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo.""""""""OOO.
+       .ooooooooOOOOOOOOOO"`
        🐭 Mice                                      🐬 Dolphins
 '''
 
 TITLE = r"""
-   ____  ___  _     ___      _                 _   _          
-  / ___||   \| |   / __|    /_\  __ _ ___ _ _ | |_(_)__ ___   
-  \___ \| |) | |__ | (__   / _ \/ _` / -_) ' \|  _| / _/ _ \  
-  |____/|___/|____| \___| /_/ \_\__, \___|_||_|\__|_\__\___/  
-                                |___/                         
+   ____  ___  _     ___      _                 _   _
+  / ___||   \| |   / __|    /_\  __ _ ___ _ _ | |_(_)__ ___
+  \___ \| |) | |__ | (__   / _ \/ _` / -_) ' \|  _| / _/ _ \
+  |____/|___/|____| \___| /_/ \_\__, \___|_||_|\__|_\__\___/
+                                |___/
 """
 
 def clear_screen():
@@ -51,15 +53,16 @@ def clear_screen():
     print("\033[2J\033[H", end="")
 
 def print_colored_logo():
-    """Imprime o logo com cores - camundongo em branco (esquerda), golfinho em ciano (direita)."""
+    """Imprime o logo com cores - mice em branco (esquerda), dolphins em ciano (direita)."""
     lines = LOGO_ASCII.strip().split('\n')
-    
+
     for i, line in enumerate(lines):
         if i < len(lines) - 1:
-            # Dividir a linha - esquerda (branco/mice), direita (ciano/dolphins)
-            if len(line) > 45:
-                left = line[:45]
-                right = line[45:]
+            # Dividir a linha - mice à esquerda (branco), dolphins à direita (ciano)
+            # A divisão agora é aproximadamente na coluna 45-50 dependendo do conteúdo
+            if len(line) > 50:
+                left = line[:50]
+                right = line[50:]
                 print(f"{WHITE}{left}{RESET}{CYAN}{right}{RESET}")
             else:
                 print(f"{WHITE}{line}{RESET}")
@@ -79,11 +82,22 @@ def print_info():
     print(f"{WHITE}     {BOLD}Orientado por Agentes de IA{RESET}")
     print(f"{DIM}     Cobrindo todas as fases do ciclo de vida de software{RESET}")
     print(f"\n{GREEN}  ▸ {WHITE}Repositório: {CYAN}github.com/arbgjr/sdlc_agentico{RESET}")
-    print(f"{GREEN}  ▸ {WHITE}Versão:      {YELLOW}2.0.7{RESET}")
+    print(f"{GREEN}  ▸ {WHITE}Versão:      {YELLOW}2.0.5{RESET}")
     print(f"{GREEN}  ▸ {WHITE}Licença:     {MAGENTA}MIT{RESET}")
+    print(f"{GREEN}  ▸ {WHITE}Changelog:   {CYAN}github.com/arbgjr/sdlc_agentico/blob/main/CHANGELOG.md{RESET}")
+
+    # Changelog resumido da versão atual
+    print(f"\n{DIM}{'─' * 80}{RESET}")
+    print(f"\n{YELLOW}  📋 {BOLD}v2.0.5 Highlights{RESET}")
+    print(f"{DIM}     Suporte para projetos muito grandes (até 900k LOC){RESET}")
+    print(f"{GREEN}     • {WHITE}sdlc-import agora suporta monorepos e sistemas legados{RESET}")
+    print(f"{GREEN}     • {WHITE}Análise completa (não amostrada) para projetos 500k-900k LOC{RESET}")
+    print(f"{GREEN}     • {WHITE}ADRs e threat models com mais qualidade para enterprise{RESET}")
+
     print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{DIM}  Comandos principais:{RESET}")
-    print(f"  {CYAN}/sdlc-start{WHITE}         Inicia novo workflow{RESET}")
+    print(f"  {CYAN}/sdlc-start{WHITE}         Inicia novo workflow SDLC completo{RESET}")
+    print(f"  {CYAN}/sdlc-import{WHITE}        Importa projeto existente (até 900k LOC){RESET}")
     print(f"  {CYAN}/sdlc-create-issues{WHITE} Cria issues no GitHub{RESET}")
     print(f"  {CYAN}/gate-check{WHITE}         Valida transição de fase{RESET}")
     print(f"  {CYAN}/adr-create{WHITE}         Registra decisão arquitetural{RESET}")
