@@ -28,7 +28,7 @@ def get_version():
         pass
 
     # Fallback se não conseguir ler
-    return "2.0.7"
+    return "not found"
 
 # Cores ANSI
 CYAN = "\033[96m"
@@ -44,8 +44,9 @@ RESET = "\033[0m"
 # ASCII Art - Trocado corretamente: MICE à esquerda, DOLPHINS à direita
 # Original tinha dolphins à esquerda e mice à direita - agora invertido
 LOGO_ASCII = r'''
-           __                                    __                             _
-           /   \                  /      \                         _.-~  )
+.
+                _                       __                                                __
+              /   \                  /      \                                        _.-~  )
               '      \              /          \                          _..--~~~~,'   ,-/     _
             |       |Oo          o|            |                       .-'. . . .'   ,-','    ,' )
             `    \  |OOOo......oOO|   /        |                     ,'. . . _   ,--~,-'__..-'  ,'
@@ -125,9 +126,6 @@ def print_info():
     print(f"\n{DIM}  Comandos principais:{RESET}")
     print(f"  {CYAN}/sdlc-start{WHITE}         Inicia novo workflow SDLC completo{RESET}")
     print(f"  {CYAN}/sdlc-import{WHITE}        Importa projeto existente (até 900k LOC){RESET}")
-    print(f"  {CYAN}/sdlc-create-issues{WHITE} Cria issues no GitHub{RESET}")
-    print(f"  {CYAN}/gate-check{WHITE}         Valida transição de fase{RESET}")
-    print(f"  {CYAN}/adr-create{WHITE}         Registra decisão arquitetural{RESET}")
     print(f"  {CYAN}/wiki-sync{WHITE}          Sincroniza docs com GitHub Wiki {DIM}(criar 1ª página antes){RESET}")
     print()
 
