@@ -1118,9 +1118,13 @@ git commit -m "fix: critical issue"
 
 ## Version History Quick Reference
 
-**Current Version**: v2.0.5 (sdlc-import - Large Project Support 900k LOC)
+**Current Version**: v2.1.3 (sdlc-import Critical Bug Fixes)
 
 **Recent Releases**:
+- v2.1.3 (2026-01-26): sdlc-import critical bug fixes (FileNotFoundError, path confusion, YAML security, error handling, datetime)
+- v2.1.2 (2026-01-26): Framework/Project Separation - major refactoring, dynamic splash screen
+- v2.0.7 (2026-01-25): Infrastructure preservation to prevent deletion of framework files
+- v2.0.6 (2026-01-24): Post-import validation system with auto-correction and quality reports
 - v2.0.5 (2026-01-24): sdlc-import max_project_size 500k→900k LOC (monorepos, enterprise legacy)
 - v2.0.4 (2026-01-24): sdlc-import v2.1.0 with 999 tests (ADR validator, graph generator, issue creator, migration analyzer)
 - v2.0.3 (2026-01-24): Auto-update orchestrator integration, migration validation, telemetry (103 tests, security hardening)

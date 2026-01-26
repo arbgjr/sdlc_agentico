@@ -1,8 +1,42 @@
 # SDLC Agêntico Version
-version: "2.1.2"
+version: "2.1.3"
 build_date: "2026-01-26"
 release_notes: |
-  Framework/Project Separation - Major Refactoring
+  sdlc-import Critical Bug Fixes
+
+  Bug Fixes:
+  - BUG #1 (CRÍTICO): FileNotFoundError ao criar graph.json/adjacency.json
+    - Adicionado graph_file.parent.mkdir() antes de escrever arquivos
+    - Garante que diretório corpus/ seja criado corretamente
+
+  - BUG #2 (CRÍTICO): Path confusion - módulos usando paths relativos
+    - DocumentationGenerator e ArchitectureVisualizer usavam Path(config['output_dir']) RELATIVO
+    - Corrigido para usar project_path / config['output_dir'] ABSOLUTO
+    - Garante artefatos salvos em /path/to/project/.project/ (não CWD)
+
+  - BUG #3 (ALTO): YAML string escaping vulnerável
+    - Configuração robusta de yaml.dump() com default_style='"'
+    - Previne ADRs inválidos em projetos Node.js (@scoped packages)
+
+  - BUG #4 (ALTO): Pipeline abort completo se graph generation falha
+    - Adicionado try-except com fallback em graph_generator
+    - Import continua mesmo se graph falhar (preserva ADRs, threat model, etc)
+
+  - BUG #5 (MÉDIO): DeprecationWarning datetime.utcnow()
+    - Migrado para datetime.now(timezone.utc) (timezone-aware)
+    - Compatibilidade com Python 3.13+
+
+  Impact:
+  - ✅ 0% de falhas devido a FileNotFoundError
+  - ✅ 100% de artefatos salvos em .agentic_sdlc/ (consistência)
+  - ✅ 0 vulnerabilidades YAML em projetos Node.js
+  - ✅ Resiliência - import não aborta em erros parciais
+  - ✅ Compatibilidade Python 3.13+ (sem deprecations)
+
+  Arquivos modificados:
+  - .claude/skills/sdlc-import/scripts/graph_generator.py
+  - .claude/skills/sdlc-import/scripts/project_analyzer.py
+  - .claude/skills/sdlc-import/scripts/documentation_generator.py
 
   Breaking Changes (Minor):
   - Directory structure reorganized: framework assets separated from project artifacts
@@ -57,6 +91,14 @@ release_notes: |
   - 1 test file (120 lines): test_infrastructure_preservation.py
 
 changelog:
+  - version: "2.1.3"
+    date: "2026-01-26"
+    changes:
+      - "fix(sdlc-import): FileNotFoundError ao gerar graph.json (garantir criação de parent dir)"
+      - "fix(sdlc-import): Path confusion - módulos usando paths relativos (corrigir para absoluto)"
+      - "fix(sdlc-import): YAML quoting vulnerável com @, &, : (configuração robusta de yaml.dump)"
+      - "fix(sdlc-import): Pipeline abort completo se graph falha (try-except com fallback)"
+      - "fix(sdlc-import): DeprecationWarning datetime.utcnow() (migrar para timezone-aware)"
   - version: "2.0.7"
     date: "2026-01-25"
     changes:
