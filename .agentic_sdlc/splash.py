@@ -117,10 +117,12 @@ def print_info():
     # Changelog resumido da versão atual
     print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{YELLOW}  📋 {BOLD}v{version} Highlights{RESET}")
-    print(f"{DIM}     Suporte para projetos muito grandes (até 900k LOC){RESET}")
-    print(f"{GREEN}     • {WHITE}sdlc-import agora suporta monorepos e sistemas legados{RESET}")
-    print(f"{GREEN}     • {WHITE}Análise completa (não amostrada) para projetos 500k-900k LOC{RESET}")
-    print(f"{GREEN}     • {WHITE}ADRs e threat models com mais qualidade para enterprise{RESET}")
+    print(f"{DIM}     sdlc-import Critical Bug Fixes{RESET}")
+    print(f"{GREEN}     • {WHITE}FileNotFoundError ao gerar graph.json (corrigido){RESET}")
+    print(f"{GREEN}     • {WHITE}Path confusion - artefatos agora salvos corretamente em .project/{RESET}")
+    print(f"{GREEN}     • {WHITE}YAML quoting para projetos Node.js (@scoped packages){RESET}")
+    print(f"{GREEN}     • {WHITE}Pipeline resiliente - continua mesmo se graph falha{RESET}")
+    print(f"{GREEN}     • {WHITE}Python 3.13+ compatibility (datetime timezone-aware){RESET}")
 
     print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{DIM}  Comandos principais:{RESET}")
