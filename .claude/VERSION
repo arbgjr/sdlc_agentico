@@ -1,13 +1,37 @@
 # SDLC Agêntico Version
-version: "2.0.7"
-build_date: "2026-01-25"
+version: "2.1.0"
+build_date: "2026-01-26"
 release_notes: |
-  sdlc-import - Infrastructure Preservation Fix
+  Framework/Project Separation - Major Refactoring
 
-  Critical Bug Fix:
-  - fix(sdlc-import): Implement infrastructure preservation to prevent deletion of framework files
-  - InfrastructurePreserver backs up and restores framework documentation
-  - Preserves templates, framework ADRs (001-099), learnings, sessions, .gitkeep, logo.png
+  Breaking Changes (Minor):
+  - Directory structure reorganized: framework assets separated from project artifacts
+  - .docs/ moved to .agentic_sdlc/docs/
+  - .scripts/ moved to .agentic_sdlc/scripts/
+  - Project artifacts now in .project/ directory
+  - Migration path provided for existing projects
+
+  New Features:
+  - Framework 100% self-contained in .agentic_sdlc/
+  - Splash screen with dynamic version reading from .claude/VERSION
+  - Enhanced ASCII art with mice/dolphins positioning
+  - Framework reusable across multiple projects
+  - Clear separation: framework vs project-specific content
+
+  Framework Structure:
+  - .agentic_sdlc/templates/ - Reusable templates
+  - .agentic_sdlc/schemas/ - Data schemas
+  - .agentic_sdlc/docs/ - Framework documentation
+  - .agentic_sdlc/scripts/ - Setup scripts
+  - .agentic_sdlc/splash.py - Enhanced splash screen
+
+  Project Structure:
+  - .project/corpus/ - RAG knowledge base
+  - .project/references/ - External documents
+  - .project/phases/ - SDLC phase outputs
+  - .project/architecture/ - Architecture artifacts
+  - .project/security/ - Security artifacts
+  - .project/reports/ - Generated reports
 
   Problem Solved:
   - sdlc-import was deleting ALL existing .agentic_sdlc/ content
