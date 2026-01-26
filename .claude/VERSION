@@ -1,96 +1,61 @@
 # SDLC Agêntico Version
-version: "2.1.3"
+version: "2.1.4"
 build_date: "2026-01-26"
 release_notes: |
-  sdlc-import Critical Bug Fixes
-
-  Bug Fixes:
-  - BUG #1 (CRÍTICO): FileNotFoundError ao criar graph.json/adjacency.json
-    - Adicionado graph_file.parent.mkdir() antes de escrever arquivos
-    - Garante que diretório corpus/ seja criado corretamente
-
-  - BUG #2 (CRÍTICO): Path confusion - módulos usando paths relativos
-    - DocumentationGenerator e ArchitectureVisualizer usavam Path(config['output_dir']) RELATIVO
-    - Corrigido para usar project_path / config['output_dir'] ABSOLUTO
-    - Garante artefatos salvos em /path/to/project/.project/ (não CWD)
-
-  - BUG #3 (ALTO): YAML string escaping vulnerável
-    - Configuração robusta de yaml.dump() com default_style='"'
-    - Previne ADRs inválidos em projetos Node.js (@scoped packages)
-
-  - BUG #4 (ALTO): Pipeline abort completo se graph generation falha
-    - Adicionado try-except com fallback em graph_generator
-    - Import continua mesmo se graph falhar (preserva ADRs, threat model, etc)
-
-  - BUG #5 (MÉDIO): DeprecationWarning datetime.utcnow()
-    - Migrado para datetime.now(timezone.utc) (timezone-aware)
-    - Compatibilidade com Python 3.13+
-
-  Impact:
-  - ✅ 0% de falhas devido a FileNotFoundError
-  - ✅ 100% de artefatos salvos em .agentic_sdlc/ (consistência)
-  - ✅ 0 vulnerabilidades YAML em projetos Node.js
-  - ✅ Resiliência - import não aborta em erros parciais
-  - ✅ Compatibilidade Python 3.13+ (sem deprecations)
-
-  Arquivos modificados:
-  - .claude/skills/sdlc-import/scripts/graph_generator.py
-  - .claude/skills/sdlc-import/scripts/project_analyzer.py
-  - .claude/skills/sdlc-import/scripts/documentation_generator.py
-
-  Breaking Changes (Minor):
-  - Directory structure reorganized: framework assets separated from project artifacts
-  - .docs/ moved to .agentic_sdlc/docs/
-  - .scripts/ moved to .agentic_sdlc/scripts/
-  - Project artifacts now in .project/ directory
-  - Migration path provided for existing projects
-
-  New Features:
-  - Framework 100% self-contained in .agentic_sdlc/
-  - Splash screen with dynamic version reading from .claude/VERSION
-  - Enhanced ASCII art with mice/dolphins positioning
-  - Framework reusable across multiple projects
-  - Clear separation: framework vs project-specific content
-
-  Framework Structure:
-  - .agentic_sdlc/templates/ - Reusable templates
-  - .agentic_sdlc/schemas/ - Data schemas
-  - .agentic_sdlc/docs/ - Framework documentation
-  - .agentic_sdlc/scripts/ - Setup scripts
-  - .agentic_sdlc/splash.py - Enhanced splash screen
-
-  Project Structure:
-  - .project/corpus/ - RAG knowledge base
-  - .project/references/ - External documents
-  - .project/phases/ - SDLC phase outputs
-  - .project/architecture/ - Architecture artifacts
-  - .project/security/ - Security artifacts
-  - .project/reports/ - Generated reports
+  .sdlcignore - Prevent Framework Self-Scanning
 
   Problem Solved:
-  - sdlc-import was deleting ALL existing .agentic_sdlc/ content
-  - Framework documentation (ADR-019 to ADR-022) was being removed
-  - Templates directory disappeared, breaking subsequent SDLC workflows
-  - Infrastructure files (.gitkeep, logo.png) required manual restoration
+  - sdlc-import was scanning its own framework code during analysis
+  - Framework test files flagged as tech debt (DEBT-SEC-001 in test_*.py)
+  - Third-party dependencies (node_modules, venv) analyzed unnecessarily
+  - Generated code (.terraform, dist) included in reports
+  - No way to exclude specific directories from analysis
 
   Solution:
-  - Automatic backup of existing infrastructure before doc generation
-  - Pattern-based detection of framework vs. imported files
-  - Restoration of preserved files after doc generation
-  - Comprehensive integration tests (4 tests covering all scenarios)
+  - Created .sdlcignore file (gitignore syntax)
+  - Implemented ignore logic in project_analyzer.py:
+    - _load_sdlcignore(): Loads patterns from project + framework root
+    - _should_ignore(): Checks files against patterns using fnmatch
+    - Modified _count_loc() and _scan_codebase() to respect ignore
+  - Framework-wide defaults in mice_dolphins/.sdlcignore
+  - Project-specific exclusions in {project}/.sdlcignore
+
+  New Features:
+  - .sdlcignore file support (200+ lines of default patterns)
+  - Prevents framework self-scanning (.claude/, .agentic_sdlc/)
+  - Excludes dependencies (node_modules, vendor, venv, __pycache__)
+  - Ignores IaC generated files (.terraform, .terraform.lock.hcl)
+  - Skips build artifacts (dist, build, target)
+  - Filters test fixtures (fixtures/, mocks/, test-data/)
+  - Backward compatible (uses config exclude_patterns as fallback)
 
   Impact:
-  - ✅ Framework documentation preserved during import
-  - ✅ Templates available for subsequent SDLC workflows
-  - ✅ No manual restoration needed
-  - ✅ Existing ADRs, learnings, sessions maintained
+  - ✅ Framework files excluded from analysis
+  - ✅ Third-party code (node_modules, venv) ignored
+  - ✅ Generated code (.terraform) ignored
+  - ✅ Clean tech debt reports (no framework false positives)
+  - ✅ Faster analysis (fewer files scanned)
+  - ✅ Backward compatible with existing configs
 
-  Files:
-  - 1 new file (315 lines): infrastructure_preserver.py
-  - 1 modified file (10 lines): project_analyzer.py
-  - 1 test file (120 lines): test_infrastructure_preservation.py
+  Files Modified:
+  - NEW: .sdlcignore (200+ lines, framework defaults)
+  - MODIFIED: .claude/skills/sdlc-import/scripts/project_analyzer.py (+100 lines)
+  - MODIFIED: .claude/skills/sdlc-import/README.md (+60 lines documentation)
+
+  Related Work:
+  - Issue #92 created: Pattern Detection for Tripla Conventions (Terraform + Database IaC)
+  - Comprehensive issue with YAML patterns, ADR examples, tests, and implementation guide
 
 changelog:
+  - version: "2.1.4"
+    date: "2026-01-26"
+    changes:
+      - "feat(sdlc-import): .sdlcignore support to prevent framework self-scanning"
+      - "feat(sdlc-import): _load_sdlcignore() loads patterns from project + framework root"
+      - "feat(sdlc-import): _should_ignore() checks files against ignore patterns"
+      - "feat(sdlc-import): Modified _count_loc() and _scan_codebase() to respect ignore"
+      - "docs(sdlc-import): Documented .sdlcignore in README with examples and benefits"
+      - "chore: Created Issue #92 for Tripla pattern detection enhancement (Terraform + Database IaC)"
   - version: "2.1.3"
     date: "2026-01-26"
     changes:
