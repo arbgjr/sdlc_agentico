@@ -19,23 +19,23 @@ DIM = "\033[2m"
 RESET = "\033[0m"
 
 LOGO_ASCII = r'''
-                           __                             _                       __
-                      _.-~  )                           /   \                  /      \
-           _..--~~~~,'   ,-/     _                     '      \              /          \
-        .-'. . . .'   ,-','    ,' )                   |       |Oo          o|            |
-      ,'. . . _   ,--~,-'__..-'  ,'                   `    \  |OOOo......oOO|   /        |
-    ,'. . .  (@)' ---~~~~      ,'                      `    \\OOOOOOOOOOOOOOO\//        /
-   /. . . . '~~             ,-'                          \ _o\OOOOOOOOOOOOOOOO//. ___ /
-  /. . . . .             ,-'                          --- OO'* `OOOOOOOOOO'*  `OOOOO--
- ; . . . .  - .        ,'                                 `OOOooOOOOOOOOOooooOOOOOO'OOOo
-: . . . .       _     /                                 .OO "OOOOOOOOOOOOOOOOOOOO"OOOOOOOo
-. . . . .          `-.:                              OOOOO^OOOO0`(mice)/"OOOOOOOOOOOOO^OOOO
- . . ./  - .          )                              `OOOOO 0000000000000000 QQQQ "OOOOOOO"
-.  . |  _____..---.._/ _____                           "OOOOOOO00000000000000000OOOOOOOOOO"
- ~---~~~~----~~~~             ~~             .ooooOOOOOOOo"OOOOOOO000000000000OOOOOOOOOOO"
-                                           .OOO"""""""""".oOOOOOOOOOOOOOOOOOOOOOOOOOOOOo
-                                             `"OOOOOOOOOOOOoooooooo.
-       🐬 Dolphins                                      🐭 Mice
+          __                             _                                   __
+      /      \                  /   \                           _.-~  )
+     /          \              /      \                     _..--~~~~,'   ,-/     _
+    |            |o          oO|       |                   .-'. . . .'   ,-','    ,' )
+    |        /   |OOo......oOO|  \    `                   ,'. . . _   ,--~,-'__..-'  ,'
+     \        //\OOOOOOOOOOOOOOO\    `                    ,'. . .  (@)' ---~~~~      ,'
+      \ ___ //.\OOOOOOOOOOOOOOOO\o_ \                    /. . . . '~~             ,-'
+   --OOOOO`  *'OOOOOOOOOO'* OO ---                       /. . . . .             ,-'
+  oOOO'OOOOOOooooOOOOOOOOOooOOO`                         ,'        .  - . . . . ;
+ oOOOOOOO"OOOOOOOOOOOOOOOOOO"OO .                      /     _       . . . . :
+OOOO^OOOOOOOOOOOOO"\)mice(`0OOOO^OOOOO                 :.`-          . . . . .
+"OOOOOOO" QQQQ 0000000000000000 OOOOO`                 )          .  - ./  . .
+"OOOOOOOOOOOOOO00000000000000OOO"                      _____ _..__---.._____  |  .
+"OOOOOOOOOOOOO000000OOOOOOO"oOOOOOOOoooo.             ~~             ~~~~----~~~---~
+oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo.""""""""OOO.
+       .ooooooooOOOOOOOOOO"`
+       🐭 Mice                                      🐬 Dolphins
 '''
 
 TITLE = r"""
@@ -51,18 +51,18 @@ def clear_screen():
     print("\033[2J\033[H", end="")
 
 def print_colored_logo():
-    """Imprime o logo com cores - golfinho em ciano, camundongo em branco."""
+    """Imprime o logo com cores - camundongo em branco, golfinho em ciano."""
     lines = LOGO_ASCII.strip().split('\n')
-    
+
     for i, line in enumerate(lines):
         if i < len(lines) - 1:
-            # Dividir a linha - golfinho à esquerda (ciano), camundongo à direita (branco)
+            # Dividir a linha - camundongo à esquerda (branco), golfinho à direita (ciano)
             if len(line) > 45:
                 left = line[:45]
                 right = line[45:]
-                print(f"{CYAN}{left}{RESET}{WHITE}{right}{RESET}")
+                print(f"{WHITE}{left}{RESET}{CYAN}{right}{RESET}")
             else:
-                print(f"{CYAN}{line}{RESET}")
+                print(f"{WHITE}{line}{RESET}")
         else:
             # Última linha com os labels
             print(f"{BOLD}{line}{RESET}")
