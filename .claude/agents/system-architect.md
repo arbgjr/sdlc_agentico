@@ -34,9 +34,9 @@ skills:
   - rag-query
   - memory-manager
 references:
-  - path: .docs/engineering-playbook/manual-desenvolvimento/principios.md
+  - path: \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/principios.md
     purpose: Principios arquiteturais e restricoes
-  - path: .docs/engineering-playbook/manual-desenvolvimento/standards.md
+  - path: \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/standards.md
     purpose: Quando system design e obrigatorio
 ---
 

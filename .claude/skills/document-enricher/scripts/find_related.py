@@ -201,7 +201,7 @@ def main():
     parser.add_argument("prompt", help="Research prompt/topic")
     parser.add_argument(
         "--index",
-        default=".agentic_sdlc/references/_index.yml",
+        default=".project/references/_index.yml",
         help="Path to _index.yml"
     )
     parser.add_argument(

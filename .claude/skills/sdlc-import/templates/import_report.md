@@ -96,7 +96,7 @@
 
 ## Architecture Diagrams
 
-Generated diagrams are available in `.agentic_sdlc/architecture/`:
+Generated diagrams are available in `.project/architecture/`:
 
 {% for diagram in diagrams %}
 - **{{ diagram.name }}** - `{{ diagram.path }}`
@@ -131,7 +131,7 @@ Generated diagrams are available in `.agentic_sdlc/architecture/`:
 {% if threats.escalation_required %}
 ⚠️ **ESCALATION REQUIRED**
 - Reasons: {{ threats.escalation_reasons }}
-- See threat model: `.agentic_sdlc/security/threat-model-inferred.yml`
+- See threat model: `.project/security/threat-model-inferred.yml`
 {% endif %}
 
 {% else %}
@@ -159,7 +159,7 @@ Threat modeling was skipped (use `--skip-threat-model` flag to re-enable).
 | {{ category.name }} | {{ category.count }} | {{ category.effort }}h |
 {% endfor %}
 
-See full report: `.agentic_sdlc/reports/tech-debt-inferred.md`
+See full report: `.project/reports/tech-debt-inferred.md`
 
 {% else %}
 Tech debt detection was skipped (use `--skip-tech-debt` flag to re-enable).

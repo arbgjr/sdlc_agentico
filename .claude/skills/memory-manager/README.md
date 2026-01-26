@@ -225,7 +225,7 @@ save_decision(
     },
     phase=5
 )
-# → Persists to .agentic_sdlc/corpus/nodes/decisions/adr-NNN.yml
+# → Persists to .project/corpus/nodes/decisions/adr-NNN.yml
 ```
 
 ### Cross-Phase Context
@@ -376,6 +376,6 @@ Simple Store is **additive** - existing `.agentic_sdlc/` structure unchanged.
 ## References
 
 - Source: [claude-orchestrator memory system](https://github.com/reshashi/claude-orchestrator/blob/main/docs/MEMORY.md)
-- Analysis: `.agentic_sdlc/corpus/nodes/learnings/LEARN-claude-orchestrator-patterns.yml`
+- Analysis: `.project/corpus/nodes/learnings/LEARN-claude-orchestrator-patterns.yml`
 - Epic: Issue #33
 - Task: Issue #36

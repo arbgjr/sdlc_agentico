@@ -111,7 +111,7 @@ class TestDetectMigrations:
     def test_migration_marker(self):
         """Test detection of 'Migration:' marker."""
         changelog = """
-        Migration: Run .scripts/migrate-v2-to-v3.sh
+        Migration: Run \.agentic_sdlc/scripts/migrate-v2-to-v3.sh
         """
         migrations = detect_migrations(changelog)
         assert len(migrations) == 1

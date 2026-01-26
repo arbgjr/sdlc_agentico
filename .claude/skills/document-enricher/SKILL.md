@@ -18,7 +18,7 @@ Automatically enriches existing reference documents with research findings from 
 **Automatic activation** when:
 - Any research agent (`domain-researcher`, `doc-crawler`, `requirements-analyst`, `adr-author`, `threat-modeler`) receives a prompt
 - Similarity to existing documents > 0.6
-- Documents exist in `.agentic_sdlc/references/`
+- Documents exist in `.project/references/`
 
 **Manual activation**:
 ```bash

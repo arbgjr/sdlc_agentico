@@ -33,7 +33,7 @@ git checkout -b feat/nome-da-feature
 # ... código ...
 
 # 4. Teste localmente
-./.scripts/setup-sdlc.sh
+./\.agentic_sdlc/scripts/setup-sdlc.sh
 claude
 /sdlc-start "teste"
 
@@ -194,7 +194,7 @@ arguments:
 1. Crie arquivo em `.claude/agents/nome-agente.md`
 2. Siga o template acima
 3. Adicione ao `settings.json` em `agents.available_agents`
-4. Adicione ao `.docs/AGENTS.md`
+4. Adicione ao `\.agentic_sdlc/docs/AGENTS.md`
 5. Teste: `"Use o nome-agente para..."`
 
 ### Nova Skill
@@ -208,7 +208,7 @@ arguments:
 
 1. Crie arquivo em `.claude/commands/nome.md`
 2. Siga o template acima
-3. Adicione ao `.docs/COMMANDS.md`
+3. Adicione ao `\.agentic_sdlc/docs/COMMANDS.md`
 4. Teste: `/nome-comando`
 
 ### Novo Hook
@@ -223,7 +223,7 @@ arguments:
 1. Crie arquivo em `.claude/skills/gate-evaluator/gates/phase-X-to-Y.yml`
 2. Defina artefatos obrigatórios
 3. Defina critérios de qualidade
-4. Adicione ao `.docs/COMMANDS.md`
+4. Adicione ao `\.agentic_sdlc/docs/COMMANDS.md`
 
 ## Testes
 

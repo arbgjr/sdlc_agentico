@@ -30,8 +30,8 @@ Create `adr_validator.py` to validate claims:
 ### Fix #6: Knowledge Graph Generator
 Create `graph_generator.py`:
 - Extract relations between ADRs (supersedes, implements, addresses)
-- Generate `.agentic_sdlc/corpus/graph.json`
-- Generate `.agentic_sdlc/corpus/adjacency.json`
+- Generate `.project/corpus/graph.json`
+- Generate `.project/corpus/adjacency.json`
 
 ### Fix #9: GitHub Issue Creator
 Enhance `documentation_generator.py`:

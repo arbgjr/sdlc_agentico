@@ -75,7 +75,7 @@ python3 .claude/skills/graph-navigator/scripts/graph_builder.py --dry-run
 
 # Incremental update for single file
 python3 .claude/skills/graph-navigator/scripts/graph_builder.py \
-    --incremental .agentic_sdlc/corpus/nodes/decisions/adr-015.yml
+    --incremental .project/corpus/nodes/decisions/adr-015.yml
 ```
 
 ### concept_extractor.py
@@ -98,7 +98,7 @@ python3 .claude/skills/graph-navigator/scripts/concept_extractor.py --output sta
 
 # Extract from single file
 python3 .claude/skills/graph-navigator/scripts/concept_extractor.py \
-    --file .agentic_sdlc/corpus/nodes/decisions/adr-001.yml
+    --file .project/corpus/nodes/decisions/adr-001.yml
 ```
 
 ### graph_visualizer.py
@@ -164,10 +164,10 @@ python3 .claude/skills/graph-navigator/scripts/graph_visualizer.py \
 
 | File | Description |
 |------|-------------|
-| `.agentic_sdlc/corpus/graph.json` | Main graph with nodes and edges |
-| `.agentic_sdlc/corpus/adjacency.json` | Adjacency index for fast traversal |
-| `.agentic_sdlc/corpus/index.yml` | Text search index |
-| `.agentic_sdlc/corpus/nodes/concepts/*.yml` | Extracted concept nodes |
+| `.project/corpus/graph.json` | Main graph with nodes and edges |
+| `.project/corpus/adjacency.json` | Adjacency index for fast traversal |
+| `.project/corpus/index.yml` | Text search index |
+| `.project/corpus/nodes/concepts/*.yml` | Extracted concept nodes |
 
 ## Integration with Other Skills
 
@@ -191,7 +191,7 @@ When saving decisions/learnings, the graph can be updated incrementally:
 ```bash
 # After saving a new ADR
 python3 .claude/skills/graph-navigator/scripts/graph_builder.py \
-    --incremental .agentic_sdlc/corpus/nodes/decisions/adr-new.yml
+    --incremental .project/corpus/nodes/decisions/adr-new.yml
 ```
 
 ### gate-evaluator

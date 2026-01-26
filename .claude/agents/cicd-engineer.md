@@ -24,7 +24,7 @@ model: sonnet
 skills:
   - rag-query
 references:
-  - path: .docs/engineering-playbook/stacks/devops/ci-cd.md
+  - path: \.agentic_sdlc/docs/engineering-playbook/stacks/devops/ci-cd.md
     purpose: Configuracao de CI/CD, gates, branching
 ---
 

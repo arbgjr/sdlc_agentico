@@ -1,0 +1,25 @@
+category: messaging
+confidence: 0.5733333333333334
+confidence_breakdown:
+  consistency: 0.417
+  evidence_quality: 1.0
+  evidence_quantity: 0.3
+  llm_bonus: 0.0
+confidence_level: medium
+date: '2026-01-26T14:05:23.930390Z'
+decision: Use Celery for messaging
+evidence:
+- file: requirements.txt
+  line: 4
+  pattern: celery
+  quality: 1.0
+  source: pattern
+evidence_count: 1
+id: ADR-INFERRED-004
+needs_validation: true
+rationale: 'Celery was selected for messaging based on analysis of 1 files. Key evidence
+  found in: requirements.txt. This decision aligns with project architecture patterns.
+  [Note: Full LLM synthesis requires API integration - see decision_extractor.py:_generate_llm_rationale]'
+status: inferred
+synthesized_by: llm
+title: Use Celery as Message Queue

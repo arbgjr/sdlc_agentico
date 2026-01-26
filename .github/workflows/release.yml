@@ -46,52 +46,30 @@ jobs:
             cp -r .agentic_sdlc/templates release-package/.agentic_sdlc/
           fi
 
-          # Copy corpus patterns (design patterns documentation)
-          if [ -d ".agentic_sdlc/corpus/patterns" ]; then
-            mkdir -p release-package/.agentic_sdlc/corpus
-            cp -r .agentic_sdlc/corpus/patterns release-package/.agentic_sdlc/corpus/
+          # Copy schemas and examples
+          if [ -d ".agentic_sdlc/schemas" ]; then
+            cp -r .agentic_sdlc/schemas release-package/.agentic_sdlc/
           fi
 
-          # Create empty directories for user data
-          mkdir -p release-package/.agentic_sdlc/projects
-          mkdir -p release-package/.agentic_sdlc/references
-          mkdir -p release-package/.agentic_sdlc/sessions
-          touch release-package/.agentic_sdlc/projects/.gitkeep
-          touch release-package/.agentic_sdlc/references/.gitkeep
-          touch release-package/.agentic_sdlc/sessions/.gitkeep
-
-          # Copy documentation from .docs/
-          mkdir -p release-package/.docs
-
-          # Copy README
-          if [ -f ".docs/README.md" ]; then
-            cp .docs/README.md release-package/.docs/
+          if [ -d ".agentic_sdlc/examples" ]; then
+            cp -r .agentic_sdlc/examples release-package/.agentic_sdlc/
           fi
 
-          # Copy guides
-          if [ -d ".docs/guides" ]; then
-            cp -r .docs/guides release-package/.docs/
+          # Copy documentation (now inside .agentic_sdlc/)
+          if [ -d ".agentic_sdlc/docs" ]; then
+            cp -r .agentic_sdlc/docs release-package/.agentic_sdlc/
           fi
 
-          # Copy SDLC documentation
-          if [ -d ".docs/sdlc" ]; then
-            cp -r .docs/sdlc release-package/.docs/
+          # Copy scripts (now inside .agentic_sdlc/)
+          if [ -d ".agentic_sdlc/scripts" ]; then
+            cp -r .agentic_sdlc/scripts release-package/.agentic_sdlc/
+            chmod +x release-package/.agentic_sdlc/scripts/*.sh 2>/dev/null || true
           fi
 
-          # Copy engineering playbook (standards, practices)
-          if [ -d ".docs/engineering-playbook" ]; then
-            cp -r .docs/engineering-playbook release-package/.docs/
-          fi
-
-          # NOTE: .docs/examples/ is NOT included in the package (development only)
-
-          # Copy scripts
-          mkdir -p release-package/.scripts
-          cp .scripts/setup-sdlc.sh release-package/.scripts/
-          if [ -f ".scripts/install-security-tools.sh" ]; then
-            cp .scripts/install-security-tools.sh release-package/.scripts/
-          fi
-          chmod +x release-package/.scripts/*.sh 2>/dev/null || true
+          # Create empty .project/ structure for user data
+          mkdir -p release-package/.project/{corpus,references,phases,architecture,security,reports,sessions}
+          mkdir -p release-package/.project/corpus/nodes/{decisions,learnings,patterns,concepts}
+          touch release-package/.project/.gitkeep
 
           # Copy root files
           # NOTE: README.md and CHANGELOG.md are NOT included - repository-specific
@@ -101,7 +79,7 @@ jobs:
           # Verify permissions before creating archive
           echo "Verifying executable permissions:"
           ls -la release-package/.claude/hooks/*.sh | head -5
-          ls -la release-package/.scripts/*.sh
+          ls -la release-package/.agentic_sdlc/scripts/*.sh
 
           # Create tar.gz (preserves Unix permissions correctly)
           cd release-package
@@ -133,14 +111,14 @@ jobs:
           echo "**Linux/macOS (recommended - preserves permissions):**" >> release_notes.md
           echo '```bash' >> release_notes.md
           echo 'curl -fsSL https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.VERSION }}/sdlc-agentico-${{ steps.version.outputs.VERSION }}.tar.gz | tar -xzf -' >> release_notes.md
-          echo "./.scripts/setup-sdlc.sh" >> release_notes.md
+          echo "./.agentic_sdlc/scripts/setup-sdlc.sh" >> release_notes.md
           echo '```' >> release_notes.md
           echo "" >> release_notes.md
           echo "**Windows/Alternative (ZIP):**" >> release_notes.md
           echo '```bash' >> release_notes.md
           echo 'curl -fsSL https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.VERSION }}/sdlc-agentico-${{ steps.version.outputs.VERSION }}.zip -o sdlc.zip' >> release_notes.md
           echo "unzip sdlc.zip -d ." >> release_notes.md
-          echo "./.scripts/setup-sdlc.sh  # Required to set executable permissions" >> release_notes.md
+          echo "./.agentic_sdlc/scripts/setup-sdlc.sh  # Required to set executable permissions" >> release_notes.md
           echo '```' >> release_notes.md
           echo "" >> release_notes.md
 
@@ -154,16 +132,16 @@ jobs:
           echo "### Package Contents" >> release_notes.md
           echo "" >> release_notes.md
           echo "- \`.claude/\` - Agents, skills, commands, hooks, and settings" >> release_notes.md
-          echo "- \`.agentic_sdlc/\` - SDLC artifacts:" >> release_notes.md
+          echo "- \`.agentic_sdlc/\` - Framework assets (100% autocontido):" >> release_notes.md
           echo "  - \`templates/\` - ADR, spec, and threat model templates" >> release_notes.md
-          echo "  - \`corpus/patterns/\` - Design patterns (Anthropic skills)" >> release_notes.md
-          echo "- \`.docs/\` - Documentation:" >> release_notes.md
-          echo "  - \`guides/\` - Quickstart, infrastructure, troubleshooting" >> release_notes.md
-          echo "  - \`sdlc/\` - Agents, commands, and SDLC overview" >> release_notes.md
-          echo "  - \`engineering-playbook/\` - Development standards and practices" >> release_notes.md
-          echo "- \`.scripts/\` - Setup and utility scripts" >> release_notes.md
-          echo "- \`README.md\` - Project documentation" >> release_notes.md
-          echo "- \`CHANGELOG.md\` - Version history" >> release_notes.md
+          echo "  - \`schemas/\` - Data schemas for validation" >> release_notes.md
+          echo "  - \`examples/\` - Example artifacts" >> release_notes.md
+          echo "  - \`docs/\` - Framework documentation" >> release_notes.md
+          echo "    - \`guides/\` - Quickstart, infrastructure, troubleshooting" >> release_notes.md
+          echo "    - \`sdlc/\` - Agents, commands, and SDLC overview" >> release_notes.md
+          echo "    - \`engineering-playbook/\` - Development standards and practices" >> release_notes.md
+          echo "  - \`scripts/\` - Setup and utility scripts" >> release_notes.md
+          echo "- \`.project/\` - Empty structure for project-specific artifacts" >> release_notes.md
           echo "- \`LICENSE\` - License information" >> release_notes.md
 
       - name: Create GitHub Release

@@ -86,8 +86,8 @@ python3 .claude/skills/system-design-decision-engine/scripts/rag_search.py "<con
 ## Referencias do Engineering Playbook
 
 Decisoes devem considerar:
-- `.docs/engineering-playbook/manual-desenvolvimento/principios.md` - Principios orientadores
-- `.docs/engineering-playbook/stacks/devops/security.md` - Threat modeling (STRIDE)
+- `\.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/principios.md` - Principios orientadores
+- `\.agentic_sdlc/docs/engineering-playbook/stacks/devops/security.md` - Threat modeling (STRIDE)
 
 ## Padrões Detalhados (Markdown)
 

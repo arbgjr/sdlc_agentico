@@ -105,14 +105,14 @@ fi
 
 # Migrar learnings/ -> corpus/learnings/
 if [ -d ".claude/memory/learnings" ]; then
-    mkdir -p .agentic_sdlc/corpus/learnings
+    mkdir -p .project/corpus/learnings
     count=$(find .claude/memory/learnings -type f 2>/dev/null | wc -l)
     if [ "$count" -gt 0 ]; then
         for file in .claude/memory/learnings/*; do
             if [ -f "$file" ]; then
                 filename=$(basename "$file")
-                if [ ! -f ".agentic_sdlc/corpus/learnings/${filename}" ]; then
-                    cp "$file" .agentic_sdlc/corpus/learnings/
+                if [ ! -f ".project/corpus/learnings/${filename}" ]; then
+                    cp "$file" .project/corpus/learnings/
                     sdlc_log_debug "Migrated learning" "file=$filename"
                     MIGRATED=$((MIGRATED + 1))
                 fi

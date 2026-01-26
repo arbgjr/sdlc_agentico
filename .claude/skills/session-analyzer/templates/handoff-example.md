@@ -18,7 +18,7 @@
 
 - Criar automation loop para monitoramento de workers (Task #34)
 - Criar ADR documentando decisões arquiteturais
-- Atualizar documentação em .docs/
+- Atualizar documentação em \.agentic_sdlc/docs/
 - Integrar com observabilidade (Loki/Grafana)
 - Criar testes de integração
 
@@ -34,7 +34,7 @@
 - `.claude/skills/memory-manager/scripts/simple_store.py`
 - `.claude/skills/memory-manager/README.md`
 - `.claude/skills/session-analyzer/scripts/handoff.py`
-- `.agentic_sdlc/corpus/nodes/learnings/LEARN-claude-orchestrator-patterns.yml`
+- `.project/corpus/nodes/learnings/LEARN-claude-orchestrator-patterns.yml`
 
 **Tools Used**: Bash, Edit, Read, TodoWrite, WebFetch, Write
 
@@ -48,7 +48,7 @@
 - All three tasks (#35, #36, #37) completed successfully
 - Next: Implement automation loop (#34) which depends on #35
 - Need to create ADR documenting architectural decisions
-- Documentation updates pending for .docs/
+- Documentation updates pending for \.agentic_sdlc/docs/
 
 ---
 

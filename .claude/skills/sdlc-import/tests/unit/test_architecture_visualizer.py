@@ -20,7 +20,7 @@ def config():
     """Default config for visualizer"""
     return {
         "general": {
-            "output_dir": ".agentic_sdlc"
+            "output_dir": ".project"
         }
     }
 
@@ -41,7 +41,7 @@ class TestArchitectureVisualizer:
         visualizer = ArchitectureVisualizer(config)
 
         assert visualizer.config == config
-        assert visualizer.output_dir == Path(".agentic_sdlc/architecture")
+        assert visualizer.output_dir == Path(".project/architecture")
 
     def test_init_output_dir(self):
         """Test output directory configuration"""

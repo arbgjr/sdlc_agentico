@@ -21,14 +21,14 @@ required_artifacts:
     agent: "domain-researcher"
 
   - name: "Documentation Index"
-    path: ".agentic_sdlc/corpus/docs/**/*.md"
+    path: ".project/corpus/docs/**/*.md"
     fallback_path: ".claude/rag/docs/**/*.md"
     description: "Documentacao oficial capturada e indexada"
     agent: "doc-crawler"
     optional: true
 
   - name: "RAG Corpus"
-    path: ".agentic_sdlc/corpus/index.yml"
+    path: ".project/corpus/index.yml"
     fallback_path: ".claude/rag/corpus.yml"
     description: "Corpus RAG inicializado com conhecimento do dominio"
     agent: "rag-curator"
@@ -41,7 +41,7 @@ quality_checks:
     validation: "grep -r 'sources:' .agentic_sdlc/projects/*/research/ .claude/memory/research/ 2>/dev/null | head -1"
 
   - check: "Documentacao oficial capturada"
-    validation: "ls .agentic_sdlc/corpus/docs/ .claude/rag/docs/ 2>/dev/null | head -1"
+    validation: "ls .project/corpus/docs/ .claude/rag/docs/ 2>/dev/null | head -1"
 
 human_approval:
   required: false

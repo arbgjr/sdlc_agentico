@@ -8,19 +8,19 @@ checks:
     type: "file_exists"
     severity: "error"
     description: "graph.json must exist in corpus"
-    file: ".agentic_sdlc/corpus/graph.json"
+    file: ".project/corpus/graph.json"
 
   - name: "adjacency_file_exists"
     type: "file_exists"
     severity: "error"
     description: "adjacency.json must exist in corpus"
-    file: ".agentic_sdlc/corpus/adjacency.json"
+    file: ".project/corpus/adjacency.json"
 
   - name: "min_nodes"
     type: "json_path"
     severity: "warning"
     description: "Graph should have at least 3 nodes for meaningful analysis"
-    file: ".agentic_sdlc/corpus/graph.json"
+    file: ".project/corpus/graph.json"
     json_path: "$.metadata.node_count"
     operator: ">="
     value: 3
@@ -29,7 +29,7 @@ checks:
     type: "json_path"
     severity: "warning"
     description: "Graph should have at least 1 edge for semantic relations"
-    file: ".agentic_sdlc/corpus/graph.json"
+    file: ".project/corpus/graph.json"
     json_path: "$.metadata.edge_count"
     operator: ">="
     value: 1
@@ -38,19 +38,19 @@ checks:
     type: "json_valid"
     severity: "error"
     description: "graph.json must be valid JSON"
-    file: ".agentic_sdlc/corpus/graph.json"
+    file: ".project/corpus/graph.json"
 
   - name: "adjacency_valid_json"
     type: "json_valid"
     severity: "error"
     description: "adjacency.json must be valid JSON"
-    file: ".agentic_sdlc/corpus/adjacency.json"
+    file: ".project/corpus/adjacency.json"
 
   - name: "graph_has_version"
     type: "json_path"
     severity: "error"
     description: "graph.json must have version field"
-    file: ".agentic_sdlc/corpus/graph.json"
+    file: ".project/corpus/graph.json"
     json_path: "$.version"
     operator: "exists"
 
@@ -62,7 +62,7 @@ checks:
       import json
       from pathlib import Path
 
-      corpus_dir = Path(".agentic_sdlc/corpus")
+      corpus_dir = Path(".project/corpus")
       with open(corpus_dir / "graph.json") as f:
           graph = json.load(f)
       with open(corpus_dir / "adjacency.json") as f:

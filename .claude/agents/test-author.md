@@ -31,7 +31,7 @@ allowed-tools:
   - Grep
   - Bash
 references:
-  - path: .docs/engineering-playbook/manual-desenvolvimento/testes.md
+  - path: \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/testes.md
     purpose: Estrategia de testes, piramide, cobertura por risco
 ---
 

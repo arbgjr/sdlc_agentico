@@ -66,9 +66,9 @@ gh pr create --title "[{{task_id}}] {{description}}" \
 
 ## Getting Help
 
-- **Project Documentation**: See `.docs/` in root
+- **Project Documentation**: See `\.agentic_sdlc/docs/` in root
 - **Architecture**: See `ARCHITECTURE.md`
-- **Playbook**: See `.docs/playbook.md`
+- **Playbook**: See `\.agentic_sdlc/docs/playbook.md`
 - **Similar Code**: Search for related implementations
 
 ## Observability

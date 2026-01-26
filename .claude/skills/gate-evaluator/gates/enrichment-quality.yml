@@ -13,7 +13,7 @@ checks:
     validation:
       type: "file_content"
       pattern: "sources:"
-      files: ".agentic_sdlc/corpus/nodes/learnings/ENRICH-*.yml"
+      files: ".project/corpus/nodes/learnings/ENRICH-*.yml"
     error_message: "Enrichment corpus nodes must include sources for research findings"
 
   - name: original_preserved
@@ -21,7 +21,7 @@ checks:
     description: "Original document must be unchanged (hash check)"
     validation:
       type: "file_integrity"
-      files: ".agentic_sdlc/references/**/*"
+      files: ".project/references/**/*"
       exclude_patterns:
         - "*.enriched.*.md"
         - "_index.yml"
@@ -32,7 +32,7 @@ checks:
     description: "Graph must contain 'enriches' relation"
     validation:
       type: "graph_structure"
-      graph_file: ".agentic_sdlc/corpus/graph.json"
+      graph_file: ".project/corpus/graph.json"
       required_edge_type: "enriches"
     error_message: "Graph must include 'enriches' relation for all enrichments"
 
@@ -41,7 +41,7 @@ checks:
     description: "Version must be incremented correctly (v1 → v2 → ...)"
     validation:
       type: "version_sequence"
-      index_file: ".agentic_sdlc/references/_index.yml"
+      index_file: ".project/references/_index.yml"
     error_message: "Enrichment versions must increment sequentially"
 
   - name: synthesis_quality
@@ -61,7 +61,7 @@ checks:
     description: "Enriched Markdown files must be properly formatted"
     validation:
       type: "markdown_lint"
-      files: ".agentic_sdlc/references/**/*.enriched.*.md"
+      files: ".project/references/**/*.enriched.*.md"
       rules:
         - "MD001"  # Header levels
         - "MD003"  # Header style

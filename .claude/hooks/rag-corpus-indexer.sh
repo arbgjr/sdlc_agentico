@@ -16,7 +16,7 @@ if [[ -f "$SCRIPT_DIR/../lib/logging.sh" ]]; then
 fi
 
 # Diretórios do corpus
-CORPUS_DIR="$REPO_ROOT/.agentic_sdlc/corpus"
+CORPUS_DIR="$REPO_ROOT/.project/corpus"
 CORPUS_DECISIONS="$CORPUS_DIR/nodes/decisions"
 CORPUS_LEARNINGS="$CORPUS_DIR/nodes/learnings"
 CORPUS_INDEX="$CORPUS_DIR/index.yml"
@@ -50,7 +50,7 @@ index_adrs() {
 # Indexa learnings das sessões
 index_learnings() {
     local count=0
-    local sessions_dir="$REPO_ROOT/.agentic_sdlc/sessions"
+    local sessions_dir="$REPO_ROOT/.project/sessions"
     
     if [[ -d "$sessions_dir" ]]; then
         for session_file in "$sessions_dir"/*.yml; do
@@ -99,7 +99,7 @@ index:
       - ".claude/memory/decisions"
     learnings:
       - "$CORPUS_LEARNINGS"
-      - ".agentic_sdlc/sessions"
+      - ".project/sessions"
     patterns:
       - "$CORPUS_DIR/nodes/patterns"
     docs:
@@ -107,7 +107,7 @@ index:
       - ".agentic_sdlc/references"
       
   search_paths:
-    - ".agentic_sdlc/corpus"
+    - ".project/corpus"
     - ".agentic_sdlc/projects"
     - ".agentic_sdlc/references"
     - ".claude/memory"

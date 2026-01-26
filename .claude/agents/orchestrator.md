@@ -326,7 +326,7 @@ Exemplo de notificacao:
   - API endpoint /analyze removed (line 78)
 
 🔧 **1 MIGRATION REQUIRED:**
-  - Run: .scripts/migrate-graph-v2.sh (line 52)
+  - Run: \.agentic_sdlc/scripts/migrate-graph-v2.sh (line 52)
 
 🔒 **1 SECURITY FIX:**
   - CVE-2026-1234: XSS in documentation_generator (line 105)

@@ -560,7 +560,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ Pop!_OS 22.04+
 
 **Arquivos modificados**:
-- `.scripts/install-security-tools.sh` (+92 linhas, -17 linhas)
+- `\.agentic_sdlc/scripts/install-security-tools.sh` (+92 linhas, -17 linhas)
 
 **Referências**:
 - PEP 668: https://peps.python.org/pep-0668/
@@ -838,7 +838,7 @@ APÓS GATE → Extrai learnings → Grava no RAG
 - **Release Pipeline** (`release.yml`)
   - Removed `CLAUDE.md` from package (project-specific, not distributable)
   - Added `CHANGELOG.md` and `LICENSE` to package
-  - Excluded `.docs/examples/` from package (development only)
+  - Excluded `\.agentic_sdlc/docs/examples/` from package (development only)
   - Excluded internal documentation files from package:
     - `.claude/memory/` (migrated to `.agentic_sdlc/`)
     - `.claude/guides/` (internal reference)
@@ -1066,7 +1066,7 @@ APÓS GATE → Extrai learnings → Grava no RAG
 
 ### Changed
 
-- Updated release pipeline to include complete `.docs/` structure
+- Updated release pipeline to include complete `\.agentic_sdlc/docs/` structure
 - Release package now includes `.agentic_sdlc/corpus/patterns/`
 - Updated `code-author` agent with frontend design guidelines
 - Updated documentation (CLAUDE.md, README.md)

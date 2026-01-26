@@ -30,7 +30,7 @@ allowed-tools:
   - Grep
   - Bash
 references:
-  - path: .docs/engineering-playbook/manual-desenvolvimento/qualidade.md
+  - path: \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/qualidade.md
     purpose: Criterios de revisao, merge blockers, excecoes
 ---
 
