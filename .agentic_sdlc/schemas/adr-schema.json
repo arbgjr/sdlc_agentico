@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/arbgjr/sdlc_agentico/schemas/adr.json",
+  "title": "Architecture Decision Record",
+  "description": "Schema for ADR (Architecture Decision Record) documents",
+  "type": "object",
+  "required": ["id", "title", "date", "status", "context", "decision", "consequences"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ADR-[0-9]{3,}$",
+      "description": "Unique identifier (e.g., ADR-001)"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 200,
+      "description": "Brief, descriptive title"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Decision date in ISO 8601 format (YYYY-MM-DD)"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["proposed", "accepted", "rejected", "deprecated", "superseded"],
+      "description": "Current status of the decision"
+    },
+    "context": {
+      "type": "string",
+      "minLength": 50,
+      "description": "Background and motivation for the decision"
+    },
+    "decision": {
+      "type": "string",
+      "minLength": 50,
+      "description": "The decision that was made"
+    },
+    "consequences": {
+      "type": "object",
+      "required": ["positive", "negative"],
+      "properties": {
+        "positive": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "Positive outcomes"
+        },
+        "negative": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "Trade-offs and negative impacts"
+        }
+      }
+    },
+    "alternatives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "rejected_because"],
+        "properties": {
+          "name": {"type": "string"},
+          "rejected_because": {"type": "string"}
+        }
+      },
+      "description": "Alternatives considered and why they were rejected"
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^ADR-[0-9]{3,}$"
+      },
+      "description": "Previous ADRs that this one supersedes"
+    },
+    "related": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^ADR-[0-9]{3,}$"
+      },
+      "description": "Related ADRs"
+    },
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Categorization tags"
+    }
+  }
+}

@@ -21,7 +21,7 @@ def config():
     """Default config for documentation generator"""
     return {
         "general": {
-            "output_dir": ".agentic_sdlc"
+            "output_dir": ".project"
         }
     }
 

@@ -20,7 +20,7 @@ def config():
     """Default config for visualizer"""
     return {
         "general": {
-            "output_dir": ".agentic_sdlc"
+            "output_dir": ".project"
         }
     }
 

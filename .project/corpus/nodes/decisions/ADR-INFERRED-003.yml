@@ -1,41 +1,25 @@
-category: authentication
-confidence: 0.805
+category: testing
+confidence: 0.5733333333333334
 confidence_breakdown:
-  consistency: 0.75
+  consistency: 0.417
   evidence_quality: 1.0
-  evidence_quantity: 0.85
+  evidence_quantity: 0.3
   llm_bonus: 0.0
-confidence_level: high
-date: '2026-01-25T04:27:00.716019Z'
-decision: Use Jwt for authentication
+confidence_level: medium
+date: '2026-01-26T14:05:30.857730Z'
+decision: Use Jest for testing
 evidence:
-- file: .claude/skills/sdlc-import/scripts/confidence_scorer.py
-  line: 300
-  pattern: jwt\.encode|jwt\.decode|PyJWT
+- file: package.json
+  line: 13
+  pattern: '"jest"'
   quality: 1.0
   source: pattern
-- file: .claude/skills/sdlc-import/tests/unit/test_confidence_scorer.py
-  line: 159
-  pattern: jwt\.encode|jwt\.decode|PyJWT
-  quality: 1.0
-  source: pattern
-- file: .claude/skills/sdlc-import/tests/unit/test_decision_extractor.py
-  line: 216
-  pattern: jwt\.encode|jwt\.decode|PyJWT
-  quality: 1.0
-  source: pattern
-- file: .claude/skills/sdlc-import/tests/unit/test_threat_modeler.py
-  line: 99
-  pattern: jwt\.encode|jwt\.decode|PyJWT
-  quality: 1.0
-  source: pattern
-evidence_count: 4
+evidence_count: 1
 id: ADR-INFERRED-003
-needs_validation: false
-rationale: 'Jwt was detected as the authentication solution based on evidence found
-  in 4 file(s): .claude/skills/sdlc-import/scripts/confidence_scorer.py, .claude/skills/sdlc-import/tests/unit/test_confidence_scorer.py,
-  .claude/skills/sdlc-import/tests/unit/test_threat_modeler.py, and 1 more. The codebase
-  shows 4 reference(s) to jwt indicating it is the adopted technology for this concern.'
+needs_validation: true
+rationale: 'Jest was selected for testing based on analysis of 1 files. Key evidence
+  found in: package.json. This decision aligns with project architecture patterns.
+  [Note: Full LLM synthesis requires API integration - see decision_extractor.py:_generate_llm_rationale]'
 status: inferred
-synthesized_by: pattern
-title: Use Jwt as Authentication Method
+synthesized_by: llm
+title: Use Jest as Testing Framework
