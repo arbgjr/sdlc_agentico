@@ -380,7 +380,7 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 ├── agents/           # 37 agentes especializados (33 + 4 consultivos)
 ├── skills/           # 28 skills reutilizáveis
 ├── commands/         # 23 comandos do usuário
-├── hooks/            # 18 hooks de automação
+├── hooks/            # 19 hooks de automação
 ├── lib/              # Bibliotecas compartilhadas (v1.7.0)
 │   ├── python/       # sdlc_logging.py, sdlc_tracing.py
 │   └── shell/        # logging_utils.sh
