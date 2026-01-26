@@ -102,6 +102,7 @@ def print_info():
     print(f"  {CYAN}/sdlc-create-issues{WHITE} Cria issues no GitHub{RESET}")
     print(f"  {CYAN}/gate-check{WHITE}         Valida transição de fase{RESET}")
     print(f"  {CYAN}/adr-create{WHITE}         Registra decisão arquitetural{RESET}")
+    print(f"  {CYAN}/wiki-sync{WHITE}          Sincroniza docs com GitHub Wiki {DIM}(criar 1ª página antes){RESET}")
     print()
 
 def animate_splash(delay: float = 0.02):
