@@ -49,10 +49,19 @@ python3 .agentic_sdlc/splash.py --no-animate
 
 ## Customização
 
-Para atualizar a versão exibida, edite `.agentic_sdlc/splash.py`:
+A versão é lida automaticamente de `.claude/VERSION`:
 
 ```python
-print(f"{GREEN}  ▸ {WHITE}Versão:      {YELLOW}2.0.7{RESET}")  # ← Atualizar aqui
+def get_version():
+    """Lê a versão do arquivo .claude/VERSION"""
+    # Busca version: "X.Y.Z" no arquivo
+    # Retorna "not found" se não encontrar
+```
+
+Para atualizar a versão exibida, edite `.claude/VERSION`:
+
+```yaml
+version: "2.1.2"  # ← Atualizar aqui
 ```
 
 ## Quando NÃO é exibida

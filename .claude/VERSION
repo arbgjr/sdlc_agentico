@@ -1,5 +1,5 @@
 # SDLC Agêntico Version
-version: "2.1.1"
+version: "2.1.2"
 build_date: "2026-01-26"
 release_notes: |
   Framework/Project Separation - Major Refactoring
