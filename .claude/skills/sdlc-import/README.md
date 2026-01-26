@@ -116,6 +116,66 @@ decision_extraction:
     model: "claude-sonnet-4-5"
 ```
 
+## .sdlcignore - Exclude Files from Analysis
+
+**NEW in v2.1.3:** Prevent self-scanning and exclude unwanted files.
+
+Create a `.sdlcignore` file in your project root (or framework root) to exclude files/directories from analysis:
+
+```gitignore
+# SDLC Framework Self-Exclusion (CRITICAL)
+.claude/
+.agentic_sdlc/
+*.skill/
+
+# Dependencies
+node_modules/
+vendor/
+venv/
+__pycache__/
+
+# Infrastructure Generated Files
+.terraform/
+.terraform.lock.hcl
+
+# Build Artifacts
+dist/
+build/
+target/
+
+# Test Fixtures
+fixtures/
+mocks/
+test-data/
+```
+
+**How it works:**
+1. Supports standard `.gitignore` syntax (glob patterns)
+2. Checked in project root AND framework root
+3. Prevents false positives from:
+   - SDLC framework scanning itself ✅
+   - Third-party dependencies ✅
+   - Generated/compiled code ✅
+   - Test fixtures/mocks ✅
+
+**Example .sdlcignore locations:**
+- `{project}/.sdlcignore` - Project-specific exclusions
+- `mice_dolphins/.sdlcignore` - Framework-wide defaults (already included)
+
+**Without .sdlcignore, you might see:**
+```
+DEBT-SEC-001: Hardcoded secret
+Location: .claude/skills/sdlc-import/tests/unit/test_*.py
+↑ Framework's own tests flagged as tech debt!
+```
+
+**With .sdlcignore:**
+```
+✅ Framework files excluded
+✅ Only project code analyzed
+✅ Clean tech debt reports
+```
+
 ## Confidence Scoring
 
 ```

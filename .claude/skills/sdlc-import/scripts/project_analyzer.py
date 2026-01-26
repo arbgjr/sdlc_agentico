@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timezone
 import yaml
+import fnmatch
 
 # Add logging utilities (absolute path from project root)
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "lib/python"))
@@ -87,6 +88,9 @@ class ProjectAnalyzer:
         self.config['analysis_id'] = self.analysis_id
         self.config['project_path'] = str(self.project_path)
 
+        # Load .sdlcignore patterns
+        self.ignore_patterns = self._load_sdlcignore()
+
         # Initialize analysis components
         self.language_detector = LanguageDetector(self.config)
         self.decision_extractor = DecisionExtractor(self.config)
@@ -118,6 +122,99 @@ class ProjectAnalyzer:
 
         logger.info("Loaded configuration", extra={"config_path": str(config_path)})
         return config
+
+    def _load_sdlcignore(self) -> List[str]:
+        """
+        Load .sdlcignore patterns from project root and framework root.
+
+        Returns:
+            List of glob patterns to ignore
+        """
+        patterns = []
+
+        # Check for .sdlcignore in project root
+        project_ignore = self.project_path / ".sdlcignore"
+
+        # Check for .sdlcignore in framework root (mice_dolphins)
+        framework_root = Path(__file__).parent.parent.parent.parent
+        framework_ignore = framework_root / ".sdlcignore"
+
+        for ignore_file in [project_ignore, framework_ignore]:
+            if ignore_file.exists():
+                try:
+                    with open(ignore_file, 'r') as f:
+                        for line in f:
+                            line = line.strip()
+                            # Skip empty lines and comments
+                            if line and not line.startswith('#'):
+                                patterns.append(line)
+                    logger.info(
+                        "Loaded .sdlcignore",
+                        extra={
+                            "file": str(ignore_file),
+                            "patterns_count": len(patterns)
+                        }
+                    )
+                except Exception as e:
+                    logger.warning(
+                        "Failed to load .sdlcignore",
+                        extra={"file": str(ignore_file), "error": str(e)}
+                    )
+
+        # Add default patterns if no .sdlcignore found
+        if not patterns:
+            patterns = [
+                ".claude/",
+                ".agentic_sdlc/",
+                ".git/",
+                "node_modules/",
+                "venv/",
+                "__pycache__/",
+                ".terraform/"
+            ]
+            logger.info("Using default ignore patterns")
+
+        return patterns
+
+    def _should_ignore(self, file_path: Path) -> bool:
+        """
+        Check if file should be ignored based on .sdlcignore patterns.
+
+        Args:
+            file_path: Path to check (relative to project root)
+
+        Returns:
+            True if should be ignored, False otherwise
+        """
+        # Get path relative to project root
+        try:
+            rel_path = file_path.relative_to(self.project_path)
+        except ValueError:
+            # File is outside project, ignore it
+            return True
+
+        path_str = str(rel_path)
+
+        # Check against ignore patterns
+        for pattern in self.ignore_patterns:
+            # Handle directory patterns (ending with /)
+            if pattern.endswith('/'):
+                if path_str.startswith(pattern) or f"/{pattern}" in path_str:
+                    return True
+            # Handle glob patterns
+            elif fnmatch.fnmatch(path_str, pattern) or fnmatch.fnmatch(file_path.name, pattern):
+                return True
+            # Handle wildcard directory patterns (e.g., **/*.pyc)
+            elif '**/' in pattern:
+                if fnmatch.fnmatch(path_str, pattern):
+                    return True
+
+        # Also check exclude_patterns from config (backward compatibility)
+        exclude_patterns = self.config['general']['exclude_patterns']
+        if any(pattern in path_str for pattern in exclude_patterns):
+            return True
+
+        return False
 
     def validate_project(self) -> bool:
         """
@@ -165,12 +262,11 @@ class ProjectAnalyzer:
 
     def _count_loc(self) -> int:
         """Count lines of code in project"""
-        exclude_patterns = self.config['general']['exclude_patterns']
         loc_count = 0
 
         for file in self.project_path.rglob("*"):
-            # Skip excluded patterns
-            if any(pattern in str(file) for pattern in exclude_patterns):
+            # Skip ignored files (uses .sdlcignore patterns)
+            if self._should_ignore(file):
                 continue
 
             # Skip non-files
@@ -254,15 +350,13 @@ class ProjectAnalyzer:
             Dict with scan statistics
         """
         with log_operation("scan_directory", logger):
-            exclude_patterns = self.config['general']['exclude_patterns']
-
             files_by_ext = {}
             total_files = 0
             total_loc = 0
 
             for file in self.project_path.rglob("*"):
-                # Skip excluded patterns
-                if any(pattern in str(file) for pattern in exclude_patterns):
+                # Skip ignored files (uses .sdlcignore patterns)
+                if self._should_ignore(file):
                     continue
 
                 # Skip non-files
