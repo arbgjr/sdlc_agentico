@@ -21,22 +21,23 @@ RESET = "\033[0m"
 # ASCII Art - Trocado corretamente: MICE à esquerda, DOLPHINS à direita
 # Original tinha dolphins à esquerda e mice à direita - agora invertido
 LOGO_ASCII = r'''
-           __                                    __                             _
-           /   \                  /      \                         _.-~  )
-          '      \              /          \            _..--~~~~,'   ,-/     _
-         |       |Oo          o|            |        .-'. . . .'   ,-','    ,' )
-         `    \  |OOOo......oOO|   /        |      ,'. . . _   ,--~,-'__..-'  ,'
-          `    \\OOOOOOOOOOOOOOO\//        /     ,'. . .  (@)' ---~~~~      ,'
-            \ _o\OOOOOOOOOOOOOOOO//. ___ /      /. . . . '~~             ,-'
-         --- OO'* `OOOOOOOOOO'*  `OOOOO--      /. . . . .             ,-'
-             `OOOooOOOOOOOOOooooOOOOOO'OOOo   ; . . . .  - .        ,'
-           .OO "OOOOOOOOOOOOOOOOOOOO"OOOOOOOo: . . . .       _     /
-        OOOOO^OOOO0`(mice)/"OOOOOOOOOOOOO^OOOO. . . . .          `-.:
-        `OOOOO 0000000000000000 QQQQ "OOOOOOO" . . ./  - .          )
-          "OOOOOOO00000000000000000OOOOOOOOOO".  . |  _____..---.._/ _____
-.ooooOOOOOOOo"OOOOOOO000000000000OOOOOOOOOOO" ~---~~~~----~~~~             ~~
-OO"""""""""".oOOOOOOOOOOOOOOOOOOOOOOOOOOOOo.O
-`"OOOOOOOOOOOOoooooooo.
+          __                                 __                             _
+         /'  '\               /      \                          _.-~  )
+        '      \            .'         \             _..--~~~~,'   ,-/     _
+       (       ).          .(            )        .-'. . . .'   ,-','    ,' )
+       `'   /  |..      ...|  .'       .'      ,'. . . _   ,--~,-'__..-'  ,'
+        `' //----------\  / .       .'      ,'. . .  (@)' ---~~~~      ,'
+          \_.//--------\_. ____ /          /. . . . '~~             ,-'
+       _.-' ' `------'    `---._          /. . . . .             ,-'
+         .'                     `-.      ; . . . .  - .        ,'
+        :        .                 :    : . . . .       _     /
+      .-'-.  (mice)                 `-. . . . . .          `-.:
+     '    `----------     .    ,      `- . . ./  - .          )
+       `--------------.  '     :      .  . |  _____..---.._/ _____
+        .'------'                :   ~---~~~~----~~~~             ~~
+     .''                       ,'
+   .''                      .-'
+       🐭 Mice                                    🐬 Dolphins
 '''
 
 TITLE = r"""
