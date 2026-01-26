@@ -35,9 +35,8 @@ LOGO_ASCII = r'''
         `OOOOO 0000000000000000 QQQQ "OOOOOOO" . . ./  - .          )
           "OOOOOOO00000000000000000OOOOOOOOOO".  . |  _____..---.._/ _____
 .ooooOOOOOOOo"OOOOOOO000000000000OOOOOOOOOOO" ~---~~~~----~~~~             ~~
-OO"""""""""".oOOOOOOOOOOOOOOOOOOOOOOOOOOOOo                                             .O
+OO"""""""""".oOOOOOOOOOOOOOOOOOOOOOOOOOOOOo.O
 `"OOOOOOOOOOOOoooooooo.
-       🐭 Mice                                      🐬 Dolphins
 '''
 
 TITLE = r"""
