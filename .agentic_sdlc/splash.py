@@ -6,6 +6,29 @@ Arte ASCII com mice à esquerda e dolphins à direita
 
 import sys
 import time
+import re
+from pathlib import Path
+
+# Função para ler versão do arquivo VERSION
+def get_version():
+    """Lê a versão do arquivo .claude/VERSION"""
+    try:
+        # Detecta o diretório do projeto
+        script_dir = Path(__file__).resolve().parent
+        project_root = script_dir.parent  # .agentic_sdlc -> root
+        version_file = project_root / '.claude' / 'VERSION'
+
+        if version_file.exists():
+            content = version_file.read_text(encoding='utf-8')
+            # Extrai versão usando regex: version: "X.Y.Z"
+            match = re.search(r'version:\s*["\']([^"\']+)["\']', content)
+            if match:
+                return match.group(1)
+    except Exception:
+        pass
+
+    # Fallback se não conseguir ler
+    return "2.0.7"
 
 # Cores ANSI
 CYAN = "\033[96m"
@@ -21,24 +44,25 @@ RESET = "\033[0m"
 # ASCII Art - Trocado corretamente: MICE à esquerda, DOLPHINS à direita
 # Original tinha dolphins à esquerda e mice à direita - agora invertido
 LOGO_ASCII = r'''
-          __                                 __                             _
-         /'  '\               /      \                          _.-~  )
-        '      \            .'         \             _..--~~~~,'   ,-/     _
-       (       ).          .(            )        .-'. . . .'   ,-','    ,' )
-       `'   /  |..      ...|  .'       .'      ,'. . . _   ,--~,-'__..-'  ,'
-        `' //----------\  / .       .'      ,'. . .  (@)' ---~~~~      ,'
-          \_.//--------\_. ____ /          /. . . . '~~             ,-'
-       _.-' ' `------'    `---._          /. . . . .             ,-'
-         .'                     `-.      ; . . . .  - .        ,'
-        :        .                 :    : . . . .       _     /
-      .-'-.  (mice)                 `-. . . . . .          `-.:
-     '    `----------     .    ,      `- . . ./  - .          )
-       `--------------.  '     :      .  . |  _____..---.._/ _____
-        .'------'                :   ~---~~~~----~~~~             ~~
-     .''                       ,'
-   .''                      .-'
-       🐭 Mice                                    🐬 Dolphins
+           __                                    __                             _
+           /   \                  /      \                         _.-~  )
+              '      \              /          \                          _..--~~~~,'   ,-/     _
+            |       |Oo          o|            |                       .-'. . . .'   ,-','    ,' )
+            `    \  |OOOo......oOO|   /        |                     ,'. . . _   ,--~,-'__..-'  ,'
+             `    \\OOOOOOOOOOOOOOO\//        /                    ,'. . .  (@)' ---~~~~      ,'
+               \ _o\OOOOOOOOOOOOOOOO//. ___ /                     /. . . . '~~             ,-'
+            --- OO'* `OOOOOOOOOO'*  `OOOOO--                     /. . . . .             ,-'
+                `OOOooOOOOOOOOOooooOOOOOO'OOOo                  ; . . . .  - .        ,'
+              .OO "OOOOOOOOOOOOOOOOOOOO"OOOOOOOo               : . . . .       _     /
+           OOOOO^OOOO0`(mice)/"OOOOOOOOOOOOO^OOOOOO           . . . . .          `-.:
+           `OOOOO 0000000000000000 QQQQ "OOOOOOO"            . . . ./  - .          )
+             "OOOOOOO00000000000000000OOOOOOOOOO"           .  . . |  _____..---.._/ _____
+  .ooooOOOOOOOo"OOOOOOO000000000000OOOOOOOOOOO"       ~---~~~~----~~~~             ~~
+.OOO"""""""""".oOOOOOOOOOOOOOOOOOOOOOOOOOOOOo      
+  `"OOOOOOOOOOOOoooooooo.                          
 '''
+
+COL_SEPARA = 51
 
 TITLE = r"""
    ____  ___  _     ___      _                 _   _
@@ -60,10 +84,10 @@ def print_colored_logo():
     for i, line in enumerate(lines):
         if i < len(lines) - 1:
             # Dividir a linha - mice à esquerda (branco), dolphins à direita (ciano)
-            # Split point é aproximadamente coluna 45
-            if len(line) > 45:
-                left = line[:45]
-                right = line[45:]
+            # Split point é aproximadamente coluna 51
+            if len(line) > COL_SEPARA:
+                left = line[:COL_SEPARA]
+                right = line[COL_SEPARA:]
                 print(f"{WHITE}{left}{RESET}{CYAN}{right}{RESET}")
             else:
                 print(f"{WHITE}{line}{RESET}")
@@ -78,18 +102,20 @@ def print_title():
 
 def print_info():
     """Imprime informações do projeto."""
+    version = get_version()
+
     print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{WHITE}  🚀 {BOLD}Framework de Orquestração de Desenvolvimento{RESET}")
     print(f"{WHITE}     {BOLD}Orientado por Agentes de IA{RESET}")
     print(f"{DIM}     Cobrindo todas as fases do ciclo de vida de software{RESET}")
     print(f"\n{GREEN}  ▸ {WHITE}Repositório: {CYAN}github.com/arbgjr/sdlc_agentico{RESET}")
-    print(f"{GREEN}  ▸ {WHITE}Versão:      {YELLOW}2.0.5{RESET}")
+    print(f"{GREEN}  ▸ {WHITE}Versão:      {YELLOW}{version}{RESET}")
     print(f"{GREEN}  ▸ {WHITE}Licença:     {MAGENTA}MIT{RESET}")
     print(f"{GREEN}  ▸ {WHITE}Changelog:   {CYAN}github.com/arbgjr/sdlc_agentico/blob/main/CHANGELOG.md{RESET}")
 
     # Changelog resumido da versão atual
     print(f"\n{DIM}{'─' * 80}{RESET}")
-    print(f"\n{YELLOW}  📋 {BOLD}v2.0.5 Highlights{RESET}")
+    print(f"\n{YELLOW}  📋 {BOLD}v{version} Highlights{RESET}")
     print(f"{DIM}     Suporte para projetos muito grandes (até 900k LOC){RESET}")
     print(f"{GREEN}     • {WHITE}sdlc-import agora suporta monorepos e sistemas legados{RESET}")
     print(f"{GREEN}     • {WHITE}Análise completa (não amostrada) para projetos 500k-900k LOC{RESET}")
@@ -100,12 +126,10 @@ def print_info():
     print(f"  {CYAN}/sdlc-start{WHITE}         Inicia novo workflow SDLC completo{RESET}")
     print(f"  {CYAN}/sdlc-import{WHITE}        Importa projeto existente (até 900k LOC){RESET}")
     print(f"  {CYAN}/sdlc-create-issues{WHITE} Cria issues no GitHub{RESET}")
-    print(f"  {CYAN}/gate-check{WHITE}         Valida transição de fase{RESET}")
-    print(f"  {CYAN}/adr-create{WHITE}         Registra decisão arquitetural{RESET}")
     print(f"  {CYAN}/wiki-sync{WHITE}          Sincroniza docs com GitHub Wiki {DIM}(criar 1ª página antes){RESET}")
     print()
 
-def animate_splash(delay: float = 0.02):
+def animate_splash():
     """Exibe a splash screen com animação."""
     clear_screen()
     print_colored_logo()
