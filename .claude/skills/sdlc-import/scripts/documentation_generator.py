@@ -24,7 +24,9 @@ class DocumentationGenerator:
 
     def __init__(self, config: Dict):
         self.config = config
-        self.output_dir = Path(config['general']['output_dir'])
+        # BUG FIX #2: Use absolute path (project_path + output_dir)
+        project_path = Path(config['project_path'])
+        self.output_dir = project_path / config['general']['output_dir']
         self.templates_dir = Path(__file__).parent.parent / "templates"
 
         # Configure Jinja2 environment
@@ -61,7 +63,16 @@ class DocumentationGenerator:
 
         for decision in decisions.get('decisions', []):
             adr_file = adr_dir / f"{decision['id']}.yml"
-            adr_content = yaml.dump(decision, default_flow_style=False)
+            # BUG FIX #3: Improve YAML quoting for special characters
+            adr_content = yaml.dump(
+                decision,
+                default_flow_style=False,
+                sort_keys=False,           # Preserve original order
+                allow_unicode=True,        # Support UTF-8
+                default_style='"',         # Force quote strings with special chars
+                explicit_start=True,       # Add --- at start
+                width=float("inf")         # Avoid line wrapping
+            )
             adr_file.write_text(adr_content)
             adrs.append(str(adr_file))
 

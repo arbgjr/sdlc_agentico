@@ -8,7 +8,7 @@ import sys
 import json
 from pathlib import Path
 from typing import Dict, List
-from datetime import datetime
+from datetime import datetime, timezone
 import yaml
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "lib/python"))
@@ -40,7 +40,7 @@ class GraphGenerator:
             graph = {
                 "version": "2.1.0",
                 "generated_by": "sdlc-import",
-                "updated_at": datetime.utcnow().isoformat() + "Z",
+                "updated_at": datetime.now(timezone.utc).isoformat() + "Z",
                 "nodes": nodes,
                 "edges": edges,
                 "metadata": {
@@ -55,10 +55,12 @@ class GraphGenerator:
 
             # Save to corpus
             graph_file = corpus_dir / "graph.json"
+            graph_file.parent.mkdir(parents=True, exist_ok=True)  # Ensure parent exists
             with open(graph_file, 'w') as f:
                 json.dump(graph, f, indent=2)
 
             adjacency_file = corpus_dir / "adjacency.json"
+            adjacency_file.parent.mkdir(parents=True, exist_ok=True)  # Ensure parent exists
             with open(adjacency_file, 'w') as f:
                 json.dump(adjacency, f, indent=2)
 
@@ -168,7 +170,7 @@ class GraphGenerator:
             "metadata": {
                 "node_count": len(nodes),
                 "edge_count": len(edges),
-                "last_updated": datetime.utcnow().isoformat() + "Z"
+                "last_updated": datetime.now(timezone.utc).isoformat() + "Z"
             }
         }
 

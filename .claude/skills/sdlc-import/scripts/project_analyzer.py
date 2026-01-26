@@ -24,7 +24,7 @@ import argparse
 import subprocess
 from pathlib import Path
 from typing import Dict, List, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import yaml
 
 # Add logging utilities (absolute path from project root)
@@ -78,8 +78,9 @@ class ProjectAnalyzer:
         """
         self.project_path = Path(project_path).resolve()
         self.config = self._load_config(config_path)
+        # Use configured output directory (.project for imported artifacts)
         self.output_dir = self.project_path / self.config['general']['output_dir']
-        self.analysis_id = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+        self.analysis_id = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
 
         # Add dynamic config fields
         self.config['project_name'] = self.project_path.name
@@ -774,7 +775,19 @@ class ProjectAnalyzer:
                 corpus_dir = self.output_dir / "corpus"
                 extracted_adrs = decisions.get('decisions', [])
                 if len(extracted_adrs) > 0:
-                    graph_result = self.graph_generator.generate(corpus_dir, extracted_adrs)
+                    # BUG FIX #4: Add error handling to prevent pipeline failure
+                    try:
+                        graph_result = self.graph_generator.generate(corpus_dir, extracted_adrs)
+                        logger.info(f"Graph generated: {graph_result.get('node_count', 0)} nodes, {graph_result.get('edge_count', 0)} edges")
+                    except Exception as e:
+                        logger.error(f"Graph generation failed: {e}")
+                        logger.warning("Continuing with import (graph will be incomplete)")
+                        graph_result = {
+                            "status": "failed",
+                            "error": str(e),
+                            "node_count": 0,
+                            "edge_count": 0
+                        }
                 else:
                     logger.warning("No ADRs found - skipping graph generation")
                     graph_result = {"status": "skipped", "reason": "no_adrs"}
@@ -788,7 +801,7 @@ class ProjectAnalyzer:
             # Build complete results before documentation generation
             results = {
                 "analysis_id": self.analysis_id,
-                "timestamp": datetime.utcnow().isoformat() + "Z",
+                "timestamp": datetime.now(timezone.utc).isoformat() + "Z",
                 "project_path": str(self.project_path),
                 "branch": branch_info,
                 "scan": scan_results,

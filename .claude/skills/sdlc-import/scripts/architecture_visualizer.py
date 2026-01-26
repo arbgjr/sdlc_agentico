@@ -26,7 +26,9 @@ class ArchitectureVisualizer:
 
     def __init__(self, config: Dict):
         self.config = config
-        self.output_dir = Path(config['general']['output_dir']) / "architecture"
+        # BUG FIX #2: Use absolute path (project_path + output_dir)
+        project_path = Path(config['project_path'])
+        self.output_dir = project_path / config['general']['output_dir'] / "architecture"
 
     def generate(self, project_path: Path, language_analysis: Dict, decisions: Dict) -> Dict:
         """Generate all diagram types"""
