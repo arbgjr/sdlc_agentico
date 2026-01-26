@@ -18,25 +18,25 @@ BOLD = "\033[1m"
 DIM = "\033[2m"
 RESET = "\033[0m"
 
-# ASCII Art - MICE à esquerda (branco), DOLPHINS à direita (ciano)
-# Manualmente invertido para posicionar mice à esquerda e dolphins à direita
+# ASCII Art - Trocado corretamente: MICE à esquerda, DOLPHINS à direita
+# Original tinha dolphins à esquerda e mice à direita - agora invertido
 LOGO_ASCII = r'''
-          __                             _                                   __
-      /      \                  /   \                           _.-~  )
-     /          \              /      \                     _..--~~~~,'   ,-/     _
-    |            |o          oO|       |                .-'. . . .'   ,-','    ,' )
-    |        /   |OOo......oOO|  \    `              ,'. . . _   ,--~,-'__..-'  ,'
-     \        //\OOOOOOOOOOOOOOO\    `                ,'. . .  (@)' ---~~~~      ,'
-      \ ___ //.\\OOOOOOOOOOOOOOOO\o_ \                /. . . . '~~             ,-'
-   --OOOOO`  *'OOOOOOOOOO'* OO ---                   /. . . . .             ,-'
-  oOOO'OOOOOOooooOOOOOOOOOooOOO`                    ; . . . .  - .        ,'
- oOOOOOOO"OOOOOOOOOOOOOOOOOO"OO .                  : . . . .       _     /
-OOOO^OOOO0`(mice)/"OOOOOOOOOOOOO^OOOOO            . . . . .          `-.:
-"OOOOOOO" QQQQ 0000000000000000 OOOOO`             . . ./  - .          )
-"OOOOOOOOOOOOOO00000000000000OOO"                 .  . |  _____..---.._/ _____
-"OOOOOOOOOOOOO000000OOOOOOO"oOOOOOOOoooo.        ~---~~~~----~~~~             ~~
-oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo.""""""""OOO.
-       .ooooooooOOOOOOOOOO"`
+           __                                    __                             _
+           /   \                  /      \                         _.-~  )
+          '      \              /          \            _..--~~~~,'   ,-/     _
+         |       |Oo          o|            |        .-'. . . .'   ,-','    ,' )
+         `    \  |OOOo......oOO|   /        |      ,'. . . _   ,--~,-'__..-'  ,'
+          `    \\OOOOOOOOOOOOOOO\//        /     ,'. . .  (@)' ---~~~~      ,'
+            \ _o\OOOOOOOOOOOOOOOO//. ___ /      /. . . . '~~             ,-'
+         --- OO'* `OOOOOOOOOO'*  `OOOOO--      /. . . . .             ,-'
+             `OOOooOOOOOOOOOooooOOOOOO'OOOo   ; . . . .  - .        ,'
+           .OO "OOOOOOOOOOOOOOOOOOOO"OOOOOOOo: . . . .       _     /
+        OOOOO^OOOO0`(mice)/"OOOOOOOOOOOOO^OOOO. . . . .          `-.:
+        `OOOOO 0000000000000000 QQQQ "OOOOOOO" . . ./  - .          )
+          "OOOOOOO00000000000000000OOOOOOOOOO".  . |  _____..---.._/ _____
+.ooooOOOOOOOo"OOOOOOO000000000000OOOOOOOOOOO" ~---~~~~----~~~~             ~~
+OO"""""""""".oOOOOOOOOOOOOOOOOOOOOOOOOOOOOo                                             .O
+`"OOOOOOOOOOOOoooooooo.
        🐭 Mice                                      🐬 Dolphins
 '''
 
@@ -51,6 +51,7 @@ TITLE = r"""
 def clear_screen():
     """Limpa a tela do terminal."""
     print("\033[2J\033[H", end="")
+    sys.stdout.flush()
 
 def print_colored_logo():
     """Imprime o logo com cores - mice em branco (esquerda), dolphins em ciano (direita)."""
@@ -59,10 +60,10 @@ def print_colored_logo():
     for i, line in enumerate(lines):
         if i < len(lines) - 1:
             # Dividir a linha - mice à esquerda (branco), dolphins à direita (ciano)
-            # A divisão agora é aproximadamente na coluna 45-50 dependendo do conteúdo
-            if len(line) > 50:
-                left = line[:50]
-                right = line[50:]
+            # Split point é aproximadamente coluna 45
+            if len(line) > 45:
+                left = line[:45]
+                right = line[45:]
                 print(f"{WHITE}{left}{RESET}{CYAN}{right}{RESET}")
             else:
                 print(f"{WHITE}{line}{RESET}")
