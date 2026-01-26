@@ -635,9 +635,14 @@ install_optional_deps() {
 # Resumo final
 print_summary() {
     # Mostrar splash screen se disponível
-    if [[ -f ".agentic_sdlc/splash.py" ]]; then
+    # Detecta o diretório do projeto (assume que o script está em .agentic_sdlc/scripts/)
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+    SPLASH_PATH="${PROJECT_ROOT}/.agentic_sdlc/splash.py"
+
+    if [[ -f "$SPLASH_PATH" ]]; then
         echo ""
-        python3 .agentic_sdlc/splash.py --no-animate 2>/dev/null || true
+        python3 "$SPLASH_PATH" --no-animate 2>/dev/null || true
         sleep 1
     fi
 
