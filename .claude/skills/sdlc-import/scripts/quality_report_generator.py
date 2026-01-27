@@ -11,7 +11,7 @@ from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 
 # Add logging utilities
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "lib/python"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent / "lib/python"))
 from sdlc_logging import get_logger
 
 from post_import_validator import ValidationResult

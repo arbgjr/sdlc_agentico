@@ -11,7 +11,7 @@ from typing import Dict, List
 from datetime import datetime, timezone
 import yaml
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "lib/python"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent / "lib/python"))
 from sdlc_logging import get_logger, log_operation
 
 logger = get_logger(__name__, skill="sdlc-import", phase=0)

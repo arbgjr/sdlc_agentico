@@ -20,7 +20,7 @@ from dataclasses import dataclass
 import yaml
 
 # Add logging utilities (absolute path from project root)
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "lib/python"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent / "lib/python"))
 from sdlc_logging import get_logger
 
 logger = get_logger(__name__, skill="sdlc-import", phase=0)
