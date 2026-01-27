@@ -103,6 +103,9 @@ class ProjectAnalyzer:
             output_dir = self.config['general'].get('output_dir', '.project')
 
         self.output_dir = self.project_path / output_dir
+        # FIX C1: Propagate resolved output_dir to config dict (used by all 15 components)
+        self.config['general']['output_dir'] = str(output_dir)
+        logger.info(f"✓ Resolved output_dir: {output_dir} (propagated to config)")
         self.analysis_id = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
 
         # Add dynamic config fields

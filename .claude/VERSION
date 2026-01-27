@@ -1,8 +1,8 @@
 # SDLC Agêntico Version
-version: "2.1.8"
+version: "2.1.9"
 build_date: "2026-01-27"
 release_notes: |
-  Configuration & Path Management - Critical Fixes
+  Critical sdlc-import Fixes (Sprint 1 - Audit Autoritas)
 
   This release addresses critical issues identified in a comprehensive audit of sdlc-import,
   significantly improving accuracy, confidence scoring, and reducing false positives.
@@ -63,6 +63,23 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "2.1.9"
+    date: "2026-01-27"
+    changes:
+      - "fix(C1): CRITICAL - Config propagation bug (all components gravam em .project/)"
+      - "fix(C1): Adiciona self.config['general']['output_dir'] = str(output_dir) após resolução"
+      - "fix(C1): Corrige divergência entre output_dir resolvido vs valor usado por componentes"
+      - "fix(C4): CRITICAL - NameError em documentation_generator.py linha 122"
+      - "fix(C4): Troca 'config' indefinido por 'self.config' em generate_adr_index()"
+      - "feat(C3): Debug logging detalhado em ADR detection"
+      - "feat(C3): logger.debug para pattern search, file count, parse status"
+      - "feat(C3): logger.info/warning para successful/failed ADR detection"
+      - "feat(C3): Seção de reconciliação no import-report.md"
+      - "feat(C3): Report mostra existing ADRs, inferred, duplicates, enrichments"
+      - "chore: pre-commit-config.yaml para prevenir undefined variables"
+      - "chore: pylint validation para sdlc-import scripts"
+      - "test: 3 testes unitários verificando C1, C4, C3 fixes"
+      - "docs: Plano de correção completo (Sprint 1-3) em audit report"
   - version: "2.1.8"
     date: "2026-01-27"
     changes:

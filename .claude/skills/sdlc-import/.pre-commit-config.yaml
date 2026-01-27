@@ -1,0 +1,10 @@
+repos:
+  - repo: https://github.com/pycqa/pylint
+    rev: v3.0.3
+    hooks:
+      - id: pylint
+        args:
+          - --errors-only
+          - --disable=all
+          - --enable=undefined-variable,used-before-assignment
+        files: ^\.claude/skills/sdlc-import/scripts/.*\.py$

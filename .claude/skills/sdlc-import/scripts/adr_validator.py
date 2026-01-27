@@ -134,15 +134,23 @@ class ADRValidator:
             if custom_dir:
                 search_patterns.append(f"**/{custom_dir}/*.md")
 
-            # Search for existing ADRs
+            # Search for existing ADRs (with detailed logging for debugging)
             for pattern in search_patterns:
-                for adr_file in project_path.rglob(pattern):
+                logger.debug(f"Searching pattern: {pattern}")
+                matched_files = list(project_path.rglob(pattern))
+                logger.debug(f"  Found {len(matched_files)} files matching pattern")
+
+                for adr_file in matched_files:
+                    logger.debug(f"  Parsing: {adr_file.relative_to(project_path)}")
                     try:
                         existing_adr = self._parse_existing_adr(adr_file, project_path)
                         if existing_adr:
                             existing_adrs.append(existing_adr)
+                            logger.info(f"  ✓ Detected ADR: {existing_adr.id} - {existing_adr.title}")
+                        else:
+                            logger.warning(f"  ✗ Failed to parse (no title/id): {adr_file.name}")
                     except Exception as e:
-                        logger.warning(f"Failed to parse {adr_file}: {e}")
+                        logger.warning(f"  ✗ Parse error: {adr_file.name}: {e}")
 
             logger.info(
                 "ADR detection complete",

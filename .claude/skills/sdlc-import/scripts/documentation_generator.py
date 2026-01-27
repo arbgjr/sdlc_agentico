@@ -119,7 +119,7 @@ class DocumentationGenerator:
             # If status is reconciled, set migrated_to path (relative to output_dir)
             if metadata.get('status') == 'reconciled':
                 # Use configured output_dir instead of hardcoded ".project"
-                output_dir_name = Path(config['general']['output_dir']).name
+                output_dir_name = Path(self.config['general']['output_dir']).name
                 entry['migrated_to'] = f"{output_dir_name}/corpus/nodes/decisions/{adr_id}.yml"
 
             index_entries.append(entry)
@@ -286,9 +286,30 @@ class DocumentationGenerator:
 - **Decisions Extracted:** {analysis_results.get('decisions', {}).get('count', 0)}
 - **Threats Identified:** {analysis_results.get('threats', {}).get('total', 0)}
 - **Tech Debt Items:** {analysis_results.get('tech_debt', {}).get('total', 0)}
-
-**Generated with SDLC Agêntico by @arbgjr**
 """
+
+        # FIX C3: Add ADR Reconciliation section if available
+        if 'reconciliation' in analysis_results:
+            recon = analysis_results['reconciliation']
+            content += f"\n## 📚 ADR Reconciliation\n\n"
+            content += f"- **Existing ADRs found:** {recon.get('total_existing', 0)}\n"
+            content += f"- **Inferred ADRs:** {recon.get('total_inferred', 0)}\n"
+            content += f"- **Duplicates skipped:** {len(recon.get('duplicate', []))}\n"
+            content += f"- **New unique ADRs:** {len(recon.get('new', []))}\n"
+            content += f"- **ADRs enriched:** {len(recon.get('enrich', []))}\n\n"
+
+            # List duplicates
+            if recon.get('duplicate'):
+                content += f"### Duplicates Detected\n\n"
+                for dup in recon['duplicate']:
+                    existing = dup.get('existing', {})
+                    inferred = dup.get('inferred', {})
+                    content += f"- ✓ **{inferred.get('title', 'Unknown')}**\n"
+                    content += f"  - Existing: `{existing.get('path', 'N/A')}`\n"
+                    content += f"  - Similarity: {dup.get('similarity', 0):.1%}\n"
+                    content += f"  - Action: Skipped generation (kept existing)\n\n"
+
+        content += "\n**Generated with SDLC Agêntico by @arbgjr**\n"
         report_file.write_text(content)
         return str(report_file)
 

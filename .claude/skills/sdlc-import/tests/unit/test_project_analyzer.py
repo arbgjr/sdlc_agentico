@@ -198,7 +198,10 @@ class TestProjectAnalyzer:
 
         # Output dir should be inside project path
         assert analyzer.output_dir.parent == temp_project
-        assert ".agentic_sdlc" in str(analyzer.output_dir)
+        # FIX: Default changed from .agentic_sdlc to .project (import_config.yml)
+        assert ".project" in str(analyzer.output_dir)
+        # Verify C1 fix: config dict was updated with resolved value
+        assert analyzer.config['general']['output_dir'] == '.project'
 
     def test_config_has_required_sections(self, temp_project):
         """Test that config has all required sections"""
