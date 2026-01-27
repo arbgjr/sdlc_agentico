@@ -73,6 +73,9 @@ show_splash() {
 # Header
 show_splash
 
+# Give user time to see splash before scrolling with logs
+sleep 2
+
 # Variaveis de opcoes
 FROM_RELEASE=false
 VERSION="latest"

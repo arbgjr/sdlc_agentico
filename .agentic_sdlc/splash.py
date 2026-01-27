@@ -145,7 +145,7 @@ def show_splash(animate: bool = True):
     if animate:
         animate_splash()
     else:
-        clear_screen()
+        # No-animate mode: don't clear screen to preserve context
         print_colored_logo()
         print_title()
         print_info()
