@@ -78,6 +78,22 @@ class ProjectAnalyzer:
             config_path: Optional path to config file
         """
         self.project_path = Path(project_path).resolve()
+
+        # BUG FIX (v2.1.7): Detect if project_path is the skill directory itself
+        # This happens when /sdlc-import is invoked without explicit path argument
+        # The framework passes the skill's base directory instead of CWD
+        if self.project_path.name == "sdlc-import" and (self.project_path / "scripts" / "project_analyzer.py").exists():
+            # We're being passed the skill directory - use CWD instead
+            original_path = self.project_path
+            self.project_path = Path.cwd().resolve()
+            logger.warning(
+                "Detected skill directory as project_path, using CWD instead",
+                extra={
+                    "original_path": str(original_path),
+                    "corrected_path": str(self.project_path)
+                }
+            )
+
         self.config = self._load_config(config_path)
         # Use configured output directory (.project for imported artifacts)
         self.output_dir = self.project_path / self.config['general']['output_dir']
