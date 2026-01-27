@@ -36,17 +36,23 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 # Show splash screen
 show_splash() {
+    # Get script directory (where setup-sdlc.sh is located)
+    local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local FRAMEWORK_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
     # Try to find splash.py
     local SPLASH_PATH=""
 
-    if [[ -f ".agentic_sdlc/splash.py" ]]; then
+    # Priority 1: Relative to framework root (most reliable)
+    if [[ -f "$FRAMEWORK_ROOT/.agentic_sdlc/splash.py" ]]; then
+        SPLASH_PATH="$FRAMEWORK_ROOT/.agentic_sdlc/splash.py"
+    # Priority 2: Relative to current directory (if running from project root)
+    elif [[ -f ".agentic_sdlc/splash.py" ]]; then
         SPLASH_PATH=".agentic_sdlc/splash.py"
-    elif [[ -f "$(dirname "${BASH_SOURCE[0]}")/../splash.py" ]]; then
-        SPLASH_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/splash.py"
     fi
 
     if [[ -n "$SPLASH_PATH" && -f "$SPLASH_PATH" ]]; then
-        python3 "$SPLASH_PATH" --no-animate 2>/dev/null || {
+        python3 "$SPLASH_PATH" --no-animate || {
             # Fallback to simple banner if splash.py fails
             echo ""
             echo "========================================"
