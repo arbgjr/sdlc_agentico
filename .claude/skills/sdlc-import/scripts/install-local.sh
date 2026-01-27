@@ -39,7 +39,7 @@ else
 fi
 
 # Verify scripts are accessible
-if [ -f "$INSTALL_DIR/scripts/sdlc_import.py" ]; then
+if [ -f "$INSTALL_DIR/scripts/project_analyzer.py" ]; then
     echo "   ✓ Scripts accessible"
 else
     echo "   ✗ Scripts not found"
@@ -49,7 +49,9 @@ fi
 echo ""
 echo "📋 Usage in target project:"
 echo "   cd ~/source/repos/tripla/autoritas"
-echo "   python3 ~/.claude/skills/sdlc-import/scripts/sdlc_import.py --interactive"
+echo "   ~/.claude/skills/sdlc-import/run-import.sh . --interactive"
+echo "   # OR:"
+echo "   python3 ~/.claude/skills/sdlc-import/scripts/project_analyzer.py . --interactive"
 echo ""
 echo "🔄 To revert to released version:"
 if [ -n "$(ls -d ${INSTALL_DIR}.backup-* 2>/dev/null | head -1)" ]; then
