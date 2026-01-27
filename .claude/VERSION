@@ -2,7 +2,29 @@
 version: "2.1.9"
 build_date: "2026-01-27"
 release_notes: |
-  Critical sdlc-import Fixes (Sprint 1 - Audit Autoritas)
+  Sprint 1-3 Complete: Critical Fixes + Framework Architecture
+
+  🎯 TESTED ON REAL PROJECT: Autoritas (430k LOC, 1,762 files)
+
+  Sprint 1 - Critical Fixes (C1, C3, C4):
+  ✅ C1: Output directory propagation fix (BLOCKER resolved)
+  ✅ C3: ADR detection - 21/21 existing ADRs indexed correctly
+  ✅ C4: NameError fix in adr_index generation (CRASH resolved)
+
+  Sprint 1 - Bonus Fixes (BF1, BF2, BF3):
+  ✅ BF1: Graceful branch handling (reuses existing branches)
+  ✅ BF2: Symlink resolution for local installation (15 scripts)
+  ✅ BF3: Confidence breakdown key fix (KeyError resolved)
+
+  Sprint 2 - Framework Architecture:
+  ✅ framework_paths.py - Centralized path resolution
+  ✅ Validated: Framework/Project separation via symlinks
+  ✅ No unnecessary file duplication
+
+  Sprint 3 - Testing & Release:
+  ✅ Full regression testing on Autoritas project
+  ✅ All 6 fixes validated in production-like environment
+  ✅ Documentation complete
 
   This release addresses critical issues identified in a comprehensive audit of sdlc-import,
   significantly improving accuracy, confidence scoring, and reducing false positives.
