@@ -1,5 +1,5 @@
 # SDLC Agêntico Version
-version: "2.1.5"
+version: "2.1.6"
 build_date: "2026-01-27"
 release_notes: |
   Splash Screen UX Bugfixes - Visibility Fixed
@@ -47,6 +47,13 @@ release_notes: |
   - Comprehensive issue with YAML patterns, ADR examples, tests, and implementation guide
 
 changelog:
+  - version: "2.1.6"
+    date: "2026-01-27"
+    changes:
+      - "fix(ci): splash.py e logo.png agora incluídos no tar.gz/zip"
+      - "fix(ci): GitHub Action copiava apenas subdiretórios, ignorava arquivos da raiz"
+      - "fix(ci): Releases anteriores (v2.1.4, v2.1.5) NÃO continham splash.py"
+      - "CRITICAL: Esta é a primeira release COM splash.py funcional!"
   - version: "2.1.5"
     date: "2026-01-27"
     changes:
