@@ -1,8 +1,36 @@
 # SDLC Agêntico Version
-version: "2.1.10"
+version: "2.1.11"
 build_date: "2026-01-27"
 release_notes: |
-  Setup Automation & Migration - Smart Update System
+  Migration Bugfix - Always Check Artifacts
+
+  🐛 CRITICAL FIX: v2.1.10 não migrava artefatos em fresh installs
+
+  Bug Fixed:
+  ✅ setup-sdlc.sh agora SEMPRE verifica artefatos antes da instalação
+  ✅ Migração oferecida mesmo em fresh installs (não só em upgrades)
+  ✅ Novo script standalone: migrate-artifacts.sh (pode rodar a qualquer momento)
+
+  Root Cause (v2.1.10):
+  - check_and_migrate_artifacts() só era chamada em confirm_update()
+  - confirm_update() só era chamada em upgrades (versão anterior detectada)
+  - Fresh installs (sem .claude/ anterior) pulavam a verificação
+  - Resultado: artefatos ficavam em .agentic_sdlc/ ao invés de .project/
+
+  Solution (v2.1.11):
+  - check_and_migrate_artifacts() agora é chamada no início do main()
+  - SEMPRE executa, independente de upgrade ou fresh install
+  - Oferece migração interativa com 3 opções:
+    [1] Migrar agora (recomendado)
+    [2] Migrar depois manualmente
+    [3] Cancelar instalação
+
+  New Script: migrate-artifacts.sh
+  - Pode ser executado manualmente a qualquer momento
+  - Detecta automaticamente artefatos em .agentic_sdlc/
+  - Migra para .project/ com confirmação
+  - Cria backup antes de limpar
+  - Verifica migração após conclusão
 
   🚀 FOCUS: Safe upgrades, automated migration, data preservation
 
@@ -144,6 +172,18 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "2.1.11"
+    date: "2026-01-27"
+    changes:
+      - "fix(CRITICAL): Migration now offered in fresh installs (not just upgrades)"
+      - "fix(setup): check_and_migrate_artifacts() moved to main() entry point"
+      - "fix(setup): Migration verification now runs ALWAYS, independent of install origin"
+      - "feat(script): migrate-artifacts.sh - standalone migration script"
+      - "feat(script): Can be executed manually at any time (./\.agentic_sdlc/scripts/migrate-artifacts.sh)"
+      - "feat(script): Interactive migration with file counts, backup, and verification"
+      - "feat(script): Auto-detects artifacts in .agentic_sdlc/ that should be in .project/"
+      - "docs(script): Comprehensive help text and progress reporting"
+      - "test(autoritas): Validated migration on real project (12 files migrated successfully)"
   - version: "2.1.10"
     date: "2026-01-27"
     changes:

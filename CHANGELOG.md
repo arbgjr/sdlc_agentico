@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.11] - 2026-01-27
+
+### Fixed - CRITICAL Migration Bug
+
+- **Setup Script** - Migration now offered in fresh installs:
+  - ✅ **Root Cause**: v2.1.10 only offered migration during upgrades, not fresh installs
+  - ✅ **Solution**: `check_and_migrate_artifacts()` now called at main() entry point
+  - ✅ **Impact**: Migration verification runs ALWAYS, independent of install origin
+  - ✅ **Tested**: Validated on Autoritas project (12 files migrated successfully)
+
+### Added - Standalone Migration Script
+
+- **migrate-artifacts.sh** - Manual migration tool:
+  - ✅ Can be executed at any time: `./\.agentic_sdlc/scripts/migrate-artifacts.sh`
+  - ✅ Interactive migration with 3 options (migrate now, later, cancel)
+  - ✅ Auto-detects artifacts in .agentic_sdlc/ that should be in .project/
+  - ✅ Displays file counts and sizes before migration
+  - ✅ Creates timestamped backups before cleanup
+  - ✅ Verifies migration success with file count comparison
+  - ✅ Comprehensive progress reporting and colored output
+
+### Changed - Migration Flow
+
+- **Always Check Artifacts** - New behavior:
+  - Before: Only checked during version upgrades (confirm_update)
+  - After: ALWAYS checked at start of installation (main entry point)
+  - Prevents: Artifacts stuck in .agentic_sdlc/ on fresh installs
+  - Benefit: Consistent behavior regardless of install method
+
 ## [2.1.10] - 2026-01-27
 
 ### Added - Smart Update System & Artifact Migration

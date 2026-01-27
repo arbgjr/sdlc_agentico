@@ -1006,10 +1006,89 @@ print_summary() {
     echo ""
 }
 
+# Verificar e oferecer migração de artefatos (SEMPRE, independente de origem)
+check_and_migrate_artifacts() {
+    # Se --force, pular verificação
+    if [[ "$FORCE_UPDATE" == "true" ]]; then
+        return 0
+    fi
+
+    # Verificar se há artefatos em .agentic_sdlc/ que deveriam estar em .project/
+    if check_project_artifacts_in_agentic_sdlc; then
+        echo ""
+        echo "╔════════════════════════════════════════════════════════════╗"
+        echo "║          ⚠️  ARTEFATOS EM LOCAL INCORRETO ⚠️                ║"
+        echo "╚════════════════════════════════════════════════════════════╝"
+        echo ""
+        log_warn "Artefatos de projeto detectados em .agentic_sdlc/"
+        echo ""
+        echo "REGRA DE OURO (v2.1.7+): Artefatos de PROJETO devem estar em .project/"
+        echo ""
+        echo "Artefatos encontrados:"
+        for dir in corpus architecture security reports references sessions; do
+            if [[ -d ".agentic_sdlc/$dir" ]]; then
+                local COUNT=$(find ".agentic_sdlc/$dir" -type f ! -name ".gitkeep" 2>/dev/null | wc -l)
+                if [[ $COUNT -gt 0 ]]; then
+                    echo "  • $dir/ ($COUNT arquivos)"
+                fi
+            fi
+        done
+
+        echo ""
+        echo -e "${CYAN}Deseja migrar estes artefatos para .project/ AGORA?${NC}"
+        echo ""
+        echo "  [1] Sim, migrar agora (RECOMENDADO)"
+        echo "  [2] Não, vou migrar depois manualmente"
+        echo "  [3] Cancelar instalação"
+        echo ""
+        read -p "Escolha [1-3]: " choice
+
+        case $choice in
+            1)
+                log_info "Executando migração automática..."
+                if migrate_project_artifacts; then
+                    log_success "Migração concluída!"
+
+                    # Perguntar sobre limpeza
+                    echo ""
+                    log_question "Deseja limpar .agentic_sdlc/ agora? (backup será criado)"
+                    read -p "Limpar? [y/N]: " clean_choice
+
+                    if [[ "$clean_choice" =~ ^[Yy]$ ]]; then
+                        clean_agentic_sdlc
+                    else
+                        log_info "Artefatos mantidos em .agentic_sdlc/ (duplicados)"
+                    fi
+                else
+                    log_error "Falha na migração. Tente manualmente: ./\.agentic_sdlc/scripts/migrate-artifacts.sh"
+                    exit 1
+                fi
+                ;;
+            2)
+                log_info "Instalação continuará. Migre manualmente depois:"
+                echo ""
+                echo "  ./\.agentic_sdlc/scripts/migrate-artifacts.sh"
+                echo ""
+                ;;
+            3)
+                log_info "Instalação cancelada."
+                exit 0
+                ;;
+            *)
+                log_error "Opção inválida."
+                exit 1
+                ;;
+        esac
+    fi
+}
+
 # Main
 main() {
     parse_args "$@"
     detect_os
+
+    # SEMPRE verificar artefatos antes de continuar (independente de origem)
+    check_and_migrate_artifacts
 
     # Se instalando de release
     if [[ "$FROM_RELEASE" == "true" ]]; then
