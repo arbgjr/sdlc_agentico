@@ -66,6 +66,16 @@ jobs:
             chmod +x release-package/.agentic_sdlc/scripts/*.sh 2>/dev/null || true
           fi
 
+          # Copy splash.py and logo from .agentic_sdlc/ root
+          if [ -f ".agentic_sdlc/splash.py" ]; then
+            cp .agentic_sdlc/splash.py release-package/.agentic_sdlc/
+            chmod +x release-package/.agentic_sdlc/splash.py
+          fi
+
+          if [ -f ".agentic_sdlc/logo.png" ]; then
+            cp .agentic_sdlc/logo.png release-package/.agentic_sdlc/
+          fi
+
           # Create empty .project/ structure for user data
           mkdir -p release-package/.project/{corpus,references,phases,architecture,security,reports,sessions}
           mkdir -p release-package/.project/corpus/nodes/{decisions,learnings,patterns,concepts}
