@@ -26,6 +26,8 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Funcoes de log
@@ -33,6 +35,7 @@ log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+log_question() { echo -e "${CYAN}[?]${NC} $1"; }
 
 # Show splash screen
 show_splash() {
@@ -82,6 +85,7 @@ VERSION="latest"
 SKIP_DEPS=false
 INSTALL_OPTIONAL=false
 CHECK_OPTIONAL=false
+FORCE_UPDATE=false
 
 # Parse de argumentos
 parse_args() {
@@ -107,6 +111,10 @@ parse_args() {
                 CHECK_OPTIONAL=true
                 shift
                 ;;
+            --force)
+                FORCE_UPDATE=true
+                shift
+                ;;
             --help|-h)
                 show_usage
                 exit 0
@@ -130,6 +138,7 @@ show_usage() {
     echo "  --skip-deps         Pula instalacao de dependencias (Python, Node, etc)"
     echo "  --install-optional  Instala dependencias opcionais (document-processor, frontend-testing)"
     echo "  --check-optional    Apenas verifica dependencias opcionais"
+    echo "  --force             Força atualização sem perguntar"
     echo "  --help              Mostra esta mensagem"
     echo ""
     echo "Exemplos:"
@@ -159,47 +168,337 @@ detect_os() {
     log_info "Sistema detectado: $OS"
 }
 
-# Verificar se .claude ja existe e perguntar ao usuario
-check_existing_claude() {
-    if [[ -d ".claude" ]]; then
-        echo ""
-        log_warn "O diretorio .claude/ ja existe!"
-        echo ""
-        echo "O que deseja fazer?"
-        echo "  [1] Fazer backup e substituir (recomendado)"
-        echo "  [2] Mesclar (manter arquivos existentes, adicionar novos)"
-        echo "  [3] Substituir sem backup"
-        echo "  [4] Cancelar instalacao"
-        echo ""
-        read -p "Escolha [1-4]: " choice
+# Detectar versão instalada
+detect_installed_version() {
+    local INSTALLED_VERSION=""
 
-        case $choice in
+    # Método 1: Ler .claude/VERSION
+    if [[ -f ".claude/VERSION" ]]; then
+        INSTALLED_VERSION=$(grep "^version:" .claude/VERSION 2>/dev/null | awk '{print $2}' | tr -d '"')
+    fi
+
+    # Método 2: Git tag (se for repo git)
+    if [[ -z "$INSTALLED_VERSION" && -d ".git" ]]; then
+        INSTALLED_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+    fi
+
+    # Método 3: Verificar diretório .agentic_sdlc
+    if [[ -z "$INSTALLED_VERSION" && -d ".agentic_sdlc" ]]; then
+        INSTALLED_VERSION="unknown"
+    fi
+
+    echo "$INSTALLED_VERSION"
+}
+
+# Verificar se há artefatos de projeto em .agentic_sdlc
+check_project_artifacts_in_agentic_sdlc() {
+    if [[ ! -d ".agentic_sdlc" ]]; then
+        return 1
+    fi
+
+    # Verificar se há artefatos que parecem ser do projeto (não do framework)
+    local HAS_ARTIFACTS=false
+
+    # Diretórios que indicam artefatos de projeto
+    local PROJECT_DIRS=(
+        ".agentic_sdlc/corpus/nodes/decisions"
+        ".agentic_sdlc/architecture"
+        ".agentic_sdlc/security"
+        ".agentic_sdlc/reports"
+    )
+
+    for dir in "${PROJECT_DIRS[@]}"; do
+        if [[ -d "$dir" ]]; then
+            # Verificar se tem arquivos (não apenas .gitkeep)
+            local FILE_COUNT=$(find "$dir" -type f ! -name ".gitkeep" 2>/dev/null | wc -l)
+            if [[ $FILE_COUNT -gt 0 ]]; then
+                HAS_ARTIFACTS=true
+                break
+            fi
+        fi
+    done
+
+    if $HAS_ARTIFACTS; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Migrar artefatos de projeto de .agentic_sdlc para .project
+migrate_project_artifacts() {
+    log_info "Iniciando migração de artefatos..."
+    echo ""
+
+    # Criar .project se não existir
+    mkdir -p .project
+
+    local MIGRATED_COUNT=0
+
+    # Diretórios a migrar
+    declare -A DIRS_TO_MIGRATE=(
+        [".agentic_sdlc/corpus"]="corpus"
+        [".agentic_sdlc/architecture"]="architecture"
+        [".agentic_sdlc/security"]="security"
+        [".agentic_sdlc/reports"]="reports"
+        [".agentic_sdlc/references"]="references"
+        [".agentic_sdlc/sessions"]="sessions"
+    )
+
+    for source_dir in "${!DIRS_TO_MIGRATE[@]}"; do
+        local dest_name="${DIRS_TO_MIGRATE[$source_dir]}"
+        local dest_dir=".project/$dest_name"
+
+        if [[ -d "$source_dir" ]]; then
+            # Verificar se tem conteúdo (além de .gitkeep)
+            local FILE_COUNT=$(find "$source_dir" -type f ! -name ".gitkeep" 2>/dev/null | wc -l)
+
+            if [[ $FILE_COUNT -gt 0 ]]; then
+                log_info "Migrando $source_dir → $dest_dir"
+
+                # Criar diretório destino
+                mkdir -p "$dest_dir"
+
+                # Copiar conteúdo (preservando estrutura)
+                cp -r "$source_dir"/* "$dest_dir/" 2>/dev/null || true
+
+                # Remover .gitkeep se existir no destino
+                rm -f "$dest_dir/.gitkeep"
+
+                MIGRATED_COUNT=$((MIGRATED_COUNT + 1))
+                log_success "  ✓ Migrado: $(find "$source_dir" -type f | wc -l) arquivos"
+            fi
+        fi
+    done
+
+    if [[ $MIGRATED_COUNT -gt 0 ]]; then
+        log_success "Migração completa: $MIGRATED_COUNT diretórios migrados"
+        return 0
+    else
+        log_info "Nenhum artefato encontrado para migrar"
+        return 1
+    fi
+}
+
+# Limpar .agentic_sdlc (remover arquivos do framework e artefatos migrados)
+clean_agentic_sdlc() {
+    if [[ ! -d ".agentic_sdlc" ]]; then
+        return 0
+    fi
+
+    log_info "Limpando .agentic_sdlc..."
+
+    # Criar backup antes de limpar
+    local BACKUP_DIR=".agentic_sdlc.backup-$(date +%Y%m%d-%H%M%S)"
+    cp -r ".agentic_sdlc" "$BACKUP_DIR" 2>/dev/null || true
+
+    if [[ -d "$BACKUP_DIR" ]]; then
+        log_info "Backup criado em: $BACKUP_DIR"
+    fi
+
+    # Remover diretório completo
+    rm -rf ".agentic_sdlc"
+
+    log_success ".agentic_sdlc removido"
+}
+
+# Confirmar atualização
+confirm_update() {
+    local CURRENT_VERSION="$1"
+    local NEW_VERSION="$2"
+
+    echo ""
+    echo "╔════════════════════════════════════════════════════════════╗"
+    echo "║           ATUALIZAÇÃO DO SDLC AGÊNTICO                     ║"
+    echo "╚════════════════════════════════════════════════════════════╝"
+    echo ""
+    echo -e "${YELLOW}Versão instalada:${NC} $CURRENT_VERSION"
+    echo -e "${GREEN}Nova versão:${NC}      $NEW_VERSION"
+    echo ""
+
+    # Verificar se há artefatos de projeto em local errado
+    if check_project_artifacts_in_agentic_sdlc; then
+        echo -e "${YELLOW}⚠️  ATENÇÃO: Artefatos de projeto detectados em .agentic_sdlc/${NC}"
+        echo ""
+        echo "Foi detectado que este projeto possui artefatos em .agentic_sdlc/"
+        echo "que deveriam estar em .project/ (REGRA DE OURO v2.1.7+)."
+        echo ""
+        echo "Artefatos encontrados:"
+
+        # Listar artefatos
+        for dir in corpus architecture security reports references; do
+            if [[ -d ".agentic_sdlc/$dir" ]]; then
+                local COUNT=$(find ".agentic_sdlc/$dir" -type f ! -name ".gitkeep" 2>/dev/null | wc -l)
+                if [[ $COUNT -gt 0 ]]; then
+                    echo "  • $dir/ ($COUNT arquivos)"
+                fi
+            fi
+        done
+
+        echo ""
+        echo -e "${CYAN}O que deseja fazer?${NC}"
+        echo ""
+        echo "  [1] Migrar artefatos para .project/ e atualizar (RECOMENDADO)"
+        echo "  [2] Continuar SEM migrar (PERDERÁ todos os artefatos!)"
+        echo "  [3] Cancelar atualização"
+        echo ""
+        read -p "Escolha [1-3]: " migration_choice
+
+        case $migration_choice in
             1)
-                BACKUP_DIR=".claude.backup.$(date +%Y%m%d_%H%M%S)"
-                log_info "Criando backup em $BACKUP_DIR..."
-                mv .claude "$BACKUP_DIR"
-                log_success "Backup criado em $BACKUP_DIR"
-                return 0
+                log_info "Opção selecionada: Migrar e atualizar"
+                echo ""
+
+                # Executar migração
+                if migrate_project_artifacts; then
+                    echo ""
+                    log_success "Artefatos migrados com sucesso para .project/"
+
+                    # Perguntar se pode limpar .agentic_sdlc
+                    echo ""
+                    log_question "Deseja remover .agentic_sdlc/ agora?"
+                    echo "  (Um backup será criado antes da remoção)"
+                    echo ""
+                    read -p "Remover .agentic_sdlc/? [y/N]: " remove_old
+
+                    if [[ "$remove_old" =~ ^[Yy]$ ]]; then
+                        clean_agentic_sdlc
+                    else
+                        log_warn ".agentic_sdlc/ mantido. Remova manualmente após validar migração."
+                    fi
+
+                    return 0
+                else
+                    log_error "Falha na migração de artefatos"
+                    return 1
+                fi
                 ;;
             2)
-                log_info "Modo mescla selecionado. Arquivos existentes serao preservados."
-                MERGE_MODE=true
-                return 0
+                echo ""
+                echo -e "${RED}╔════════════════════════════════════════════════════════════╗${NC}"
+                echo -e "${RED}║                    ⚠️  AVISO CRÍTICO ⚠️                     ║${NC}"
+                echo -e "${RED}╚════════════════════════════════════════════════════════════╝${NC}"
+                echo ""
+                echo -e "${YELLOW}Você escolheu NÃO migrar os artefatos do projeto.${NC}"
+                echo ""
+                echo "Isso significa que você PERDERÁ:"
+                echo "  • Todos os ADRs inferidos/convertidos"
+                echo "  • Diagramas de arquitetura"
+                echo "  • Threat models"
+                echo "  • Reports de tech debt"
+                echo "  • Referências e sessões"
+                echo ""
+                echo "TOTAL DE DADOS QUE SERÃO PERDIDOS:"
+                local TOTAL_FILES=$(find .agentic_sdlc/{corpus,architecture,security,reports,references,sessions} -type f ! -name ".gitkeep" 2>/dev/null | wc -l)
+                local TOTAL_SIZE=$(du -sh .agentic_sdlc 2>/dev/null | cut -f1)
+                echo "  • Arquivos: $TOTAL_FILES"
+                echo "  • Tamanho: $TOTAL_SIZE"
+                echo ""
+                echo -e "${RED}Esta ação é IRREVERSÍVEL!${NC}"
+                echo ""
+                read -p "Tem CERTEZA que deseja continuar SEM migrar? [y/N]: " confirm_loss
+
+                if [[ "$confirm_loss" =~ ^[Yy]$ ]]; then
+                    log_warn "Continuando SEM migração. Artefatos serão perdidos."
+
+                    # Criar backup antes de deletar
+                    clean_agentic_sdlc
+
+                    return 0
+                else
+                    log_info "Atualização cancelada. Execute novamente e escolha opção 1 para migrar."
+                    exit 0
+                fi
                 ;;
             3)
-                log_warn "Substituindo sem backup..."
-                rm -rf .claude
-                return 0
-                ;;
-            4)
-                log_info "Instalacao cancelada pelo usuario."
+                log_info "Atualização cancelada pelo usuário."
                 exit 0
                 ;;
             *)
-                log_error "Opcao invalida. Cancelando."
+                log_error "Opção inválida. Atualização cancelada."
                 exit 1
                 ;;
         esac
+    else
+        # Sem artefatos de projeto, apenas confirmar atualização
+        echo "A atualização irá:"
+        echo "  • Atualizar framework de $CURRENT_VERSION → $NEW_VERSION"
+        echo "  • Limpar .agentic_sdlc/ (se existir)"
+        echo "  • Manter .project/ intacto"
+        echo ""
+        read -p "Deseja continuar com a atualização? [y/N]: " confirm
+
+        if [[ "$confirm" =~ ^[Yy]$ ]]; then
+            # Limpar .agentic_sdlc se existir
+            if [[ -d ".agentic_sdlc" ]]; then
+                clean_agentic_sdlc
+            fi
+            return 0
+        else
+            log_info "Atualização cancelada pelo usuário."
+            exit 0
+        fi
+    fi
+}
+
+# Verificar se .claude ja existe e perguntar ao usuario
+check_existing_claude() {
+    if [[ -d ".claude" ]]; then
+        # Detectar versão instalada
+        CURRENT_VERSION=$(detect_installed_version)
+
+        if [[ -n "$CURRENT_VERSION" ]]; then
+            # Versão detectada, perguntar sobre atualização
+            if [[ "$FORCE_UPDATE" == "true" ]]; then
+                log_info "Modo --force: atualizando sem perguntar"
+                confirm_update "$CURRENT_VERSION" "$VERSION"
+                return 0
+            else
+                # Perguntar se quer atualizar
+                confirm_update "$CURRENT_VERSION" "$VERSION"
+                return 0
+            fi
+        else
+            # .claude existe mas versão não detectada
+            echo ""
+            log_warn "O diretorio .claude/ ja existe!"
+            echo ""
+            echo "O que deseja fazer?"
+            echo "  [1] Fazer backup e substituir (recomendado)"
+            echo "  [2] Mesclar (manter arquivos existentes, adicionar novos)"
+            echo "  [3] Substituir sem backup"
+            echo "  [4] Cancelar instalacao"
+            echo ""
+            read -p "Escolha [1-4]: " choice
+
+            case $choice in
+                1)
+                    BACKUP_DIR=".claude.backup.$(date +%Y%m%d_%H%M%S)"
+                    log_info "Criando backup em $BACKUP_DIR..."
+                    mv .claude "$BACKUP_DIR"
+                    log_success "Backup criado em $BACKUP_DIR"
+                    return 0
+                    ;;
+                2)
+                    log_info "Modo mescla selecionado. Arquivos existentes serao preservados."
+                    MERGE_MODE=true
+                    return 0
+                    ;;
+                3)
+                    log_warn "Substituindo sem backup..."
+                    rm -rf .claude
+                    return 0
+                    ;;
+                4)
+                    log_info "Instalacao cancelada pelo usuario."
+                    exit 0
+                    ;;
+                *)
+                    log_error "Opcao invalida. Cancelando."
+                    exit 1
+                    ;;
+            esac
+        fi
     fi
 }
 
@@ -400,7 +699,7 @@ check_gh_project_scope() {
 
     # Verificar scopes atuais usando gh auth status
     local AUTH_OUTPUT=$(gh auth status 2>&1)
-    
+
     # Procurar por "Token scopes" na saída
     if echo "$AUTH_OUTPUT" | grep -qi "project"; then
         log_success "Scope 'project' disponível"
@@ -434,7 +733,7 @@ check_gh_project_scope() {
         log_info "Executando 'gh auth refresh -s project'..."
         if gh auth refresh -s project; then
             log_success "Scope 'project' adicionado com sucesso"
-            
+
             # Verificar novamente
             if gh api user -H "X-OAuth-Scopes: true" 2>&1 | grep -qi "project"; then
                 log_success "Verificação: scope 'project' confirmado"
@@ -560,7 +859,7 @@ run_checks() {
 make_scripts_executable() {
     log_info "Configurando permissoes de scripts..."
 
-    if [[ -d ".scripts" ]]; then
+    if [[ -d "\.agentic_sdlc/scripts" ]]; then
         chmod +x \.agentic_sdlc/scripts/*.sh 2>/dev/null || true
         log_success "Scripts em \.agentic_sdlc/scripts/ configurados"
     fi

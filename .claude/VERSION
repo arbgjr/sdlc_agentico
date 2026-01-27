@@ -1,10 +1,69 @@
 # SDLC Agêntico Version
-version: "2.1.9"
+version: "2.1.10"
 build_date: "2026-01-27"
 release_notes: |
-  Sprint 1-3 Complete: Critical Fixes + Framework Architecture
+  Setup Automation & Migration - Smart Update System
 
-  🎯 TESTED ON REAL PROJECT: Autoritas (430k LOC, 1,762 files)
+  🚀 FOCUS: Safe upgrades, automated migration, data preservation
+
+  Key Features:
+  ✅ Smart version detection (3 methods: VERSION file, git tags, directory existence)
+  ✅ Artifact migration from .agentic_sdlc/ to .project/ with user confirmation
+  ✅ Critical data loss warnings with explicit user consent
+  ✅ Automatic backup creation before destructive operations
+  ✅ Uninstall script for local symlink installations
+  ✅ Comprehensive audit system identifying 22 problems in sdlc-import v2.0.0
+
+  🛠️ Enhanced Setup Script (setup-sdlc.sh):
+  - detect_installed_version(): 3-method version detection
+  - check_project_artifacts_in_agentic_sdlc(): Detects misplaced artifacts
+  - migrate_project_artifacts(): Safe migration with user confirmation
+  - clean_agentic_sdlc(): Backup + removal workflow
+  - confirm_update(): Interactive upgrade with 3 options:
+    [1] Migrate and update (RECOMMENDED)
+    [2] Continue without migration (CRITICAL WARNING)
+    [3] Cancel update
+
+  🔧 New Scripts:
+  - uninstall-local.sh: Interactive uninstall for symlink installations
+    • Backup restoration from .backup-YYYYMMDD-HHMMSS
+    • Clean uninstall (remove symlinks only)
+    • Complete cleanup (remove everything)
+
+  📊 Audit System:
+  - CRITICAL-AUDIT-v2.0.0-autoritas.md: Comprehensive analysis
+    • 2 CRITICAL problems (C1: output dir, C2: framework copied)
+    • 3 GRAVE problems (G1-G3: reconciliation, logging, conversion rate)
+    • 4 MEDIUM problems (M1-M4: UX issues)
+    • 5 LIGHT problems (L1-L5: minor improvements)
+    • 8 SUGGESTIONS (S1-S8: feature enhancements)
+
+  🎯 Migration Workflow:
+  1. Detect old version
+  2. Check for artifacts in .agentic_sdlc/
+  3. Offer migration to .project/
+  4. Show data loss warning if declined
+  5. Create backup before removal
+  6. Clean and proceed with update
+
+  💡 Safety Features:
+  - Interactive confirmations for destructive operations
+  - Automatic backups (.agentic_sdlc.backup-YYYYMMDD-HHMMSS)
+  - Detailed file counts and size reporting
+  - Colored output with clear warnings (RED for critical)
+  - --force flag for automation without prompts
+
+  📈 User Experience:
+  - Visual boxes and formatted output
+  - Clear action prompts with numbered choices
+  - Explicit data loss warnings with file counts
+  - Recommendation badges (RECOMMENDED)
+  - Success/warning/error logging throughout
+
+  Files Modified:
+  - setup-sdlc.sh (+500 lines): Smart update and migration logic
+  - uninstall-local.sh (NEW, 134 lines): Uninstall automation
+  - CRITICAL-AUDIT-v2.0.0-autoritas.md (NEW): Comprehensive audit report
 
   Sprint 1 - Critical Fixes (C1, C3, C4):
   ✅ C1: Output directory propagation fix (BLOCKER resolved)
@@ -85,6 +144,32 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "2.1.10"
+    date: "2026-01-27"
+    changes:
+      - "feat(setup): Smart version detection with 3 methods (VERSION file, git tags, directory)"
+      - "feat(setup): detect_installed_version() function for upgrade detection"
+      - "feat(setup): Artifact migration from .agentic_sdlc/ to .project/ with confirmation"
+      - "feat(setup): check_project_artifacts_in_agentic_sdlc() detects misplaced files"
+      - "feat(setup): migrate_project_artifacts() safe migration with file counts"
+      - "feat(setup): confirm_update() interactive upgrade with 3 options"
+      - "feat(setup): Critical data loss warnings with explicit file counts and sizes"
+      - "feat(setup): Automatic backup creation before destructive operations"
+      - "feat(setup): clean_agentic_sdlc() with timestamped backups"
+      - "feat(setup): Visual improvements - colored boxes, formatted prompts"
+      - "feat(setup): --force flag for automation without prompts"
+      - "feat(uninstall): uninstall-local.sh for symlink installation removal"
+      - "feat(uninstall): Interactive menu - restore backup, clean uninstall, complete cleanup"
+      - "feat(uninstall): Automatic backup detection and restoration"
+      - "feat(audit): CRITICAL-AUDIT-v2.0.0-autoritas.md comprehensive analysis"
+      - "feat(audit): 22 problems categorized (2 critical, 3 grave, 4 medium, 5 light, 8 suggestions)"
+      - "feat(audit): Evidence-based root cause analysis with recommendations"
+      - "fix(setup): Prevents data loss during framework updates"
+      - "fix(setup): Handles legacy .agentic_sdlc/ installations gracefully"
+      - "ux(setup): Numbered choice menus for better clarity"
+      - "ux(setup): RED critical warnings for data loss scenarios"
+      - "ux(setup): Detailed feedback - file counts, sizes, paths"
+      - "docs(setup): Enhanced help text and upgrade prompts"
   - version: "2.1.9"
     date: "2026-01-27"
     changes:

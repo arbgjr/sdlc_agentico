@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.10] - 2026-01-27
+
+### Added - Smart Update System & Artifact Migration
+
+- **Enhanced Setup Script** - Intelligent update detection and migration:
+  - ✅ `detect_installed_version()` - 3-method version detection (VERSION file, git tags, directory existence)
+  - ✅ `check_project_artifacts_in_agentic_sdlc()` - Detects misplaced project artifacts
+  - ✅ `migrate_project_artifacts()` - Safe migration from .agentic_sdlc/ to .project/ with user confirmation
+  - ✅ `clean_agentic_sdlc()` - Backup + removal workflow with timestamped backups
+  - ✅ `confirm_update()` - Interactive upgrade with 3 options:
+    - [1] Migrate and update (RECOMMENDED)
+    - [2] Continue without migration (CRITICAL WARNING with data loss details)
+    - [3] Cancel update
+  - ✅ Visual improvements - colored boxes, formatted prompts, numbered menus
+  - ✅ `--force` flag for automation without prompts
+
+- **Uninstall Script** - Interactive removal for symlink installations:
+  - ✅ `uninstall-local.sh` - Menu-driven uninstall with 3 options:
+    - [1] Restore from backup (.backup-YYYYMMDD-HHMMSS)
+    - [2] Clean uninstall (remove symlinks only)
+    - [3] Complete cleanup (remove everything)
+  - ✅ Automatic backup detection and restoration
+  - ✅ Safety confirmations before destructive operations
+
+- **Audit System** - Comprehensive analysis framework:
+  - ✅ CRITICAL-AUDIT-v2.0.0-autoritas.md - 22 problems categorized:
+    - 2 CRITICAL: Output directory ignored, framework files copied
+    - 3 GRAVE: Reconciliation missing, debug logging absent, low conversion rate
+    - 4 MEDIUM: UX issues
+    - 5 LIGHT: Minor improvements
+    - 8 SUGGESTIONS: Feature enhancements
+  - ✅ Evidence-based root cause analysis
+  - ✅ Detailed recommendations with effort estimates
+
+### Changed - Migration Workflow
+
+- **Data Preservation First** - Critical warnings before any data loss:
+  - Shows detailed file counts and sizes before deletion
+  - Requires explicit user confirmation for data loss scenarios
+  - Creates automatic backups (.agentic_sdlc.backup-YYYYMMDD-HHMMSS)
+  - RED warning boxes for critical operations
+
+### Fixed
+
+- **Update Safety** - Prevents accidental data loss during framework upgrades
+- **Legacy Installations** - Handles old .agentic_sdlc/ project installations gracefully
+- **Symlink Management** - Proper cleanup and restoration for local installations
+
+### Security
+
+- **Backup Everything** - Never deletes without creating a backup first
+- **Explicit Consent** - Interactive confirmations for all destructive operations
+- **Rollback Ready** - All backups timestamped and preserved
+
 ## [2.0.5] - 2026-01-24
 
 ### Fixed - Large Project Support
