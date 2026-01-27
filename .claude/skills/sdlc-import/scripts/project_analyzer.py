@@ -95,8 +95,14 @@ class ProjectAnalyzer:
             )
 
         self.config = self._load_config(config_path)
-        # Use configured output directory (.project for imported artifacts)
-        self.output_dir = self.project_path / self.config['general']['output_dir']
+
+        # Load output directory from settings.json (v2.1.7)
+        # Priority: settings.json > import_config.yml > default ".project"
+        output_dir = self._load_output_dir_from_settings()
+        if not output_dir:
+            output_dir = self.config['general'].get('output_dir', '.project')
+
+        self.output_dir = self.project_path / output_dir
         self.analysis_id = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
 
         # Add dynamic config fields
@@ -138,6 +144,47 @@ class ProjectAnalyzer:
 
         logger.info("Loaded configuration", extra={"config_path": str(config_path)})
         return config
+
+    def _load_output_dir_from_settings(self) -> Optional[str]:
+        """
+        Load output directory configuration from .claude/settings.json
+
+        Returns:
+            Output directory path or None if not configured
+        """
+        settings_path = self.project_path / ".claude" / "settings.json"
+
+        # Try framework root if not in project
+        if not settings_path.exists():
+            framework_root = Path(__file__).parent.parent.parent.parent
+            settings_path = framework_root / ".claude" / "settings.json"
+
+        if not settings_path.exists():
+            logger.debug("settings.json not found, using config default")
+            return None
+
+        try:
+            with open(settings_path, 'r') as f:
+                settings = json.load(f)
+
+            output_dir = settings.get('sdlc', {}).get('output', {}).get('project_artifacts_dir')
+
+            if output_dir:
+                logger.info(
+                    "Loaded output directory from settings.json",
+                    extra={"output_dir": output_dir, "settings_path": str(settings_path)}
+                )
+                return output_dir
+            else:
+                logger.debug("No output.project_artifacts_dir in settings.json")
+                return None
+
+        except Exception as e:
+            logger.warning(
+                "Failed to load settings.json",
+                extra={"error": str(e), "settings_path": str(settings_path)}
+            )
+            return None
 
     def _load_sdlcignore(self) -> List[str]:
         """

@@ -3,6 +3,8 @@
 
 general:
   # Output directory for generated documentation (project-specific artifacts)
+  # DEPRECATED (v2.1.7): Configure in .claude/settings.json -> sdlc.output.project_artifacts_dir
+  # This value is used as fallback if settings.json is not found
   output_dir: ".project"
 
   # Patterns to exclude from analysis

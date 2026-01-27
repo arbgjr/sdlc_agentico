@@ -412,6 +412,10 @@
         "crypto_change": true,
         "new_public_endpoint": true
       }
+    },
+    "output": {
+      "project_artifacts_dir": ".project",
+      "framework_artifacts_dir": ".agentic_sdlc"
     }
   },
   "integrations": {

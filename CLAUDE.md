@@ -149,7 +149,49 @@ All behavior is defined in `.claude/settings.json`, which configures:
 
 \.agentic_sdlc/docs/                # User documentation and playbook
 \.agentic_sdlc/scripts/             # Installation automation
+
+.project/             # Imported project artifacts (v2.1.7 - configurable)
+├── corpus/           # ADRs inferred from codebase
+├── architecture/     # Generated diagrams
+├── security/         # Threat models
+└── reports/          # Tech debt and analysis reports
 ```
+
+### Output Directory Configuration (v2.1.7)
+
+**CRITICAL:** Understand the difference between framework and project artifacts:
+
+| Directory | Purpose | Configured In |
+|-----------|---------|---------------|
+| **`.agentic_sdlc/`** | Framework artifacts (templates, corpus, sessions) | Hardcoded |
+| **`.project/`** | Imported project artifacts (ADRs, diagrams, reports) | `.claude/settings.json` |
+
+**Configuration:**
+
+```json
+// .claude/settings.json
+{
+  "sdlc": {
+    "output": {
+      "project_artifacts_dir": ".project",        // Default (recommended)
+      "framework_artifacts_dir": ".agentic_sdlc"  // Framework only
+    }
+  }
+}
+```
+
+**Priority Order:**
+1. `.claude/settings.json` → `sdlc.output.project_artifacts_dir`
+2. `import_config.yml` → `general.output_dir` (fallback, deprecated)
+3. Default: `.project`
+
+**When `/sdlc-import` runs:**
+- ADRs inferred → `.project/corpus/nodes/decisions/`
+- Diagrams → `.project/architecture/`
+- Threat models → `.project/security/`
+- Reports → `.project/reports/`
+
+**NOT `.agentic_sdlc/`** - That's for framework artifacts only!
 
 ### Phase Flow
 ```
