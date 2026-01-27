@@ -1,8 +1,8 @@
 # SDLC Agêntico Version
-version: "2.1.7"
+version: "2.1.8"
 build_date: "2026-01-27"
 release_notes: |
-  sdlc-import Major Improvements - 10 Critical/Grave Fixes
+  Configuration & Path Management - Critical Fixes
 
   This release addresses critical issues identified in a comprehensive audit of sdlc-import,
   significantly improving accuracy, confidence scoring, and reducing false positives.
@@ -63,6 +63,26 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "2.1.8"
+    date: "2026-01-27"
+    changes:
+      - "fix(sdlc-import): project_path bug - Detecta quando skill directory é passado ao invés de CWD"
+      - "fix(sdlc-import): Corrige bug onde /sdlc-import gravava em .claude/skills/sdlc-import/.agentic_sdlc/"
+      - "fix(sdlc-import): Auto-detecção de skill directory + correção para Path.cwd()"
+      - "feat(config): output_dir agora configurável em settings.json"
+      - "feat(config): Nova seção sdlc.output.project_artifacts_dir e framework_artifacts_dir"
+      - "feat(config): Prioridade: settings.json > import_config.yml > default .project"
+      - "feat(config): Método _load_output_dir_from_settings() para leitura dinâmica"
+      - "fix(sdlc-import): Remove TODOS hardcoded paths .project e .agentic_sdlc"
+      - "fix(sdlc-import): documentation_generator.py - usa config['general']['output_dir'] dinamicamente"
+      - "fix(sdlc-import): _load_sdlcignore() - usa framework_artifacts_dir de settings.json"
+      - "feat(sdlc-import): _load_output_dir_from_settings_for_framework() para ignore patterns"
+      - "docs(CLAUDE.md): Clarifica diferença entre project_artifacts_dir e framework_artifacts_dir"
+      - "docs(CLAUDE.md): REGRA DE OURO - project_artifacts_dir SEMPRE, framework_artifacts_dir APENAS no framework"
+      - "docs(CLAUDE.md): Casos de uso detalhados (Autoritas vs mice_dolphins)"
+      - "test(sdlc-import): 3 testes para project_path detection (skill dir, normal, edge case)"
+      - "test(sdlc-import): 3 testes para output_dir settings (settings.json, fallback, default)"
+      - "BREAKING: Nenhum - Totalmente backward compatible com fallback"
   - version: "2.1.7"
     date: "2026-01-27"
     changes:

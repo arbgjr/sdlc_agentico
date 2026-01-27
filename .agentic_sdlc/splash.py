@@ -117,12 +117,12 @@ def print_info():
     # Changelog resumido da versão atual
     print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{YELLOW}  📋 {BOLD}v{version} Highlights{RESET}")
-    print(f"{DIM}     sdlc-import Major Improvements - 10 Critical Fixes{RESET}")
-    print(f"{GREEN}     • {WHITE}ADR Reconciliation - Detect existing ADRs to avoid duplicates{RESET}")
-    print(f"{GREEN}     • {WHITE}Enhanced Confidence Scoring - Rubric-based with breakdown{RESET}")
-    print(f"{GREEN}     • {WHITE}Multi-Pattern Authorization - 8+ patterns including custom attributes{RESET}")
-    print(f"{GREEN}     • {WHITE}Bounded Context Threat Modeling - Domain-specific threats (GDPR, financial){RESET}")
-    print(f"{GREEN}     • {WHITE}Test Coverage Analysis - Detect existing tests before reporting 'no tests'{RESET}")
+    print(f"{DIM}     Configuration & Path Management - Critical Fixes{RESET}")
+    print(f"{GREEN}     • {WHITE}Configurable Output Directories - settings.json support for project/framework paths{RESET}")
+    print(f"{GREEN}     • {WHITE}Fixed project_path Bug - Auto-detect skill directory vs CWD{RESET}")
+    print(f"{GREEN}     • {WHITE}Removed ALL Hardcoded Paths - Dynamic path construction everywhere{RESET}")
+    print(f"{GREEN}     • {WHITE}Settings Priority - settings.json > import_config.yml > default{RESET}")
+    print(f"{GREEN}     • {WHITE}Framework/Project Separation - Clear REGRA DE OURO documentation{RESET}")
 
     print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{DIM}  Comandos principais:{RESET}")
