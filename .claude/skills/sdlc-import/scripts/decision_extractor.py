@@ -164,7 +164,7 @@ class DecisionExtractor:
             "category": category,
             "confidence": confidence_score.overall,
             "confidence_level": confidence_score.level.value,
-            "confidence_breakdown": self.scorer.to_dict(confidence_score)["breakdown"],
+            "confidence_breakdown": self.scorer.to_dict(confidence_score)["confidence_breakdown"],
             "status": "inferred",
             "date": datetime.utcnow().isoformat() + "Z",
             "decision": f"Use {tech_name.title()} for {category}",
