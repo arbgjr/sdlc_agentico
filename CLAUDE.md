@@ -140,31 +140,49 @@ All behavior is defined in `.claude/settings.json`, which configures:
 │   └── logging/      # logging.yml, dashboards/
 └── settings.json     # Central configuration
 
-.agentic_sdlc/        # SDLC artifacts and project state (NEW)
-├── projects/         # Project-specific artifacts
-├── references/       # External reference documents (legal, technical, business)
-├── templates/        # Reusable templates (ADR, spec, threat-model)
-├── corpus/           # RAG knowledge corpus
-└── sessions/         # Session history
+.agentic_sdlc/        # SDLC workflow artifacts DO PROJETO
+├── corpus/           # RAG knowledge corpus (decisões, learnings, patterns)
+│   ├── nodes/        # Knowledge nodes
+│   │   ├── decisions/    # ADRs criados manualmente durante workflow
+│   │   ├── learnings/    # Learnings de retrospectivas
+│   │   ├── patterns/     # Padrões identificados
+│   │   └── concepts/     # Conceitos extraídos
+│   ├── graph.json        # Semantic knowledge graph
+│   └── index.yml         # Text search index
+├── sessions/         # Session history DO PROJETO
+├── templates/        # Templates DO PROJETO (ADR, spec, threat-model)
+├── references/       # Documentos de referência DO PROJETO (legal, técnico, business)
+└── docs/             # User documentation and playbook
 
-\.agentic_sdlc/docs/                # User documentation and playbook
 \.agentic_sdlc/scripts/             # Installation automation
 
-.project/             # Imported project artifacts (v2.1.7 - configurable)
-├── corpus/           # ADRs inferred from codebase
-├── architecture/     # Generated diagrams
-├── security/         # Threat models
-└── reports/          # Tech debt and analysis reports
+.project/             # Artefatos IMPORTADOS via /sdlc-import (configurable)
+├── corpus/           # ADRs inferidos via reverse engineering
+│   └── nodes/
+│       └── decisions/    # ADR-INFERRED-001.yml, ADR-INFERRED-002.yml, etc.
+├── architecture/     # Diagramas gerados automaticamente
+│   ├── component-diagram.mmd
+│   ├── dependency-graph.dot
+│   └── data-flow.mmd
+├── security/         # Threat models inferidos
+│   └── threat-model-inferred.yml
+└── reports/          # Reports de tech debt e análise
+    ├── tech-debt-inferred.md
+    └── import-report.md
 ```
 
 ### Output Directory Configuration (v2.1.7)
 
-**CRITICAL:** Understand the difference between framework and project artifacts:
+**CRITICAL:** Todos artefatos (corpus, sessions, diagrams) são DO PROJETO. O diretório depende do FLUXO usado:
 
-| Directory | Purpose | Configured In |
-|-----------|---------|---------------|
-| **`.agentic_sdlc/`** | Framework artifacts (templates, corpus, sessions) | Hardcoded |
-| **`.project/`** | Imported project artifacts (ADRs, diagrams, reports) | `.claude/settings.json` |
+| Directory | Fluxo | Quando Usar | Conteúdo |
+|-----------|-------|-------------|----------|
+| **`.agentic_sdlc/`** | Desenvolvimento normal | `/sdlc-start`, workflow SDLC | corpus/, sessions/, templates/, references/ DO PROJETO |
+| **`.project/`** | Import de legado | `/sdlc-import` | corpus/, sessions/, architecture/, security/, reports/ DO PROJETO |
+
+**Ambos contêm artefatos DO MESMO PROJETO, mas:**
+- `.agentic_sdlc/` = Criado MANUALMENTE durante desenvolvimento com workflow SDLC
+- `.project/` = Gerado AUTOMATICAMENTE via reverse engineering (`/sdlc-import`)
 
 **Configuration:**
 
@@ -173,25 +191,50 @@ All behavior is defined in `.claude/settings.json`, which configures:
 {
   "sdlc": {
     "output": {
-      "project_artifacts_dir": ".project",        // Default (recommended)
-      "framework_artifacts_dir": ".agentic_sdlc"  // Framework only
+      "project_artifacts_dir": ".project",  // Onde /sdlc-import grava (default)
+      "framework_artifacts_dir": ".agentic_sdlc"  // DEPRECATED - mantido para compatibilidade
     }
   }
 }
 ```
 
-**Priority Order:**
+**Priority Order (apenas para `/sdlc-import`):**
 1. `.claude/settings.json` → `sdlc.output.project_artifacts_dir`
 2. `import_config.yml` → `general.output_dir` (fallback, deprecated)
 3. Default: `.project`
 
 **When `/sdlc-import` runs:**
-- ADRs inferred → `.project/corpus/nodes/decisions/`
-- Diagrams → `.project/architecture/`
-- Threat models → `.project/security/`
-- Reports → `.project/reports/`
+```
+.project/
+├── corpus/
+│   └── nodes/
+│       └── decisions/     # ADR-INFERRED-001.yml + cópia dos ADRs existentes
+├── architecture/          # Diagramas gerados (Mermaid, DOT)
+├── security/              # Threat models inferidos (STRIDE)
+├── reports/               # Tech debt reports
+└── sessions/              # Import session logs
+```
 
-**NOT `.agentic_sdlc/`** - That's for framework artifacts only!
+**When `/sdlc-start` or workflow runs:**
+```
+.agentic_sdlc/
+├── corpus/
+│   └── nodes/
+│       ├── decisions/     # ADRs criados manualmente
+│       ├── learnings/     # Learnings de retrospectivas
+│       ├── patterns/      # Patterns identificados
+│       └── concepts/      # Conceitos extraídos
+├── sessions/              # Session history
+├── templates/             # Templates customizados do projeto
+└── references/            # Documentos de referência do projeto
+```
+
+**Caso de Uso: Migração de Legado para SDLC Workflow**
+
+Se você importar um projeto legado e depois adotar SDLC workflow:
+1. `/sdlc-import` → Gera `.project/` com análise inicial
+2. `/sdlc-start` → Cria `.agentic_sdlc/` para workflow ativo
+3. AMBOS coexistem - `.project/` é snapshot histórico, `.agentic_sdlc/` é trabalho ativo
 
 ### Phase Flow
 ```
