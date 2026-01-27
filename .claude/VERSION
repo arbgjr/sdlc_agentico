@@ -1,8 +1,8 @@
 # SDLC Agêntico Version
-version: "2.1.4"
-build_date: "2026-01-26"
+version: "2.1.5"
+build_date: "2026-01-27"
 release_notes: |
-  .sdlcignore - Prevent Framework Self-Scanning
+  Splash Screen UX Bugfixes - Visibility Fixed
 
   Problem Solved:
   - sdlc-import was scanning its own framework code during analysis
@@ -47,6 +47,14 @@ release_notes: |
   - Comprehensive issue with YAML patterns, ADR examples, tests, and implementation guide
 
 changelog:
+  - version: "2.1.5"
+    date: "2026-01-27"
+    changes:
+      - "fix(splash): Removido clear_screen() em --no-animate mode para preservar contexto"
+      - "fix(setup): Adicionado sleep 2 após show_splash para dar tempo de visualização"
+      - "fix(setup): Splash screen agora visível durante toda execução do setup"
+      - "fix(setup): Path detection do splash.py corrigido para funcionar de qualquer diretório"
+      - "feat(setup): Splash completo com mice+dolphins ASCII art sempre exibido"
   - version: "2.1.4"
     date: "2026-01-26"
     changes:
