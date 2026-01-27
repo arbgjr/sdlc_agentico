@@ -186,6 +186,47 @@ class ProjectAnalyzer:
             )
             return None
 
+    def _load_output_dir_from_settings_for_framework(self) -> Optional[str]:
+        """
+        Load framework artifacts directory from .claude/settings.json
+
+        Used for ignore patterns - we always ignore framework_artifacts_dir.
+
+        Returns:
+            Framework artifacts directory or None if not configured
+        """
+        settings_path = self.project_path / ".claude" / "settings.json"
+
+        # Try framework root if not in project
+        if not settings_path.exists():
+            framework_root = Path(__file__).parent.parent.parent.parent
+            settings_path = framework_root / ".claude" / "settings.json"
+
+        if not settings_path.exists():
+            return None
+
+        try:
+            with open(settings_path, 'r') as f:
+                settings = json.load(f)
+
+            framework_dir = settings.get('sdlc', {}).get('output', {}).get('framework_artifacts_dir')
+
+            if framework_dir:
+                logger.debug(
+                    "Loaded framework_artifacts_dir from settings.json",
+                    extra={"framework_artifacts_dir": framework_dir}
+                )
+                return framework_dir
+            else:
+                return None
+
+        except Exception as e:
+            logger.debug(
+                "Failed to load framework_artifacts_dir from settings.json",
+                extra={"error": str(e)}
+            )
+            return None
+
     def _load_sdlcignore(self) -> List[str]:
         """
         Load .sdlcignore patterns from project root and framework root.
@@ -226,16 +267,25 @@ class ProjectAnalyzer:
 
         # Add default patterns if no .sdlcignore found
         if not patterns:
+            # Always ignore:
+            # - .claude/ (framework configuration)
+            # - framework_artifacts_dir (from settings.json, default .agentic_sdlc/)
+            # - Common build/cache directories
+            framework_artifacts_dir = self._load_output_dir_from_settings_for_framework() or ".agentic_sdlc"
+
             patterns = [
                 ".claude/",
-                ".agentic_sdlc/",
+                f"{framework_artifacts_dir}/",
                 ".git/",
                 "node_modules/",
                 "venv/",
                 "__pycache__/",
                 ".terraform/"
             ]
-            logger.info("Using default ignore patterns")
+            logger.info(
+                "Using default ignore patterns",
+                extra={"framework_artifacts_dir": framework_artifacts_dir}
+            )
 
         return patterns
 

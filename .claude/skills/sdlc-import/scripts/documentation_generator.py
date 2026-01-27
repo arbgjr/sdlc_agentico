@@ -116,9 +116,11 @@ class DocumentationGenerator:
                 'similarity': metadata.get('similarity')
             }
 
-            # If status is reconciled, set migrated_to path
+            # If status is reconciled, set migrated_to path (relative to output_dir)
             if metadata.get('status') == 'reconciled':
-                entry['migrated_to'] = f".project/corpus/nodes/decisions/{adr_id}.yml"
+                # Use configured output_dir instead of hardcoded ".project"
+                output_dir_name = Path(config['general']['output_dir']).name
+                entry['migrated_to'] = f"{output_dir_name}/corpus/nodes/decisions/{adr_id}.yml"
 
             index_entries.append(entry)
 
@@ -139,11 +141,13 @@ class DocumentationGenerator:
         for enrich in reconciliation.get('enrich', []):
             existing = enrich.get('existing', {})
             inferred = enrich.get('inferred', {})
+            # Use configured output_dir instead of hardcoded ".project"
+            output_dir_name = Path(self.config['general']['output_dir']).name
             index_entries.append({
                 'id': inferred.get('id'),
                 'original': existing.get('path'),
                 'format': existing.get('format'),
-                'migrated_to': f".project/corpus/nodes/decisions/{inferred.get('id')}.yml",
+                'migrated_to': f"{output_dir_name}/corpus/nodes/decisions/{inferred.get('id')}.yml",
                 'status': 'enriched',
                 'similarity': enrich.get('similarity'),
                 'enrichment_note': 'Original ADR enriched with automated analysis'

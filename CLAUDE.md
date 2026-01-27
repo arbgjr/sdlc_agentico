@@ -173,16 +173,12 @@ All behavior is defined in `.claude/settings.json`, which configures:
 
 ### Output Directory Configuration (v2.1.7)
 
-**CRITICAL:** Todos artefatos (corpus, sessions, diagrams) são DO PROJETO. O diretório depende do FLUXO usado:
+**REGRA DE OURO:**
 
-| Directory | Fluxo | Quando Usar | Conteúdo |
-|-----------|-------|-------------|----------|
-| **`.agentic_sdlc/`** | Desenvolvimento normal | `/sdlc-start`, workflow SDLC | corpus/, sessions/, templates/, references/ DO PROJETO |
-| **`.project/`** | Import de legado | `/sdlc-import` | corpus/, sessions/, architecture/, security/, reports/ DO PROJETO |
-
-**Ambos contêm artefatos DO MESMO PROJETO, mas:**
-- `.agentic_sdlc/` = Criado MANUALMENTE durante desenvolvimento com workflow SDLC
-- `.project/` = Gerado AUTOMATICAMENTE via reverse engineering (`/sdlc-import`)
+| Setting | Quando Usar | Onde Grava |
+|---------|-------------|------------|
+| `project_artifacts_dir` | **SEMPRE** - Qualquer comando em qualquer projeto | `.project/` (default) |
+| `framework_artifacts_dir` | **APENAS** quando desenvolvendo o próprio framework (este repo) | `.agentic_sdlc/` |
 
 **Configuration:**
 
@@ -191,50 +187,83 @@ All behavior is defined in `.claude/settings.json`, which configures:
 {
   "sdlc": {
     "output": {
-      "project_artifacts_dir": ".project",  // Onde /sdlc-import grava (default)
-      "framework_artifacts_dir": ".agentic_sdlc"  // DEPRECATED - mantido para compatibilidade
+      "project_artifacts_dir": ".project",        // TODOS comandos gravam aqui
+      "framework_artifacts_dir": ".agentic_sdlc"  // APENAS artefatos DO framework
     }
   }
 }
 ```
 
-**Priority Order (apenas para `/sdlc-import`):**
+**Priority Order (TODOS comandos):**
 1. `.claude/settings.json` → `sdlc.output.project_artifacts_dir`
 2. `import_config.yml` → `general.output_dir` (fallback, deprecated)
 3. Default: `.project`
 
-**When `/sdlc-import` runs:**
+### Quando Usar Cada Diretório
+
+**`.project/` - Artefatos DO PROJETO ATUAL (SEMPRE):**
+
+**TODOS** os comandos em **QUALQUER** projeto gravam aqui:
+```bash
+/sdlc-import          # → .project/corpus/, architecture/, security/, reports/
+/sdlc-start           # → .project/corpus/nodes/decisions/
+/new-feature "auth"   # → .project/corpus/nodes/decisions/ADR-XXX.yml
+/quick-fix "bug"      # → .project/sessions/
 ```
-.project/
+
+**Estrutura:**
+```
+.project/                      # ← TODOS comandos gravam SEMPRE aqui
 ├── corpus/
 │   └── nodes/
-│       └── decisions/     # ADR-INFERRED-001.yml + cópia dos ADRs existentes
-├── architecture/          # Diagramas gerados (Mermaid, DOT)
-├── security/              # Threat models inferidos (STRIDE)
-├── reports/               # Tech debt reports
-└── sessions/              # Import session logs
+│       ├── decisions/         # ADRs (inferidos OU manuais)
+│       ├── learnings/         # Learnings
+│       └── patterns/          # Patterns
+├── architecture/              # Diagramas
+├── security/                  # Threat models
+├── reports/                   # Reports
+└── sessions/                  # Sessions
 ```
 
-**When `/sdlc-start` or workflow runs:**
+**`.agentic_sdlc/` - Artefatos DO FRAMEWORK (APENAS este repo):**
+
+**APENAS** quando você está desenvolvendo O PRÓPRIO FRAMEWORK (mice_dolphins):
+
+**Estrutura:**
 ```
-.agentic_sdlc/
-├── corpus/
-│   └── nodes/
-│       ├── decisions/     # ADRs criados manualmente
-│       ├── learnings/     # Learnings de retrospectivas
-│       ├── patterns/      # Patterns identificados
-│       └── concepts/      # Conceitos extraídos
-├── sessions/              # Session history
-├── templates/             # Templates customizados do projeto
-└── references/            # Documentos de referência do projeto
+.agentic_sdlc/                 # ← Artefatos SOBRE o framework
+├── corpus/nodes/decisions/    # ADRs SOBRE o framework (ex: ADR-022)
+├── templates/                 # Templates DO framework
+├── docs/                      # Docs DO framework
+├── scripts/                   # Scripts DO framework
+└── schemas/                   # Schemas DO framework
 ```
 
-**Caso de Uso: Migração de Legado para SDLC Workflow**
+### Casos de Uso
 
-Se você importar um projeto legado e depois adotar SDLC workflow:
-1. `/sdlc-import` → Gera `.project/` com análise inicial
-2. `/sdlc-start` → Cria `.agentic_sdlc/` para workflow ativo
-3. AMBOS coexistem - `.project/` é snapshot histórico, `.agentic_sdlc/` é trabalho ativo
+**Caso 1: Projeto Autoritas**
+```bash
+cd /home/user/autoritas
+/sdlc-import
+# ✅ Grava em: /home/user/autoritas/.project/
+# ❌ NUNCA em: /home/user/autoritas/.agentic_sdlc/
+
+/new-feature "assessment"
+# ✅ Grava em: /home/user/autoritas/.project/corpus/nodes/decisions/
+# ❌ NUNCA em: /home/user/autoritas/.agentic_sdlc/
+```
+
+**Caso 2: Desenvolvendo o Framework**
+```bash
+cd /home/user/mice_dolphins  # Repo do framework
+
+# Analisando o framework como projeto:
+/sdlc-import
+# ✅ Grava em: /home/user/mice_dolphins/.project/
+
+# Criando ADR SOBRE o framework (manualmente):
+# ✅ Grava em: /home/user/mice_dolphins/.agentic_sdlc/corpus/nodes/decisions/ADR-022.yml
+```
 
 ### Phase Flow
 ```
