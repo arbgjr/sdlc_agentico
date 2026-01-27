@@ -117,12 +117,12 @@ def print_info():
     # Changelog resumido da versão atual
     print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{YELLOW}  📋 {BOLD}v{version} Highlights{RESET}")
-    print(f"{DIM}     .sdlcignore - Prevent Framework Self-Scanning{RESET}")
-    print(f"{GREEN}     • {WHITE}.sdlcignore support (gitignore syntax) to exclude files/dirs{RESET}")
-    print(f"{GREEN}     • {WHITE}Framework files (.claude/, .agentic_sdlc/) no longer scanned{RESET}")
-    print(f"{GREEN}     • {WHITE}Clean tech debt reports (no framework false positives){RESET}")
-    print(f"{GREEN}     • {WHITE}Issue #92 created - Tripla Terraform + Database IaC patterns{RESET}")
-    print(f"{GREEN}     • {WHITE}Faster analysis (fewer files scanned, backward compatible){RESET}")
+    print(f"{DIM}     sdlc-import Major Improvements - 10 Critical Fixes{RESET}")
+    print(f"{GREEN}     • {WHITE}ADR Reconciliation - Detect existing ADRs to avoid duplicates{RESET}")
+    print(f"{GREEN}     • {WHITE}Enhanced Confidence Scoring - Rubric-based with breakdown{RESET}")
+    print(f"{GREEN}     • {WHITE}Multi-Pattern Authorization - 8+ patterns including custom attributes{RESET}")
+    print(f"{GREEN}     • {WHITE}Bounded Context Threat Modeling - Domain-specific threats (GDPR, financial){RESET}")
+    print(f"{GREEN}     • {WHITE}Test Coverage Analysis - Detect existing tests before reporting 'no tests'{RESET}")
 
     print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{DIM}  Comandos principais:{RESET}")

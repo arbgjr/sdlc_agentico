@@ -1,8 +1,8 @@
 # SDLC Agêntico Version
-version: "2.1.6"
+version: "2.1.7"
 build_date: "2026-01-27"
 release_notes: |
-  Splash Screen UX Bugfixes - Visibility Fixed
+  sdlc-import Major Improvements - 10 Critical Fixes
 
   Problem Solved:
   - sdlc-import was scanning its own framework code during analysis
@@ -47,6 +47,39 @@ release_notes: |
   - Comprehensive issue with YAML patterns, ADR examples, tests, and implementation guide
 
 changelog:
+  - version: "2.1.7"
+    date: "2026-01-27"
+    changes:
+      - "feat(sdlc-import): C1 - ADR reconciliation to avoid duplicates"
+      - "feat(sdlc-import): C1 - detect_existing_adrs() scans docs/adr/, decisions/, .adr/"
+      - "feat(sdlc-import): C1 - reconcile_adrs() with similarity threshold >0.8"
+      - "feat(sdlc-import): C1 - generate adr_index.yml for cross-reference tracking"
+      - "feat(sdlc-import): C2 - Multi-pattern authorization detection (8 patterns)"
+      - "feat(sdlc-import): C2 - Detects [Authorize], RequireAuthorization(), RequirePermission, custom attributes"
+      - "feat(sdlc-import): C2 - Checks infrastructure: AddAuthorization(), UseAuthorization()"
+      - "feat(sdlc-import): C2 - Reduced false positives (P1 instead of P0 when uncertain)"
+      - "feat(sdlc-import): C3 - Confidence scoring with rubric and breakdown"
+      - "feat(sdlc-import): C3 - ConfidenceRubric class with evidence-based scoring (code/docs/runtime)"
+      - "feat(sdlc-import): C3 - Weighted formula: 0.5*code + 0.3*docs + 0.2*runtime"
+      - "feat(sdlc-import): C3 - Margin calculation (±0.05 to ±0.15) based on evidence diversity"
+      - "feat(sdlc-import): C3 - Validation status: NOT_VALIDATED vs VALIDATED"
+      - "feat(sdlc-import): G1 - Threat model per bounded context"
+      - "feat(sdlc-import): G1 - Detect bounded contexts (.api, .service, .domain suffixes)"
+      - "feat(sdlc-import): G1 - Domain-specific threats: GDPR (3), Financial (2), Event-driven (2)"
+      - "feat(sdlc-import): G1 - Data lifecycle threats (4): backup encryption, retention bypass, PITR abuse, export exfiltration"
+      - "feat(sdlc-import): G1 - Context characteristics: has_events, has_gdpr_data, has_financial_data"
+      - "feat(sdlc-import): G2 - Test coverage analysis before reporting 'no tests'"
+      - "feat(sdlc-import): G2 - Count test files, test projects, estimated test count"
+      - "feat(sdlc-import): G2 - Use dotnet test --list-tests for .NET projects"
+      - "feat(sdlc-import): G2 - P0 only if truly no tests, P2 if coverage unknown"
+      - "feat(sdlc-import): G3 - Internal architecture diagrams"
+      - "feat(sdlc-import): G3 - CQRS/MediatR sequence: Endpoint→Validator→Mediator→Handler→Repo→DbContext"
+      - "feat(sdlc-import): G3 - Traditional MVC fallback: Controller→Service→Repository→Database"
+      - "feat(sdlc-import): G3 - Auto-detect architecture pattern from backend frameworks"
+      - "feat(sdlc-import): M2 - Tech debt risk scoring structure (probability × impact)"
+      - "feat(sdlc-import): M3 - Anti-mock policy validation structure"
+      - "feat(sdlc-import): M4 - Secret scanning structure"
+      - "config(sdlc-import): Added adr_reconciliation config with similarity_threshold=0.8"
   - version: "2.1.6"
     date: "2026-01-27"
     changes:
