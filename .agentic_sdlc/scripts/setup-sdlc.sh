@@ -286,7 +286,7 @@ clean_agentic_sdlc() {
         return 0
     fi
 
-    log_info "Limpando .agentic_sdlc..."
+    log_info "Limpando artefatos de .agentic_sdlc/..."
 
     # Criar backup antes de limpar
     local BACKUP_DIR=".agentic_sdlc.backup-$(date +%Y%m%d-%H%M%S)"
@@ -296,10 +296,27 @@ clean_agentic_sdlc() {
         log_info "Backup criado em: $BACKUP_DIR"
     fi
 
-    # Remover diretório completo
-    rm -rf ".agentic_sdlc"
+    # CORRIGIDO: Remover APENAS artefatos, manter framework (scripts, templates, schemas, docs, logo.png, splash.py)
+    local ARTIFACT_DIRS=(
+        "corpus"
+        "architecture"
+        "security"
+        "reports"
+        "references"
+        "sessions"
+    )
 
-    log_success ".agentic_sdlc removido"
+    for dir in "${ARTIFACT_DIRS[@]}"; do
+        if [[ -d ".agentic_sdlc/$dir" ]]; then
+            log_info "  Removendo .agentic_sdlc/$dir/"
+            rm -rf ".agentic_sdlc/$dir"
+            mkdir -p ".agentic_sdlc/$dir"
+            touch ".agentic_sdlc/$dir/.gitkeep"
+        fi
+    done
+
+    log_success "Artefatos removidos (framework mantido)"
+    log_info "Framework preservado: scripts/, templates/, schemas/, docs/, logo.png, splash.py"
 }
 
 # Confirmar atualização

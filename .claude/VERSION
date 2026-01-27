@@ -1,8 +1,21 @@
 # SDLC Agêntico Version
-version: "2.1.11"
+version: "2.1.12"
 build_date: "2026-01-27"
 release_notes: |
-  Migration Bugfix - Always Check Artifacts
+  CRITICAL HOTFIX - Framework Preservation During Cleanup
+
+  🔥 CRITICAL BUG (v2.1.11): clean_agentic_sdlc() deletava TUDO
+
+  Bug:
+  - clean_agentic_sdlc() fazia `rm -rf ".agentic_sdlc"`
+  - Deletava framework INTEIRO (scripts, templates, schemas, docs)
+  - Usuário ficava sem framework após migração
+
+  Fix (v2.1.12):
+  - clean_agentic_sdlc() agora remove APENAS artefatos
+  - PRESERVA framework: scripts/, templates/, schemas/, docs/, logo.png, splash.py
+  - Remove seletivamente: corpus/, architecture/, security/, reports/, references/, sessions/
+  - Cria .gitkeep nos diretórios limpos
 
   🐛 CRITICAL FIX: v2.1.10 não migrava artefatos em fresh installs
 
@@ -172,6 +185,16 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "2.1.12"
+    date: "2026-01-27"
+    changes:
+      - "fix(CRITICAL): clean_agentic_sdlc() now preserves framework files"
+      - "fix(setup): Changed from `rm -rf .agentic_sdlc` to selective artifact removal"
+      - "fix(setup): Framework preserved: scripts/, templates/, schemas/, docs/, logo.png, splash.py"
+      - "fix(setup): Only removes artifact directories: corpus/, architecture/, security/, reports/, references/, sessions/"
+      - "fix(setup): Creates .gitkeep in cleaned directories"
+      - "docs(setup): Added log message listing preserved framework files"
+      - "test(autoritas): Framework successfully restored after cleanup bug"
   - version: "2.1.11"
     date: "2026-01-27"
     changes:

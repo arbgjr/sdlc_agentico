@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.12] - 2026-01-27
+
+### Fixed - CRITICAL Framework Deletion Bug
+
+- **clean_agentic_sdlc()** - Now preserves framework files:
+  - ✅ **Bug**: v2.1.11 did `rm -rf ".agentic_sdlc"` - deleted EVERYTHING
+  - ✅ **Impact**: Users lost framework (scripts, templates, schemas, docs) after cleanup
+  - ✅ **Fix**: Selective removal of artifact directories only
+  - ✅ **Preserved**: scripts/, templates/, schemas/, docs/, logo.png, splash.py
+  - ✅ **Removed**: corpus/, architecture/, security/, reports/, references/, sessions/
+  - ✅ **Safety**: Creates .gitkeep in cleaned directories
+  - ✅ **Feedback**: Logs which framework files were preserved
+
+### Recovery
+
+- **Autoritas Project** - Framework successfully restored from backup:
+  - Backup used: `.agentic_sdlc.backup-20260127-201155`
+  - Restored: scripts/, templates/, schemas/, docs/, logo.png, splash.py
+  - Verified: All framework functionality intact after restoration
+
 ## [2.1.11] - 2026-01-27
 
 ### Fixed - CRITICAL Migration Bug
