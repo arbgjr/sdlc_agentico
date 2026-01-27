@@ -89,6 +89,22 @@ language_detection:
   # LSP timeout per language (seconds)
   lsp_timeout: 30
 
+# NEW (v2.1.7): ADR Reconciliation
+adr_reconciliation:
+  # Enable ADR reconciliation to avoid duplicates
+  enabled: true
+
+  # Minimum similarity threshold (0.0-1.0) to consider ADRs the same
+  similarity_threshold: 0.8
+
+  # Common ADR locations to search
+  search_patterns:
+    - "docs/adr/*.md"
+    - "docs/decisions/*.md"
+    - ".adr/*.md"
+    - "decisions/*.md"
+    - "architecture/decisions/*.md"
+
 decision_extraction:
   # Confidence thresholds
   confidence:

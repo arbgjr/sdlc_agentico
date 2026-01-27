@@ -3,23 +3,33 @@
 Confidence Scoring Module
 Calculates confidence scores for inferred architecture decisions.
 
-Formula:
-    confidence = 0.4 * evidence_quality +
-                 0.3 * evidence_quantity +
-                 0.2 * consistency +
-                 0.1 * llm_bonus
+NEW (v2.1.7): Evidence-based Rubric with Breakdown
 
-Thresholds:
-    HIGH   (>= 0.8) - Auto-accept
-    MEDIUM (0.5-0.8) - Needs validation
-    LOW    (< 0.5) - Create issue for manual review
+Rubric Tiers:
+    code_and_tests_passing:      1.00 - Code + Tests + Runtime validation
+    code_and_docs_consistent:    0.90 - Code + Documentation
+    code_only:                    0.80 - Code evidence only
+    docs_only:                    0.70 - Documentation only
+    inferred_from_patterns:       0.60 - Inferred from patterns
+    speculative:                  0.50 - Speculative/uncertain
+
+Breakdown Components:
+    - code_evidence:              Evidence from source code (0.0-1.0)
+    - documentation_evidence:     Evidence from docs/comments (0.0-1.0)
+    - runtime_validation:         Evidence from runtime (tests/validation) (0.0-1.0)
+    - weighted_average:           Final score with margin (± uncertainty)
+    - margin:                     Uncertainty margin (default ±0.10)
+
+Validation Status:
+    - NOT_VALIDATED:              Static analysis only
+    - VALIDATED:                  Runtime validation performed
 """
 
 import sys
 import logging
 from pathlib import Path
-from typing import Dict, List, Any
-from dataclasses import dataclass
+from typing import Dict, List, Any, Optional
+from dataclasses import dataclass, field
 from enum import Enum
 
 # Add logging utilities (absolute path from project root)
@@ -56,6 +66,158 @@ class ConfidenceScore:
     consistency: float
     llm_bonus: float
     evidence_count: int
+    # NEW (v2.1.7): Rubric-based breakdown
+    code_evidence: float = 0.0
+    documentation_evidence: float = 0.0
+    runtime_validation: float = 0.0
+    margin: float = 0.10
+    validation_status: str = "NOT_VALIDATED"
+    validation_recommendations: List[str] = field(default_factory=list)
+
+
+class ConfidenceRubric:
+    """
+    NEW (v2.1.7): Evidence-based confidence rubric.
+
+    Provides structured scoring based on evidence types.
+    """
+
+    # Rubric tiers (deterministic scoring)
+    SCORES = {
+        "code_and_tests_passing": 1.00,
+        "code_and_docs_consistent": 0.90,
+        "code_only": 0.80,
+        "docs_only": 0.70,
+        "inferred_from_patterns": 0.60,
+        "speculative": 0.50,
+    }
+
+    @staticmethod
+    def calculate(
+        code_evidence: float,
+        docs_evidence: float,
+        runtime_validation: float
+    ) -> ConfidenceScore:
+        """
+        Calculate confidence score using rubric.
+
+        Args:
+            code_evidence: Evidence from source code (0.0-1.0)
+            docs_evidence: Evidence from documentation (0.0-1.0)
+            runtime_validation: Evidence from runtime tests (0.0-1.0)
+
+        Returns:
+            ConfidenceScore with rubric-based scoring
+        """
+        # Weighted formula
+        weighted = (
+            code_evidence * 0.5 +
+            docs_evidence * 0.3 +
+            runtime_validation * 0.2
+        )
+
+        # Determine level
+        if weighted >= 0.8:
+            level = ConfidenceLevel.HIGH
+        elif weighted >= 0.5:
+            level = ConfidenceLevel.MEDIUM
+        else:
+            level = ConfidenceLevel.LOW
+
+        # Validation status
+        if runtime_validation > 0:
+            validation_status = "VALIDATED"
+            recommendations = []
+        else:
+            validation_status = "NOT_VALIDATED - Static analysis only"
+            recommendations = [
+                "Consider adding runtime validation tests",
+                "Validate with integration tests if possible"
+            ]
+
+        # Calculate margin (uncertainty)
+        # Higher uncertainty if only one type of evidence
+        evidence_types = sum([
+            1 if code_evidence > 0 else 0,
+            1 if docs_evidence > 0 else 0,
+            1 if runtime_validation > 0 else 0
+        ])
+
+        if evidence_types == 1:
+            margin = 0.15  # High uncertainty
+        elif evidence_types == 2:
+            margin = 0.10  # Medium uncertainty
+        else:
+            margin = 0.05  # Low uncertainty
+
+        return ConfidenceScore(
+            overall=weighted,
+            level=level,
+            evidence_quality=max(code_evidence, docs_evidence, runtime_validation),
+            evidence_quantity=(code_evidence + docs_evidence + runtime_validation) / 3.0,
+            consistency=evidence_types / 3.0,  # Consistency = diversity of evidence
+            llm_bonus=0.0,  # Deprecated in rubric-based scoring
+            evidence_count=evidence_types,
+            code_evidence=code_evidence,
+            documentation_evidence=docs_evidence,
+            runtime_validation=runtime_validation,
+            margin=margin,
+            validation_status=validation_status,
+            validation_recommendations=recommendations
+        )
+
+    @staticmethod
+    def from_evidence_types(evidence: List[Evidence]) -> ConfidenceScore:
+        """
+        Calculate confidence from evidence list by categorizing evidence types.
+
+        Categorization logic:
+        - Code evidence: .cs/.py/.java files, source code patterns
+        - Documentation evidence: README, docs/, comments, markdown files
+        - Runtime validation: test files, migration files (validated at runtime)
+
+        Args:
+            evidence: List of Evidence objects
+
+        Returns:
+            ConfidenceScore using rubric
+        """
+        # Categorize evidence by file type and source
+        code_evidences = []
+        docs_evidences = []
+        runtime_evidences = []
+
+        for e in evidence:
+            file_lower = e.file.lower()
+
+            # Runtime evidence (tests, migrations executed at runtime)
+            if any(pattern in file_lower for pattern in ['test', 'spec', 'migration', '__test__']):
+                runtime_evidences.append(e)
+            # Documentation evidence
+            elif any(pattern in file_lower for pattern in ['readme', 'docs/', '.md', 'comment', 'docstring']):
+                docs_evidences.append(e)
+            # Code evidence (default)
+            else:
+                code_evidences.append(e)
+
+        # Calculate scores for each category
+        code_evidence = sum(e.quality for e in code_evidences) / len(code_evidences) if code_evidences else 0.0
+        docs_evidence = sum(e.quality for e in docs_evidences) / len(docs_evidences) if docs_evidences else 0.0
+        runtime_validation = sum(e.quality for e in runtime_evidences) / len(runtime_evidences) if runtime_evidences else 0.0
+
+        logger.debug(
+            "Categorized evidence",
+            extra={
+                "code_count": len(code_evidences),
+                "docs_count": len(docs_evidences),
+                "runtime_count": len(runtime_evidences),
+                "code_score": code_evidence,
+                "docs_score": docs_evidence,
+                "runtime_score": runtime_validation
+            }
+        )
+
+        return ConfidenceRubric.calculate(code_evidence, docs_evidence, runtime_validation)
 
 
 class ConfidenceScorer:
@@ -202,16 +364,27 @@ class ConfidenceScorer:
 
         return bonus
 
-    def calculate(self, evidence: List[Evidence]) -> ConfidenceScore:
+    def calculate(self, evidence: List[Evidence], use_rubric: bool = True) -> ConfidenceScore:
         """
         Calculate overall confidence score.
 
+        NEW (v2.1.7): Uses rubric-based scoring by default for better calibration.
+
         Args:
             evidence: List of Evidence objects
+            use_rubric: Use ConfidenceRubric for scoring (default: True)
 
         Returns:
             ConfidenceScore object
         """
+        if use_rubric:
+            # NEW (v2.1.7): Use rubric-based scoring
+            logger.debug("Using rubric-based confidence scoring")
+            return ConfidenceRubric.from_evidence_types(evidence)
+
+        # LEGACY: Original formula (deprecated, kept for compatibility)
+        logger.warning("Using legacy confidence scoring (deprecated)")
+
         # Calculate components
         evidence_quality = self.calculate_evidence_quality(evidence)
         evidence_quantity = self.calculate_evidence_quantity(evidence)
@@ -263,19 +436,27 @@ class ConfidenceScorer:
             score: ConfidenceScore object
 
         Returns:
-            Dictionary representation
+            Dictionary representation with rubric breakdown (v2.1.7)
         """
-        return {
-            "overall": round(score.overall, 3),
+        result = {
+            "confidence": round(score.overall, 2),
             "level": score.level.value,
-            "breakdown": {
-                "evidence_quality": round(score.evidence_quality, 3),
-                "evidence_quantity": round(score.evidence_quantity, 3),
-                "consistency": round(score.consistency, 3),
-                "llm_bonus": round(score.llm_bonus, 3)
+            "confidence_breakdown": {
+                "code_evidence": round(score.code_evidence, 2),
+                "documentation_evidence": round(score.documentation_evidence, 2),
+                "runtime_validation": round(score.runtime_validation, 2),
+                "weighted_average": round(score.overall, 2),
+                "margin": f"±{score.margin:.2f}"
             },
+            "validation_status": score.validation_status,
             "evidence_count": score.evidence_count
         }
+
+        # Add validation recommendations if not validated
+        if score.validation_recommendations:
+            result["validation_recommendations"] = score.validation_recommendations
+
+        return result
 
 
 def main():

@@ -44,12 +44,18 @@ class DocumentationGenerator:
         project_path = Path(analysis_results.get('project_path', '.'))
         original_adrs = self._index_original_adrs(project_path)
 
+        # NEW (v2.1.7): Generate ADR index for reconciliation
+        adr_index = None
+        if 'adr_reconciliation' in analysis_results:
+            adr_index = self._generate_adr_index(analysis_results.get('adr_reconciliation', {}))
+
         generated_files = {
             "adrs": self._generate_adrs(analysis_results.get('decisions', {})),
             "threat_model": self._generate_threat_model(analysis_results.get('threats', {})),
             "tech_debt_report": self._generate_tech_debt_report(analysis_results.get('tech_debt', {})),
             "import_report": self._generate_import_report(analysis_results),
-            "original_adrs": original_adrs  # FIX #7: Track original ADRs
+            "original_adrs": original_adrs,  # FIX #7: Track original ADRs
+            "adr_index": adr_index  # NEW (v2.1.7): ADR reconciliation index
         }
 
         logger.info("Documentation generation complete")
@@ -77,6 +83,97 @@ class DocumentationGenerator:
             adrs.append(str(adr_file))
 
         return adrs
+
+    def _generate_adr_index(self, reconciliation: Dict) -> str:
+        """
+        NEW (v2.1.7): Generate ADR index for reconciliation.
+
+        Creates adr_index.yml that cross-references:
+        - Original ADRs (Markdown)
+        - Inferred ADRs (YAML)
+        - Migration/enrichment status
+
+        Args:
+            reconciliation: Reconciliation results from ADRValidator
+
+        Returns:
+            Path to generated adr_index.yml
+        """
+        index_file = self.output_dir / "references" / "adr_index.yml"
+        index_file.parent.mkdir(parents=True, exist_ok=True)
+
+        # Build index entries
+        index_entries = []
+
+        # Add entries from reconciliation index
+        for adr_id, metadata in reconciliation.get('index', {}).items():
+            entry = {
+                'id': adr_id,
+                'original': metadata.get('original'),
+                'format': metadata.get('format'),
+                'migrated_to': None,  # Will be populated if migrated
+                'status': metadata.get('status'),
+                'similarity': metadata.get('similarity')
+            }
+
+            # If status is reconciled, set migrated_to path
+            if metadata.get('status') == 'reconciled':
+                entry['migrated_to'] = f".project/corpus/nodes/decisions/{adr_id}.yml"
+
+            index_entries.append(entry)
+
+        # Add duplicates (skipped ADRs)
+        for duplicate in reconciliation.get('duplicate', []):
+            existing = duplicate.get('existing', {})
+            inferred = duplicate.get('inferred', {})
+            index_entries.append({
+                'id': inferred.get('id'),
+                'original': existing.get('path'),
+                'format': existing.get('format'),
+                'migrated_to': None,  # Not migrated (already exists)
+                'status': 'skipped_duplicate',
+                'similarity': duplicate.get('similarity')
+            })
+
+        # Add enrichment candidates
+        for enrich in reconciliation.get('enrich', []):
+            existing = enrich.get('existing', {})
+            inferred = enrich.get('inferred', {})
+            index_entries.append({
+                'id': inferred.get('id'),
+                'original': existing.get('path'),
+                'format': existing.get('format'),
+                'migrated_to': f".project/corpus/nodes/decisions/{inferred.get('id')}.yml",
+                'status': 'enriched',
+                'similarity': enrich.get('similarity'),
+                'enrichment_note': 'Original ADR enriched with automated analysis'
+            })
+
+        # Create full index structure
+        index_data = {
+            'adr_index': index_entries,
+            'summary': {
+                'total_original': reconciliation.get('total_existing', 0),
+                'total_inferred': reconciliation.get('total_inferred', 0),
+                'duplicates_skipped': len(reconciliation.get('duplicate', [])),
+                'enriched': len(reconciliation.get('enrich', [])),
+                'new_generated': len(reconciliation.get('new', []))
+            },
+            'generated_at': datetime.utcnow().isoformat() + 'Z'
+        }
+
+        # Write YAML
+        index_content = yaml.dump(
+            index_data,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            explicit_start=True
+        )
+        index_file.write_text(index_content)
+
+        logger.info(f"ADR index generated: {index_file}")
+        return str(index_file)
 
     def _generate_threat_model(self, threats: Dict) -> str:
         """Generate threat model file"""

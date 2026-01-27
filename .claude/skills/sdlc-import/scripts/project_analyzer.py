@@ -835,6 +835,51 @@ class ProjectAnalyzer:
                     logger.warning("No ADRs found - skipping claim validation")
                     validation_results = {"status": "skipped", "reason": "no_adrs"}
 
+            # NEW (v2.1.7): Reconcile with existing ADRs to avoid duplicates
+            reconciliation_results = {}
+            if self.config.get('adr_reconciliation', {}).get('enabled', True):
+                existing_adrs = self.adr_validator.detect_existing_adrs(self.project_path)
+                extracted_adrs = decisions.get('decisions', [])
+
+                if len(existing_adrs) > 0:
+                    logger.info(f"Found {len(existing_adrs)} existing ADRs - reconciling")
+                    similarity_threshold = self.config.get('adr_reconciliation', {}).get('similarity_threshold', 0.8)
+                    reconciliation = self.adr_validator.reconcile_adrs(
+                        existing_adrs,
+                        extracted_adrs,
+                        similarity_threshold=similarity_threshold
+                    )
+
+                    # Update decisions dict with reconciliation results
+                    reconciliation_results = {
+                        'total_existing': len(existing_adrs),
+                        'total_inferred': len(extracted_adrs),
+                        'duplicate': reconciliation.duplicate,
+                        'enrich': reconciliation.enrich,
+                        'new': reconciliation.new,
+                        'index': reconciliation.index
+                    }
+
+                    # Replace extracted decisions with only new ADRs (avoid duplicates)
+                    decisions['decisions'] = reconciliation.new
+                    decisions['count'] = len(reconciliation.new)
+                    decisions['duplicates_skipped'] = len(reconciliation.duplicate)
+                    decisions['enriched'] = len(reconciliation.enrich)
+
+                    logger.info(
+                        "ADR reconciliation complete",
+                        extra={
+                            "existing": len(existing_adrs),
+                            "inferred": len(extracted_adrs),
+                            "duplicates": len(reconciliation.duplicate),
+                            "enriched": len(reconciliation.enrich),
+                            "new": len(reconciliation.new)
+                        }
+                    )
+                else:
+                    logger.info("No existing ADRs found - all inferred ADRs will be generated")
+                    reconciliation_results = {"status": "no_existing_adrs"}
+
             # Step 6: Generate diagrams
             diagrams = self.generate_diagrams(language_analysis, decisions)
 
@@ -905,6 +950,7 @@ class ProjectAnalyzer:
                 "threats": threats,
                 "tech_debt": tech_debt,
                 "adr_validation": validation_results,
+                "adr_reconciliation": reconciliation_results,  # NEW (v2.1.7)
                 "knowledge_graph": graph_result,
                 "github_issues": github_issues
             }

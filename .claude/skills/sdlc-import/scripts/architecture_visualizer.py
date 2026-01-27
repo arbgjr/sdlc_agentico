@@ -48,6 +48,12 @@ class ArchitectureVisualizer:
         dataflow_path.write_text(dataflow_mmd)
         diagrams.append({"name": "Data Flow", "path": str(dataflow_path), "type": "dataflow", "format": "mermaid"})
 
+        # NEW (v2.1.7 - G3): Internal architecture diagram
+        internal_arch_path = self.output_dir / "internal-architecture.mmd"
+        internal_arch_mmd = self._generate_internal_architecture_diagram(language_analysis, decisions)
+        internal_arch_path.write_text(internal_arch_mmd)
+        diagrams.append({"name": "Internal Architecture", "path": str(internal_arch_path), "type": "internal", "format": "mermaid"})
+
         logger.info(f"Generated {len(diagrams)} diagrams")
         return {"diagrams": diagrams, "count": len(diagrams)}
 
@@ -87,6 +93,66 @@ class ArchitectureVisualizer:
     DB --> |Result| Backend
     Backend --> |Response| API
     API --> |HTTP Response| User"""
+
+    def _generate_internal_architecture_diagram(self, language_analysis: Dict, decisions: Dict) -> str:
+        """
+        NEW (v2.1.7 - G3): Generate internal architecture diagram.
+
+        Shows:
+        - Controller/Endpoint → MediatR Command/Query
+        - Handler → Repository → DbContext
+        - FluentValidation pipeline
+        - AutoMapper
+
+        Returns:
+            Mermaid sequence diagram
+        """
+        # Detect if using CQRS/MediatR pattern (common in .NET)
+        uses_mediatr = False
+        backend_frameworks = language_analysis.get('frameworks', {}).get('backend', [])
+        if any('asp' in fw.lower() or '.net' in fw.lower() for fw in backend_frameworks):
+            uses_mediatr = True
+
+        if uses_mediatr:
+            # CQRS/MediatR architecture (ASP.NET)
+            return """sequenceDiagram
+    participant Client
+    participant Endpoint as API Endpoint
+    participant Validator as FluentValidator
+    participant Mediator as MediatR
+    participant Handler as CommandHandler
+    participant Repo as Repository
+    participant DB as DbContext
+
+    Client->>Endpoint: POST /resource
+    Endpoint->>Validator: Validate DTO
+    Validator-->>Endpoint: Valid
+    Endpoint->>Mediator: Send Command
+    Mediator->>Handler: Handle Command
+    Handler->>Repo: Save Entity
+    Repo->>DB: SaveChanges()
+    DB-->>Repo: Success
+    Repo-->>Handler: Entity
+    Handler-->>Mediator: Result
+    Mediator-->>Endpoint: Result
+    Endpoint-->>Client: 201 Created"""
+        else:
+            # Traditional MVC/layered architecture
+            return """sequenceDiagram
+    participant Client
+    participant Controller
+    participant Service
+    participant Repository
+    participant Database
+
+    Client->>Controller: HTTP Request
+    Controller->>Service: Business Logic
+    Service->>Repository: Data Access
+    Repository->>Database: Query
+    Database-->>Repository: Result
+    Repository-->>Service: Data
+    Service-->>Controller: Response
+    Controller-->>Client: HTTP Response"""
 
 
 def main():
