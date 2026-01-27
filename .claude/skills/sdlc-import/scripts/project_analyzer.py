@@ -450,14 +450,37 @@ class ProjectAnalyzer:
                 )
                 return {"branch": branch_name, "created": True}
             except subprocess.CalledProcessError as e:
-                logger.error(
-                    "Failed to create branch",
-                    extra={
-                        "branch": branch_name,
-                        "error": str(e)
-                    }
+                # Check if branch already exists
+                result = subprocess.run(
+                    ["git", "branch", "--list", branch_name],
+                    cwd=str(self.project_path),
+                    capture_output=True,
+                    text=True
                 )
-                raise
+
+                if result.stdout.strip():
+                    # Branch exists - checkout to it
+                    logger.warning(
+                        "Branch already exists, checking out",
+                        extra={"branch": branch_name}
+                    )
+                    subprocess.run(
+                        ["git", "checkout", branch_name],
+                        cwd=str(self.project_path),
+                        check=True,
+                        capture_output=True
+                    )
+                    return {"branch": branch_name, "created": False, "reused": True}
+                else:
+                    # Different error - re-raise
+                    logger.error(
+                        "Failed to create branch",
+                        extra={
+                            "branch": branch_name,
+                            "error": str(e)
+                        }
+                    )
+                    raise
 
     def scan_directory(self) -> Dict:
         """
