@@ -34,12 +34,38 @@ log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
+# Show splash screen
+show_splash() {
+    # Try to find splash.py
+    local SPLASH_PATH=""
+
+    if [[ -f ".agentic_sdlc/splash.py" ]]; then
+        SPLASH_PATH=".agentic_sdlc/splash.py"
+    elif [[ -f "$(dirname "${BASH_SOURCE[0]}")/../splash.py" ]]; then
+        SPLASH_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/splash.py"
+    fi
+
+    if [[ -n "$SPLASH_PATH" && -f "$SPLASH_PATH" ]]; then
+        python3 "$SPLASH_PATH" --no-animate 2>/dev/null || {
+            # Fallback to simple banner if splash.py fails
+            echo ""
+            echo "========================================"
+            echo "   SDLC Agentico - Setup Script"
+            echo "========================================"
+            echo ""
+        }
+    else
+        # Simple banner if splash.py not found
+        echo ""
+        echo "========================================"
+        echo "   SDLC Agentico - Setup Script"
+        echo "========================================"
+        echo ""
+    fi
+}
+
 # Header
-echo ""
-echo "========================================"
-echo "   SDLC Agentico - Setup Script"
-echo "========================================"
-echo ""
+show_splash
 
 # Variaveis de opcoes
 FROM_RELEASE=false
@@ -634,18 +660,6 @@ install_optional_deps() {
 
 # Resumo final
 print_summary() {
-    # Mostrar splash screen se disponível
-    # Detecta o diretório do projeto (assume que o script está em .agentic_sdlc/scripts/)
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-    SPLASH_PATH="${PROJECT_ROOT}/.agentic_sdlc/splash.py"
-
-    if [[ -f "$SPLASH_PATH" ]]; then
-        echo ""
-        python3 "$SPLASH_PATH" --no-animate 2>/dev/null || true
-        sleep 1
-    fi
-
     echo ""
     echo "========================================"
     echo "   Setup Completo!"
