@@ -33,6 +33,12 @@ jobs:
           rm -f release-package/.claude/best-practices.md
           rm -f release-package/.claude/quick-reference.md
 
+          # Remove framework-specific automation (not for end-users)
+          rm -f release-package/.claude/scripts/update-component-counts.sh
+          rm -f release-package/.claude/hooks/auto-update-component-counts.sh
+          rm -f release-package/.claude/commands/update-docs.md
+          rm -rf release-package/.claude/skills/update-docs
+
           # Ensure all scripts have executable permissions
           chmod +x release-package/.claude/hooks/*.sh 2>/dev/null || true
           find release-package/.claude/skills -name "*.sh" -type f -exec chmod +x {} \; 2>/dev/null || true

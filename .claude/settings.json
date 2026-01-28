@@ -152,6 +152,42 @@
             "command": ".claude/hooks/phase-commit-reminder.sh"
           }
         ]
+      },
+      {
+        "matcher": "Write(.claude/agents/*.md)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/auto-update-component-counts.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write(.claude/skills/**/SKILL.md)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/auto-update-component-counts.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write(.claude/commands/*.md)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/auto-update-component-counts.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write(.claude/hooks/*.sh)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/auto-update-component-counts.sh"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
