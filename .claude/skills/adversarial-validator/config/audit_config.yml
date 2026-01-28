@@ -1,0 +1,166 @@
+# Adversarial Audit Configuration
+# Controls when and how adversarial audits are executed
+
+adversarial_audit:
+  # Enable/disable adversarial audits globally
+  enabled: true
+
+  # Which phases to audit (0-8)
+  # Recommended: Critical phases where self-validation is insufficient
+  phases:
+    - 3  # Architecture (ADRs, threat models, design decisions)
+    - 5  # Implementation (code quality, tests, security)
+    - 6  # Quality (test coverage, security scans, performance)
+
+  # Severity thresholds for decision making
+  fail_on:
+    - "CRITICAL"  # Always fail on CRITICAL findings
+    - "GRAVE"     # Always fail on GRAVE findings
+
+  warn_on:
+    - "MEDIUM"    # Pass with warnings on MEDIUM
+    - "LIGHT"     # Pass with warnings on LIGHT
+
+  # Auto-correction behavior
+  auto_correct:
+    enabled: true
+    max_retries: 1  # Attempt to fix once, then escalate to human
+
+  # Audit thoroughness level
+  # - quick: Basic automated checks only (30s-1min)
+  # - normal: Automated checks + LLM review (1-2min)
+  # - deep: Full adversarial analysis with challenge prompts (2-5min)
+  thoroughness: "normal"
+
+  # Reporting configuration
+  reporting:
+    format: "yaml"  # yaml | json | markdown
+    save_reports: true
+    reports_dir: ".agentic_sdlc/audits"
+    include_evidence: true
+    include_recommendations: true
+
+  # Automated checks to run
+  automated_checks:
+    security:
+      - hardcoded_secrets
+      - sql_injection_patterns
+      - xss_vulnerabilities
+      - insecure_dependencies
+
+    quality:
+      - test_coverage
+      - todos_fixmes
+      - error_handling
+      - logging_coverage
+
+    completeness:
+      - required_artifacts
+      - documentation_complete
+      - all_acceptance_criteria
+
+  # Exclusions (when you need to bypass certain checks)
+  exclusions:
+    # Patterns to exclude from checks
+    paths:
+      - "tests/**"
+      - "node_modules/**"
+      - ".git/**"
+      - "*.md"  # Don't scan markdown for hardcoded secrets
+
+    # Specific checks to disable (use sparingly!)
+    disabled_checks: []
+    # Example: ["todos_in_code", "coverage_threshold"]
+
+# Phase-specific audit criteria
+phase_criteria:
+  phase_0:
+    name: "Intake & Preparation"
+    expected_artifacts:
+      - ".agentic_sdlc/projects/*/manifest.yml"
+    quality_checks:
+      - "requirements_clear"
+      - "stakeholders_identified"
+
+  phase_1:
+    name: "Discovery & Research"
+    expected_artifacts:
+      - ".agentic_sdlc/corpus/nodes/*"
+    quality_checks:
+      - "research_documented"
+      - "knowledge_indexed"
+
+  phase_2:
+    name: "Requirements & Planning"
+    expected_artifacts:
+      - ".agentic_sdlc/projects/*/requirements/*.yml"
+    quality_checks:
+      - "user_stories_testable"
+      - "acceptance_criteria_complete"
+      - "nfrs_defined"
+
+  phase_3:
+    name: "Architecture & Design"
+    expected_artifacts:
+      - "docs/adr/*.md"
+      - ".agentic_sdlc/security/threat-model-*.yml"
+      - ".agentic_sdlc/architecture/*.mmd"
+    quality_checks:
+      - "adrs_complete"
+      - "threat_model_stride_complete"
+      - "diagrams_exist"
+      - "alternatives_considered"
+
+  phase_4:
+    name: "Delivery Planning"
+    expected_artifacts:
+      - ".agentic_sdlc/projects/*/planning/task-breakdown.yml"
+    quality_checks:
+      - "dependencies_mapped"
+      - "estimates_realistic"
+      - "buffer_included"
+
+  phase_5:
+    name: "Implementation"
+    expected_artifacts:
+      - "src/**/*.py"  # Or appropriate language
+      - "tests/**/*"
+    quality_checks:
+      - "no_hardcoded_secrets"
+      - "test_coverage_adequate"
+      - "error_handling_present"
+      - "no_todos_fixmes"
+
+  phase_6:
+    name: "Quality Assurance"
+    expected_artifacts:
+      - "tests/**/*"
+      - ".agentic_sdlc/reports/*"
+    quality_checks:
+      - "tests_passing"
+      - "coverage_threshold"
+      - "security_scan_passed"
+
+  phase_7:
+    name: "Release & Deployment"
+    expected_artifacts:
+      - "CHANGELOG.md"
+      - ".agentic_sdlc/releases/*"
+    quality_checks:
+      - "release_notes_complete"
+      - "rollback_plan_exists"
+
+  phase_8:
+    name: "Operations & Monitoring"
+    expected_artifacts:
+      - ".agentic_sdlc/operations/*"
+    quality_checks:
+      - "monitoring_configured"
+      - "runbooks_updated"
+
+# Logging configuration
+logging:
+  level: "INFO"  # DEBUG | INFO | WARNING | ERROR
+  format: "structured"  # structured | plain
+  destination: "loki"  # loki | file | console
+  skill: "adversarial-validator"

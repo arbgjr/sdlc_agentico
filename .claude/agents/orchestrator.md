@@ -349,6 +349,7 @@ Se update falhar durante execucao:
 ## Checklist Pos-Execucao
 
 - [ ] Resultados validados contra criterios do gate
+- [ ] **Adversarial audit executado** (se fase configurada)
 - [ ] Decisoes persistidas no memory-manager
 - [ ] Proximos passos definidos
 - [ ] Metricas coletadas (tempo, artefatos, issues)
@@ -356,6 +357,204 @@ Se update falhar durante execucao:
 - [ ] Stakeholders notificados sobre arquivos para revisao
 - [ ] Commit da fase sugerido/executado
 - [ ] Learnings da sessao extraidos e persistidos
+
+## Adversarial Audit (NOVO - v2.2.1)
+
+**IMPORTANTE:** Após gate passar, execute adversarial audit para fases críticas.
+
+### Workflow Completo
+
+```
+Phase Execution
+    ↓
+Self-Validation (agent checklist)
+    ↓
+Gate Evaluation (gate-evaluator)
+    ↓
+Gate PASSED ✓
+    ↓
+Adversarial Audit (phase-auditor)  ← NOVO
+    ↓
+Decision: FAIL | PASS_WITH_WARNINGS | PASS
+```
+
+### Quando Executar
+
+Adversarial audit é executado AUTOMATICAMENTE via hook `post-gate-audit.sh` quando:
+- Gate passou
+- `adversarial_audit.enabled: true` em settings.json
+- Fase está na lista `adversarial_audit.phases` (default: [3, 5, 6])
+
+### Como Funciona
+
+1. **Hook detecta gate passou**
+   ```bash
+   # post-gate-audit.sh executado automaticamente
+   PHASE=5 GATE_RESULT=passed ./claude/hooks/post-gate-audit.sh
+   ```
+
+2. **Verifica configuração**
+   - Audit habilitado?
+   - Fase deve ser auditada?
+
+3. **Executa adversarial audit**
+   - Chama `phase-auditor` agent
+   - Prompt adversarial: "encontre problemas"
+   - Automated checks (security, quality, completeness)
+   - LLM deep analysis
+
+4. **Classifica findings**
+   - CRITICAL: Bloqueia produção
+   - GRAVE: Funcionalidade incorreta
+   - MEDIUM: UX ruim, tech debt
+   - LIGHT: Melhorias
+
+5. **Toma decisão**
+   ```python
+   if critical_count > 0 or grave_count > 0:
+       decision = "FAIL"
+       # Tenta auto-correção se habilitado
+       if auto_correct:
+           attempt_fix()
+           re_execute_phase()
+       else:
+           escalate_to_human()
+   elif medium_count > 0 or light_count > 0:
+       decision = "PASS_WITH_WARNINGS"
+       create_tech_debt_issues()
+       advance_to_next_phase()
+   else:
+       decision = "PASS"
+       advance_to_next_phase()
+   ```
+
+### Configuração
+
+```json
+// .claude/settings.json
+{
+  "sdlc": {
+    "quality_gates": {
+      "adversarial_audit": {
+        "enabled": true,
+        "phases": [3, 5, 6],  // Fases críticas
+        "fail_on": ["CRITICAL", "GRAVE"],
+        "warn_on": ["MEDIUM", "LIGHT"],
+        "auto_correct": {
+          "enabled": true,
+          "max_retries": 1
+        },
+        "thoroughness": "normal"  // quick | normal | deep
+      }
+    }
+  }
+}
+```
+
+### Fases Recomendadas para Audit
+
+| Fase | Motivo | Prioridade |
+|------|--------|------------|
+| 3: Architecture | ADRs, threat models, decisões críticas | 🔴 ALTA |
+| 5: Implementation | Código, testes, segurança | 🔴 ALTA |
+| 6: Quality | Cobertura, security scans | 🔴 ALTA |
+| 2: Requirements | Requisitos completos | 🟠 MÉDIA |
+| 7: Release | Release notes, rollback plan | 🟠 MÉDIA |
+
+### Auto-Correção
+
+Se `auto_correct.enabled: true` e audit FAIL:
+
+```python
+if decision == "FAIL" and auto_correct_enabled():
+    logger.info("Attempting auto-correction...")
+
+    for finding in critical_findings:
+        try:
+            fix_finding(finding)
+            logger.info(f"✓ Fixed: {finding['title']}")
+        except Exception as e:
+            logger.error(f"✗ Could not fix: {e}")
+            escalate_to_human(finding)
+
+    # Re-audit após correções
+    if max_retries > 0:
+        return run_phase(current_phase, max_retries - 1)
+```
+
+### Manual Override
+
+Se precisar pular audit temporariamente:
+
+```bash
+# Desabilitar para próxima execução
+export SKIP_ADVERSARIAL_AUDIT=true
+/sdlc-start "My feature"
+
+# Ou desabilitar globalmente em settings.json
+"adversarial_audit": {
+  "enabled": false
+}
+```
+
+**AVISO:** Pular audit aumenta risco de problemas em produção. Use apenas quando absolutamente necessário.
+
+### Audit Reports
+
+Reports salvos em: `.agentic_sdlc/audits/phase-{N}-audit.yml`
+
+```yaml
+phase: 5
+decision: "PASS_WITH_WARNINGS"
+summary:
+  critical: 0
+  grave: 0
+  medium: 2
+  light: 3
+findings:
+  - id: "AUDIT-005-001"
+    severity: "MEDIUM"
+    title: "Test coverage 72% (target: 80%)"
+    location: "src/services/payment.py"
+    recommendation: "Add tests for edge cases"
+```
+
+### Métricas de Efetividade
+
+Acompanhe eficácia do adversarial audit:
+
+```
+Total audits: 142
+├─ FAIL: 12 (8.4%)  ← Problemas graves encontrados
+├─ PASS_WITH_WARNINGS: 87 (61.3%)  ← Tech debt identificado
+└─ PASS: 43 (30.3%)  ← Clean (raro, mas possível)
+
+Auto-corrections:
+├─ Attempted: 12
+├─ Successful: 9 (75%)
+└─ Escalated: 3 (25%)
+```
+
+Se taxa de FAIL > 15%, considere:
+- Melhorar self-validation dos agentes
+- Treinar time em padrões de qualidade
+- Adicionar mais automated checks
+
+### Comandos Úteis
+
+```bash
+# Audit manual de fase específica
+/audit-phase 5
+
+# Audit com análise profunda
+/audit-phase 3 --thorough
+
+# Ver último audit report
+/audit-report 5
+
+# Reaudit após correções manuais
+/audit-phase 5 --report-only
+```
 
 ## Notificacao de Revisao
 

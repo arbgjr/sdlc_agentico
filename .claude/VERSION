@@ -1,8 +1,8 @@
 # SDLC Agêntico Version
-version: "2.2.0"
+version: "2.2.1"
 build_date: "2026-01-28"
 release_notes: |
-  FEATURE RELEASE - Sprint 2 & 3 Complete - Documentation & Metrics Enhancements
+  FEATURE RELEASE - Adversarial Audit System + Agent Strictness Improvements
 
   Sprint 2 (v2.2.0) - MÉDIO - Documentation Improvements:
 
@@ -360,6 +360,34 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "2.2.1"
+    date: "2026-01-28"
+    changes:
+      - "feat(adversarial-validator): NEW skill - adversarial audit system for SDLC phases"
+      - "feat(phase-auditor): NEW agent (opus) - challenges work to find CRITICAL/GRAVE/MEDIUM/LIGHT issues"
+      - "feat(audit): 3-layer validation - Self-Validation → Gate → Adversarial Audit"
+      - "feat(audit): Decision flow - FAIL (re-execute) | PASS_WITH_WARNINGS (create issues) | PASS (advance)"
+      - "feat(audit): Auto-correction with max_retries=1 before human escalation"
+      - "feat(audit): Configurable phases (default: 3, 5, 6 for critical phases)"
+      - "feat(audit): Automated checks - security (secrets, SQL injection, XSS), quality (coverage, TODOs), completeness (docs)"
+      - "feat(audit): Classification system - CRITICAL (production blocker) → GRAVE (functionality incorrect) → MEDIUM (UX/tech debt) → LIGHT (improvements)"
+      - "feat(hooks): post-gate-audit.sh - automatic adversarial audit after gates pass"
+      - "feat(commands): /audit-phase - manual adversarial audit invocation"
+      - "feat(agents): 13 agents improved with strictness patterns"
+      - "feat(agents): Real UTC Timestamps mandate in 7 agents (adr-author, threat-modeler, incident-commander, release-manager, doc-generator, rca-analyst, metrics-analyst)"
+      - "feat(agents): Quality Assurance mandate in 6 agents (code-author, test-author, iac-engineer, threat-modeler, adr-author, delivery-planner)"
+      - "feat(orchestrator): Adversarial audit integration in Phase checklist"
+      - "feat(orchestrator): Comprehensive 'Adversarial Audit' section with workflow, config examples, metrics"
+      - "config(audit): audit_config.yml with phase criteria, automated checks, exclusions"
+      - "config(audit): fail_on: [CRITICAL, GRAVE], warn_on: [MEDIUM, LIGHT]"
+      - "config(audit): thoroughness: quick | normal | deep"
+      - "impact: Self-validation by agents now complemented with challenge-based auditing"
+      - "impact: CRITICAL/GRAVE findings block phase advancement (auto-correction attempted once)"
+      - "impact: MEDIUM/LIGHT findings create tech debt issues (phase advancement allowed)"
+      - "impact: Agents now enforce real timestamps, complete execution, zero shortcuts"
+      - "docs(agents): Enhanced validation checklists with explicit completeness checks"
+      - "docs(orchestrator): 135+ lines documenting adversarial audit workflow"
+      - "docs(skill): SKILL.md complete guide with usage, configuration, troubleshooting"
   - version: "2.2.0"
     date: "2026-01-28"
     changes:
