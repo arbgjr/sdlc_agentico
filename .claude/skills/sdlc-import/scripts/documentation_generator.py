@@ -45,9 +45,9 @@ class DocumentationGenerator:
         original_adrs = self._index_original_adrs(project_path)
 
         # NEW (v2.1.7): Generate ADR index for reconciliation
-        adr_index = None
-        if 'adr_reconciliation' in analysis_results:
-            adr_index = self._generate_adr_index(analysis_results.get('adr_reconciliation', {}))
+        # FIX BUG C1 (v2.1.15): Always generate adr_index.yml even if reconciliation is empty
+        reconciliation_data = analysis_results.get('adr_reconciliation', {})
+        adr_index = self._generate_adr_index(reconciliation_data)
 
         generated_files = {
             "adrs": self._generate_adrs(analysis_results.get('decisions', {})),
@@ -96,6 +96,7 @@ class DocumentationGenerator:
 
         Args:
             reconciliation: Reconciliation results from ADRValidator
+                            Can be empty dict or {"status": "no_existing_adrs"}
 
         Returns:
             Path to generated adr_index.yml
@@ -103,6 +104,7 @@ class DocumentationGenerator:
         index_file = self.output_dir / "references" / "adr_index.yml"
         index_file.parent.mkdir(parents=True, exist_ok=True)
 
+        # FIX BUG C1 (v2.1.15): Handle empty reconciliation or no existing ADRs
         # Build index entries
         index_entries = []
 
@@ -155,6 +157,7 @@ class DocumentationGenerator:
             })
 
         # Create full index structure
+        # FIX BUG C1 (v2.1.15): Add status field for tracking
         index_data = {
             'adr_index': index_entries,
             'summary': {
@@ -162,10 +165,14 @@ class DocumentationGenerator:
                 'total_inferred': reconciliation.get('total_inferred', 0),
                 'duplicates_skipped': len(reconciliation.get('duplicate', [])),
                 'enriched': len(reconciliation.get('enrich', [])),
-                'new_generated': len(reconciliation.get('new', []))
+                'new_generated': len(reconciliation.get('new', [])),
+                'status': reconciliation.get('status', 'reconciled')  # NEW: Track reconciliation status
             },
             'generated_at': datetime.utcnow().isoformat() + 'Z'
         }
+
+        # FIX BUG C1 (v2.1.15): Log reconciliation status for debugging
+        logger.info(f"Generating ADR index with {len(index_entries)} entries (status: {reconciliation.get('status', 'reconciled')})")
 
         # Write YAML
         index_content = yaml.dump(
@@ -289,11 +296,16 @@ class DocumentationGenerator:
 - **Tech Debt Items:** {analysis_results.get('tech_debt', {}).get('total', 0)}
 """
 
-        # FIX C3: Add ADR Reconciliation section if available
-        if 'reconciliation' in analysis_results:
-            recon = analysis_results['reconciliation']
+        # FIX G2 (v2.1.15): Correct key name to match project_analyzer.py
+        if 'adr_reconciliation' in analysis_results:
+            recon = analysis_results['adr_reconciliation']
+            total_existing = recon.get('total_existing', 0)
+
+            # FIX G2 (v2.1.15): Log actual count for debugging
+            logger.info(f"Import report: total_existing={total_existing}, duplicates={len(recon.get('duplicate', []))}, enriched={len(recon.get('enrich', []))}, new={len(recon.get('new', []))}")
+
             content += f"\n## 📚 ADR Reconciliation\n\n"
-            content += f"- **Existing ADRs found:** {recon.get('total_existing', 0)}\n"
+            content += f"- **Existing ADRs found:** {total_existing}\n"
             content += f"- **Inferred ADRs:** {recon.get('total_inferred', 0)}\n"
             content += f"- **Duplicates skipped:** {len(recon.get('duplicate', []))}\n"
             content += f"- **New unique ADRs:** {len(recon.get('new', []))}\n"

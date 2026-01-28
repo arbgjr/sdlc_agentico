@@ -420,3 +420,45 @@ class TestDocumentationGenerator:
         assert "adrs" in result
         assert "threat_model" in result
         assert len(result["adrs"]) == 0
+
+    def test_adr_reconciliation_count_consistency(self, temp_output):
+        """
+        FIX BUG G2 (v2.1.15): Test that ADR count in summary matches actual count.
+
+        Verifies that the reconciliation report correctly displays the number of
+        existing ADRs without off-by-one errors.
+        """
+        config = {"general": {"output_dir": str(temp_output / ".agentic_sdlc")}}
+        generator = DocumentationGenerator(config)
+
+        # Simulate 21 existing ADRs (from Autoritas project)
+        analysis_results = {
+            "analysis_id": "20260127-audit",
+            "language_analysis": {"primary_language": "python"},
+            "decisions": {"count": 5, "decisions": []},
+            "threats": {"total": 0},
+            "tech_debt": {"total": 0},
+            "adr_reconciliation": {
+                "total_existing": 21,  # Expected: 21 existing ADRs
+                "total_inferred": 21,
+                "duplicate": [{"existing": {}, "inferred": {}, "similarity": 0.95}] * 16,  # 16 duplicates
+                "enrich": [],
+                "new": []
+            }
+        }
+
+        report_file = generator._generate_import_report(analysis_results)
+        content = Path(report_file).read_text()
+
+        # Verify count is correct (21, not 20)
+        assert "**Existing ADRs found:** 21" in content
+
+        # Verify duplicates count
+        assert "**Duplicates skipped:** 16" in content
+
+        # Ensure no off-by-one error in calculation
+        import re
+        match = re.search(r'\*\*Existing ADRs found:\*\* (\d+)', content)
+        assert match is not None, "Could not find 'Existing ADRs found' in report"
+        reported_count = int(match.group(1))
+        assert reported_count == 21, f"Expected 21 ADRs, but report shows {reported_count}"

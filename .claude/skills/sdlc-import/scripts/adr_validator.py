@@ -249,24 +249,43 @@ class ADRValidator:
             new = []
             index = {}
 
-            for inferred in inferred_adrs:
+            # FIX BUG G1 (v2.1.15): Add detailed logging to track reconciliation
+            for idx, inferred in enumerate(inferred_adrs):
                 inferred_title = inferred.get('title', '')
+                inferred_id = inferred.get('id', f'UNKNOWN-{idx}')
                 best_match = None
                 best_similarity = 0.0
+
+                logger.debug(f"🔍 Comparing inferred ADR [{idx+1}/{len(inferred_adrs)}]: {inferred_id} - '{inferred_title}'")
 
                 # Compare with all existing ADRs
                 for existing in existing_adrs:
                     similarity = self._calculate_similarity(inferred_title, existing.title)
 
+                    logger.debug(f"  ↳ vs '{existing.title}' ({existing.format}): similarity={similarity:.2%}")
+
                     if similarity > best_similarity:
                         best_similarity = similarity
                         best_match = existing
+
+                # FIX BUG G1 (v2.1.15): Log decision for each ADR
+                logger.info(
+                    f"ADR reconciliation decision for '{inferred_id}'",
+                    extra={
+                        "inferred_title": inferred_title,
+                        "best_match": best_match.title if best_match else None,
+                        "best_similarity": best_similarity,
+                        "threshold": similarity_threshold,
+                        "decision": "match" if best_similarity >= similarity_threshold else "new"
+                    }
+                )
 
                 # Categorize based on similarity
                 if best_similarity >= similarity_threshold:
                     # Duplicate or enrichment candidate
                     if best_match.format == "yaml":
                         # Already in SDLC format, skip
+                        logger.debug(f"  ✓ DUPLICATE (YAML): '{inferred_title}' ≈ '{best_match.title}' ({best_similarity:.2%})")
                         duplicate.append({
                             "inferred": inferred,
                             "existing": {
@@ -280,6 +299,7 @@ class ADRValidator:
                         })
                     else:
                         # Markdown format, can enrich
+                        logger.debug(f"  ✓ ENRICH (Markdown): '{inferred_title}' ≈ '{best_match.title}' ({best_similarity:.2%})")
                         enrich.append({
                             "inferred": inferred,
                             "existing": {
@@ -300,6 +320,7 @@ class ADRValidator:
                     }
                 else:
                     # Truly new ADR
+                    logger.debug(f"  ✗ NEW: '{inferred_title}' (best={best_similarity:.2%}, threshold={similarity_threshold:.2%})")
                     new.append(inferred)
 
             logger.info(

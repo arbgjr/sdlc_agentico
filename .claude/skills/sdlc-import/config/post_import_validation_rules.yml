@@ -47,7 +47,7 @@ post_import_validation:
 
     # Required artifacts that must be present
     required_artifacts:
-      - "corpus/nodes/decisions/adr_index.md"
+      - "references/adr_index.yml"  # FIX BUG C1 (v2.1.15): Correct path and extension
       - "reports/tech-debt-inferred.md"
       - "architecture/component-diagram.mmd"
       - "security/threat-model-inferred.yml"

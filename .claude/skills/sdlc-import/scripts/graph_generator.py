@@ -22,7 +22,36 @@ class GraphGenerator:
 
     def __init__(self, config: Dict):
         self.config = config
+        self.framework_version = self._load_framework_version()  # FIX BUG C2 (v2.1.15)
         self.enabled = config.get('graph_generation', {}).get('enabled', True)
+
+    def _load_framework_version(self) -> str:
+        """
+        FIX BUG C2 (v2.1.15): Load version from .claude/VERSION instead of hardcoding.
+
+        Returns:
+            Framework version string (e.g., "2.1.15")
+
+        Raises:
+            FileNotFoundError: If .claude/VERSION does not exist
+            KeyError: If version field is missing
+        """
+        version_file = Path(__file__).resolve().parent.parent.parent.parent / "VERSION"
+        try:
+            with open(version_file) as f:
+                version_data = yaml.safe_load(f)
+                version = version_data['version']
+                logger.debug(f"Loaded framework version: {version} from {version_file}")
+                return version
+        except FileNotFoundError:
+            logger.error(f"Version file not found: {version_file}")
+            raise
+        except KeyError:
+            logger.error(f"'version' field missing in {version_file}")
+            raise
+        except Exception as e:
+            logger.error(f"Failed to load version from {version_file}: {e}")
+            raise
 
     def generate(self, corpus_dir: Path, extracted_adrs: List[Dict]) -> Dict:
         """Generate graph.json and adjacency.json from extracted ADRs"""
@@ -37,8 +66,9 @@ class GraphGenerator:
             adjacency = self._build_adjacency(nodes, edges)
 
             # Create graph.json
+            # FIX BUG C2 (v2.1.15): Use framework version from .claude/VERSION
             graph = {
-                "version": "2.1.0",
+                "version": self.framework_version,
                 "generated_by": "sdlc-import",
                 "updated_at": datetime.now(timezone.utc).isoformat() + "Z",
                 "nodes": nodes,
@@ -164,8 +194,9 @@ class GraphGenerator:
 
     def _build_adjacency(self, nodes: List[Dict], edges: List[Dict]) -> Dict:
         """Build adjacency list for fast graph traversal"""
+        # FIX BUG C2 (v2.1.15): Use framework version from .claude/VERSION
         adjacency = {
-            "version": "2.1.0",
+            "version": self.framework_version,
             "adjacency": {},
             "metadata": {
                 "node_count": len(nodes),
