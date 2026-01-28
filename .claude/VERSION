@@ -1,10 +1,56 @@
 # SDLC Agêntico Version
-version: "2.1.15"
+version: "2.2.0"
 build_date: "2026-01-28"
 release_notes: |
-  CRITICAL FIX - Audit Bugs C1, C2, G2, G1 - sdlc-import Quality Improvements
+  FEATURE RELEASE - Sprint 2 & 3 Complete - Documentation & Metrics Enhancements
 
-  Sprint 1 (v2.1.15) - Critical & Grave Fixes:
+  Sprint 2 (v2.2.0) - MÉDIO - Documentation Improvements:
+
+  M2: Seção detalhada de reconciliação
+  - Overview completo de reconciliação (existing, inferred, converted, new, not converted)
+  - Explicação de critérios de conversão (confidence > 0.90, relevância, core architectural)
+  - Lista de ADRs não convertidos com justificativas claras
+  - Breakdown de duplicates, enrichments, e low confidence
+  - Referência completa ao adr_index.yml
+  - Documentação de cross-reference index structure
+  - Impact: Usuários entendem POR QUE ADRs foram ou não convertidos
+
+  M1: Renomear README.md para ARTIFACTS.md
+  - Status: N/A - README.md não está sendo gerado no código atual
+  - Marcado como não aplicável (sugestão para implementação futura)
+
+  Sprint 3 (v2.2.1) - LEVE - User Experience Enhancements:
+
+  L1: Explicação completa de confidence scores
+  - Seção "About Confidence Scores" no import report
+  - Breakdown detalhado de fatores (40% code, 30% docs, 20% runtime, 10% cross-ref)
+  - Tabela de interpretação com ranges (0.90-1.00 High, 0.70-0.89 Medium, 0.50-0.69 Low, 0.00-0.49 Very Low)
+  - Explicação de margin of error (±0.05 a ±0.15 baseado em diversidade)
+  - Exemplos práticos: "0.85 ± 0.08 = confiança entre 77% e 93%"
+  - Impact: Usuários entendem como interpretar confidence scores
+
+  L2: Métricas detalhadas de execução
+  - Tracking de tempo por fase em project_analyzer.py (import time module)
+  - Timing breakdown: branch, validation, scan, language_detection, decision_extraction, diagrams, threats, tech_debt
+  - Métricas de qualidade: files_scanned, files_parsed_successfully, parsing_success_rate
+  - Seção "Execution Metrics" no import report com tabela de timing
+  - Analysis quality metrics (success rate, binary files skipped)
+  - Total execution time sempre exibido
+  - Impact: Visibilidade de performance e qualidade de análise
+
+  Files Modified:
+  - documentation_generator.py (+133 linhas)
+    • Seção detalhada de reconciliação com justificativas (M2)
+    • Seção "About Confidence Scores" com tabela interpretativa (L1)
+    • Seção "Execution Metrics" com timing breakdown (L2)
+  - project_analyzer.py (+37 linhas)
+    • Tracking de tempo por fase com time.time() (L2)
+    • Métricas de qualidade de análise (L2)
+    • Dicionário execution_metrics adicionado a results (L2)
+
+  Total Effort: 5 horas (M2: 2h, L1: 1h, L2: 2h, M1: 0h N/A)
+
+  Previous Release (v2.1.15) - Sprint 1 - Critical & Grave Fixes:
 
   C1: adr_index.yml não gerado
   - SEMPRE gera adr_index.yml mesmo quando reconciliation vazia
@@ -314,6 +360,33 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "2.2.0"
+    date: "2026-01-28"
+    changes:
+      - "feat(MEDIUM M2): Seção detalhada de reconciliação no import report"
+      - "feat(M2): Overview completo (existing, inferred, converted, new, not converted)"
+      - "feat(M2): Explicação de critérios de conversão (confidence > 0.90, relevância)"
+      - "feat(M2): Lista de ADRs não convertidos com justificativas"
+      - "feat(M2): Breakdown de duplicates, enrichments, low confidence"
+      - "feat(M2): Referência completa ao adr_index.yml"
+      - "feat(M2): Documentação de cross-reference index structure"
+      - "feat(LIGHT L1): Seção completa 'About Confidence Scores'"
+      - "feat(L1): Breakdown de fatores (40% code, 30% docs, 20% runtime, 10% cross-ref)"
+      - "feat(L1): Tabela de interpretação (High/Medium/Low/Very Low)"
+      - "feat(L1): Explicação de margin of error (±0.05 a ±0.15)"
+      - "feat(L1): Exemplos práticos de interpretação"
+      - "feat(LIGHT L2): Métricas detalhadas de execução"
+      - "feat(L2): Tracking de tempo por fase em project_analyzer.py"
+      - "feat(L2): Timing breakdown (branch, validation, scan, detection, etc.)"
+      - "feat(L2): Métricas de qualidade (success rate, binary files)"
+      - "feat(L2): Seção 'Execution Metrics' no import report"
+      - "feat(L2): Total execution time sempre exibido"
+      - "chore(M1): README.md → ARTIFACTS.md marcado como N/A (não aplicável)"
+      - "impact(M2): Usuários entendem POR QUE ADRs foram/não convertidos"
+      - "impact(L1): Usuários entendem como interpretar confidence scores"
+      - "impact(L2): Visibilidade de performance e qualidade de análise"
+      - "docs(report): +133 linhas em documentation_generator.py"
+      - "perf(metrics): +37 linhas em project_analyzer.py"
   - version: "2.1.15"
     date: "2026-01-28"
     changes:
