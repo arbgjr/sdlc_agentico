@@ -16,6 +16,7 @@ Guia de resolucao de problemas comuns ao usar o SDLC Agentico.
 8. [Permissao negada em comandos](#8-permissao-negada-em-comandos)
 9. [Fase do SDLC nao detectada](#9-fase-do-sdlc-nao-detectada)
 10. [Arquivos de configuracao corrompidos](#10-arquivos-de-configuracao-corrompidos)
+11. [Como habilitar logging detalhado](#11-como-habilitar-logging-detalhado)
 
 ---
 
@@ -274,6 +275,231 @@ EOF
 
 ---
 
+## 11. Como habilitar logging detalhado
+
+**Sintoma**: Precisa de logs detalhados para debug ou investigacao de bugs.
+
+**Quando usar**:
+- Investigar reconciliacao de ADRs (sdlc-import)
+- Debug de quality gates
+- Rastrear execucao de hooks
+- Analisar performance de comandos
+
+**IMPORTANTE**: Comandos slash do Claude Code (como `/sdlc-import`) **NAO** aceitam pipes bash (`|`, `>`, `tee`). Use as opcoes abaixo.
+
+### Opcao 1: Via Claude Code (Temporario - 1 sessao) ✅ **RECOMENDADO**
+
+Simplesmente escreva no chat do Claude Code:
+
+```
+/sdlc-import com logging detalhado
+```
+
+Ou:
+
+```
+Execute /sdlc-import com log level DEBUG
+```
+
+**Como funciona**: O Claude automaticamente define `SDLC_LOG_LEVEL=DEBUG` antes de executar.
+
+**Vantagens**:
+- ✅ Mais simples
+- ✅ Logs ficam no historico do chat
+- ✅ Sem configuracao necessaria
+
+---
+
+### Opcao 2: Via Variavel de Ambiente (Temporario - sessao do terminal)
+
+Antes de executar comandos no Claude Code:
+
+```bash
+export SDLC_LOG_LEVEL=DEBUG
+```
+
+Depois execute o comando normalmente:
+```
+/sdlc-import
+```
+
+**Variaveis de ambiente disponiveis**:
+
+| Variavel | Valores | Default | Descricao |
+|----------|---------|---------|-----------|
+| `SDLC_LOG_LEVEL` | DEBUG, INFO, WARNING, ERROR, CRITICAL | INFO | Nivel de log |
+| `SDLC_LOKI_ENABLED` | true, false | true | Enviar logs para Loki |
+| `SDLC_LOKI_URL` | URL | http://localhost:3100 | URL do Loki |
+| `SDLC_JSON_LOGS` | true, false | false | Formato JSON no console |
+
+**Exemplo com multiplas variaveis**:
+```bash
+export SDLC_LOG_LEVEL=DEBUG
+export SDLC_JSON_LOGS=true
+export SDLC_LOKI_ENABLED=false
+
+/sdlc-import
+```
+
+---
+
+### Opcao 3: Via settings.json (Permanente)
+
+Edite `.claude/settings.json` no projeto e adicione a secao `env`:
+
+```json
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "version": "1.0",
+  "project": {
+    "name": "meu_projeto",
+    "description": "..."
+  },
+
+  "env": {
+    "SDLC_LOG_LEVEL": "DEBUG",
+    "SDLC_LOKI_ENABLED": "true",
+    "SDLC_JSON_LOGS": "false"
+  },
+
+  "hooks": {
+    ...
+  }
+}
+```
+
+**Vantagens**:
+- ✅ Log DEBUG sempre ativo
+- ✅ Configuracao persistente
+- ✅ Compartilhavel via git
+
+**Desvantagens**:
+- ⚠️ Logs mais verbosos o tempo todo
+- ⚠️ Pode impactar performance
+
+---
+
+### Opcao 4: Executar Script Python Diretamente (Avancado)
+
+Se precisar redirecionar saida para arquivo:
+
+```bash
+cd /caminho/do/projeto
+
+# Com logging DEBUG
+SDLC_LOG_LEVEL=DEBUG python3 \
+  .claude/skills/sdlc-import/scripts/project_analyzer.py \
+  /caminho/do/projeto \
+  2>&1 | tee import-debug.log
+
+# Ver apenas logs de reconciliacao de ADRs
+grep "Comparing inferred ADR\|DUPLICATE\|ENRICH\|NEW" import-debug.log
+
+# Ver decisoes finais
+grep "ADR reconciliation decision" import-debug.log
+```
+
+**Quando usar**: Quando precisa salvar logs em arquivo para analise posterior.
+
+---
+
+### Niveis de Log Disponiveis
+
+| Nivel | Quando usar |
+|-------|-------------|
+| **DEBUG** | Investigacao profunda, rastrear cada passo |
+| **INFO** | Fluxo normal, marcos importantes |
+| **WARNING** | Alertas, comportamento inesperado |
+| **ERROR** | Erros recuperaveis |
+| **CRITICAL** | Erros fatais, sistema nao pode continuar |
+
+---
+
+### Exemplos de Uso
+
+**Debug de reconciliacao de ADRs**:
+```
+/sdlc-import com log DEBUG
+```
+
+Procure no output:
+- `🔍 Comparing inferred ADR` - Cada comparacao
+- `vs '...'` - Similaridade calculada
+- `✓ DUPLICATE`, `✓ ENRICH`, `✗ NEW` - Decisoes finais
+
+**Debug de quality gate**:
+```bash
+export SDLC_LOG_LEVEL=DEBUG
+/gate-check phase-5-to-6
+```
+
+**Debug de hooks**:
+```bash
+export SDLC_LOG_LEVEL=DEBUG
+# Hooks serao executados com logging detalhado automaticamente
+```
+
+---
+
+### Verificar Logs Estruturados (Loki/Grafana)
+
+Se Loki estiver configurado:
+
+1. **Acessar Grafana**: http://localhost:3003
+2. **Explore > Loki**
+3. **Query**:
+   ```logql
+   {app="sdlc-agentico", level="debug"}
+   ```
+
+**Filtros uteis**:
+```logql
+# Logs de uma skill especifica
+{app="sdlc-agentico", skill="sdlc-import"}
+
+# Logs de uma fase especifica
+{app="sdlc-agentico", phase="5"}
+
+# Logs de erro
+{app="sdlc-agentico", level="error"}
+
+# Logs de reconciliacao
+{app="sdlc-agentico"} |= "reconciliation"
+```
+
+---
+
+### Solucao de Problemas Comuns
+
+**Logs nao aparecem**:
+```bash
+# Verificar nivel atual
+echo $SDLC_LOG_LEVEL
+
+# Forcar DEBUG
+export SDLC_LOG_LEVEL=DEBUG
+
+# Verificar se Loki esta rodando
+curl http://localhost:3100/ready
+```
+
+**Logs muito verbosos**:
+```bash
+# Desabilitar DEBUG apos debug
+unset SDLC_LOG_LEVEL
+# Ou
+export SDLC_LOG_LEVEL=INFO
+```
+
+**Pipes bash nao funcionam**:
+```
+❌ /sdlc-import 2>&1 | tee log.txt  # NAO FUNCIONA
+✅ /sdlc-import com log DEBUG       # FUNCIONA
+✅ Script Python direto | tee       # FUNCIONA (Opcao 4)
+```
+
+---
+
 ## Comandos Uteis de Diagnostico
 
 ```bash
@@ -311,4 +537,4 @@ Se o problema persistir:
 
 ---
 
-*Ultima atualizacao: 2026-01-13*
+*Ultima atualizacao: 2026-01-28 (v2.2.0 - Adicionada secao 11: Como habilitar logging detalhado)*
