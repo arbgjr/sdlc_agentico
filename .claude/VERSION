@@ -1,8 +1,23 @@
 # SDLC Agêntico Version
-version: "2.2.3"
+version: "2.2.4"
 build_date: "2026-01-28"
 release_notes: |
-  HOTFIX - VERSION File YAML Syntax Error
+  HOTFIX v2.2.4 - Critical sdlc-import Bug Fixes (Audit Autoritas)
+
+  Fixes ALL CRITICAL and SEVERE issues from adversarial audit:
+  - C1: graph.json generation (VERSION path fixed)
+  - C2: adr_index.yml generation (config already enabled, added defensive logging)
+  - C3: Invalid YAML in ADRs (removed alternatives_considered field, added validation)
+  - G2: Version display (dynamic loading from VERSION file)
+
+  Files Modified:
+  - graph_generator.py: Fixed VERSION file path (scripts/../../../.claude/VERSION)
+  - project_analyzer.py: Added defensive logging when ADR reconciliation disabled
+  - documentation_generator.py: Remove alternatives_considered, YAML validation, dynamic version
+  - import_report.md template: Dynamic version placeholder
+  - test_v2_2_4_fixes.py: Unit tests for all fixes (5 tests, all passing)
+
+  Previous Release - HOTFIX v2.2.3 - VERSION File YAML Syntax Error
 
   Sprint 2 (v2.2.0) - MÉDIO - Documentation Improvements:
 

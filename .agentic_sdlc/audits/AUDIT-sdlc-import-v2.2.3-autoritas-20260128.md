@@ -19,9 +19,13 @@
 - **2 LEVES** (melhorias)
 
 **Status das Correções v2.2.2:**
-- ❌ Correções do v2.2.2 **NÃO FORAM APLICADAS**
-- ❌ Workflow novo NÃO foi executado
-- ❌ validate_import.py detectou os mesmos problemas
+- ✅ Framework v2.2.3 está CORRETAMENTE instalado em Autoritas
+- ✅ Agent instructions (sdlc-importer.md) contém workflow completo
+- ❌ **Python scripts NÃO implementam o workflow v2.2.2**
+- ❌ Código em project_analyzer.py, graph_generator.py, etc. ainda é pré-v2.2.2
+- ❌ validate_import.py detectou os mesmos problemas (C1, C2)
+
+**Root Cause:** Gap entre instruções do agent (o que fazer) e código Python (como fazer)
 
 **Taxa de Sucesso:** 40% (4/10 artefatos mandatórios criados)
 
@@ -272,15 +276,23 @@ def _load_framework_version():
 
 ---
 
-## 🟠 GRAVE 3: Workflow v2.2.2 NÃO Foi Executado
+## 🟠 GRAVE 3: Python Scripts NÃO Implementam Workflow v2.2.2
 
-**Severidade:** GRAVE (regressão total)
+**Severidade:** GRAVE (código não implementado)
 **Prioridade:** P1
 **Release Alvo:** v2.2.4
 
 ### Evidência
 
-Comparação do output atual vs esperado (v2.2.2):
+**Framework v2.2.3 ESTÁ instalado corretamente:**
+```bash
+$ cat /home/armando_jr/source/repos/tripla/autoritas/.claude/VERSION | head -5
+framework: sdlc_agentico
+version: "2.2.3"
+build_date: "2026-01-26"
+```
+
+**Mas workflow v2.2.2 NÃO foi executado:**
 
 | Artefato | Esperado (v2.2.2) | Atual | Status |
 |----------|-------------------|-------|--------|
@@ -296,21 +308,31 @@ Comparação do output atual vs esperado (v2.2.2):
 
 ### Root Cause
 
-**Hipótese:** O sdlc-import executado NÃO é a versão v2.2.3.
+**CORRETO:** A instalação do framework v2.2.3 está perfeita. O problema é que os **scripts Python** (project_analyzer.py, decision_extractor.py, graph_generator.py, documentation_generator.py) **NÃO têm o código implementado** que executa o workflow v2.2.2.
 
-Possíveis causas:
-1. Cache do Python (.pyc antigos)
-2. Symlinks apontando para versão antiga
-3. project_analyzer.py não foi atualizado com v2.2.2 changes
+**Diferença:**
+- ✅ `.claude/VERSION` → v2.2.3 (CORRETO)
+- ✅ `.claude/agents/sdlc-importer.md` → Contém instruções detalhadas do workflow (CORRETO)
+- ❌ `.claude/skills/sdlc-import/scripts/*.py` → Código NÃO implementa as instruções (ERRADO)
+
+**Analogia:** É como ter um manual de instruções (agent) perfeito, mas o código (scripts) ainda não foi escrito para seguir essas instruções.
 
 ### Recomendação
 
-Verificar qual versão de project_analyzer.py está sendo usada:
+Verificar código dos scripts Python e implementar workflow v2.2.2:
 
 ```bash
-$ head -50 /path/to/autoritas/.claude/skills/sdlc-import/scripts/project_analyzer.py
-# Check for imports: graph_generator, adr_validator reconciliation
+# Verificar se graph_generator.py existe e está sendo chamado
+$ grep -n "graph_generator" .claude/skills/sdlc-import/scripts/project_analyzer.py
+
+# Verificar se adr_validator.py tem reconciliation
+$ grep -n "reconcile" .claude/skills/sdlc-import/scripts/adr_validator.py
+
+# Verificar se decision_extractor.py gera YAML válido
+$ grep -n "alternatives_considered" .claude/skills/sdlc-import/scripts/decision_extractor.py
 ```
+
+**Ação:** Implementar o código Python que executa as instruções documentadas no agent sdlc-importer.md
 
 ---
 
@@ -473,10 +495,10 @@ deployment-diagram.mmd
    - Implementar _load_framework_version() em documentation_generator.py
    - Substituir hardcoded "v2.0.0"
 
-6. **G3: Investigar por que workflow v2.2.2 não executou** (2h)
-   - Verificar versão de project_analyzer.py em uso
-   - Limpar cache Python (.pyc)
-   - Validar symlinks
+6. **G3: Implementar código Python do workflow v2.2.2** (2h)
+   - Comparar sdlc-importer.md (agent instructions) vs project_analyzer.py (código)
+   - Implementar Steps 7-11 do workflow que faltam no código
+   - Garantir que todos os 7 artefatos esperados sejam gerados
 
 **Total Estimado:** 14.5 horas
 

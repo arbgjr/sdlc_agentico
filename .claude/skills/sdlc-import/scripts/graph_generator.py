@@ -36,19 +36,20 @@ class GraphGenerator:
             FileNotFoundError: If .claude/VERSION does not exist
             KeyError: If version field is missing
         """
+        # Path: scripts/ (parent) -> sdlc-import/ (parent.parent) -> skills/ (parent³) -> .claude/ (parent⁴)
         version_file = Path(__file__).resolve().parent.parent.parent.parent / "VERSION"
         try:
             with open(version_file) as f:
                 version_data = yaml.safe_load(f)
                 version = version_data['version']
-                logger.debug(f"Loaded framework version: {version} from {version_file}")
+                logger.debug(f"Loaded framework version: {version} from {version_file.resolve()}")
                 return version
         except FileNotFoundError:
-            logger.error(f"Version file not found: {version_file}")
-            raise
+            logger.error(f"Version file not found: {version_file.resolve()}")
+            raise FileNotFoundError(f"VERSION file not found at {version_file.resolve()}")
         except KeyError:
             logger.error(f"'version' field missing in {version_file}")
-            raise
+            raise KeyError(f"'version' field missing in {version_file}")
         except Exception as e:
             logger.error(f"Failed to load version from {version_file}: {e}")
             raise

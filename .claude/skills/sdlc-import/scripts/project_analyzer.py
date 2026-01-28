@@ -997,7 +997,16 @@ class ProjectAnalyzer:
 
             # NEW (v2.1.7): Reconcile with existing ADRs to avoid duplicates
             reconciliation_results = {}
-            if self.config.get('adr_reconciliation', {}).get('enabled', True):
+            adr_config = self.config.get('adr_reconciliation', {})
+            enabled = adr_config.get('enabled', True)
+
+            if not enabled:
+                logger.warning("ADR reconciliation is DISABLED in config")
+                logger.warning("Set adr_reconciliation.enabled: true to enable")
+                logger.warning("adr_index.yml will NOT be generated")
+
+            if enabled:
+                logger.info("ADR reconciliation enabled - checking for existing ADRs")
                 existing_adrs = self.adr_validator.detect_existing_adrs(self.project_path)
                 extracted_adrs = decisions.get('decisions', [])
 

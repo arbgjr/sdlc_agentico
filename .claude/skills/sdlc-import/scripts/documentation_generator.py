@@ -29,12 +29,42 @@ class DocumentationGenerator:
         self.output_dir = project_path / config['general']['output_dir']
         self.templates_dir = Path(__file__).parent.parent / "templates"
 
+        # FIX v2.2.4: Load framework version dynamically
+        self.framework_version = self._load_framework_version()
+
         # Configure Jinja2 environment
         self.jinja_env = Environment(
             loader=FileSystemLoader(str(self.templates_dir)),
             trim_blocks=True,
             lstrip_blocks=True
         )
+
+    def _load_framework_version(self) -> str:
+        """
+        FIX v2.2.4: Load SDLC framework version from VERSION file.
+
+        Returns:
+            Version string (e.g., "v2.2.4")
+        """
+        try:
+            # Path: scripts/ (parent) -> sdlc-import/ (parent.parent) -> skills/ (parent³) -> .claude/ (parent⁴)
+            version_file = Path(__file__).resolve().parent.parent.parent.parent / "VERSION"
+            if not version_file.exists():
+                logger.warning(f"VERSION file not found at {version_file.resolve()}")
+                return "v2.2.4"  # Fallback to current version
+
+            version_data = yaml.safe_load(version_file.read_text())
+            version = version_data.get('version', 'v2.2.4')
+
+            # Ensure version has 'v' prefix for consistency
+            if not version.startswith('v'):
+                version = f'v{version}'
+
+            logger.info(f"Loaded framework version: {version}")
+            return version
+        except Exception as e:
+            logger.error(f"Failed to load version: {e}")
+            return "v2.2.4"  # Safe fallback
 
     def generate(self, analysis_results: Dict) -> Dict:
         """Generate all documentation"""
@@ -62,12 +92,21 @@ class DocumentationGenerator:
         return generated_files
 
     def _generate_adrs(self, decisions: Dict) -> List[str]:
-        """Generate ADR files"""
+        """Generate ADR files with YAML validation"""
         adrs = []
         adr_dir = self.output_dir / "corpus/nodes/decisions"
         adr_dir.mkdir(parents=True, exist_ok=True)
 
         for decision in decisions.get('decisions', []):
+            # FIX v2.2.4: Remove alternatives_considered field (causes YAML issues)
+            # This field generates nested lists which are invalid YAML
+            if 'alternatives_considered' in decision:
+                logger.warning(
+                    f"Removing alternatives_considered from {decision.get('id')} "
+                    "to prevent YAML parsing errors"
+                )
+                del decision['alternatives_considered']
+
             adr_file = adr_dir / f"{decision['id']}.yml"
             # BUG FIX #3: Improve YAML quoting for special characters
             # FIX v2.1.13: Remove default_style='"' which quoted keys incorrectly
@@ -80,6 +119,16 @@ class DocumentationGenerator:
                 explicit_start=True,       # Add --- at start
                 width=float("inf")         # Avoid line wrapping
             )
+
+            # FIX v2.2.4: Validate generated YAML before writing
+            try:
+                yaml.safe_load(adr_content)
+                logger.debug(f"YAML validation passed for {decision.get('id')}")
+            except yaml.YAMLError as e:
+                logger.error(f"YAML validation FAILED for {decision.get('id')}: {e}")
+                logger.error(f"Content preview:\n{adr_content[:500]}")
+                raise ValueError(f"Generated invalid YAML for {decision.get('id')}: {e}")
+
             adr_file.write_text(adr_content)
             adrs.append(str(adr_file))
 
@@ -283,7 +332,8 @@ class DocumentationGenerator:
         report_file = self.output_dir / "reports/import-report.md"
         report_file.parent.mkdir(parents=True, exist_ok=True)
 
-        content = f"""# Import Analysis Report
+        # FIX v2.2.4: Add framework version to report header
+        content = f"""# SDLC Import Report - {self.framework_version}
 
 **Analysis ID:** {analysis_results.get('analysis_id', 'unknown')}
 **Date:** {datetime.utcnow().isoformat()}Z
