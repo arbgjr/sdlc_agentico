@@ -334,6 +334,11 @@ class ADRValidator:
         norm1 = text1.lower().strip()
         norm2 = text2.lower().strip()
 
+        # FIX v2.1.13: Remove ADR prefix (e.g., "adr-012: ", "adr-013: ")
+        # This allows better matching between inferred and existing ADRs
+        norm1 = re.sub(r'^adr-\d+:\s*', '', norm1)
+        norm2 = re.sub(r'^adr-\d+:\s*', '', norm2)
+
         # Calculate similarity
         return SequenceMatcher(None, norm1, norm2).ratio()
 

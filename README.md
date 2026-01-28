@@ -1,6 +1,6 @@
 <!-- Core Badges -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.1.12-blue.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v2.1.12)
+[![Version](https://img.shields.io/badge/version-2.1.13-blue.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v2.1.13)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 
 <!-- AI Compatibility -->
@@ -38,7 +38,7 @@ O SDLC Agêntico é um framework que usa **37 agentes especializados** (33 orque
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         SDLC AGÊNTICO v2.1.12                           │
+│                         SDLC AGÊNTICO v2.1.13                           │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  Ideia → [Intake] → [Discovery] → [Requirements] → [Architecture]       │

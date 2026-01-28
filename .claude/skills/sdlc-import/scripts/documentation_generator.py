@@ -70,12 +70,13 @@ class DocumentationGenerator:
         for decision in decisions.get('decisions', []):
             adr_file = adr_dir / f"{decision['id']}.yml"
             # BUG FIX #3: Improve YAML quoting for special characters
+            # FIX v2.1.13: Remove default_style='"' which quoted keys incorrectly
             adr_content = yaml.dump(
                 decision,
                 default_flow_style=False,
                 sort_keys=False,           # Preserve original order
                 allow_unicode=True,        # Support UTF-8
-                default_style='"',         # Force quote strings with special chars
+                # default_style removed - let YAML choose proper quoting
                 explicit_start=True,       # Add --- at start
                 width=float("inf")         # Avoid line wrapping
             )
