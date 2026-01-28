@@ -1,8 +1,8 @@
 # SDLC Agêntico Version
-version: "2.2.1"
+version: "2.2.2"
 build_date: "2026-01-28"
 release_notes: |
-  FEATURE RELEASE - Adversarial Audit System + Agent Strictness Improvements
+  CRITICAL FIX - Agent Instructions Clarity (Prevents Custom Script Creation)
 
   Sprint 2 (v2.2.0) - MÉDIO - Documentation Improvements:
 
@@ -360,6 +360,33 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "2.2.2"
+    date: "2026-01-28"
+    changes:
+      - "fix(CRITICAL): Improved sdlc-importer agent instructions to prevent custom script creation"
+      - "fix(agent): Added detailed workflow steps with explicit Python code examples"
+      - "fix(agent): Step 6 - Reconcile ADRs now shows exact adr_validator.py.reconcile_adrs() usage"
+      - "fix(agent): Step 8 - Detect Tech Debt now shows exact tech_debt_detector.py.scan() usage"
+      - "fix(agent): Step 10 - Generate Graph now shows exact graph_generator.py.generate() usage"
+      - "fix(agent): Step 11 - Generate Docs now shows Jinja2 template usage pattern"
+      - "fix(agent): Step 12 - Validate Artifacts now checks all mandatory files exist"
+      - "fix(agent): Enhanced 'Mandatory Artifacts' section with validation table and fallback rules"
+      - "fix(agent): Added 'Error Handling and Recovery' section with diagnosis steps"
+      - "fix(agent): Added 'Success Criteria (Final Checklist)' with completeness validation"
+      - "feat(validation): New validate_import.py script checks import completeness"
+      - "feat(validation): Validates graph.json structure (nodes, edges, version not hardcoded)"
+      - "feat(validation): Validates adr_index.yml structure (metadata, summary)"
+      - "feat(validation): Validates import-report.md has required sections"
+      - "feat(validation): Checks for unauthorized scripts in .project/scripts/"
+      - "feat(validation): Checks for suspicious rounded timestamps (00:00:00)"
+      - "root_cause: Framework scripts were CORRECT - agent instructions were UNCLEAR"
+      - "root_cause: LLM created custom scripts because agent didn't tell it to use framework tools"
+      - "impact: sdlc-import will no longer create analyze_tech_debt.py or convert_adrs.py"
+      - "impact: Framework scripts (tech_debt_detector.py, adr_validator.py) now properly utilized"
+      - "impact: All mandatory artifacts (graph.json, adr_index.yml, reports) now validated"
+      - "usage: python3 .claude/skills/sdlc-import/scripts/validate_import.py --output-dir .project --strict"
+      - "docs(agent): 300+ lines enhanced in sdlc-importer.md with workflow details"
+      - "test(validation): validate_import.py with 250+ lines of validation logic"
   - version: "2.2.1"
     date: "2026-01-28"
     changes:
