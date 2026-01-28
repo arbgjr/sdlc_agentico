@@ -1,23 +1,44 @@
 # SDLC Agêntico Version
-version: "2.2.4"
+version: "2.3.0"
 build_date: "2026-01-28"
 release_notes: |
-  HOTFIX v2.2.4 - Critical sdlc-import Bug Fixes (Audit Autoritas)
+  v2.3.0 - Auto-Update Component Counts (Feature Release)
 
-  Fixes ALL CRITICAL and SEVERE issues from adversarial audit:
-  - C1: graph.json generation (VERSION path fixed)
-  - C2: adr_index.yml generation (config already enabled, added defensive logging)
-  - C3: Invalid YAML in ADRs (removed alternatives_considered field, added validation)
-  - G2: Version display (dynamic loading from VERSION file)
+  NEW FEATURE: Automatic Documentation Synchronization
+  - Never fail doc validation badge again!
+  - Zero manual effort to keep counters updated
+  - Automatic detection of new agents/skills/commands/hooks
+
+  Components Added:
+  - Script: update-component-counts.sh (counts and updates docs)
+  - Hook: auto-update-component-counts.sh (PostToolUse automation)
+  - Command: /update-docs (manual execution)
+  - Skill: update-docs (with auto-commit option)
+
+  How It Works:
+  1. You create a new agent/skill/command/hook
+  2. PostToolUse hook detects the change
+  3. README.md and CLAUDE.md updated automatically
+  4. You commit with synchronized documentation
+
+  Benefits:
+  - ✅ Never miss component count updates
+  - ✅ Doc validation badge always passes
+  - ✅ README/CLAUDE.md always in sync
+  - ✅ Framework-specific (excluded from releases)
+
+  Files Created:
+  - .claude/scripts/update-component-counts.sh
+  - .claude/hooks/auto-update-component-counts.sh
+  - .claude/commands/update-docs.md
+  - .claude/skills/update-docs/SKILL.md
 
   Files Modified:
-  - graph_generator.py: Fixed VERSION file path (scripts/../../../.claude/VERSION)
-  - project_analyzer.py: Added defensive logging when ADR reconciliation disabled
-  - documentation_generator.py: Remove alternatives_considered, YAML validation, dynamic version
-  - import_report.md template: Dynamic version placeholder
-  - test_v2_2_4_fixes.py: Unit tests for all fixes (5 tests, all passing)
+  - .claude/settings.json (4 new PostToolUse matchers)
+  - .github/workflows/release.yml (exclude framework-only files)
+  - README.md (30 skills, 25 commands, 21 hooks)
 
-  Previous Release - HOTFIX v2.2.3 - VERSION File YAML Syntax Error
+  Previous Release - HOTFIX v2.2.4 - Critical sdlc-import Bug Fixes
 
   Sprint 2 (v2.2.0) - MÉDIO - Documentation Improvements:
 
