@@ -1,7 +1,45 @@
 # SDLC Agêntico Version
-version: "2.1.14"
+version: "2.1.15"
 build_date: "2026-01-28"
 release_notes: |
+  CRITICAL FIX - Audit Bugs C1, C2, G2, G1 - sdlc-import Quality Improvements
+
+  Sprint 1 (v2.1.15) - Critical & Grave Fixes:
+
+  C1: adr_index.yml não gerado
+  - SEMPRE gera adr_index.yml mesmo quando reconciliation vazia
+  - Remove condição que bloqueava geração (if 'adr_reconciliation' in analysis_results)
+  - Adiciona logging de status de reconciliation para debug
+  - Corrige quality gate: references/adr_index.yml (era corpus/nodes/decisions/adr_index.md)
+  - Impact: Todos os projetos agora terão adr_index.yml garantido
+
+  C2: Versão hardcoded no graph.json
+  - Adiciona _load_framework_version() que lê .claude/VERSION dinamicamente
+  - Substitui "2.1.0" hardcoded por self.framework_version (linhas 41, 198)
+  - Fail explicitly se VERSION não existe (sem fallback silencioso)
+  - Impact: graph.json agora sempre reflete versão correta do framework
+
+  G2: Contagem incorreta de ADRs no summary (20 ao invés de 21)
+  - Corrige chave de 'reconciliation' para 'adr_reconciliation' em documentation_generator.py
+  - Adiciona logging de contagem para debug
+  - Adiciona teste unitário test_adr_reconciliation_count_consistency()
+  - Impact: Summary reports agora mostram contagem exata de ADRs existentes
+
+  G1: Apenas 5/21 ADRs processados (investigação em andamento)
+  - Adiciona logging detalhado em reconcile_adrs() para rastrear similaridade
+  - Log de cada comparação inferred vs existing ADR
+  - Log de decisão final (DUPLICATE/ENRICH/NEW) com threshold
+  - Permite investigar threshold 0.8 e normalização de títulos
+  - Impact: Logs detalhados permitirão identificar por que 16 ADRs foram descartados
+
+  Files Modified:
+  - post_import_validation_rules.yml - Quality gate corrigido
+  - adr_validator.py - Logging detalhado para investigação
+  - documentation_generator.py - Geração garantida de adr_index.yml + chave corrigida
+  - graph_generator.py - Versão dinâmica de .claude/VERSION
+  - test_documentation_generator.py - Teste de consistência de contagem
+
+  Previous Release (v2.1.14):
   CRITICAL FIX - LLM Instructions Corrected for Output Location
 
   🎯 ROOT CAUSE IDENTIFIED & FIXED
@@ -276,6 +314,27 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "2.1.15"
+    date: "2026-01-28"
+    changes:
+      - "fix(CRITICAL C1): adr_index.yml agora SEMPRE gerado mesmo quando reconciliation vazia"
+      - "fix(CRITICAL C1): Remove condição bloqueante if 'adr_reconciliation' in analysis_results"
+      - "fix(CRITICAL C1): Adiciona logging de status para debug"
+      - "fix(CRITICAL C1): Corrige quality gate path: references/adr_index.yml"
+      - "fix(CRITICAL C2): Versão hardcoded substituída por leitura de .claude/VERSION"
+      - "fix(CRITICAL C2): Adiciona _load_framework_version() em graph_generator.py"
+      - "fix(CRITICAL C2): Fail explicitly se VERSION não existe (sem fallback)"
+      - "fix(GRAVE G2): Corrige chave 'reconciliation' → 'adr_reconciliation'"
+      - "fix(GRAVE G2): Contagem de ADRs no summary agora correta (21 não 20)"
+      - "fix(GRAVE G2): Adiciona logging de contagem para debug"
+      - "test(G2): Adiciona test_adr_reconciliation_count_consistency()"
+      - "feat(GRAVE G1): Logging detalhado em reconcile_adrs() para investigação"
+      - "feat(G1): Log de cada comparação inferred vs existing ADR com similaridade"
+      - "feat(G1): Log de decisão final (DUPLICATE/ENRICH/NEW) com threshold"
+      - "impact(C1): Todos projetos agora terão adr_index.yml garantido"
+      - "impact(C2): graph.json sempre reflete versão correta do framework"
+      - "impact(G2): Summary reports agora mostram contagem exata"
+      - "impact(G1): Logs permitirão identificar por que 16/21 ADRs foram descartados"
   - version: "2.1.14"
     date: "2026-01-28"
     changes:
