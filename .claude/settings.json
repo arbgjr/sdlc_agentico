@@ -6,7 +6,7 @@
     "description": "SDLC Agentico - Sistema de desenvolvimento de software orientado por agentes"
   },
   "env": {
-    "SDLC_LOG_LEVEL": "INFO",
+    "SDLC_LOG_LEVEL": "WARNING",
     "SDLC_LOKI_ENABLED": "false",
     "SDLC_LOKI_URL": "http://localhost:3100"
   },

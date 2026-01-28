@@ -142,14 +142,14 @@ show_usage() {
     echo "  --help              Mostra esta mensagem"
     echo ""
     echo "Exemplos:"
-    echo "  # Instalacao local (apos clonar repo)"
-    echo "  ./\.agentic_sdlc/scripts/setup-sdlc.sh"
+    echo "  # Instalacao local (apos clonar repo ou baixar release)"
+    echo "  ./.agentic_sdlc/scripts/setup-sdlc.sh"
     echo ""
     echo "  # Instalacao remota (ultima release)"
-    echo "  curl -fsSL ${REPO_URL}/raw/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release"
+    echo "  curl -fsSL ${REPO_URL}/raw/main/.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release"
     echo ""
     echo "  # Instalacao de versao especifica"
-    echo "  curl -fsSL ${REPO_URL}/raw/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.0.0"
+    echo "  curl -fsSL ${REPO_URL}/raw/main/.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release --version v1.0.0"
     echo ""
 }
 
@@ -1010,16 +1010,16 @@ print_summary() {
     echo ""
     echo "Ferramentas opcionais:"
     echo "  # Seguranca:"
-    echo "  ./\.agentic_sdlc/scripts/install-security-tools.sh --all"
+    echo "  ./.agentic_sdlc/scripts/install-security-tools.sh --all"
     echo ""
     echo "  # Skills (document-processor, frontend-testing):"
-    echo "  ./\.agentic_sdlc/scripts/setup-sdlc.sh --check-optional    # Verificar"
-    echo "  ./\.agentic_sdlc/scripts/setup-sdlc.sh --install-optional  # Instalar"
+    echo "  ./.agentic_sdlc/scripts/setup-sdlc.sh --check-optional    # Verificar"
+    echo "  ./.agentic_sdlc/scripts/setup-sdlc.sh --install-optional  # Instalar"
     echo ""
     echo "Documentacao:"
-    echo "  - \.agentic_sdlc/docs/QUICKSTART.md"
-    echo "  - \.agentic_sdlc/docs/INFRASTRUCTURE.md"
-    echo "  - \.agentic_sdlc/docs/playbook.md"
+    echo "  - .agentic_sdlc/docs/QUICKSTART.md"
+    echo "  - .agentic_sdlc/docs/INFRASTRUCTURE.md"
+    echo "  - .agentic_sdlc/docs/playbook.md"
     echo ""
 }
 
@@ -1077,14 +1077,14 @@ check_and_migrate_artifacts() {
                         log_info "Artefatos mantidos em .agentic_sdlc/ (duplicados)"
                     fi
                 else
-                    log_error "Falha na migração. Tente manualmente: ./\.agentic_sdlc/scripts/migrate-artifacts.sh"
+                    log_error "Falha na migração. Tente manualmente: ./.agentic_sdlc/scripts/migrate-artifacts.sh"
                     exit 1
                 fi
                 ;;
             2)
                 log_info "Instalação continuará. Migre manualmente depois:"
                 echo ""
-                echo "  ./\.agentic_sdlc/scripts/migrate-artifacts.sh"
+                echo "  ./.agentic_sdlc/scripts/migrate-artifacts.sh"
                 echo ""
                 ;;
             3)
