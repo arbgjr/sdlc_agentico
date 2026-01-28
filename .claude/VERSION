@@ -1,7 +1,35 @@
 # SDLC Agêntico Version
-version: "2.1.13"
-build_date: "2026-01-27"
+version: "2.1.14"
+build_date: "2026-01-28"
 release_notes: |
+  CRITICAL FIX - LLM Instructions Corrected for Output Location
+
+  🎯 ROOT CAUSE IDENTIFIED & FIXED
+
+  Bug (LLM Misdirection):
+  - Agent and command documentation was instructing the LLM to write to .agentic_sdlc/
+  - This caused /sdlc-import command with LLM to ignore settings.json configuration
+  - Python code was CORRECT (v2.1.13 line 108 fix worked)
+  - But LLM followed agent docs instead of code configuration
+
+  Files with Incorrect Instructions:
+  - .claude/agents/sdlc-importer.md line 19, 98
+  - .claude/commands/sdlc-import.md line 17, 109-125
+  - .claude/skills/sdlc-import/SKILL.md line 21, 35, 87-100
+
+  Impact:
+  - When executing /sdlc-import via Claude Code CLI with LLM enabled
+  - Files were written to .agentic_sdlc/ instead of .project/
+  - Direct Python script execution worked correctly
+  - User reported: "o commando ou a skill estão direcionando a LLM de forma errada"
+
+  Fix (v2.1.14):
+  - Updated all agent/command/skill documentation to state .project/
+  - Added "Output Directory Configuration" sections explaining priority order
+  - Added explicit warnings: "Never write to .agentic_sdlc/"
+  - LLM now correctly respects settings.json configuration
+
+  Previous Release (v2.1.13):
   CRITICAL FIX - ADR Reconciliation (TWO Bugs Fixed)
 
   🎯 ROOT CAUSES IDENTIFIED & FIXED
@@ -248,6 +276,19 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "2.1.14"
+    date: "2026-01-28"
+    changes:
+      - "fix(CRITICAL): Corrected LLM instructions in agent/command/skill docs"
+      - "fix(docs): .claude/agents/sdlc-importer.md now states .project/ not .agentic_sdlc/"
+      - "fix(docs): .claude/commands/sdlc-import.md now states .project/ not .agentic_sdlc/"
+      - "fix(docs): .claude/skills/sdlc-import/SKILL.md now states .project/ not .agentic_sdlc/"
+      - "fix(llm): Added 'Output Directory Configuration' sections to all docs"
+      - "fix(llm): Added explicit warning: 'Never write to .agentic_sdlc/'"
+      - "fix(llm): LLM now respects settings.json configuration when executing /sdlc-import"
+      - "cause(root): v2.1.13 Python code was correct, but LLM followed docs not code"
+      - "impact: /sdlc-import via CLI with LLM was writing to wrong location"
+      - "reported: User executing /sdlc-import in Autoritas project"
   - version: "2.1.13"
     date: "2026-01-27"
     changes:
