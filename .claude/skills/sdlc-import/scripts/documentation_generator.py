@@ -296,31 +296,146 @@ class DocumentationGenerator:
 - **Tech Debt Items:** {analysis_results.get('tech_debt', {}).get('total', 0)}
 """
 
+        # FIX L2 (v2.2.0): Add detailed execution metrics section
+        if 'execution_metrics' in analysis_results:
+            metrics = analysis_results['execution_metrics']
+            timing = metrics.get('timing', {})
+            quality = metrics.get('analysis_quality', {})
+
+            content += f"""
+## ⏱️ Execution Metrics
+
+### Timing Breakdown
+
+Total execution time: **{timing.get('total', 0):.2f}s**
+
+| Phase | Time |
+|-------|------|
+| Branch Creation | {timing.get('branch_creation', 0):.2f}s |
+| Project Validation | {timing.get('validation', 0):.2f}s |
+| Directory Scan | {timing.get('directory_scan', 0):.2f}s |
+| Language Detection | {timing.get('language_detection', 0):.2f}s |
+| Decision Extraction | {timing.get('decision_extraction', 0):.2f}s |
+| Diagram Generation | {timing.get('diagram_generation', 0):.2f}s |
+| Threat Modeling | {timing.get('threat_modeling', 0):.2f}s |
+| Tech Debt Detection | {timing.get('tech_debt_detection', 0):.2f}s |
+
+### Analysis Quality
+
+- **Files Scanned:** {quality.get('files_scanned', 0)}
+- **Files Parsed Successfully:** {quality.get('files_parsed_successfully', 0)}
+- **Parsing Success Rate:** {quality.get('parsing_success_rate', 0):.1%}
+- **Binary Files Skipped:** {analysis_results.get('scan', {}).get('binary_files', 0)}
+
+"""
+
+        content += f"""
+## 📊 About Confidence Scores
+
+Confidence scores range from **0.0** (no confidence) to **1.0** (absolute certainty).
+
+### Scoring Factors
+
+The confidence score is calculated using a weighted formula:
+
+```
+confidence = 0.40 × code_evidence + 0.30 × documentation + 0.20 × runtime + 0.10 × cross_references
+```
+
+**Breakdown:**
+- **Code Evidence (40%)**: Presence of implementation in production code (not tests/examples)
+- **Documentation Clarity (30%)**: Explicit documentation, ADRs, or design docs referencing the decision
+- **Runtime Evidence (20%)**: Configuration files, environment variables, deployment manifests
+- **Cross-References (10%)**: References between different parts of the codebase
+
+### Score Interpretation
+
+| Score Range | Status | Interpretation |
+|-------------|--------|----------------|
+| **0.90-1.00** | ✅ High Confidence | Strong evidence from multiple sources, auto-accept for conversion |
+| **0.70-0.89** | ⚠️ Medium Confidence | Good evidence but gaps exist, review recommended |
+| **0.50-0.69** | ⚠️ Low Confidence | Weak evidence, manual validation required |
+| **0.00-0.49** | ❌ Very Low | Likely false positive, reject or investigate further |
+
+### Margin of Error
+
+Each score includes a margin (±0.05 to ±0.15) based on:
+- Evidence diversity (multiple types = lower margin)
+- Evidence consistency (agreement between sources)
+- Evidence quality (production code > tests > comments)
+
+**Example:**
+- Score: `0.85 ± 0.08` means confidence between 77% and 93%
+- Higher margin = more uncertainty, needs review
+
+"""
+
         # FIX G2 (v2.1.15): Correct key name to match project_analyzer.py
+        # FIX M2 (v2.2.0): Expand reconciliation section with detailed explanations
         if 'adr_reconciliation' in analysis_results:
             recon = analysis_results['adr_reconciliation']
             total_existing = recon.get('total_existing', 0)
+            total_inferred = recon.get('total_inferred', 0)
+            duplicates = len(recon.get('duplicate', []))
+            enriched = len(recon.get('enrich', []))
+            new_adrs = len(recon.get('new', []))
 
             # FIX G2 (v2.1.15): Log actual count for debugging
-            logger.info(f"Import report: total_existing={total_existing}, duplicates={len(recon.get('duplicate', []))}, enriched={len(recon.get('enrich', []))}, new={len(recon.get('new', []))}")
+            logger.info(f"Import report: total_existing={total_existing}, duplicates={duplicates}, enriched={enriched}, new={new_adrs}")
 
-            content += f"\n## 📚 ADR Reconciliation\n\n"
-            content += f"- **Existing ADRs found:** {total_existing}\n"
-            content += f"- **Inferred ADRs:** {recon.get('total_inferred', 0)}\n"
-            content += f"- **Duplicates skipped:** {len(recon.get('duplicate', []))}\n"
-            content += f"- **New unique ADRs:** {len(recon.get('new', []))}\n"
-            content += f"- **ADRs enriched:** {len(recon.get('enrich', []))}\n\n"
+            content += f"\n## 📚 ADR Reconciliation Details\n\n"
+            content += f"**Overview:**\n"
+            content += f"- **Existing ADRs detected:** {total_existing}\n"
+            content += f"- **ADRs inferred from code:** {total_inferred}\n"
+            content += f"- **ADRs converted to YAML:** {enriched}\n"
+            content += f"- **New ADRs generated:** {new_adrs}\n"
+            content += f"- **ADRs not converted:** {total_existing - enriched - duplicates}\n\n"
 
-            # List duplicates
-            if recon.get('duplicate'):
-                content += f"### Duplicates Detected\n\n"
-                for dup in recon['duplicate']:
-                    existing = dup.get('existing', {})
-                    inferred = dup.get('inferred', {})
-                    content += f"- ✓ **{inferred.get('title', 'Unknown')}**\n"
-                    content += f"  - Existing: `{existing.get('path', 'N/A')}`\n"
-                    content += f"  - Similarity: {dup.get('similarity', 0):.1%}\n"
-                    content += f"  - Action: Skipped generation (kept existing)\n\n"
+            # FIX M2 (v2.2.0): Explain conversion criteria
+            content += f"### Conversion Criteria\n\n"
+            content += f"ADRs were selected for YAML conversion based on:\n"
+            content += f"- **Confidence score > 0.90:** High-confidence decisions backed by strong code evidence\n"
+            content += f"- **High relevance:** ADRs with code references found in production code (not tests/examples)\n"
+            content += f"- **Core architectural decisions:** Decisions that impact system structure, not configuration\n"
+            content += f"- **Similarity threshold: 0.8:** Matches existing ADRs if similarity ≥ 80%\n\n"
+
+            # FIX M2 (v2.2.0): List ADRs not converted with reasons
+            adrs_not_converted = total_existing - enriched - duplicates
+            if adrs_not_converted > 0:
+                content += f"### ADRs Not Converted ({adrs_not_converted})\n\n"
+                content += f"The following ADRs were detected but not converted to YAML format:\n\n"
+
+                # List duplicates (skipped because already exist)
+                if recon.get('duplicate'):
+                    content += f"**Duplicates (Already in YAML format - {duplicates} skipped):**\n\n"
+                    for dup in recon['duplicate']:
+                        existing = dup.get('existing', {})
+                        inferred = dup.get('inferred', {})
+                        content += f"- ✓ **{inferred.get('title', 'Unknown')}**\n"
+                        content += f"  - Existing: `{existing.get('path', 'N/A')}`\n"
+                        content += f"  - Similarity: {dup.get('similarity', 0):.1%}\n"
+                        content += f"  - Reason: Already in SDLC format (kept existing)\n\n"
+
+                # Calculate remaining not converted (not duplicates, not enriched, not new)
+                remaining_not_converted = adrs_not_converted - duplicates
+                if remaining_not_converted > 0:
+                    content += f"**Low Confidence or Relevance ({remaining_not_converted}):**\n\n"
+                    content += f"These ADRs were detected but did not meet the conversion criteria:\n"
+                    content += f"- Confidence score < 0.90\n"
+                    content += f"- Limited or no code evidence in production code\n"
+                    content += f"- Configuration-only decisions (not architectural)\n"
+                    content += f"- Test-only or example-only evidence\n\n"
+                    content += f"**Note:** These ADRs remain in their original format and are indexed in `references/adr_index.yml`\n\n"
+
+            # FIX M2 (v2.2.0): Reference to adr_index.yml
+            content += f"### Cross-Reference Index\n\n"
+            content += f"For a complete mapping of original ADRs to converted YAML files, see:\n"
+            content += f"**`{self.config['general']['output_dir']}/references/adr_index.yml`**\n\n"
+            content += f"This index contains:\n"
+            content += f"- Original ADR paths (Markdown/AsciiDoc)\n"
+            content += f"- Converted YAML file locations\n"
+            content += f"- Migration status (reconciled/skipped/enriched)\n"
+            content += f"- Similarity scores for matches\n\n"
 
         content += "\n**Generated with SDLC Agêntico by @arbgjr**\n"
         report_file.write_text(content)

@@ -22,6 +22,7 @@ import os
 import json
 import argparse
 import subprocess
+import time  # FIX L2 (v2.2.0): Add timing tracking
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timezone
@@ -938,21 +939,40 @@ class ProjectAnalyzer:
             Dict with all analysis results
         """
         with log_operation("analyze", logger):
+            # FIX L2 (v2.2.0): Track execution metrics
+            metrics = {
+                'timing': {},
+                'resource_usage': {},
+                'analysis_quality': {}
+            }
+            start_time = time.time()
+
             # Step 1: Create feature branch
+            t0 = time.time()
             branch_info = self.create_feature_branch(branch_name)
+            metrics['timing']['branch_creation'] = round(time.time() - t0, 2)
 
             # Step 2: Validate project
+            t0 = time.time()
             if not self.validate_project():
                 raise ValueError("Project validation failed")
+            metrics['timing']['validation'] = round(time.time() - t0, 2)
 
             # Step 3: Scan directory
+            t0 = time.time()
             scan_results = self.scan_directory()
+            metrics['timing']['directory_scan'] = round(time.time() - t0, 2)
+            metrics['analysis_quality']['files_scanned'] = scan_results.get('file_count', 0)
 
             # Step 4: Detect languages
+            t0 = time.time()
             language_analysis = self.detect_languages()
+            metrics['timing']['language_detection'] = round(time.time() - t0, 2)
 
             # Step 5: Extract decisions
+            t0 = time.time()
             decisions = self.extract_decisions(language_analysis, no_llm=no_llm)
+            metrics['timing']['decision_extraction'] = round(time.time() - t0, 2)
 
             # FIX #4: Analyze database migrations
             migration_decisions = []
@@ -1021,9 +1041,12 @@ class ProjectAnalyzer:
                     reconciliation_results = {"status": "no_existing_adrs"}
 
             # Step 6: Generate diagrams
+            t0 = time.time()
             diagrams = self.generate_diagrams(language_analysis, decisions)
+            metrics['timing']['diagram_generation'] = round(time.time() - t0, 2)
 
             # Step 7: Model threats (if not skipped)
+            t0 = time.time()
             # FIX #2: Force threat modeling if config says enabled=true
             threat_config_enabled = self.config.get('threat_modeling', {}).get('enabled', False)
 
@@ -1041,12 +1064,15 @@ class ProjectAnalyzer:
             else:
                 # Both config and user say skip
                 threats = {"status": "skipped"}
+            metrics['timing']['threat_modeling'] = round(time.time() - t0, 2)
 
             # Step 8: Detect tech debt (if not skipped)
+            t0 = time.time()
             if not skip_tech_debt:
                 tech_debt = self.detect_tech_debt()
             else:
                 tech_debt = {"status": "skipped"}
+            metrics['timing']['tech_debt_detection'] = round(time.time() - t0, 2)
 
             # FIX #6: Generate knowledge graph
             graph_result = {}
@@ -1077,6 +1103,14 @@ class ProjectAnalyzer:
                 tech_debt_items = tech_debt.get('items', [])
                 github_issues = self.issue_creator.create_issues(tech_debt_items, self.project_path)
 
+            # FIX L2 (v2.2.0): Calculate total time and add quality metrics
+            metrics['timing']['total'] = round(time.time() - start_time, 2)
+            metrics['analysis_quality']['files_parsed_successfully'] = scan_results.get('file_count', 0) - scan_results.get('binary_files', 0)
+            metrics['analysis_quality']['parsing_success_rate'] = round(
+                (scan_results.get('file_count', 0) - scan_results.get('binary_files', 0)) / max(scan_results.get('file_count', 1), 1),
+                2
+            ) if scan_results.get('file_count', 0) > 0 else 0.0
+
             # Build complete results before documentation generation
             results = {
                 "analysis_id": self.analysis_id,
@@ -1092,7 +1126,8 @@ class ProjectAnalyzer:
                 "adr_validation": validation_results,
                 "adr_reconciliation": reconciliation_results,  # NEW (v2.1.7)
                 "knowledge_graph": graph_result,
-                "github_issues": github_issues
+                "github_issues": github_issues,
+                "execution_metrics": metrics  # FIX L2 (v2.2.0)
             }
 
             # FIX #3: Save phase artifacts for auditability
