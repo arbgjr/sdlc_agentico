@@ -34,7 +34,7 @@ Sistema de desenvolvimento de software orientado por agentes de IA que automatiz
 
 ## O Que É
 
-O SDLC Agêntico é um framework que usa **37 agentes especializados** (33 orquestrados + 4 consultivos) para guiar seu projeto através de **9 fases (0-8)** do ciclo de desenvolvimento, desde a ideia inicial até a operação em produção.
+O SDLC Agêntico é um framework que usa **38 agentes especializados** (33 orquestrados + 4 consultivos + 1 meta) para guiar seu projeto através de **9 fases (0-8)** do ciclo de desenvolvimento, desde a ideia inicial até a operação em produção.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -45,7 +45,7 @@ O SDLC Agêntico é um framework que usa **37 agentes especializados** (33 orque
 │                                         ↓                               │
 │  Produção ← [Release] ← [Quality] ← [Implementation] ← [Planning]       │
 │                                                                         │
-│  37 Agentes | 9 Fases | Quality Gates | Security by Design              │
+│  38 Agentes | 9 Fases | Quality Gates | Security by Design              │
 │  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot         │
 │                                                                         │
 │  v2.2.4: Critical Audit Fixes | graph.json | YAML | Version Loading     │
@@ -395,10 +395,10 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 
 ```
 .claude/
-├── agents/           # 37 agentes especializados (33 + 4 consultivos)
-├── skills/           # 28 skills reutilizáveis
-├── commands/         # 23 comandos do usuário
-├── hooks/            # 19 hooks de automação
+├── agents/           # 38 agentes especializados (33 + 4 consultivos + 1 meta)
+├── skills/           # 29 skills reutilizáveis
+├── commands/         # 24 comandos do usuário
+├── hooks/            # 20 hooks de automação
 ├── lib/              # Bibliotecas compartilhadas (v1.7.0)
 │   ├── python/       # sdlc_logging.py, sdlc_tracing.py
 │   └── shell/        # logging_utils.sh
