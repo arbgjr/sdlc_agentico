@@ -18,6 +18,7 @@ Reverse engineer existing codebases (not necessarily legacy - can be modern proj
 5. **Tech Debt Detection** - Identify technical debt items with P0-P3 priorities (10-50 items)
 6. **Documentation Generation** - Create complete `.project/` structure (respects settings.json configuration)
 7. **Quality Validation** - Run sdlc-import-gate.yml to ensure quality
+8. **Quality Assurance** - Ensures that all stages of the Reverse Engineering process have been executed exactly as they were supposed to be.
 
 ## Output Directory Configuration
 

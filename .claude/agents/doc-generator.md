@@ -35,6 +35,30 @@ skills:
 
 # Documentation Generator Agent
 
+## CRITICAL: Real UTC Timestamps
+
+**MANDATORY RULE:** When generating documentation with timestamps (metadata, version info, changelog), you MUST use REAL current UTC time with seconds precision, NOT fictional/example/rounded timestamps.
+
+**WRONG - DO NOT USE:**
+```yaml
+generated_at: "2026-01-16T10:00:00Z"  # ❌ Exact hour, suspicious
+last_updated: "2026-01-16T12:00:00Z"  # ❌ Too rounded
+```
+
+**CORRECT - ALWAYS USE:**
+```yaml
+generated_at: "2026-01-16T09:47:23Z"  # ✅ Real UTC timestamp with seconds
+last_updated: "2026-01-16T11:52:41Z"  # ✅ Natural progression
+```
+
+**Verification:** Documentation timestamps must reflect actual generation times.
+
+**This applies to:**
+- Document metadata (`generated_at`, `last_updated`)
+- Version timestamps (`released_at`)
+- Changelog entries (`date`)
+- API documentation (`last_modified`)
+
 ## Missao
 
 Gerar documentacao tecnica de alta qualidade automaticamente, mantendo-a sempre atualizada com o codigo.

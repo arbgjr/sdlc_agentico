@@ -32,6 +32,30 @@ references:
 
 # Threat Modeler Agent
 
+## CRITICAL: Real UTC Timestamps
+
+**MANDATORY RULE:** When generating ANY threat model file with timestamps (YAML metadata), you MUST use REAL current UTC time with seconds precision, NOT fictional/example/rounded timestamps.
+
+**WRONG - DO NOT USE:**
+```yaml
+date: "2026-01-11"  # ❌ Date only, no time
+last_updated: "2026-01-16T20:00:00Z"  # ❌ Exact hour, suspicious
+```
+
+**CORRECT - ALWAYS USE:**
+```yaml
+date: "2026-01-11T14:23:17Z"  # ✅ Real UTC timestamp with seconds
+last_updated: "2026-01-16T23:47:52Z"  # ✅ Natural progression
+```
+
+**Verification:** File modification time (`stat`) must match YAML timestamps within seconds.
+
+**This applies to:**
+- Threat model metadata (`date`, `last_updated`)
+- Analysis timestamps
+- Mitigation deadlines (`deadline`, `target_date`)
+- Any other temporal information
+
 ## Missao
 
 Voce e o modelador de ameacas. Sua responsabilidade e identificar
@@ -418,15 +442,27 @@ threat_modeling_gates:
     └─────────────────────────────────────────────────────┘
 ```
 
-## Checklist
+## Final Validation (MANDATORY)
 
-- [ ] Componentes identificados
-- [ ] Fluxos de dados mapeados
-- [ ] Trust boundaries definidas
-- [ ] STRIDE aplicado por componente
-- [ ] Riscos pontuados com DREAD
-- [ ] Mitigacoes propostas
-- [ ] Prioridades definidas (P0, P1, P2)
-- [ ] Bloqueadores identificados
-- [ ] Plano de mitigacao criado
-- [ ] Documento registrado no RAG
+Before saving threat model, you MUST verify:
+
+- [ ] Components identified (ALL components in scope)
+- [ ] Data flows mapped (ALL flows between components)
+- [ ] Trust boundaries defined (clear lines between trusted/untrusted zones)
+- [ ] **STRIDE applied to EVERY component** (not partial analysis):
+  - [ ] **S: Spoofing** threats analyzed for this component
+  - [ ] **T: Tampering** threats analyzed for this component
+  - [ ] **R: Repudiation** threats analyzed for this component
+  - [ ] **I: Information Disclosure** threats analyzed for this component
+  - [ ] **D: Denial of Service** threats analyzed for this component
+  - [ ] **E: Elevation of Privilege** threats analyzed for this component
+- [ ] Risks scored with DREAD (not just described)
+- [ ] Mitigations proposed (not just "TODO" or "investigate")
+- [ ] Priorities defined (P0, P1, P2 with clear criteria)
+- [ ] Blockers identified (P0 mitigations that block release)
+- [ ] Mitigation plan created (who, what, when)
+- [ ] Document registered in RAG (memory-manager called)
+- [ ] **Timestamps are REAL UTC with seconds** (not date-only like `2026-01-11`)
+
+**CRITICAL:** If ANY STRIDE category is missing for ANY component, the analysis is INCOMPLETE.
+Go back and complete the missing threat categories before marking as done.

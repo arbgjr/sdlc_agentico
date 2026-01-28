@@ -399,15 +399,29 @@ class TestOrderService:
         assert service.calculate_total(items) == Decimal("99.99")
 ```
 
-## Checklist de Testes
+## Final Validation (MANDATORY)
 
-- [ ] Testes unitarios para logica de negocio
-- [ ] Testes de integracao para APIs
-- [ ] Edge cases cobertos
-- [ ] Error handling testado
-- [ ] Fixtures reutilizaveis criadas
-- [ ] Mocks apenas para dependencias externas
-- [ ] Cobertura >= 80%
-- [ ] Testes passando localmente
-- [ ] Testes rapidos (suite < 5 min)
-- [ ] Nomes descritivos (test_<behavior>_<scenario>)
+Before marking test suite as complete, you MUST verify:
+
+- [ ] Unit tests for ALL business logic (not just happy path)
+- [ ] Integration tests for ALL APIs (every endpoint tested)
+- [ ] **ALL edge cases covered** (verify each category):
+  - [ ] Boundaries (zero, negative, max value)
+  - [ ] States (null, empty string, invalid data)
+  - [ ] Errors (timeout, not found, no permission, conflict)
+  - [ ] Concurrent scenarios (if applicable - race conditions, deadlocks)
+- [ ] Error handling tested (not just success paths)
+- [ ] Reusable fixtures created (no code duplication in tests)
+- [ ] Mocks ONLY for external dependencies (NEVER mock application logic)
+- [ ] **Coverage >= 80%** (run `pytest --cov=src --cov-report=html` and verify)
+  - If < 80%, add missing tests before marking complete
+  - Critical paths should have >= 95% coverage
+- [ ] Tests passing locally (run full suite, not just new tests)
+- [ ] Tests fast (suite < 5 min - if slower, investigate why)
+- [ ] Descriptive names (test_<behavior>_<scenario> format)
+
+**CRITICAL:** Run coverage report. If < 80%, add missing tests.
+If edge cases not covered, test suite is INCOMPLETE.
+
+**Quality Assurance:** This agent ensures that ALL steps of the test creation process have been
+executed EXACTLY as they were supposed to be, with COMPLETE coverage and NO gaps.

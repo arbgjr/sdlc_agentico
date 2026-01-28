@@ -214,6 +214,50 @@ iac_output:
 6. **SEMPRE** configurar backup
 7. **SEMPRE** habilitar audit logging
 
+## Final Validation (MANDATORY)
+
+Before applying IaC, you MUST verify:
+
+### Security Checklist (100% required - NO exceptions)
+
+**Networking:**
+- [ ] VNet/VPC with private subnets configured
+- [ ] NSG/Security Groups restrictive (deny by default, allow only necessary)
+- [ ] Private endpoints where possible (databases, storage, etc.)
+- [ ] WAF in front of public services (if any)
+
+**Identity & Access:**
+- [ ] Managed Identity / IAM Roles configured (NO service accounts with passwords)
+- [ ] Least privilege RBAC applied (minimum permissions needed)
+- [ ] NO credentials hardcoded anywhere (check ALL files)
+- [ ] Dedicated service accounts per application
+
+**Data Protection:**
+- [ ] Encryption at rest enabled (for databases, storage, disks)
+- [ ] Encryption in transit enabled (TLS 1.2+ minimum)
+- [ ] Automated backup configured (with retention policies)
+- [ ] Retention policies defined (comply with regulations)
+
+**Observability:**
+- [ ] Audit logging enabled (for ALL resources)
+- [ ] Security metrics configured (failed logins, unauthorized access)
+- [ ] Alerts configured (for critical security events)
+- [ ] Log aggregation setup (centralized logging)
+
+### Validation Commands (MUST pass ALL before apply)
+
+- [ ] `terraform validate` passed (no syntax errors)
+- [ ] `checkov scan` passed (0 CRITICAL/HIGH findings)
+- [ ] `tfsec scan` passed (0 CRITICAL/HIGH findings)
+- [ ] `terraform plan` reviewed (no surprises in changes)
+- [ ] Cost estimate reviewed (no unexpected expenses)
+
+**CRITICAL:** If ANY security item is missing, infrastructure is NOT PRODUCTION-READY.
+Fix ALL items before applying. NO shortcuts, NO "we'll fix it later".
+
+**Quality Assurance:** This agent ensures that ALL steps of the IaC generation process have been
+executed EXACTLY as they were supposed to be, with COMPLETE security controls and NO gaps.
+
 ## Ferramentas
 
 - Terraform (principal)

@@ -259,32 +259,48 @@ spec_kit_flow:
 
 ## Integracao com GitHub Milestones
 
-### Workflow Automatizado (OBRIGATORIO)
+### Workflow Automatizado (MANDATORY - Post-Planning)
 
-Ao criar o **task-breakdown.yml**, você DEVE executar automaticamente os 3 scripts de automação:
+**IMPORTANTE:** Após criar `task-breakdown.yml`, você DEVE executar automaticamente
+os 3 scripts de automação EM SEQUÊNCIA:
 
 ```bash
-# 1. Criar TODOS os milestones automaticamente
+# 1. CREATE ALL MILESTONES (must run first)
 python3 .claude/skills/github-sync/scripts/create_all_sprints.py \
   .agentic_sdlc/projects/{project-id}/planning/task-breakdown.yml \
   --base-date "2026-01-20"
 
-# 2. Criar TODAS as issues automaticamente
+# Wait for completion, verify: 0 failed
+
+# 2. CREATE ALL ISSUES (must run second)
 python3 .claude/skills/github-sync/scripts/bulk_create_issues.py \
   .agentic_sdlc/projects/{project-id}/planning/task-breakdown.yml \
   {project-number}
 
-# 3. Atribuir TODAS as issues aos milestones corretos
+# Wait for completion, verify: 0 failed
+
+# 3. ASSIGN ISSUES TO MILESTONES (must run last)
 python3 .claude/skills/github-sync/scripts/assign_issues_bulk.py \
   .agentic_sdlc/projects/{project-id}/planning/task-breakdown.yml
+
+# Wait for completion, verify: 0 failed
 ```
 
-**IMPORTANTE:**
-- Esses scripts DEVEM ser executados AUTOMATICAMENTE após criar task-breakdown.yml
-- NÃO espere comando do usuário
-- Execute em sequência: milestones → issues → assignment
-- Verifique os logs para garantir sucesso (0 failed)
-- Se houver falhas, reporte e corrija antes de prosseguir
+**Regras:**
+- ✅ Execute automaticamente após gerar task-breakdown.yml
+- ✅ Execute em sequência (NÃO paralelo)
+- ✅ Aguarde cada script terminar antes do próximo
+- ✅ Verifique logs: se houver falhas (> 0 failed), corrija antes de prosseguir
+- ❌ NÃO espere comando do usuário para executar
+- ❌ NÃO pule scripts "para agilizar"
+- ❌ NÃO continue se houver falhas
+
+**Se algum script falhar:**
+1. Reporte erro detalhado ao usuário
+2. Identifique causa (rate limit? permissão? formato?)
+3. Corrija o problema
+4. Re-execute apenas o script que falhou
+5. Continue sequência após sucesso
 
 ### Criar Milestone Manual (apenas se necessário)
 
@@ -515,17 +531,29 @@ Claude will:
 2. Queue dependent tasks (wait for blockers)
 3. Start automation loop to monitor progress
 
-## Checklist
+## Final Validation (MANDATORY)
 
-- [ ] Backlog priorizado recebido
-- [ ] Capacidade do time calculada
-- [ ] Stories quebradas em tasks
-- [ ] Estimativas feitas pelo time
-- [ ] Dependencias mapeadas
-- [ ] Caminho critico identificado
-- [ ] Buffer incluido (20%)
-- [ ] Riscos listados com mitigacoes
-- [ ] Milestones definidos
-- [ ] Plano revisado com time
-- [ ] Stakeholders alinhados
-- [ ] **Task spec gerado para parallel workers** (Complexity 2+)
+Before committing sprint plan, you MUST verify:
+
+- [ ] Backlog prioritized received from PO (not assumed)
+- [ ] Team capacity calculated (person-days available - accounting for vacations, holidays)
+- [ ] Stories broken down into tasks (not left as large chunks)
+- [ ] Estimates done by team (not solo planning - get team input)
+- [ ] **ALL dependencies mapped** (not partial - verify each category):
+  - [ ] Technical dependencies (task A needs task B)
+  - [ ] Cross-team dependencies (external teams involved)
+  - [ ] External dependencies (third-party, vendors)
+- [ ] Critical path identified (longest sequence of dependent tasks)
+- [ ] Buffer included (20% of capacity for bugs/unknowns)
+- [ ] Risks listed WITH mitigations (not just risks without plans)
+- [ ] Milestones defined with dates (clear checkpoints)
+- [ ] Plan reviewed WITH team (not just sent - got feedback and buy-in)
+- [ ] Stakeholders aligned (approval received, not assumed)
+- [ ] Task spec generated for parallel workers (if Complexity 2+)
+- [ ] **Automation scripts executed** (see Workflow Automatizado section above)
+
+**CRITICAL:** If ANY item is incomplete, planning is NOT DONE.
+Go back and finish missing items before marking as complete.
+
+**Quality Assurance:** This agent ensures that ALL steps of the planning process have been
+executed EXACTLY as they were supposed to be, with NO shortcuts or assumptions.

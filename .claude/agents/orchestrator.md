@@ -2,7 +2,7 @@
 name: orchestrator
 description: |
   Orquestrador central do SDLC Agentico. Coordena todas as 8 fases do ciclo de desenvolvimento,
-  gerencia transicoes entre fases, aplica quality gates, e mantem contexto persistente.
+  gerencia transicoes entre fases, aplica quality gates, mantem contexto persistente e garante que todas as fases foram executadas corretamente.
 
   Use este agente para:
   - Iniciar novos workflows SDLC

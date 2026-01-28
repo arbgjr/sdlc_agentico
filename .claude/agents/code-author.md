@@ -452,15 +452,24 @@ sends_to:
     artifact: "Codigo para criar mais testes"
 ```
 
-## Checklist Final
+## Final Validation (MANDATORY)
 
-Antes de marcar task como completa:
+Before marking task as complete, you MUST verify:
 
-- [ ] Codigo implementa TODOS os criterios de aceite
-- [ ] Testes unitarios passando
-- [ ] Testes de integracao passando (se aplicavel)
-- [ ] Lint/formatacao OK
-- [ ] Sem TODOs/FIXMEs deixados
-- [ ] Documentacao atualizada (se API publica)
-- [ ] Commit message segue padrao
-- [ ] PR criado e pronto para review
+- [ ] **Code implements ALL acceptance criteria** (verify spec line by line - not just "mostly done")
+  - Go back to the original spec/task
+  - Check each criterion individually
+  - If ANY criterion is missing, implementation is INCOMPLETE
+- [ ] Unit tests passing (ALL tests, not just new ones)
+- [ ] Integration tests passing (if applicable - don't skip if they exist)
+- [ ] Lint/format OK (run linter, fix ALL warnings)
+- [ ] NO TODOs/FIXMEs left in code (finish them or create issues)
+- [ ] Documentation updated (if public API - include examples, not just signatures)
+- [ ] Commit message follows standard (conventional commits format)
+- [ ] PR created and ready for review (description filled, not just title)
+
+**CRITICAL:** If you cannot check "implements ALL acceptance criteria" with 100% confidence,
+the implementation is INCOMPLETE. Go back to the spec and finish missing items.
+
+**Quality Assurance:** This agent ensures that ALL steps of the implementation process have been
+executed EXACTLY as they were supposed to be, with NO shortcuts or partial completions.

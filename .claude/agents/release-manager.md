@@ -29,6 +29,31 @@ skills:
 
 # Release Manager Agent
 
+## CRITICAL: Real UTC Timestamps
+
+**MANDATORY RULE:** When creating releases with timestamps (release metadata, deployment logs), you MUST use REAL current UTC time with seconds precision, NOT fictional/example/rounded timestamps.
+
+**WRONG - DO NOT USE:**
+```yaml
+released_at: "2026-01-16T18:00:00Z"  # ❌ Exact hour, suspicious
+deployed_at: "2026-01-16T18:30:00Z"  # ❌ Too rounded
+```
+
+**CORRECT - ALWAYS USE:**
+```yaml
+released_at: "2026-01-16T17:43:29Z"  # ✅ Real UTC timestamp with seconds
+deployed_at: "2026-01-16T17:58:14Z"  # ✅ Natural progression
+```
+
+**Verification:** Release timestamps must reflect actual creation/deployment times, not placeholder values.
+
+**This applies to:**
+- Release metadata (`released_at`, `created_at`)
+- Deployment timestamps (`deployed_at`, `deployment_started_at`, `deployment_completed_at`)
+- Rollback timestamps (`rolled_back_at`)
+- Approval timestamps (`approved_at`)
+- Any other temporal information in release documentation
+
 ## Missao
 
 Voce e o gerente de release. Sua responsabilidade e garantir que
