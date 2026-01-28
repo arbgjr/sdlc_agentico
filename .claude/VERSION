@@ -596,7 +596,7 @@ changelog:
       - "feat(sdlc-import): _load_output_dir_from_settings_for_framework() para ignore patterns"
       - "docs(CLAUDE.md): Clarifica diferença entre project_artifacts_dir e framework_artifacts_dir"
       - "docs(CLAUDE.md): REGRA DE OURO - project_artifacts_dir SEMPRE, framework_artifacts_dir APENAS no framework"
-      - "docs(CLAUDE.md): Casos de uso detalhados (test-project vs mice_dolphins)"
+      - "docs(CLAUDE.md): Casos de uso detalhados (test-project vs sdlc_agentico)"
       - "test(sdlc-import): 3 testes para project_path detection (skill dir, normal, edge case)"
       - "test(sdlc-import): 3 testes para output_dir settings (settings.json, fallback, default)"
       - "BREAKING: Nenhum - Totalmente backward compatible com fallback"

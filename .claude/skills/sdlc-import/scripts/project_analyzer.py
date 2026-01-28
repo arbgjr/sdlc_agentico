@@ -244,7 +244,7 @@ class ProjectAnalyzer:
         # Check for .sdlcignore in project root
         project_ignore = self.project_path / ".sdlcignore"
 
-        # Check for .sdlcignore in framework root (mice_dolphins)
+        # Check for .sdlcignore in framework root (sdlc_agentico)
         framework_root = Path(__file__).parent.parent.parent.parent
         framework_ignore = framework_root / ".sdlcignore"
 

@@ -227,7 +227,7 @@ All behavior is defined in `.claude/settings.json`, which configures:
 
 **`.agentic_sdlc/` - Artefatos DO FRAMEWORK (APENAS este repo):**
 
-**APENAS** quando você está desenvolvendo O PRÓPRIO FRAMEWORK (mice_dolphins):
+**APENAS** quando você está desenvolvendo O PRÓPRIO FRAMEWORK (sdlc_agentico):
 
 **Estrutura:**
 ```
@@ -255,14 +255,14 @@ cd /home/user/autoritas
 
 **Caso 2: Desenvolvendo o Framework**
 ```bash
-cd /home/user/mice_dolphins  # Repo do framework
+cd /home/user/sdlc_agentico  # Repo do framework
 
 # Analisando o framework como projeto:
 /sdlc-import
-# ✅ Grava em: /home/user/mice_dolphins/.project/
+# ✅ Grava em: /home/user/sdlc_agentico/.project/
 
 # Criando ADR SOBRE o framework (manualmente):
-# ✅ Grava em: /home/user/mice_dolphins/.agentic_sdlc/corpus/nodes/decisions/ADR-022.yml
+# ✅ Grava em: /home/user/sdlc_agentico/.agentic_sdlc/corpus/nodes/decisions/ADR-022.yml
 ```
 
 ### Phase Flow
