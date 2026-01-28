@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orchestrates **37 specialized agents (33 orchestrated + 4 consultive)** through **9 development phases (0-8)**. This is a **configuration and orchestration framework**, not a traditional application codebase.
+SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orchestrates **38 specialized agents (33 orchestrated + 4 consultive + 1 meta)** through **9 development phases (0-8)**. This is a **configuration and orchestration framework**, not a traditional application codebase.
 
 **Key Features:**
 - Security by Design integrated in all phases
@@ -119,7 +119,7 @@ gh auth status
 
 ### Configuration-Driven Design
 All behavior is defined in `.claude/settings.json`, which configures:
-- 37 agents organized by SDLC phase (33 orchestrated + 4 consultive)
+- 38 agents organized by SDLC phase (33 orchestrated + 4 consultive + 1 meta)
 - Git hooks for validation and automation
 - Quality gates between phases (including Security Gate)
 - Complexity levels (0-3) that determine which phases are executed
@@ -128,7 +128,7 @@ All behavior is defined in `.claude/settings.json`, which configures:
 ### Directory Structure
 ```
 .claude/
-├── agents/           # Agent specs (markdown) - 37 specialized roles
+├── agents/           # Agent specs (markdown) - 38 specialized roles
 ├── skills/           # Reusable capabilities with scripts
 │   └── gate-evaluator/gates/  # YAML quality gate definitions (including security-gate.yml)
 ├── commands/         # Slash commands for user interaction
