@@ -1,8 +1,8 @@
 # SDLC Agêntico Version
-version: "2.2.2"
+version: "2.2.3"
 build_date: "2026-01-28"
 release_notes: |
-  CRITICAL FIX - Agent Instructions Clarity (Prevents Custom Script Creation)
+  HOTFIX - VERSION File YAML Syntax Error
 
   Sprint 2 (v2.2.0) - MÉDIO - Documentation Improvements:
 
@@ -360,6 +360,17 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "2.2.3"
+    date: "2026-01-28"
+    changes:
+      - "fix(CRITICAL): Invalid YAML escape sequence in VERSION file line 509"
+      - "fix(yaml): Changed './\\.agentic_sdlc/' to './.agentic_sdlc/' (removed backslash)"
+      - "root_cause: Invalid escape '\\.' in double-quoted YAML string (v2.1.11 changelog)"
+      - "impact: graph_generator.py was failing to load VERSION file"
+      - "impact: sdlc-import was completely broken (Exit code 1)"
+      - "impact: yaml.scanner.ScannerError: unknown escape character '.'"
+      - "validation: python3 -c 'import yaml; yaml.safe_load(...)' now passes"
+      - "severity: BLOCKER - prevented all sdlc-import executions"
   - version: "2.2.2"
     date: "2026-01-28"
     changes:
@@ -506,7 +517,7 @@ changelog:
       - "fix(setup): check_and_migrate_artifacts() moved to main() entry point"
       - "fix(setup): Migration verification now runs ALWAYS, independent of install origin"
       - "feat(script): migrate-artifacts.sh - standalone migration script"
-      - "feat(script): Can be executed manually at any time (./\.agentic_sdlc/scripts/migrate-artifacts.sh)"
+      - "feat(script): Can be executed manually at any time (./.agentic_sdlc/scripts/migrate-artifacts.sh)"
       - "feat(script): Interactive migration with file counts, backup, and verification"
       - "feat(script): Auto-detects artifacts in .agentic_sdlc/ that should be in .project/"
       - "docs(script): Comprehensive help text and progress reporting"
