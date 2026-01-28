@@ -14,7 +14,7 @@ This command analyzes your project and generates:
 - Architecture diagrams (Mermaid + DOT)
 - STRIDE threat model
 - Technical debt report (P0-P3 prioritized)
-- Complete `.agentic_sdlc/` structure
+- Complete `.project/` structure (respects settings.json configuration)
 
 ## Usage
 
@@ -103,10 +103,19 @@ The command executes a 9-step analysis:
 - Rust (Actix)
 - Kotlin (Ktor)
 
+## Output Directory
+
+**IMPORTANT:** Output directory is configurable via settings.json (default: `.project/`)
+
+**Configuration priority:**
+1. `.claude/settings.json` → `sdlc.output.project_artifacts_dir`
+2. `import_config.yml` → `general.output_dir` (fallback)
+3. Default: `.project`
+
 ## Output Structure
 
 ```
-.agentic_sdlc/
+.project/                          ← Default (configurable)
 ├── corpus/
 │   └── nodes/
 │       └── decisions/
@@ -123,6 +132,8 @@ The command executes a 9-step analysis:
     ├── tech-debt-inferred.md
     └── import-report.md
 ```
+
+**Never write to `.agentic_sdlc/`** - this directory is for framework files only.
 
 ## Decision Confidence Levels
 

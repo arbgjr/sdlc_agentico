@@ -18,7 +18,7 @@ Reverse engineer existing codebases (not necessarily legacy - can be modern proj
 - Generate 3-5 architecture diagrams (Mermaid + DOT)
 - Perform STRIDE threat modeling
 - Identify 10-50 tech debt items (P0-P3 prioritized)
-- Create complete `.agentic_sdlc/` structure
+- Create complete `.project/` structure (respects settings.json configuration)
 - Auto-create feature branch before analysis
 
 ---
@@ -32,11 +32,12 @@ Reverse engineer existing codebases (not necessarily legacy - can be modern proj
 
 **Read-Only Analysis:**
 - Never modifies source code
-- Only creates `.agentic_sdlc/` documentation
+- Only creates `.project/` documentation (configurable via settings.json)
 
 **Configuration Over Code:**
 - All thresholds in YAML files
 - Extensible pattern libraries
+- Output directory respects settings.json configuration
 
 ---
 
@@ -82,9 +83,18 @@ Reverse engineer existing codebases (not necessarily legacy - can be modern proj
 
 ## Outputs
 
+**Output Directory Configuration:**
+
+The skill respects `settings.json` configuration for output location.
+
+**Priority order:**
+1. `.claude/settings.json` → `sdlc.output.project_artifacts_dir` (default: `.project`)
+2. `import_config.yml` → `general.output_dir` (fallback, deprecated)
+3. Default: `.project`
+
 **Created Files:**
 ```
-.agentic_sdlc/
+.project/                          ← Default (configurable)
 ├── corpus/nodes/decisions/
 │   ├── ADR-INFERRED-001.yml
 │   ├── ADR-INFERRED-002.yml
@@ -99,6 +109,8 @@ Reverse engineer existing codebases (not necessarily legacy - can be modern proj
     ├── tech-debt-inferred.md
     └── import-report.md
 ```
+
+**IMPORTANT:** Never write to `.agentic_sdlc/` - this directory is for framework files only.
 
 ---
 

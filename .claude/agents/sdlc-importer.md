@@ -16,8 +16,28 @@ Reverse engineer existing codebases (not necessarily legacy - can be modern proj
 3. **Diagram Generation** - Create architecture diagrams (Mermaid + DOT, 3-5 diagrams)
 4. **Threat Modeling** - Perform STRIDE analysis using security-guidance plugin
 5. **Tech Debt Detection** - Identify technical debt items with P0-P3 priorities (10-50 items)
-6. **Documentation Generation** - Create complete `.agentic_sdlc/` structure
+6. **Documentation Generation** - Create complete `.project/` structure (respects settings.json configuration)
 7. **Quality Validation** - Run sdlc-import-gate.yml to ensure quality
+
+## Output Directory Configuration
+
+**CRITICAL:** Always respect the output directory configuration from settings.json.
+
+**Priority order:**
+1. `.claude/settings.json` → `sdlc.output.project_artifacts_dir` (default: `.project`)
+2. `import_config.yml` → `general.output_dir` (fallback, deprecated)
+3. Default: `.project`
+
+**Directory Structure Created:**
+```
+.project/                          ← ALWAYS write here (configurable)
+├── corpus/nodes/decisions/        ← ADRs (inferred)
+├── architecture/                  ← Diagrams (Mermaid, DOT)
+├── security/                      ← Threat models
+└── reports/                       ← Import reports, tech debt
+```
+
+**Never write to `.agentic_sdlc/`** - this is for framework files only.
 
 ## Workflow
 
@@ -95,7 +115,7 @@ Phase 1 (v1.0.0):
 ## Success Criteria
 
 ✅ All quality gate checks passed
-✅ Documentation created in `.agentic_sdlc/`
+✅ Documentation created in `.project/` (per settings.json configuration)
 ✅ Feature branch ready for review
 ✅ High-confidence decisions validated
 ✅ P0 tech debt identified
