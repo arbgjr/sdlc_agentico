@@ -1232,9 +1232,11 @@ git commit -m "fix: critical issue"
 
 ## Version History Quick Reference
 
-**Current Version**: v2.1.4 (.sdlcignore - Prevent Framework Self-Scanning)
+**Current Version**: v2.3.1 (Critical Bug Fixes - sdlc-import WITH LLM)
 
 **Recent Releases**:
+- v2.3.1 (2026-01-28): CRITICAL fixes for sdlc-import WITH LLM - 4 bugs fixed (UnboundLocalError, error handling, ADR reconciliation, graph persistence)
+- v2.3.0 (2026-01-28): Auto-Update Component Counts (automatic doc synchronization, zero manual effort)
 - v2.1.4 (2026-01-26): .sdlcignore support to prevent framework self-scanning, Issue #92 (Tripla pattern detection)
 - v2.1.3 (2026-01-26): sdlc-import critical bug fixes (FileNotFoundError, path confusion, YAML security, error handling, datetime)
 - v2.1.2 (2026-01-26): Framework/Project Separation - major refactoring, dynamic splash screen

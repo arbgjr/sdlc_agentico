@@ -107,50 +107,76 @@ class PostImportValidator:
                 })
 
         # 2. Fix Tech Debt Report (already handled by documentation_generator.py)
+        # BUG FIX #1: Initialize with safe defaults to prevent UnboundLocalError
+        tech_debt_result = {"was_incomplete": False, "original_count": 0, "rendered_count": 0, "report_path": ""}
+
         if self.config.get('tech_debt_validation', {}).get('enabled', True):
-            tech_debt_result = self.fixers['tech_debt'].fix(
-                tech_debt=import_results.get('tech_debt', {}),
-                output_dir=output_dir,
-                correlation_id=correlation_id
-            )
+            try:
+                tech_debt_result = self.fixers['tech_debt'].fix(
+                    tech_debt=import_results.get('tech_debt', {}),
+                    output_dir=output_dir,
+                    correlation_id=correlation_id
+                )
 
-            corrections_applied['tech_debt_regeneration'] = {
-                'original_item_count': tech_debt_result['original_count'],
-                'rendered_item_count': tech_debt_result['rendered_count'],
-                'report_path': str(tech_debt_result['report_path'])
-            }
+                corrections_applied['tech_debt_regeneration'] = {
+                    'original_item_count': tech_debt_result['original_count'],
+                    'rendered_item_count': tech_debt_result['rendered_count'],
+                    'report_path': str(tech_debt_result['report_path'])
+                }
 
-            if tech_debt_result['was_incomplete']:
+                if tech_debt_result['was_incomplete']:
+                    issues_detected.append({
+                        'category': 'tech_debt',
+                        'severity': 'critical',
+                        'message': f"Tech debt report was incomplete (missing {tech_debt_result['original_count']} items)",
+                        'correction': 'Regenerated with full item list'
+                    })
+            except Exception as e:
+                logger.error(f"Tech debt validation failed: {e}", exc_info=True)
+                tech_debt_result = {"was_incomplete": True, "error": str(e), "original_count": 0, "rendered_count": 0, "report_path": ""}
                 issues_detected.append({
                     'category': 'tech_debt',
-                    'severity': 'critical',
-                    'message': f"Tech debt report was incomplete (missing {tech_debt_result['original_count']} items)",
-                    'correction': 'Regenerated with full item list'
+                    'severity': 'error',
+                    'message': f"Tech debt validation crashed: {str(e)}",
+                    'correction': 'Using default values'
                 })
 
         # 3. Fix Diagrams (validate quality)
+        # BUG FIX #1: Initialize with safe defaults to prevent UnboundLocalError
+        diagram_result = {"regenerated": False, "regenerated_diagrams": []}
+
         if self.config.get('diagram_validation', {}).get('enabled', True):
-            # Extract diagrams list from the diagrams dict (contains {"diagrams": [...], "count": N})
-            diagrams_dict = import_results.get('diagrams', {})
-            diagrams_list = diagrams_dict.get('diagrams', []) if isinstance(diagrams_dict, dict) else []
+            try:
+                # Extract diagrams list from the diagrams dict (contains {"diagrams": [...], "count": N})
+                diagrams_dict = import_results.get('diagrams', {})
+                diagrams_list = diagrams_dict.get('diagrams', []) if isinstance(diagrams_dict, dict) else []
 
-            diagram_result = self.fixers['diagrams'].fix(
-                diagrams=diagrams_list,
-                language_analysis=import_results.get('language_analysis', {}),
-                output_dir=output_dir
-            )
+                diagram_result = self.fixers['diagrams'].fix(
+                    diagrams=diagrams_list,
+                    language_analysis=import_results.get('language_analysis', {}),
+                    output_dir=output_dir
+                )
 
-            if diagram_result['regenerated']:
-                corrections_applied['diagram_regeneration'] = {
-                    'regenerated_count': len(diagram_result['regenerated_diagrams']),
-                    'reason': 'Diagrams were too generic'
-                }
+                if diagram_result['regenerated']:
+                    corrections_applied['diagram_regeneration'] = {
+                        'regenerated_count': len(diagram_result['regenerated_diagrams']),
+                        'reason': 'Diagrams were too generic'
+                    }
 
+                    issues_detected.append({
+                        'category': 'diagrams',
+                        'severity': 'warning',
+                        'message': 'Diagrams were generic templates',
+                        'correction': f"Regenerated {len(diagram_result['regenerated_diagrams'])} diagrams"
+                    })
+            except Exception as e:
+                logger.error(f"Diagram validation failed: {e}", exc_info=True)
+                diagram_result = {"regenerated": False, "regenerated_diagrams": [], "error": str(e)}
                 issues_detected.append({
                     'category': 'diagrams',
-                    'severity': 'warning',
-                    'message': 'Diagrams were generic templates',
-                    'correction': f"Regenerated {len(diagram_result['regenerated_diagrams'])} diagrams"
+                    'severity': 'error',
+                    'message': f"Diagram validation crashed: {str(e)}",
+                    'correction': 'Using default values'
                 })
 
         # 4. Validate artifact completeness

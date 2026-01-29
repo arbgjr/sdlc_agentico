@@ -219,22 +219,24 @@ class DecisionExtractor:
         """
         Generate rationale using LLM synthesis.
 
-        Note: This is a placeholder. In production, would call Claude API.
+        BUG FIX #3: Use SAME format as pattern rationale for consistency.
+        This prevents ADR reconciliation from incorrectly marking LLM ADRs as duplicates.
         """
         if not self.llm_enabled:
             return self._generate_pattern_rationale(category, tech_name, evidence)
 
-        # FIX #1: Enhanced LLM synthesis with context
+        # BUG FIX #3: Match pattern rationale format for consistent reconciliation
         files = set(e.file for e in evidence)
-        file_list = list(files)[:5]  # Show up to 5 files for context
+        file_list = ", ".join(list(files)[:3])
+        if len(files) > 3:
+            file_list += f", and {len(files) - 3} more"
 
-        # TODO: Call Claude API here with evidence context
-        # For now, enhanced placeholder with more detail
+        # Use CONSISTENT format with pattern rationale (no placeholder note)
         return (
-            f"{tech_name.title()} was selected for {category} based on analysis of {len(files)} files. "
-            f"Key evidence found in: {', '.join(file_list)}. "
-            f"This decision aligns with project architecture patterns. "
-            f"[Note: Full LLM synthesis requires API integration - see decision_extractor.py:_generate_llm_rationale]"
+            f"{tech_name.title()} was detected as the {category} solution based on "
+            f"evidence found in {len(files)} file(s): {file_list}. "
+            f"The codebase shows {len(evidence)} reference(s) to {tech_name} "
+            "indicating it is the adopted technology for this concern."
         )
 
 

@@ -1,6 +1,6 @@
 <!-- Core Badges -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v2.3.0)
+[![Version](https://img.shields.io/badge/version-2.3.1-blue.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v2.3.1)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 
 <!-- AI Compatibility -->
@@ -38,7 +38,7 @@ O SDLC Agêntico é um framework que usa **38 agentes especializados** (33 orque
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         SDLC AGÊNTICO v2.3.0                            │
+│                         SDLC AGÊNTICO v2.3.1                            │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  Ideia → [Intake] → [Discovery] → [Requirements] → [Architecture]       │
@@ -48,6 +48,7 @@ O SDLC Agêntico é um framework que usa **38 agentes especializados** (33 orque
 │  38 Agentes | 9 Fases | Quality Gates | Security by Design              │
 │  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot         │
 │                                                                         │
+│  v2.3.1: CRITICAL Fixes | sdlc-import LLM | 4 Bugs | No Crashes | 9 ADRs │
 │  v2.3.0: Auto-Update Docs | Component Counts | Zero Effort | Always Sync│
 │  v2.2.4: Critical Audit Fixes | graph.json | YAML | Version Loading     │
 │  v2.2.2: Agent Instructions | Prevent Custom Scripts | Validation Tool  │
@@ -95,7 +96,7 @@ O SDLC Agêntico é um framework que usa **38 agentes especializados** (33 orque
 
 ```bash
 # Definir versão desejada (consulte releases para última versão)
-VERSION="v2.3.0"
+VERSION="v2.3.1"
 
 # Download e extração (preserva permissões de execução)
 curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -

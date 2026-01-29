@@ -1089,19 +1089,39 @@ class ProjectAnalyzer:
                 corpus_dir = self.output_dir / "corpus"
                 extracted_adrs = decisions.get('decisions', [])
                 if len(extracted_adrs) > 0:
-                    # BUG FIX #4: Add error handling to prevent pipeline failure
+                    # BUG FIX #4: Add error handling AND persist graph.json even on failure
                     try:
                         graph_result = self.graph_generator.generate(corpus_dir, extracted_adrs)
                         logger.info(f"Graph generated: {graph_result.get('node_count', 0)} nodes, {graph_result.get('edge_count', 0)} edges")
+
+                        # BUG FIX #4: Persist graph.json to disk
+                        graph_file = corpus_dir / "graph.json"
+                        graph_file.parent.mkdir(parents=True, exist_ok=True)
+                        with open(graph_file, 'w') as f:
+                            json.dump(graph_result, f, indent=2)
+                        logger.info(f"Graph saved to {graph_file}")
+
                     except Exception as e:
-                        logger.error(f"Graph generation failed: {e}")
-                        logger.warning("Continuing with import (graph will be incomplete)")
-                        graph_result = {
+                        logger.error(f"Graph generation failed: {e}", exc_info=True)
+
+                        # BUG FIX #4: Create minimal valid graph.json instead of failing silently
+                        minimal_graph = {
                             "status": "failed",
                             "error": str(e),
+                            "version": "2.3.1",
+                            "nodes": [],
+                            "edges": [],
                             "node_count": 0,
                             "edge_count": 0
                         }
+
+                        graph_file = corpus_dir / "graph.json"
+                        graph_file.parent.mkdir(parents=True, exist_ok=True)
+                        with open(graph_file, 'w') as f:
+                            json.dump(minimal_graph, f, indent=2)
+
+                        graph_result = minimal_graph
+                        logger.warning(f"Created minimal graph.json at {graph_file}")
                 else:
                     logger.warning("No ADRs found - skipping graph generation")
                     graph_result = {"status": "skipped", "reason": "no_adrs"}
@@ -1168,41 +1188,64 @@ class ProjectAnalyzer:
                 validation_config = self._load_validation_config()
 
                 # Execute validation + correction
+                # BUG FIX #2: Add error handling to prevent crashes from propagating
                 validator = PostImportValidator(validation_config)
-                validation_result = validator.validate_and_fix(
-                    import_results=results,
-                    project_path=str(self.project_path),
-                    output_dir=self.output_dir,
-                    correlation_id=self.analysis_id
-                )
 
-                # Generate quality report
-                quality_report = self._generate_quality_report(
-                    validation_result=validation_result,
-                    project_name=self.project_path.name,
-                    correlation_id=self.analysis_id
-                )
+                try:
+                    validation_result = validator.validate_and_fix(
+                        import_results=results,
+                        project_path=str(self.project_path),
+                        output_dir=self.output_dir,
+                        correlation_id=self.analysis_id
+                    )
 
-                # Save quality report
-                quality_report_path = self.output_dir / "reports" / "post_import_quality_report.md"
-                quality_report_path.parent.mkdir(parents=True, exist_ok=True)
-                quality_report_path.write_text(quality_report)
+                    # Generate quality report
+                    quality_report = self._generate_quality_report(
+                        validation_result=validation_result,
+                        project_name=self.project_path.name,
+                        correlation_id=self.analysis_id
+                    )
 
-                # Step 11: USER APPROVAL
-                user_decision = self._prompt_user_approval(
-                    quality_report=quality_report,
-                    validation_result=validation_result,
-                    correlation_id=self.analysis_id
-                )
+                    # Save quality report
+                    quality_report_path = self.output_dir / "reports" / "post_import_quality_report.md"
+                    quality_report_path.parent.mkdir(parents=True, exist_ok=True)
+                    quality_report_path.write_text(quality_report)
 
-                # Update results with validation
-                results['post_import_validation'] = {
-                    'status': user_decision.value,
-                    'score': validation_result.overall_score,
-                    'corrections_applied': validation_result.corrections_applied,
-                    'issues_detected': validation_result.issues_detected,
-                    'report_path': str(quality_report_path.relative_to(self.project_path))
-                }
+                    # Step 11: USER APPROVAL
+                    user_decision = self._prompt_user_approval(
+                        quality_report=quality_report,
+                        validation_result=validation_result,
+                        correlation_id=self.analysis_id
+                    )
+
+                    # Update results with validation
+                    results['post_import_validation'] = {
+                        'status': user_decision.value,
+                        'score': validation_result.overall_score,
+                        'corrections_applied': validation_result.corrections_applied,
+                        'issues_detected': validation_result.issues_detected,
+                        'report_path': str(quality_report_path.relative_to(self.project_path))
+                    }
+
+                except Exception as e:
+                    logger.error(
+                        f"Post-import validation FAILED: {e}",
+                        extra={'correlation_id': self.analysis_id},
+                        exc_info=True
+                    )
+
+                    # BUG FIX #2: Graceful degradation - mark as failed but CONTINUE
+                    results['post_import_validation'] = {
+                        'status': 'failed',
+                        'error': str(e),
+                        'score': 0.0,
+                        'corrections_applied': {},
+                        'issues_detected': [],
+                        'note': 'Import completed but validation crashed - artifacts may be incomplete'
+                    }
+
+                    # Log to user
+                    logger.warning("Import artifacts created but validation failed - review manually")
 
                 # Abort if user rejected
                 if user_decision == UserDecision.ABORT:
