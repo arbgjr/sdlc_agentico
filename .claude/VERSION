@@ -1,8 +1,16 @@
 # SDLC Agêntico Version
-version: "2.3.2"
+version: "2.3.3"
 build_date: "2026-01-29"
 release_notes: |
-  v2.3.2 - Major Bug Fixes Sprint (14 bugs fixed: 6 CRITICAL, 3 GRAVE, 4 MEDIUM, 1 LIGHT)
+  v2.3.3 - HOTFIX: Artifact Generation Silent Failures (3 CRITICAL bugs)
+
+  CRITICAL FIXES:
+  - C5: Threat model YAML validation prevents invalid backticks/markdown
+  - C6: Exit code 1 when required artifacts missing (CI/CD failure detection)
+  - C1: graph.json ALWAYS generated, even with 0 ADRs
+
+  Discovered via post-release audit on Autoritas project execution.
+  Prevents silent failures when artifact generation encounters errors.
 
   NEW FEATURE: Automatic Documentation Synchronization
   - Never fail doc validation badge again!
@@ -396,6 +404,29 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "2.3.3"
+    date: "2026-01-29"
+    changes:
+      - "fix(CRITICAL C5): Threat model YAML validation"
+      - "fix(C5): Use same yaml.dump() params as ADRs (explicit_start, width=inf)"
+      - "fix(C5): Add pre-write YAML validation with yaml.safe_load()"
+      - "fix(C5): Raise ValueError if threat model YAML invalid (prevents write)"
+      - "impact(C5): No more ScannerError on backticks or markdown code blocks"
+      - "fix(CRITICAL C6): Exit code validation now invoked"
+      - "fix(C6): _check_artifacts_created() called BEFORE return results"
+      - "fix(C6): FileNotFoundError raised when graph.json/adr_index.yml missing"
+      - "fix(C6): CI/CD pipelines can now detect sdlc-import failures"
+      - "impact(C6): No more 'success' when artifacts missing"
+      - "fix(CRITICAL C1): graph.json ALWAYS generated"
+      - "fix(C1): Generate empty graph.json when no ADRs extracted"
+      - "fix(C1): Metadata includes status='empty' and reason='no_adrs_extracted'"
+      - "fix(C1): Use framework_version from graph_generator (not hardcoded)"
+      - "impact(C1): Required artifact always exists for validation"
+      - "docs(audit): CRITICAL_AUDIT_v2.3.2_POST_RELEASE.md added"
+      - "docs(audit): 22 problems identified (6 CRITICAL, 4 GRAVE, 5 MEDIUM, 3 LIGHT, 4 SUGGESTIONS)"
+      - "docs(audit): Root cause: v2.0.0 was executed, not v2.3.2"
+      - "severity: P0 BLOCKER - Silent failures in artifact generation"
+      - "effort: 3 hours (C5: 1h, C6: 1h, C1: 1h)"
   - version: "2.3.2"
     date: "2026-01-29"
     changes:
