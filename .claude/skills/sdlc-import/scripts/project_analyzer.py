@@ -1281,37 +1281,56 @@ class ProjectAnalyzer:
             if self.config.get('graph_generation', {}).get('enabled', True):
                 corpus_dir = self.output_dir / "corpus"
                 extracted_adrs = decisions.get('decisions', [])
-                if len(extracted_adrs) > 0:
-                    # BUG FIX #4: Add error handling AND persist graph.json even on failure
-                    try:
+
+                # FIX C1 (v2.3.3): ALWAYS generate graph.json, even if no ADRs
+                # This ensures required artifact exists for validation
+                try:
+                    if len(extracted_adrs) > 0:
                         graph_result = self.graph_generator.generate(corpus_dir, extracted_adrs)
                         logger.info(f"Graph generated: {graph_result.get('node_count', 0)} nodes, {graph_result.get('edge_count', 0)} edges")
-
-                        # BUG FIX #4: Persist graph.json to disk
-                        graph_file = corpus_dir / "graph.json"
-                        graph_file.parent.mkdir(parents=True, exist_ok=True)
-                        with open(graph_file, 'w') as f:
-                            json.dump(graph_result, f, indent=2)
-                        logger.info(f"Graph saved to {graph_file}")
-
-                    except Exception as e:
-                        logger.error(f"Graph generation failed: {e}", exc_info=True)
-
-                        # BUG FIX #4: Create minimal valid graph.json instead of failing silently
-                        minimal_graph = {
-                            "status": "failed",
-                            "error": str(e),
-                            "version": "2.3.1",
+                    else:
+                        # FIX C1: Generate empty graph when no ADRs extracted
+                        logger.warning("No ADRs extracted - generating empty graph")
+                        graph_result = {
+                            "version": self.graph_generator.framework_version,
+                            "generated_by": "sdlc-import",
+                            "updated_at": datetime.now(timezone.utc).isoformat() + "Z",
                             "nodes": [],
                             "edges": [],
-                            "node_count": 0,
-                            "edge_count": 0
+                            "metadata": {
+                                "node_count": 0,
+                                "edge_count": 0,
+                                "relation_types": [],
+                                "status": "empty",
+                                "reason": "no_adrs_extracted"
+                            }
                         }
 
-                        graph_file = corpus_dir / "graph.json"
-                        graph_file.parent.mkdir(parents=True, exist_ok=True)
-                        with open(graph_file, 'w') as f:
-                            json.dump(minimal_graph, f, indent=2)
+                    # BUG FIX #4: Persist graph.json to disk
+                    graph_file = corpus_dir / "graph.json"
+                    graph_file.parent.mkdir(parents=True, exist_ok=True)
+                    with open(graph_file, 'w') as f:
+                        json.dump(graph_result, f, indent=2)
+                    logger.info(f"Graph saved to {graph_file}")
+
+                except Exception as e:
+                    logger.error(f"Graph generation failed: {e}", exc_info=True)
+
+                    # BUG FIX #4: Create minimal valid graph.json instead of failing silently
+                    minimal_graph = {
+                        "status": "failed",
+                        "error": str(e),
+                        "version": self.graph_generator.framework_version,
+                        "nodes": [],
+                        "edges": [],
+                        "node_count": 0,
+                        "edge_count": 0
+                    }
+
+                    graph_file = corpus_dir / "graph.json"
+                    graph_file.parent.mkdir(parents=True, exist_ok=True)
+                    with open(graph_file, 'w') as f:
+                        json.dump(minimal_graph, f, indent=2)
 
                         graph_result = minimal_graph
                         logger.warning(f"Created minimal graph.json at {graph_file}")
@@ -1473,6 +1492,32 @@ class ProjectAnalyzer:
                 extra={"analysis_id": self.analysis_id, "branch_pushed": push_result}
             )
 
+            # FIX C6 (v2.3.3): Validate required artifacts were created
+            # Even if analysis "succeeds", must ensure critical files exist
+            if not self._check_artifacts_created():
+                missing_files = []
+                required = [
+                    self.output_dir / "corpus/graph.json",
+                    self.output_dir / "corpus/adr_index.yml",
+                    self.output_dir / "reports/import-report.md"
+                ]
+                for f in required:
+                    if not f.exists():
+                        missing_files.append(str(f.relative_to(self.project_path)))
+
+                logger.error(
+                    "Import completed but required artifacts are missing",
+                    extra={
+                        "missing_files": missing_files,
+                        "analysis_id": self.analysis_id
+                    }
+                )
+                raise FileNotFoundError(
+                    f"Required artifacts missing: {', '.join(missing_files)}. "
+                    "Import may have silently failed during artifact generation."
+                )
+
+            logger.info("All required artifacts validated successfully")
             return results
 
 

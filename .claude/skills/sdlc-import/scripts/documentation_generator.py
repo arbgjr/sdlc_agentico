@@ -237,10 +237,35 @@ class DocumentationGenerator:
         return str(index_file)
 
     def _generate_threat_model(self, threats: Dict) -> str:
-        """Generate threat model file"""
+        """
+        Generate threat model file with YAML validation.
+
+        FIX C5 (v2.3.3): Use same YAML params as ADRs to ensure proper quoting.
+        """
         threat_file = self.output_dir / "security/threat-model-inferred.yml"
         threat_file.parent.mkdir(parents=True, exist_ok=True)
-        threat_file.write_text(yaml.dump(threats, default_flow_style=False))
+
+        # FIX C5: Use same YAML dump params as ADRs for consistency
+        threat_content = yaml.dump(
+            threats,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            explicit_start=True,
+            width=float("inf")
+        )
+
+        # FIX C5: Validate generated YAML before writing
+        try:
+            yaml.safe_load(threat_content)
+            logger.debug("Threat model YAML validation passed")
+        except yaml.YAMLError as e:
+            logger.error(f"Threat model YAML validation FAILED: {e}")
+            logger.error(f"Content preview:\n{threat_content[:500]}")
+            raise ValueError(f"Generated invalid threat model YAML: {e}")
+
+        threat_file.write_text(threat_content)
+        logger.info(f"Threat model generated: {threat_file}")
         return str(threat_file)
 
     def _generate_tech_debt_report(self, tech_debt: Dict) -> str:
