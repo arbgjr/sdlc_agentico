@@ -1232,9 +1232,10 @@ git commit -m "fix: critical issue"
 
 ## Version History Quick Reference
 
-**Current Version**: v2.3.1 (Critical Bug Fixes - sdlc-import WITH LLM)
+**Current Version**: v2.3.2 (Major Bug Fixes Sprint - sdlc-import Production Ready)
 
 **Recent Releases**:
+- v2.3.2 (2026-01-29): Major Bug Fixes Sprint - 14 bugs fixed (6 CRITICAL: CI/CD auto-approve, migration exclusions, quality/security gates, LLM enablement, exit codes; 3 GRAVE: diagram auto-fix, tech debt deduplication, ADR logging; 4 MEDIUM: progress bar, dry-run, ADR validation, confidence transparency)
 - v2.3.1 (2026-01-28): CRITICAL fixes for sdlc-import WITH LLM - 4 bugs fixed (UnboundLocalError, error handling, ADR reconciliation, graph persistence)
 - v2.3.0 (2026-01-28): Auto-Update Component Counts (automatic doc synchronization, zero manual effort)
 - v2.1.4 (2026-01-26): .sdlcignore support to prevent framework self-scanning, Issue #92 (Tripla pattern detection)

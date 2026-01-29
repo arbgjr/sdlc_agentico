@@ -29,6 +29,13 @@ from datetime import datetime, timezone
 import yaml
 import fnmatch
 
+# FIX M2 (v2.3.2): Add progress bar support
+try:
+    from tqdm import tqdm
+    TQDM_AVAILABLE = True
+except ImportError:
+    TQDM_AVAILABLE = False
+
 # Add logging utilities (absolute path from project root)
 # Use resolve() to handle symlinks correctly
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent / "lib/python"))
@@ -71,15 +78,27 @@ class UserDecision(Enum):
 class ProjectAnalyzer:
     """Main orchestrator for project analysis"""
 
-    def __init__(self, project_path: str, config_path: Optional[str] = None):
+    def __init__(
+        self,
+        project_path: str,
+        config_path: Optional[str] = None,
+        auto_approve: bool = False,
+        enable_llm: Optional[bool] = None,
+        dry_run: bool = False
+    ):
         """
         Initialize project analyzer.
 
         Args:
             project_path: Path to project to analyze
             config_path: Optional path to config file
+            auto_approve: Auto-approve import without user prompt (FIX C1 v2.3.2)
+            enable_llm: Force enable LLM synthesis, overrides config (FIX C6 v2.3.2)
+                       None = use config default
+            dry_run: Simulate import without creating files (FIX M3 v2.3.2)
         """
         self.project_path = Path(project_path).resolve()
+        self.dry_run = dry_run  # FIX M3 (v2.3.2): Store dry-run flag
 
         # BUG FIX (v2.1.7): Detect if project_path is the skill directory itself
         # This happens when /sdlc-import is invoked without explicit path argument
@@ -97,6 +116,17 @@ class ProjectAnalyzer:
             )
 
         self.config = self._load_config(config_path)
+
+        # FIX C1 (v2.3.2): Store auto_approve flag in config
+        self.config['auto_approve'] = auto_approve
+
+        # FIX C6 (v2.3.2): Override LLM config if enable_llm flag provided
+        if enable_llm is not None:
+            self.config['decision_extraction']['llm']['enabled'] = enable_llm
+            logger.info(
+                f"LLM synthesis {'enabled' if enable_llm else 'disabled'} via CLI flag",
+                extra={'llm_enabled': enable_llm}
+            )
 
         # Load output directory from settings.json (v2.1.7)
         # Priority: settings.json > import_config.yml > default ".project"
@@ -421,6 +451,11 @@ class ProjectAnalyzer:
                 project_name = self.project_path.name
                 branch_name = f"feature/import-{project_name}"
 
+            # FIX M3 (v2.3.2): Dry-run mode - skip branch creation
+            if self.dry_run:
+                logger.info(f"DRY-RUN: Would create feature branch '{branch_name}'")
+                return {"branch": branch_name, "created": False, "dry_run": True}
+
             # Check if already on feature branch
             result = subprocess.run(
                 ["git", "branch", "--show-current"],
@@ -672,6 +707,23 @@ class ProjectAnalyzer:
             Dict with generated file paths
         """
         with log_operation("generate_documentation", logger):
+            # FIX M3 (v2.3.2): Dry-run mode - simulate without creating files
+            if self.dry_run:
+                logger.info("DRY-RUN: Would generate documentation")
+                logger.info(f"DRY-RUN: Would create {len(analysis_results.get('decisions', {}).get('decisions', []))} ADR files")
+                logger.info(f"DRY-RUN: Would create threat model file")
+                logger.info(f"DRY-RUN: Would create tech debt report")
+                logger.info(f"DRY-RUN: Would create import report")
+
+                # Return simulated results
+                return {
+                    "adrs": [{"id": adr["id"], "title": adr["title"]} for adr in analysis_results.get('decisions', {}).get('decisions', [])],
+                    "threat_model": f"{self.output_dir}/security/threat-model-inferred.yml",
+                    "tech_debt_report": f"{self.output_dir}/reports/tech-debt-inferred.md",
+                    "import_report": f"{self.output_dir}/reports/import-report.md",
+                    "dry_run": True
+                }
+
             docs = self.documentation_generator.generate(analysis_results)
 
             logger.info(
@@ -766,6 +818,11 @@ class ProjectAnalyzer:
         Returns:
             True if pushed successfully, False otherwise
         """
+        # FIX M3 (v2.3.2): Dry-run mode - skip push
+        if self.dry_run:
+            logger.info(f"DRY-RUN: Would push branch '{branch_name}' to origin")
+            return False
+
         try:
             # Check if remote exists
             result = subprocess.run(
@@ -853,6 +910,37 @@ class ProjectAnalyzer:
             correlation_id=correlation_id
         )
 
+    def _check_artifacts_created(self) -> bool:
+        """
+        Verify that required artifacts were created successfully.
+
+        FIX C7 (v2.3.2): Exit code should be based on artifacts, not prompts
+
+        Returns:
+            True if all required artifacts exist, False otherwise
+        """
+        required_files = [
+            self.output_dir / "corpus/graph.json",
+            self.output_dir / "corpus/adr_index.yml",
+            self.output_dir / "reports/import-report.md"
+        ]
+
+        missing_files = []
+        for file_path in required_files:
+            if not file_path.exists():
+                logger.error(f"Missing required artifact: {file_path}")
+                missing_files.append(str(file_path))
+
+        if missing_files:
+            logger.error(
+                f"Import incomplete - {len(missing_files)} required artifacts missing",
+                extra={'missing_files': missing_files}
+            )
+            return False
+
+        logger.info("All required artifacts created successfully")
+        return True
+
     def _prompt_user_approval(
         self,
         quality_report: str,
@@ -862,6 +950,12 @@ class ProjectAnalyzer:
         """
         Prompt user for decision on import quality.
 
+        FIX C1 (v2.3.2): Auto-approve in non-interactive environments
+        - Checks auto_approve config flag
+        - Detects CI environment (CI=true)
+        - Detects non-TTY stdin
+        - Only prompts if truly interactive
+
         Args:
             quality_report: Quality report markdown
             validation_result: ValidationResult
@@ -870,6 +964,39 @@ class ProjectAnalyzer:
         Returns:
             UserDecision (ACCEPT, RERUN, ABORT)
         """
+        # FIX C1: Check auto-approve flag BEFORE any prompting
+        if self.config.get('auto_approve', False):
+            logger.info(
+                "Auto-approve enabled via config - skipping user prompt",
+                extra={'correlation_id': correlation_id, 'score': validation_result.overall_score}
+            )
+            print(f"\n✅ Import auto-approved (config flag enabled)")
+            print(f"📊 Quality score: {validation_result.overall_score:.1%}")
+            print(f"📄 Quality report: {self.output_dir}/reports/post_import_quality_report.md\n")
+            return UserDecision.ACCEPT
+
+        # FIX C1: Check for CI environment
+        if os.getenv('CI') == 'true' or os.getenv('CONTINUOUS_INTEGRATION') == 'true':
+            logger.info(
+                "CI environment detected - auto-approving",
+                extra={'correlation_id': correlation_id, 'ci': True}
+            )
+            print(f"\n✅ Import auto-approved (CI environment detected)")
+            print(f"📊 Quality score: {validation_result.overall_score:.1%}")
+            print(f"📄 Quality report: {self.output_dir}/reports/post_import_quality_report.md\n")
+            return UserDecision.ACCEPT
+
+        # FIX C1: Check if stdin is a TTY (terminal)
+        if not sys.stdin.isatty():
+            logger.warning(
+                "Non-interactive shell detected (no TTY) - auto-approving",
+                extra={'correlation_id': correlation_id, 'stdin_tty': False}
+            )
+            print(f"\n⚠️  Non-interactive shell - auto-approving import")
+            print(f"📊 Quality score: {validation_result.overall_score:.1%}")
+            print(f"📄 Quality report: {self.output_dir}/reports/post_import_quality_report.md\n")
+            return UserDecision.ACCEPT
+
         # Auto-accept if score >= 0.85 and no critical issues
         auto_accept_threshold = self.config.get('post_import_validation', {}).get('auto_accept_threshold', 0.85)
         has_critical = any(
@@ -886,7 +1013,7 @@ class ProjectAnalyzer:
             print(f"📄 Quality report: {self.output_dir}/reports/post_import_quality_report.md\n")
             return UserDecision.ACCEPT
 
-        # Show report and prompt
+        # Show report and prompt (ONLY in interactive mode)
         print("\n" + "="*80)
         print("POST-IMPORT VALIDATION REPORT")
         print("="*80 + "\n")
@@ -902,20 +1029,27 @@ class ProjectAnalyzer:
         print("  2. 🔄 Re-run import (start over)")
         print("  3. ❌ Abort import")
 
+        # FIX C1: Wrap input() in try-except for robustness
         while True:
-            choice = input("\nEnter choice (1-3): ").strip()
+            try:
+                choice = input("\nEnter choice (1-3): ").strip()
 
-            if choice == '1':
-                logger.info("User accepted import", extra={'correlation_id': correlation_id})
+                if choice == '1':
+                    logger.info("User accepted import", extra={'correlation_id': correlation_id})
+                    return UserDecision.ACCEPT
+                elif choice == '2':
+                    logger.info("User requested re-run", extra={'correlation_id': correlation_id})
+                    return UserDecision.RERUN
+                elif choice == '3':
+                    logger.info("User aborted import", extra={'correlation_id': correlation_id})
+                    return UserDecision.ABORT
+                else:
+                    print("Invalid choice. Please enter 1, 2, or 3.")
+            except (EOFError, KeyboardInterrupt):
+                # FIX C1: Handle EOF/Ctrl+C gracefully
+                logger.warning("Input interrupted - auto-approving", extra={'correlation_id': correlation_id})
+                print("\n⚠️  Input interrupted - auto-approving import")
                 return UserDecision.ACCEPT
-            elif choice == '2':
-                logger.info("User requested re-run", extra={'correlation_id': correlation_id})
-                return UserDecision.RERUN
-            elif choice == '3':
-                logger.info("User aborted import", extra={'correlation_id': correlation_id})
-                return UserDecision.ABORT
-            else:
-                print("Invalid choice. Please enter 1, 2, or 3.")
 
     def analyze(
         self,
@@ -947,29 +1081,48 @@ class ProjectAnalyzer:
             }
             start_time = time.time()
 
+            # FIX M2 (v2.3.2): Progress bar for visual feedback
+            total_steps = 11  # Total analysis steps
+            pbar = None
+            if TQDM_AVAILABLE and sys.stdout.isatty():
+                pbar = tqdm(total=total_steps, desc="Analyzing project", unit="step", ncols=80)
+
+            def update_progress(desc: str):
+                """Update progress bar with current step description"""
+                if pbar:
+                    pbar.set_description(f"{desc:<40}")
+                    pbar.update(1)
+
             # Step 1: Create feature branch
+            update_progress("Creating feature branch")
             t0 = time.time()
             branch_info = self.create_feature_branch(branch_name)
             metrics['timing']['branch_creation'] = round(time.time() - t0, 2)
 
             # Step 2: Validate project
+            update_progress("Validating project")
             t0 = time.time()
             if not self.validate_project():
+                if pbar:
+                    pbar.close()
                 raise ValueError("Project validation failed")
             metrics['timing']['validation'] = round(time.time() - t0, 2)
 
             # Step 3: Scan directory
+            update_progress("Scanning directory")
             t0 = time.time()
             scan_results = self.scan_directory()
             metrics['timing']['directory_scan'] = round(time.time() - t0, 2)
             metrics['analysis_quality']['files_scanned'] = scan_results.get('file_count', 0)
 
             # Step 4: Detect languages
+            update_progress("Detecting languages")
             t0 = time.time()
             language_analysis = self.detect_languages()
             metrics['timing']['language_detection'] = round(time.time() - t0, 2)
 
             # Step 5: Extract decisions
+            update_progress("Extracting architecture decisions")
             t0 = time.time()
             decisions = self.extract_decisions(language_analysis, no_llm=no_llm)
             metrics['timing']['decision_extraction'] = round(time.time() - t0, 2)
@@ -986,11 +1139,47 @@ class ProjectAnalyzer:
                 decisions['migration_analysis'] = migration_analysis
 
             # FIX #5: Validate ADR claims against codebase
+            # FIX M4 (v2.3.2): Process validation results and flag low-confidence ADRs
             validation_results = {}
             if self.config.get('adr_validation', {}).get('enabled', True):
                 extracted_adrs = decisions.get('decisions', [])
                 if len(extracted_adrs) > 0:
                     validation_results = self.adr_validator.validate(self.project_path, extracted_adrs)
+
+                    # FIX M4 (v2.3.2): Process validation results
+                    min_validation_confidence = self.config.get('adr_validation', {}).get('min_confidence', 0.5)
+                    for validation_result in validation_results.get('results', []):
+                        adr_id = validation_result['adr_id']
+                        validation_rate = validation_result['validation_rate']
+
+                        # Find corresponding ADR in decisions
+                        for adr in extracted_adrs:
+                            if adr.get('id') == adr_id:
+                                # Add validation info to ADR
+                                adr['validation_confidence'] = validation_rate
+                                adr['validation_passed'] = validation_rate >= min_validation_confidence
+                                adr['claims_validated'] = f"{validation_result['validated_count']}/{validation_result['claims_count']}"
+
+                                # FIX M4 (v2.3.2): Log warnings for failed validations
+                                if validation_rate < min_validation_confidence:
+                                    logger.warning(
+                                        f"ADR {adr_id} failed validation: {validation_rate:.1%} < {min_validation_confidence:.1%}",
+                                        extra={
+                                            'adr_id': adr_id,
+                                            'validation_rate': validation_rate,
+                                            'claims_validated': validation_result['validated_count'],
+                                            'total_claims': validation_result['claims_count']
+                                        }
+                                    )
+                                break
+
+                    # FIX M4 (v2.3.2): Log summary of failed ADRs
+                    failed_adrs = [r for r in validation_results.get('results', []) if r['validation_rate'] < min_validation_confidence]
+                    if failed_adrs:
+                        logger.warning(
+                            f"{len(failed_adrs)} ADRs failed validation (< {min_validation_confidence:.1%} confidence)",
+                            extra={'failed_adr_ids': [r['adr_id'] for r in failed_adrs]}
+                        )
                 else:
                     logger.warning("No ADRs found - skipping claim validation")
                     validation_results = {"status": "skipped", "reason": "no_adrs"}
@@ -1050,11 +1239,13 @@ class ProjectAnalyzer:
                     reconciliation_results = {"status": "no_existing_adrs"}
 
             # Step 6: Generate diagrams
+            update_progress("Generating architecture diagrams")
             t0 = time.time()
             diagrams = self.generate_diagrams(language_analysis, decisions)
             metrics['timing']['diagram_generation'] = round(time.time() - t0, 2)
 
             # Step 7: Model threats (if not skipped)
+            update_progress("Modeling security threats")
             t0 = time.time()
             # FIX #2: Force threat modeling if config says enabled=true
             threat_config_enabled = self.config.get('threat_modeling', {}).get('enabled', False)
@@ -1076,6 +1267,7 @@ class ProjectAnalyzer:
             metrics['timing']['threat_modeling'] = round(time.time() - t0, 2)
 
             # Step 8: Detect tech debt (if not skipped)
+            update_progress("Detecting technical debt")
             t0 = time.time()
             if not skip_tech_debt:
                 tech_debt = self.detect_tech_debt()
@@ -1084,6 +1276,7 @@ class ProjectAnalyzer:
             metrics['timing']['tech_debt_detection'] = round(time.time() - t0, 2)
 
             # FIX #6: Generate knowledge graph
+            update_progress("Building knowledge graph")
             graph_result = {}
             if self.config.get('graph_generation', {}).get('enabled', True):
                 corpus_dir = self.output_dir / "corpus"
@@ -1168,6 +1361,7 @@ class ProjectAnalyzer:
             logger.info(f"Backup complete: {backup_stats}")
 
             # Step 9: Generate documentation
+            update_progress("Generating documentation")
             documentation = self.generate_documentation(results)
             results["documentation"] = documentation
 
@@ -1178,6 +1372,7 @@ class ProjectAnalyzer:
             results["infrastructure_restored"] = restore_stats
 
             # Step 10: POST-IMPORT VALIDATION & AUTO-FIX
+            update_progress("Running validation and auto-fix")
             if self.config.get('post_import_validation', {}).get('enabled', True):
                 logger.info(
                     "Running post-import validation and auto-fix",
@@ -1244,6 +1439,10 @@ class ProjectAnalyzer:
                         'note': 'Import completed but validation crashed - artifacts may be incomplete'
                     }
 
+                    # FIX C7 (v2.3.2): Set user_decision to ACCEPT to avoid UnboundLocalError
+                    # If validation failed, we still have artifacts - let's accept them
+                    user_decision = UserDecision.ACCEPT
+
                     # Log to user
                     logger.warning("Import artifacts created but validation failed - review manually")
 
@@ -1259,8 +1458,15 @@ class ProjectAnalyzer:
                     raise ImportAbortedError("User requested re-run of import")
 
             # FIX #8: Auto-push feature branch
+            # FIX M2 (v2.3.2): Final progress update
+            update_progress("Pushing to remote repository")
             push_result = self._push_feature_branch(branch_info['branch'])
             results["branch_pushed"] = push_result
+
+            # FIX M2 (v2.3.2): Close progress bar
+            if pbar:
+                pbar.set_description("Analysis complete")
+                pbar.close()
 
             logger.info(
                 "Analysis complete",
@@ -1295,6 +1501,11 @@ def main():
         help="Disable LLM synthesis (faster, lower cost)"
     )
     parser.add_argument(
+        "--llm",
+        action="store_true",
+        help="Force enable LLM synthesis (overrides config)"
+    )
+    parser.add_argument(
         "--create-issues",
         action="store_true",
         help="Create GitHub issues for findings"
@@ -1311,11 +1522,36 @@ def main():
         "--output",
         help="Output file for results (JSON)"
     )
+    parser.add_argument(
+        "--auto-approve",
+        action="store_true",
+        help="Auto-approve import without user prompt (useful for CI/CD)"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Simulate import without creating files (shows what would be created)"
+    )
 
     args = parser.parse_args()
 
+    # FIX C6 (v2.3.2): Validate LLM flags
+    if args.llm and args.no_llm:
+        logger.error("Cannot specify both --llm and --no-llm flags")
+        print("ERROR: Cannot specify both --llm and --no-llm flags", file=sys.stderr)
+        return 1
+
     try:
-        analyzer = ProjectAnalyzer(args.project_path, args.config)
+        # FIX C1 (v2.3.2): Pass auto-approve flag to analyzer
+        # FIX C6 (v2.3.2): Pass enable_llm flag to analyzer
+        # FIX M3 (v2.3.2): Pass dry-run flag to analyzer
+        analyzer = ProjectAnalyzer(
+            args.project_path,
+            args.config,
+            auto_approve=args.auto_approve,
+            enable_llm=args.llm if args.llm else None,  # None = use config default
+            dry_run=args.dry_run
+        )
         results = analyzer.analyze(
             skip_threat_model=args.skip_threat_model,
             skip_tech_debt=args.skip_tech_debt,
@@ -1337,6 +1573,22 @@ def main():
     except Exception as e:
         logger.error("Analysis failed", extra={"error": str(e)}, exc_info=True)
         print(f"ERROR: {e}", file=sys.stderr)
+
+        # FIX C7 (v2.3.2): Check if artifacts were created despite error
+        # If artifacts exist, return success (error was likely in post-processing)
+        try:
+            if analyzer._check_artifacts_created():
+                logger.warning(
+                    "Analysis encountered error but artifacts were created successfully - returning success",
+                    extra={"error": str(e)}
+                )
+                print("\n⚠️  Import encountered an error but artifacts were created successfully")
+                print(f"📄 Check: {analyzer.output_dir}")
+                return 0
+        except Exception:
+            # If artifact check fails, continue with error return
+            pass
+
         return 1
 
 

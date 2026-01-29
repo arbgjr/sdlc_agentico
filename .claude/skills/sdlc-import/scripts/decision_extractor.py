@@ -30,6 +30,30 @@ logger = get_logger(__name__, skill="sdlc-import", phase=0)
 class DecisionExtractor:
     """Extract architecture decisions from codebase"""
 
+    # FIX C3 (v2.3.2): Exclude auto-generated files from decision extraction
+    # These patterns prevent false positive ADRs from generated code
+    EXCLUDED_FILE_PATTERNS = [
+        r'Migrations/\d{14}_.*\.cs$',           # EF Core migrations (C#)
+        r'Migrations/\d{14}_.*\.Designer\.cs$', # EF Core migration designers
+        r'migrations/\d{14}_.*\.py$',            # Django migrations (Python)
+        r'db/migrate/\d{14}_.*\.rb$',            # Rails migrations (Ruby)
+        r'\.g\.cs$',                             # Generated code (C#)
+        r'\.Designer\.cs$',                      # Auto-generated designers (C#)
+        r'\.generated\.cs$',                     # Generated code marker
+        r'\.g\.dart$',                           # Generated Dart code
+        r'\.freezed\.dart$',                     # Freezed generated code (Dart)
+        r'\.gr\.dart$',                          # Auto Route generated (Dart)
+        r'/obj/',                                # Build artifacts (C#, .NET)
+        r'/bin/',                                # Build artifacts (C#, .NET)
+        r'/node_modules/',                       # Node.js dependencies
+        r'/dist/',                               # Distribution artifacts
+        r'/build/',                              # Build output
+        r'/\.next/',                             # Next.js build
+        r'/target/',                             # Rust/Java build
+        r'__pycache__/',                         # Python cache
+        r'\.pyc$',                               # Python bytecode
+    ]
+
     def __init__(self, config: Dict):
         """Initialize decision extractor"""
         self.config = config
@@ -47,6 +71,31 @@ class DecisionExtractor:
         patterns_file = Path(__file__).parent.parent / "config" / "decision_patterns.yml"
         with open(patterns_file, 'r') as f:
             return yaml.safe_load(f)
+
+    def _should_scan_file(self, file_path: Path) -> bool:
+        """
+        Check if file should be scanned for decisions.
+
+        FIX C3 (v2.3.2): Exclude auto-generated files to prevent false positive ADRs
+
+        Args:
+            file_path: Path to file to check
+
+        Returns:
+            True if file should be scanned, False if should be excluded
+        """
+        file_str = str(file_path)
+
+        # Check exclusion patterns
+        for pattern in self.EXCLUDED_FILE_PATTERNS:
+            if re.search(pattern, file_str):
+                logger.debug(
+                    f"Excluding file (auto-generated/build artifact): {file_path}",
+                    extra={'pattern': pattern}
+                )
+                return False
+
+        return True
 
     def extract(self, project_path: Path, language_analysis: Dict, no_llm: bool = False) -> Dict:
         """Extract architecture decisions from project"""
@@ -111,6 +160,10 @@ class DecisionExtractor:
             for location in locations:
                 for file in project_path.glob(location):
                     if not file.is_file():
+                        continue
+
+                    # FIX C3 (v2.3.2): Check if file should be scanned
+                    if not self._should_scan_file(file):
                         continue
 
                     try:
@@ -183,6 +236,23 @@ class DecisionExtractor:
             "synthesized_by": synthesized_by,
             "needs_validation": confidence_score.level.value != 'high'
         }
+
+        # FIX M5 (v2.3.2): Log confidence score breakdown for transparency
+        breakdown = self.scorer.to_dict(confidence_score)["confidence_breakdown"]
+        logger.info(
+            f"Created {decision['id']}: {title} (confidence: {confidence_score.overall:.2f} = {confidence_score.level.value})",
+            extra={
+                "decision_id": decision['id'],
+                "confidence": confidence_score.overall,
+                "confidence_level": confidence_score.level.value,
+                "code_evidence": breakdown['code_evidence'],
+                "documentation_evidence": breakdown['documentation_evidence'],
+                "runtime_validation": breakdown['runtime_validation'],
+                "formula": f"0.5*{breakdown['code_evidence']:.2f} + 0.3*{breakdown['documentation_evidence']:.2f} + 0.2*{breakdown['runtime_validation']:.2f} = {breakdown['weighted_average']} {breakdown['margin']}",
+                "evidence_count": len(evidence),
+                "synthesized_by": synthesized_by
+            }
+        )
 
         return decision
 

@@ -245,6 +245,44 @@ github_integration:
     sdlc_import: "sdlc-import"
     needs_review: "needs-review"
 
+# FIX C4 & C5 (v2.3.2): Post-import validation gates
+post_import_validation:
+  enabled: true
+
+  # FIX C4 (v2.3.2): Quality gate threshold
+  pass_threshold: 0.70  # Minimum quality score (70%)
+
+  # Auto-accept threshold (skip user prompt if quality high enough)
+  auto_accept_threshold: 0.85  # 85% quality = auto-accept
+
+  # Validation modules (can be disabled individually)
+  adr_validation:
+    enabled: true
+  tech_debt_validation:
+    enabled: true
+  diagram_validation:
+    enabled: true
+  artifact_completeness_validation:
+    enabled: true
+
+# FIX C5 (v2.3.2): Security by Design gate
+security_gate:
+  enabled: true
+
+  # Block import if CRITICAL threats detected
+  block_on_critical: true
+
+  # Warn but don't block on HIGH threats
+  warn_on_high: true
+
+  # Escalation triggers (notify stakeholders)
+  escalate_on:
+    - cvss_score >= 7.0
+    - pii_exposure
+    - auth_changes
+    - crypto_changes
+    - new_public_endpoints
+
 branching:
   # Auto-create feature branch
   auto_branch: true

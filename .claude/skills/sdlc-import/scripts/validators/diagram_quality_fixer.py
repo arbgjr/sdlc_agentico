@@ -12,6 +12,10 @@ from typing import Dict, List
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent / "lib/python"))
 from sdlc_logging import get_logger
 
+# FIX G1 (v2.3.2): Import ArchitectureVisualizer for actual regeneration
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from architecture_visualizer import ArchitectureVisualizer
+
 logger = get_logger(__name__, skill="sdlc-import", phase=0)
 
 
@@ -23,7 +27,7 @@ class DiagramQualityFixer:
         self.min_nodes = config.get('diagram_validation', {}).get('min_nodes', 5)
         self.min_edges = config.get('diagram_validation', {}).get('min_edges', 4)
 
-    def fix(self, diagrams: List[Dict], language_analysis: Dict, output_dir: Path) -> Dict:
+    def fix(self, diagrams: List[Dict], language_analysis: Dict, output_dir: Path, decisions: Dict = None) -> Dict:
         """
         Validate diagram complexity and regenerate if too generic.
 
@@ -31,15 +35,18 @@ class DiagramQualityFixer:
             diagrams: List of diagram dicts (mermaid format)
             language_analysis: Language analysis results (to infer architecture)
             output_dir: Output directory for diagrams
+            decisions: ADR decisions dict (needed for regeneration)
 
         Returns:
             {
                 'regenerated': bool,
-                'regenerated_diagrams': [...]
+                'regenerated_diagrams': [...],
+                'original_diagrams': [...]
             }
         """
         regenerated = False
         regenerated_diagrams = []
+        needs_regeneration = False
 
         logger.info(
             f"Validating {len(diagrams)} diagrams",
@@ -66,18 +73,50 @@ class DiagramQualityFixer:
                     f"Diagram {diagram_type} is too generic: {nodes} nodes, {edges} edges",
                     extra={'type': diagram_type, 'nodes': nodes, 'edges': edges}
                 )
+                needs_regeneration = True
+
+        # FIX G1 (v2.3.2): Actually regenerate diagrams if too generic
+        if needs_regeneration and decisions is not None:
+            logger.info("Regenerating diagrams with ArchitectureVisualizer")
+            try:
+                # Create visualizer config
+                visualizer_config = {
+                    'project_path': output_dir.parent,  # output_dir is .project/, project is parent
+                    'general': {
+                        'output_dir': output_dir.name  # Just the directory name
+                    }
+                }
+
+                visualizer = ArchitectureVisualizer(visualizer_config)
+
+                # Regenerate all diagrams
+                project_path = output_dir.parent
+                regen_result = visualizer.generate(
+                    project_path=project_path,
+                    language_analysis=language_analysis,
+                    decisions=decisions
+                )
+
+                regenerated_diagrams = regen_result.get('diagrams', [])
                 regenerated = True
-                # Actual regeneration would happen in architecture_visualizer.py
-                # For now, we just mark it as needing regeneration
+
+                logger.info(
+                    f"Successfully regenerated {len(regenerated_diagrams)} diagrams",
+                    extra={'diagrams': [d['name'] for d in regenerated_diagrams]}
+                )
+            except Exception as e:
+                logger.error(f"Failed to regenerate diagrams: {e}", exc_info=True)
+                regenerated = False
 
         result = {
             'regenerated': regenerated,
-            'regenerated_diagrams': regenerated_diagrams
+            'regenerated_diagrams': regenerated_diagrams,
+            'original_diagrams': diagrams
         }
 
         logger.info(
             f"Diagram validation complete: regenerated={regenerated}",
-            extra=result
+            extra={'regenerated_count': len(regenerated_diagrams)}
         )
 
         return result

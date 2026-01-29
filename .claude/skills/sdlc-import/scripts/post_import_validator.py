@@ -45,6 +45,72 @@ class PostImportValidator:
             'completeness': ArtifactCompletenessFixer(config)
         }
 
+    def _validate_security_threats(self, import_results: Dict, correlation_id: str) -> Dict:
+        """
+        Validate security threats and enforce Security by Design gate.
+
+        FIX C5 (v2.3.2): Block import on CRITICAL security threats
+
+        Args:
+            import_results: Import results containing threats
+            correlation_id: Correlation ID for logging
+
+        Returns:
+            Dict with validation result and threat details
+        """
+        threats = import_results.get('threats', {}).get('threats', [])
+
+        # Count by severity
+        critical_threats = [t for t in threats if t.get('severity') == 'CRITICAL']
+        high_threats = [t for t in threats if t.get('severity') == 'HIGH']
+
+        # Security gate config
+        security_gate_config = self.config.get('security_gate', {})
+        block_on_critical = security_gate_config.get('block_on_critical', True)
+        warn_on_high = security_gate_config.get('warn_on_high', True)
+
+        # Check for CRITICAL threats (BLOCKER)
+        if len(critical_threats) > 0:
+            logger.error(
+                f"Security gate FAILED: {len(critical_threats)} CRITICAL threat(s) detected",
+                extra={
+                    'correlation_id': correlation_id,
+                    'critical_count': len(critical_threats),
+                    'critical_threats': [t['title'] for t in critical_threats]
+                }
+            )
+
+            if block_on_critical:
+                return {
+                    'passed': False,
+                    'critical_count': len(critical_threats),
+                    'high_count': len(high_threats),
+                    'critical_threats': critical_threats,
+                    'high_threats': high_threats,
+                    'blocked': True,
+                    'message': f'Security gate BLOCKED: {len(critical_threats)} CRITICAL threat(s) must be resolved'
+                }
+
+        # Warn on HIGH threats (don't block, but escalate)
+        if len(high_threats) > 0 and warn_on_high:
+            logger.warning(
+                f"{len(high_threats)} HIGH severity threat(s) detected - review recommended",
+                extra={
+                    'correlation_id': correlation_id,
+                    'high_count': len(high_threats),
+                    'high_threats': [t['title'] for t in high_threats]
+                }
+            )
+
+        return {
+            'passed': True,
+            'critical_count': 0,
+            'high_count': len(high_threats),
+            'critical_threats': [],
+            'high_threats': high_threats,
+            'blocked': False
+        }
+
     def validate_and_fix(
         self,
         import_results: Dict,
@@ -99,6 +165,34 @@ class PostImportValidator:
             }
 
             if adr_result['removed_adrs']:
+                # FIX G4 (v2.3.2): Enhanced logging for ADR removal with detailed reasons
+                logger.warning(
+                    f"Removed {len(adr_result['removed_adrs'])} false positive ADR(s)",
+                    extra={
+                        'correlation_id': correlation_id,
+                        'removed_count': len(adr_result['removed_adrs']),
+                        'removed_adr_ids': adr_result['removed_adrs']
+                    }
+                )
+
+                # Log details for each removed ADR
+                for adr_id, reason_info in adr_result['removed_reasons'].items():
+                    reason_type = reason_info.get('reason', 'unknown')
+                    suspicious_pct = reason_info.get('suspicious_percentage', 0.0)
+                    suspicious_files = reason_info.get('suspicious_files', [])
+
+                    logger.info(
+                        f"ADR {adr_id} removed: {reason_type}",
+                        extra={
+                            'correlation_id': correlation_id,
+                            'adr_id': adr_id,
+                            'reason': reason_type,
+                            'suspicious_percentage': suspicious_pct,
+                            'suspicious_file_count': len(suspicious_files),
+                            'suspicious_files': suspicious_files[:5]  # First 5 files
+                        }
+                    )
+
                 issues_detected.append({
                     'category': 'adr_evidence',
                     'severity': 'warning',
@@ -106,9 +200,9 @@ class PostImportValidator:
                     'details': adr_result['removed_reasons']
                 })
 
-        # 2. Fix Tech Debt Report (already handled by documentation_generator.py)
+        # 2. Fix Tech Debt Report (deduplication + validation)
         # BUG FIX #1: Initialize with safe defaults to prevent UnboundLocalError
-        tech_debt_result = {"was_incomplete": False, "original_count": 0, "rendered_count": 0, "report_path": ""}
+        tech_debt_result = {"was_incomplete": False, "original_count": 0, "rendered_count": 0, "report_path": "", "duplicates_removed": 0, "deduplicated_items": []}
 
         if self.config.get('tech_debt_validation', {}).get('enabled', True):
             try:
@@ -118,11 +212,30 @@ class PostImportValidator:
                     correlation_id=correlation_id
                 )
 
+                # FIX G2 (v2.3.2): Update import_results with deduplicated items
+                if tech_debt_result.get('deduplicated_items'):
+                    import_results['tech_debt']['tech_debt'] = tech_debt_result['deduplicated_items']
+                    import_results['tech_debt']['total'] = len(tech_debt_result['deduplicated_items'])
+                    logger.info(
+                        f"Updated import_results with {len(tech_debt_result['deduplicated_items'])} deduplicated tech debt items",
+                        extra={'correlation_id': correlation_id}
+                    )
+
                 corrections_applied['tech_debt_regeneration'] = {
                     'original_item_count': tech_debt_result['original_count'],
                     'rendered_item_count': tech_debt_result['rendered_count'],
+                    'duplicates_removed': tech_debt_result.get('duplicates_removed', 0),
                     'report_path': str(tech_debt_result['report_path'])
                 }
+
+                # FIX G2 (v2.3.2): Log duplicate removal
+                if tech_debt_result.get('duplicates_removed', 0) > 0:
+                    issues_detected.append({
+                        'category': 'tech_debt',
+                        'severity': 'warning',
+                        'message': f"Removed {tech_debt_result['duplicates_removed']} duplicate tech debt items",
+                        'correction': f"Deduplicated from {tech_debt_result['original_count']} to {tech_debt_result['rendered_count']} items"
+                    })
 
                 if tech_debt_result['was_incomplete']:
                     issues_detected.append({
@@ -151,13 +264,26 @@ class PostImportValidator:
                 diagrams_dict = import_results.get('diagrams', {})
                 diagrams_list = diagrams_dict.get('diagrams', []) if isinstance(diagrams_dict, dict) else []
 
+                # FIX G1 (v2.3.2): Pass decisions to enable actual diagram regeneration
                 diagram_result = self.fixers['diagrams'].fix(
                     diagrams=diagrams_list,
                     language_analysis=import_results.get('language_analysis', {}),
-                    output_dir=output_dir
+                    output_dir=output_dir,
+                    decisions=import_results.get('decisions', {})
                 )
 
                 if diagram_result['regenerated']:
+                    # FIX G1 (v2.3.2): Update import_results with regenerated diagrams
+                    if diagram_result['regenerated_diagrams']:
+                        import_results['diagrams'] = {
+                            'diagrams': diagram_result['regenerated_diagrams'],
+                            'count': len(diagram_result['regenerated_diagrams'])
+                        }
+                        logger.info(
+                            f"Updated import_results with {len(diagram_result['regenerated_diagrams'])} regenerated diagrams",
+                            extra={'correlation_id': correlation_id}
+                        )
+
                     corrections_applied['diagram_regeneration'] = {
                         'regenerated_count': len(diagram_result['regenerated_diagrams']),
                         'reason': 'Diagrams were too generic'
@@ -190,6 +316,34 @@ class PostImportValidator:
                 'details': completeness_result['missing_artifacts']
             })
 
+        # FIX C5 (v2.3.2): Validate security threats
+        security_result = self._validate_security_threats(import_results, correlation_id)
+
+        if not security_result['passed']:
+            # Add security issues to detected issues
+            for threat in security_result['critical_threats']:
+                issues_detected.append({
+                    'category': 'security',
+                    'severity': 'critical',
+                    'message': f"CRITICAL security threat: {threat.get('title', 'Unknown')}",
+                    'details': {
+                        'threat_id': threat.get('id'),
+                        'cvss_score': threat.get('cvss_score'),
+                        'description': threat.get('description')
+                    }
+                })
+
+            for threat in security_result['high_threats']:
+                issues_detected.append({
+                    'category': 'security',
+                    'severity': 'high',
+                    'message': f"HIGH security threat: {threat.get('title', 'Unknown')}",
+                    'details': {
+                        'threat_id': threat.get('id'),
+                        'cvss_score': threat.get('cvss_score')
+                    }
+                })
+
         # 5. Calculate overall score
         overall_score = self._calculate_score(
             corrections_applied=corrections_applied,
@@ -197,11 +351,41 @@ class PostImportValidator:
             completeness=completeness_result
         )
 
-        # 6. Determine if passed
+        # FIX C4 (v2.3.2): Enforce quality gate threshold
+        quality_threshold = self.config.get('pass_threshold', 0.70)
+        quality_passed = overall_score >= quality_threshold
+
+        # FIX C5 (v2.3.2): Enforce security gate
+        security_passed = security_result['passed']
+
+        # 6. Determine if passed (ALL gates must pass)
+        has_critical_issues = any(issue['severity'] == 'critical' for issue in issues_detected)
+
         passed = (
-            overall_score >= self.config.get('pass_threshold', 0.70)
-            and not any(issue['severity'] == 'critical' for issue in issues_detected)
+            quality_passed
+            and security_passed
+            and not has_critical_issues
         )
+
+        # Log gate failures
+        if not quality_passed:
+            logger.error(
+                f"Quality gate FAILED: score {overall_score:.2%} < threshold {quality_threshold:.2%}",
+                extra={'correlation_id': correlation_id, 'score': overall_score, 'threshold': quality_threshold}
+            )
+
+        if not security_passed:
+            logger.error(
+                f"Security gate FAILED: {security_result['critical_count']} CRITICAL threat(s)",
+                extra={'correlation_id': correlation_id, 'threats': security_result['critical_threats']}
+            )
+
+        if has_critical_issues:
+            critical_issues = [i for i in issues_detected if i['severity'] == 'critical']
+            logger.error(
+                f"Validation FAILED: {len(critical_issues)} critical issue(s) detected",
+                extra={'correlation_id': correlation_id, 'issues': critical_issues}
+            )
 
         result = ValidationResult(
             passed=passed,
@@ -212,7 +396,14 @@ class PostImportValidator:
                 'adr_quality_score': self._calculate_adr_score(import_results),
                 'tech_debt_completeness': 1.0 if not tech_debt_result.get('was_incomplete') else 0.5,
                 'diagram_quality': 1.0 if not diagram_result.get('regenerated') else 0.5,
-                'artifact_completeness': len(completeness_result['present_artifacts']) / len(self.fixers['completeness'].required) if self.fixers['completeness'].required else 1.0
+                'artifact_completeness': len(completeness_result['present_artifacts']) / len(self.fixers['completeness'].required) if self.fixers['completeness'].required else 1.0,
+                # FIX C5 (v2.3.2): Add security metrics
+                'security_critical_threats': security_result['critical_count'],
+                'security_high_threats': security_result['high_count'],
+                'security_gate_passed': security_passed,
+                # FIX C4 (v2.3.2): Add quality gate status
+                'quality_gate_passed': quality_passed,
+                'quality_threshold': quality_threshold
             }
         )
 
