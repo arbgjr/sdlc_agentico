@@ -6,7 +6,7 @@ Ensures tech debt reports have full item details, not just summaries.
 
 import sys
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 # Add logging utilities
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent / "lib/python"))
