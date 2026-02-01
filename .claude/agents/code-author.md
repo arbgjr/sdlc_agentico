@@ -24,13 +24,20 @@ model: sonnet
 skills:
   - rag-query
   - memory-manager
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Glob
-  - Grep
-  - Bash
+# Tool Access Control (OpenClaw pattern)
+# code-author needs full file system and runtime access for implementation
+# This is one of the few agents that SHOULD have Bash access
+allowed_tools:
+  - Read           # Read code files
+  - Write          # Create new files
+  - Edit           # Modify existing code
+  - Glob           # Find files
+  - Grep           # Search code
+  - Bash           # Run tests, build, format
+  - AskUserQuestion # Clarify implementation
+  - Skill          # Use other skills
+denied_tools:
+  - Task           # No spawning sub-agents (use parallel-workers instead)
 references:
   - path: \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/standards.md
     purpose: Regras de qualidade, versionamento, merge blockers

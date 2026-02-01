@@ -13,6 +13,16 @@
   "hooks": {
     "PreToolUse": [
       {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/enforce-tool-access.py || python .claude/hooks/enforce-tool-access.py",
+            "description": "Tool Access Control - validates tool usage against agent-specific allow/deny lists"
+          }
+        ]
+      },
+      {
         "matcher": "Write(.agentic_sdlc/**/*)",
         "hooks": [
           {

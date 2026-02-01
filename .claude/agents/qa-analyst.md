@@ -24,6 +24,20 @@ model: sonnet
 skills:
   - rag-query
   - frontend-testing
+# Tool Access Control (OpenClaw pattern)
+# qa-analyst should READ code/tests and RUN tests
+# Can execute Bash for test execution but NO code modification
+allowed_tools:
+  - Read           # Read code and test files
+  - Grep           # Search for test patterns
+  - Glob           # Find test files
+  - Bash           # Run tests, coverage reports
+  - AskUserQuestion # Clarify quality criteria
+  - Skill          # Use frontend-testing skill
+denied_tools:
+  - Edit           # No code modification
+  - Write          # No creating production code (tests OK via Bash)
+  - Task           # No spawning sub-agents
 ---
 
 # QA Analyst Agent
