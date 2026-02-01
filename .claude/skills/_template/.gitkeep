@@ -1,0 +1,9 @@
+# Template for SDLC Agêntico Skills
+
+This directory contains the official template following Anthropic best practices:
+- Natural language first
+- Progressive disclosure (< 500 lines SKILL.md)
+- Scripts only when justified
+- Assume Claude is smart
+
+See README.md for usage instructions.
