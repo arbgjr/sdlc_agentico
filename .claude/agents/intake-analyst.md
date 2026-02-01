@@ -25,6 +25,21 @@ skills:
   - rag-query
   - bmad-integration
   - document-processor
+# Tool Access Control (OpenClaw pattern)
+# intake-analyst should READ documents and WRITE intake analysis
+# NO code execution, NO git operations
+allowed_tools:
+  - Read           # Read requirement documents
+  - Write          # Write intake analysis
+  - Grep           # Search for requirements
+  - Glob           # Find documents
+  - AskUserQuestion # Clarify requirements
+  - Skill          # Use document-processor skill
+denied_tools:
+  - Bash           # No command execution
+  - Edit           # No code modification
+  - Task           # No spawning sub-agents
+  - Git            # No git operations
 ---
 
 # Intake Analyst Agent

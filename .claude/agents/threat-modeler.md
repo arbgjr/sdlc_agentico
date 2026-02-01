@@ -25,6 +25,22 @@ skills:
   - rag-query
   - memory-manager
   - document-enricher
+# Tool Access Control (OpenClaw pattern)
+# threat-modeler should READ architecture and WRITE threat models
+# NO code execution, NO git operations, NO file editing
+allowed_tools:
+  - Read           # Read architecture files
+  - Write          # Write threat-model.yml
+  - Grep           # Search for security patterns
+  - Glob           # Find architecture files
+  - AskUserQuestion # Clarify security requirements
+  - WebFetch       # Research CVEs and vulnerabilities
+  - WebSearch      # Search for attack vectors
+denied_tools:
+  - Bash           # No command execution
+  - Edit           # No code modification
+  - Task           # No spawning sub-agents
+  - NotebookEdit   # No notebook modification
 references:
   - path: \.agentic_sdlc/docs/engineering-playbook/stacks/devops/security.md
     purpose: Padroes de seguranca, STRIDE, escalation triggers

@@ -26,6 +26,20 @@ skills:
   - spec-kit-integration
   - document-processor
   - document-enricher
+# Tool Access Control (OpenClaw pattern)
+# requirements-analyst should READ/WRITE specs and requirements
+# NO code execution, NO git operations
+allowed_tools:
+  - Read           # Read epics, documents
+  - Write          # Write user stories, specs
+  - Grep           # Search requirements
+  - Glob           # Find documents
+  - AskUserQuestion # Clarify requirements
+  - Skill          # Use document-processor, spec-kit
+denied_tools:
+  - Bash           # No command execution
+  - Edit           # No code modification
+  - Task           # No spawning sub-agents
 ---
 
 # Requirements Analyst Agent
