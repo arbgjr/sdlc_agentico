@@ -9,7 +9,7 @@
 
 ## Contexto
 
-Após 2 meses de desenvolvimento do SDLC Agêntico, chegamos a um ponto crítico: temos **124 scripts Python** em 30 skills e **13.894 linhas** em 38 agents. Análise das boas práticas oficiais da Anthropic revelou que estamos **sobre-automatizando com scripts quando linguagem natural seria suficiente e mais eficaz**.
+Após quase 1 mes de desenvolvimento do SDLC Agêntico, chegamos a um ponto crítico: temos **124 scripts Python** em 30 skills e **13.894 linhas** em 38 agents. Análise das boas práticas oficiais da Anthropic revelou que estamos **sobre-automatizando com scripts quando linguagem natural seria suficiente e mais eficaz**.
 
 ## O Problema: Script Creep
 
