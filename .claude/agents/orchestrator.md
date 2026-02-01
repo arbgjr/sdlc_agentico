@@ -183,11 +183,347 @@ level_3_enterprise:
 ## Checklist Pre-Execucao
 
 - [ ] **Verificar atualizacoes disponiveis (version-checker)**
+- [ ] **Detectar cliente ativo (client_resolver)** ← NEW v3.0.0
 - [ ] Contexto do projeto carregado do memory-manager
 - [ ] Fase atual identificada
 - [ ] Artefatos da fase anterior verificados
 - [ ] Nivel de complexidade detectado
 - [ ] Agentes necessarios identificados
+
+## Client-Aware Agent Resolution (v3.0.0)
+
+### Overview
+
+Starting in v3.0.0, the orchestrator supports **profile-based multi-tenancy** where clients can customize agents, skills, gates, and templates without forking the framework.
+
+**Key Concept:** Each client profile is an "overlay" on top of the base framework. When loading an agent, the orchestrator checks for client-specific overrides first, then falls back to base.
+
+### Client Detection
+
+At workflow start, the orchestrator MUST detect the active client:
+
+```python
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(".claude/lib/python")))
+from client_resolver import ClientResolver
+
+# Initialize resolver
+resolver = ClientResolver()
+
+# Detect active client (priority order)
+client_id = resolver.detect_client()
+# Priority:
+# 1. $SDLC_CLIENT environment variable
+# 2. .project/.client file (persisted)
+# 3. Auto-detect from profile markers
+# 4. Fallback to "generic" (base framework)
+
+print(f"Active client: {client_id}")
+```
+
+### Agent Resolution
+
+When loading an agent, use client-aware resolution:
+
+```python
+# BEFORE v3.0.0 (direct path)
+agent_path = Path(".claude/agents/code-reviewer.md")
+
+# AFTER v3.0.0 (client-aware)
+try:
+    agent_path = resolver.resolve_agent("code-reviewer", client_id)
+    # Returns:
+    # - clients/{client_id}/agents/code-reviewer.md (if exists) ← OVERRIDE
+    # - .claude/agents/code-reviewer.md (fallback) ← BASE
+except FileNotFoundError:
+    # Agent not found in client or base
+    raise
+```
+
+### Skill Resolution
+
+Same pattern for skills:
+
+```python
+# Resolve skill directory
+skill_path = resolver.resolve_skill("gate-evaluator", client_id)
+# Returns:
+# - clients/{client_id}/skills/gate-evaluator/ (if exists) ← OVERRIDE
+# - .claude/skills/gate-evaluator/ (fallback) ← BASE
+```
+
+### Profile Loading
+
+Load client profile to check customizations:
+
+```python
+profile = resolver.load_profile(client_id)
+
+# Check for custom gates
+custom_gates = profile.get("gates", {}).get("additions", [])
+for gate in custom_gates:
+    gate_name = gate["name"]
+    gate_path = gate["path"]
+    after_phase = gate["after_phase"]
+    print(f"Custom gate: {gate_name} after phase {after_phase}")
+
+# Check for agent overrides
+agent_overrides = profile.get("agents", {}).get("overrides", [])
+for override in agent_overrides:
+    agent_name = override["name"]
+    reason = override["reason"]
+    print(f"Overridden agent: {agent_name} - {reason}")
+```
+
+### Client Version Compatibility
+
+Before executing workflow, validate client profile is compatible with framework:
+
+```python
+client_info = resolver.get_client_info(client_id)
+if client_info:
+    min_version = client_info.get("framework", {}).get("min_version")
+    max_version = client_info.get("framework", {}).get("max_version")
+
+    # Check framework version (from .claude/VERSION)
+    import yaml
+    with open(".claude/VERSION") as f:
+        framework_version = yaml.safe_load(f)["version"]
+
+    # Validate (implement semantic version comparison)
+    if not is_version_compatible(framework_version, min_version, max_version):
+        raise VersionIncompatibleError(
+            f"Framework v{framework_version} incompatible with client "
+            f"requirements: {min_version} <= v <= {max_version}"
+        )
+```
+
+### Workflow Integration
+
+Update standard workflow initialization:
+
+```python
+def start_sdlc_workflow(description: str):
+    """Start SDLC workflow with client awareness."""
+
+    # 1. Detect client (FIRST STEP)
+    resolver = ClientResolver()
+    client_id = resolver.detect_client()
+
+    print(f"🎯 Active client: {client_id}")
+
+    # 2. Load client profile
+    profile = resolver.load_profile(client_id)
+    client_name = profile.get("client", {}).get("name", client_id)
+
+    print(f"📋 Profile: {client_name}")
+
+    # 3. Validate version compatibility
+    validate_client_compatibility(resolver, client_id)
+
+    # 4. Detect complexity level (existing logic)
+    complexity = detect_complexity(description)
+
+    # 5. Load agents with client-aware resolution
+    for phase in get_phases_for_complexity(complexity):
+        agents = get_agents_for_phase(phase)
+
+        for agent_name in agents:
+            # Use client-aware resolution
+            agent_path = resolver.resolve_agent(agent_name, client_id)
+
+            # Log which version is being used
+            if "clients" in str(agent_path):
+                print(f"  ✓ {agent_name} (client-specific)")
+            else:
+                print(f"  ✓ {agent_name} (base)")
+
+            # Load and execute agent
+            load_and_execute_agent(agent_path, phase)
+
+        # Evaluate gate (client-aware)
+        evaluate_gate(phase, client_id)
+```
+
+### Logging and Observability
+
+All client-aware operations should be logged:
+
+```python
+import sys
+sys.path.insert(0, ".claude/lib/python")
+from sdlc_logging import get_logger
+
+logger = get_logger("orchestrator", skill="orchestrator", phase=current_phase)
+
+logger.info(
+    "Client detected",
+    extra={
+        "client_id": client_id,
+        "client_name": client_name,
+        "detection_method": detection_method,  # env | persisted | auto-detect | default
+    }
+)
+
+logger.info(
+    "Agent resolved",
+    extra={
+        "agent_name": agent_name,
+        "resolution": "client-override" if is_override else "base",
+        "path": str(agent_path),
+    }
+)
+```
+
+### Error Handling
+
+Handle client-related errors gracefully:
+
+```python
+try:
+    agent_path = resolver.resolve_agent(agent_name, client_id)
+except FileNotFoundError:
+    logger.error(
+        f"Agent {agent_name} not found in client or base",
+        extra={"client_id": client_id}
+    )
+    # Fallback strategy or escalate to user
+    raise
+
+except VersionIncompatibleError as e:
+    logger.error(
+        "Client profile incompatible with framework version",
+        extra={
+            "framework_version": framework_version,
+            "client_min": min_version,
+            "client_max": max_version,
+        }
+    )
+    # Ask user to update profile or framework
+    raise
+```
+
+### Example: Full Workflow Initialization
+
+```python
+def orchestrate_sdlc(description: str, complexity: Optional[int] = None):
+    """
+    Complete SDLC orchestration with v3.0.0 client awareness.
+    """
+    logger = get_logger("orchestrator")
+
+    # ==== CLIENT DETECTION ====
+    resolver = ClientResolver()
+    client_id = resolver.detect_client()
+
+    logger.info(f"🎯 Active client: {client_id}")
+
+    # ==== PROFILE LOADING ====
+    try:
+        profile = resolver.load_profile(client_id)
+        client_info = profile.get("client", {})
+
+        logger.info(
+            "Client profile loaded",
+            extra={
+                "name": client_info.get("name"),
+                "domain": client_info.get("domain"),
+                "version": client_info.get("version"),
+            }
+        )
+    except Exception as e:
+        logger.warning(f"Could not load client profile: {e}")
+        # Continue with generic (base framework)
+        client_id = "generic"
+
+    # ==== VERSION VALIDATION ====
+    validate_client_compatibility(resolver, client_id)
+
+    # ==== COMPLEXITY DETECTION ====
+    if complexity is None:
+        complexity = detect_complexity_from_description(description)
+
+    logger.info(f"Complexity level: {complexity}")
+
+    # ==== PHASE EXECUTION ====
+    phases = get_phases_for_complexity(complexity)
+
+    for phase_num in phases:
+        logger.info(f"Starting Phase {phase_num}")
+
+        # Get agents for phase
+        agent_names = get_agents_for_phase(phase_num)
+
+        for agent_name in agent_names:
+            # CLIENT-AWARE RESOLUTION
+            try:
+                agent_path = resolver.resolve_agent(agent_name, client_id)
+
+                is_override = "clients" in str(agent_path)
+                logger.info(
+                    f"Loading agent: {agent_name}",
+                    extra={
+                        "resolution": "client-override" if is_override else "base",
+                        "path": str(agent_path),
+                    }
+                )
+
+                # Execute agent
+                execute_agent(agent_path, phase_num, description)
+
+            except FileNotFoundError:
+                logger.error(f"Agent {agent_name} not found")
+                raise
+
+        # GATE EVALUATION (with client-specific gates)
+        evaluate_gate_with_client(phase_num, client_id, resolver)
+
+        logger.info(f"Phase {phase_num} completed")
+
+    logger.info("SDLC workflow completed successfully")
+```
+
+### Client-Specific Gates
+
+When evaluating gates, check for client-specific additions:
+
+```python
+def evaluate_gate_with_client(phase: int, client_id: str, resolver: ClientResolver):
+    """Evaluate gate with client-specific additions."""
+
+    # 1. Load base gate
+    base_gate_path = Path(f".claude/skills/gate-evaluator/gates/phase-{phase}-to-{phase+1}.yml")
+
+    # 2. Check for client-specific gates
+    profile = resolver.load_profile(client_id)
+    custom_gates = profile.get("gates", {}).get("additions", [])
+
+    client_gates_for_phase = [
+        g for g in custom_gates
+        if g.get("after_phase") == phase
+    ]
+
+    # 3. Evaluate base gate
+    evaluate_gate(base_gate_path)
+
+    # 4. Evaluate client-specific gates
+    for gate_config in client_gates_for_phase:
+        gate_name = gate_config["name"]
+        gate_path = Path(f"clients/{client_id}/{gate_config['path']}")
+
+        logger.info(f"Evaluating client-specific gate: {gate_name}")
+        evaluate_gate(gate_path)
+```
+
+### Best Practices
+
+1. **Always detect client first** - Before any agent/skill loading
+2. **Log all resolutions** - Track which client/base resources are used
+3. **Validate compatibility** - Check version constraints before execution
+4. **Graceful fallback** - If client profile fails, use generic (base)
+5. **Clear errors** - User-friendly messages when client config is wrong
 
 ## Verificacao de Atualizacoes (Phase 0)
 
