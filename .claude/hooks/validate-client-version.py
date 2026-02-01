@@ -143,7 +143,7 @@ def main():
             print("     git pull origin main && git checkout <tag>", file=sys.stderr)
         elif parse_version(framework_version) > parse_version(max_version or "999.0.0"):
             print(f"  1. Update client profile to support v{framework_version}", file=sys.stderr)
-            print(f"     Edit: clients/{client_id}/profile.yml", file=sys.stderr)
+            print(f"     Edit: .sdlc_clients/{client_id}/profile.yml", file=sys.stderr)
             print(f"     Set: max_version: \"{framework_version}\"", file=sys.stderr)
         print("  2. Switch to generic client: /set-client generic", file=sys.stderr)
         print("", file=sys.stderr)

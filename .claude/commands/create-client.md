@@ -23,7 +23,7 @@
 
 **What it creates**:
 ```
-clients/your-id/
+.sdlc_clients/your-id/
 ├── profile.yml              # Client configuration
 ├── README.md                # Client-specific docs
 ├── agents/                  # Agent overrides (empty)
@@ -39,7 +39,7 @@ clients/your-id/
 ```
 
 **Next Steps After Creation**:
-1. Review `clients/your-id/profile.yml`
+1. Review `.sdlc_clients/your-id/profile.yml`
 2. Add customizations:
    - Override agents (copy from `.claude/agents/`)
    - Add custom gates (create in `skills/gate-evaluator/gates/`)
@@ -52,6 +52,6 @@ clients/your-id/
 - `/sdlc-start` - Run workflow with active client
 
 **See Also**:
-- `clients/_base/README.md` - Comprehensive onboarding guide
-- `clients/demo-client/` - Example client profile
-- `clients/_base/profile.yml` - Full template with all options
+- `.sdlc_clients/_base/README.md` - Comprehensive onboarding guide
+- `.sdlc_clients/demo-client/` - Example client profile
+- `.sdlc_clients/_base/profile.yml` - Full template with all options

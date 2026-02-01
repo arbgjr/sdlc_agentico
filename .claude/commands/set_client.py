@@ -28,7 +28,7 @@ def usage():
     print("Set active SDLC Agêntico client profile.")
     print()
     print("Arguments:")
-    print("  client-id    Client ID (must exist in clients/ directory)")
+    print("  client-id    Client ID (must exist in .sdlc_clients/ directory)")
     print()
     print("Examples:")
     print("  set_client.py generic        # Use base framework (default)")

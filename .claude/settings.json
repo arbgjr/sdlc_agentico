@@ -288,7 +288,7 @@
   "sdlc": {
     "clients": {
       "enabled": true,
-      "directory": "clients",
+      "directory": ".sdlc_clients",
       "default_profile": "generic",
       "auto_detect": true
     },

@@ -235,7 +235,7 @@ agent_path = Path(".claude/agents/code-reviewer.md")
 try:
     agent_path = resolver.resolve_agent("code-reviewer", client_id)
     # Returns:
-    # - clients/{client_id}/agents/code-reviewer.md (if exists) ← OVERRIDE
+    # - .sdlc_clients/{client_id}/agents/code-reviewer.md (if exists) ← OVERRIDE
     # - .claude/agents/code-reviewer.md (fallback) ← BASE
 except FileNotFoundError:
     # Agent not found in client or base
@@ -250,7 +250,7 @@ Same pattern for skills:
 # Resolve skill directory
 skill_path = resolver.resolve_skill("gate-evaluator", client_id)
 # Returns:
-# - clients/{client_id}/skills/gate-evaluator/ (if exists) ← OVERRIDE
+# - .sdlc_clients/{client_id}/skills/gate-evaluator/ (if exists) ← OVERRIDE
 # - .claude/skills/gate-evaluator/ (fallback) ← BASE
 ```
 
@@ -511,7 +511,7 @@ def evaluate_gate_with_client(phase: int, client_id: str, resolver: ClientResolv
     # 4. Evaluate client-specific gates
     for gate_config in client_gates_for_phase:
         gate_name = gate_config["name"]
-        gate_path = Path(f"clients/{client_id}/{gate_config['path']}")
+        gate_path = Path(f".sdlc_clients/{client_id}/{gate_config['path']}")
 
         logger.info(f"Evaluating client-specific gate: {gate_name}")
         evaluate_gate(gate_path)

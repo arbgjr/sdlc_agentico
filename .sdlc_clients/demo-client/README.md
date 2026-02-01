@@ -15,14 +15,14 @@ This demo includes **minimal examples** of each customization type:
 ### 1. Agent Override: code-reviewer
 
 - **Base**: `.claude/agents/code-reviewer.md`
-- **Override**: `clients/demo-client/agents/code-reviewer.md`
+- **Override**: `.sdlc_clients/demo-client/agents/code-reviewer.md`
 - **Change**: Adds ONE custom checklist item ("Check for TODOs")
 - **Similarity**: 95% identical to base
 - **Purpose**: Shows override mechanics without heavy customization
 
 ### 2. Custom Gate: demo-custom-gate
 
-- **Location**: `clients/demo-client/skills/gate-evaluator/gates/demo-custom-gate.yml`
+- **Location**: `.sdlc_clients/demo-client/skills/gate-evaluator/gates/demo-custom-gate.yml`
 - **When**: After Phase 6 (Quality)
 - **Validates**: ADRs have "Impact" section
 - **Purpose**: Simple validation example (NOT domain-specific)
@@ -30,7 +30,7 @@ This demo includes **minimal examples** of each customization type:
 ### 3. Template Override: adr-template-custom
 
 - **Base**: `.agentic_sdlc/templates/adr-template.yml`
-- **Override**: `clients/demo-client/templates/adr-template-custom.yml`
+- **Override**: `.sdlc_clients/demo-client/templates/adr-template-custom.yml`
 - **Change**: Adds ONE extra field ("Business Impact")
 - **Purpose**: Shows template customization without major changes
 
@@ -92,8 +92,8 @@ Then customize based on **your specific requirements**:
 
 ## Learning Resources
 
-- **Template**: `clients/_base/profile.yml` - Full schema
-- **Guide**: `clients/_base/README.md` - Comprehensive onboarding
+- **Template**: `.sdlc_clients/_base/profile.yml` - Full schema
+- **Guide**: `.sdlc_clients/_base/README.md` - Comprehensive onboarding
 - **Framework Docs**: `.agentic_sdlc/docs/` - SDLC concepts
 - **Agent Docs**: `.claude/agents/*.md` - Individual agent guides
 

@@ -35,7 +35,7 @@ def create_client_profile(
         domain: Industry domain
         client_id: Client ID (lowercase, hyphens)
         clients_dir: Clients directory
-        template_dir: Template directory (default: clients/_base)
+        template_dir: Template directory (default: .sdlc_clients/_base)
 
     Returns:
         bool: Success
@@ -137,10 +137,10 @@ Override base agents for domain-specific behavior:
 
 ```bash
 # Copy base agent
-cp .claude/agents/code-reviewer.md clients/{client_id}/agents/
+cp .claude/agents/code-reviewer.md .sdlc_clients/{client_id}/agents/
 
 # Edit to add custom checks
-vim clients/{client_id}/agents/code-reviewer.md
+vim .sdlc_clients/{client_id}/agents/code-reviewer.md
 ```
 
 Then update `profile.yml`:
@@ -189,9 +189,9 @@ Run a workflow to test your customizations:
 
 ## Documentation
 
-- **Base Template**: `clients/_base/profile.yml`
-- **Onboarding Guide**: `clients/_base/README.md`
-- **Demo Client**: `clients/demo-client/` (learning example)
+- **Base Template**: `.sdlc_clients/_base/profile.yml`
+- **Onboarding Guide**: `.sdlc_clients/_base/README.md`
+- **Demo Client**: `.sdlc_clients/demo-client/` (learning example)
 
 ## Support
 
@@ -227,8 +227,8 @@ Run a workflow to test your customizations:
     print("Documentation:")
     print(f"  - Profile: {profile_path}")
     print(f"  - README: {readme_path}")
-    print("  - Template: clients/_base/profile.yml")
-    print("  - Guide: clients/_base/README.md")
+    print("  - Template: .sdlc_clients/_base/profile.yml")
+    print("  - Guide: .sdlc_clients/_base/README.md")
     print()
 
     return True

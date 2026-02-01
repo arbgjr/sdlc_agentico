@@ -31,7 +31,7 @@ Create a client profile when:
 /create-client --name "Your Company" --domain "industry" --id yourco
 
 # This creates:
-# clients/yourco/
+# .sdlc_clients/yourco/
 # ├── profile.yml (from template)
 # ├── agents/ (empty)
 # ├── skills/ (empty)
@@ -42,7 +42,7 @@ Create a client profile when:
 
 ### Step 2: Configure Auto-Detection
 
-Edit `clients/yourco/profile.yml`:
+Edit `.sdlc_clients/yourco/profile.yml`:
 
 ```yaml
 client:
@@ -72,10 +72,10 @@ Choose what to customize (start small!):
 
 ```bash
 # Copy base agent to client directory
-cp .claude/agents/code-reviewer.md clients/yourco/agents/
+cp .claude/agents/code-reviewer.md .sdlc_clients/yourco/agents/
 
 # Edit to add custom checklist
-vim clients/yourco/agents/code-reviewer.md
+vim .sdlc_clients/yourco/agents/code-reviewer.md
 ```
 
 Update `profile.yml`:
@@ -92,7 +92,7 @@ agents:
 
 ```bash
 # Create new gate
-cat > clients/yourco/skills/gate-evaluator/gates/custom-gate.yml << EOF
+cat > .sdlc_clients/yourco/skills/gate-evaluator/gates/custom-gate.yml << EOF
 gate_name: "compliance-check"
 phase_transition: "6-to-7"
 checks:
@@ -117,10 +117,10 @@ gates:
 
 ```bash
 # Copy base template
-cp .agentic_sdlc/templates/adr-template.yml clients/yourco/templates/
+cp .agentic_sdlc/templates/adr-template.yml .sdlc_clients/yourco/templates/
 
 # Add custom fields
-vim clients/yourco/templates/adr-template.yml
+vim .sdlc_clients/yourco/templates/adr-template.yml
 ```
 
 ### Step 4: Test Your Profile
@@ -143,7 +143,7 @@ cat .project/.client  # Should show: yourco
 
 ```bash
 # Run validation suite
-./clients/_base/validate-client.sh clients/yourco
+./.sdlc_clients/_base/validate-client.sh .sdlc_clients/yourco
 
 # Should pass:
 # ✅ Profile schema valid
@@ -155,7 +155,7 @@ cat .project/.client  # Should show: yourco
 ## Profile Structure
 
 ```
-clients/yourco/
+.sdlc_clients/yourco/
 ├── profile.yml              # Client configuration (REQUIRED)
 ├── README.md                # Client-specific documentation
 │
@@ -189,7 +189,7 @@ clients/yourco/
 
 When SDLC Agêntico loads resources, it follows this priority:
 
-1. **Client override** (if exists): `clients/yourco/agents/code-reviewer.md`
+1. **Client override** (if exists): `.sdlc_clients/yourco/agents/code-reviewer.md`
 2. **Base framework** (fallback): `.claude/agents/code-reviewer.md`
 3. **Error** (if not found anywhere)
 
@@ -202,7 +202,7 @@ def resolve_agent(agent_name: str) -> Path:
 
     # Check client override
     if client != "generic":
-        client_path = f"clients/{client}/agents/{agent_name}.md"
+        client_path = f".sdlc_clients/{client}/agents/{agent_name}.md"
         if os.path.exists(client_path):
             return client_path  # ✅ Use override
 
@@ -220,7 +220,7 @@ def resolve_agent(agent_name: str) -> Path:
 When querying knowledge (RAG), SDLC Agêntico searches in order:
 
 1. **Base corpus**: `.agentic_sdlc/corpus/` (generic patterns, always included)
-2. **Client corpus**: `clients/yourco/corpus/` (industry-specific knowledge)
+2. **Client corpus**: `.sdlc_clients/yourco/corpus/` (industry-specific knowledge)
 3. **Project corpus**: `.project/corpus/` (project-specific decisions)
 
 **Example RAG query**: "What are the authentication patterns?"
@@ -253,7 +253,7 @@ When querying knowledge (RAG), SDLC Agêntico searches in order:
 
 ```bash
 # Check detection markers
-cat clients/yourco/profile.yml | yq '.client.detection'
+cat .sdlc_clients/yourco/profile.yml | yq '.client.detection'
 
 # Manually set client
 /set-client yourco
@@ -267,13 +267,13 @@ cat .project/.client  # Should show: yourco
 
 ```bash
 # Check file exists
-ls -la clients/yourco/agents/code-reviewer.md
+ls -la .sdlc_clients/yourco/agents/code-reviewer.md
 
 # Check profile configuration
-cat clients/yourco/profile.yml | yq '.agents.overrides'
+cat .sdlc_clients/yourco/profile.yml | yq '.agents.overrides'
 
 # Check orchestrator logs
-# Should see: "Loading agent: code-reviewer from clients/yourco/agents/"
+# Should see: "Loading agent: code-reviewer from .sdlc_clients/yourco/agents/"
 ```
 
 ### Version compatibility error
@@ -283,7 +283,7 @@ cat clients/yourco/profile.yml | yq '.agents.overrides'
 cat .claude/VERSION | yq '.version'  # e.g., 3.0.0
 
 # Check client requirements
-cat clients/yourco/profile.yml | yq '.client.framework'
+cat .sdlc_clients/yourco/profile.yml | yq '.client.framework'
 
 # Update client if needed
 # min_version: "3.0.0"
@@ -294,8 +294,8 @@ cat clients/yourco/profile.yml | yq '.client.framework'
 
 See these example clients:
 
-- **`clients/demo-client/`**: Minimal example showing customization mechanics
-- **`clients/generic/`**: Alias to base framework (default when no client set)
+- **`.sdlc_clients/demo-client/`**: Minimal example showing customization mechanics
+- **`.sdlc_clients/generic/`**: Alias to base framework (default when no client set)
 
 ## Support
 

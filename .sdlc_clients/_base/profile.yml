@@ -90,11 +90,11 @@ corpus:
   # Client-specific knowledge nodes
   patterns:
     # Example: Industry-specific patterns
-    # - "clients/{client_id}/corpus/nodes/patterns/*.yml"
+    # - ".sdlc_clients/{client_id}/corpus/nodes/patterns/*.yml"
 
   decisions:
     # Example: Client-specific ADRs
-    # - "clients/{client_id}/corpus/nodes/decisions/*.yml"
+    # - ".sdlc_clients/{client_id}/corpus/nodes/decisions/*.yml"
 
 # Hooks configuration (optional)
 hooks:

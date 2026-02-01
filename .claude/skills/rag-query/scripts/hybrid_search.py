@@ -492,7 +492,7 @@ def get_corpus_paths(client_id: Optional[str] = None) -> List[Path]:
 
     Priority order:
     1. Base corpus (.agentic_sdlc/corpus) - always included
-    2. Client corpus (clients/{client_id}/corpus) - if client != "generic"
+    2. Client corpus (.sdlc_clients/{client_id}/corpus) - if client != "generic"
     3. Project corpus (.project/corpus) - always included
 
     Args:
@@ -516,7 +516,7 @@ def get_corpus_paths(client_id: Optional[str] = None) -> List[Path]:
 
     # 2. Client corpus (if not generic)
     if client_id != "generic":
-        client_corpus = Path(f"clients/{client_id}/corpus")
+        client_corpus = Path(f".sdlc_clients/{client_id}/corpus")
         if client_corpus.exists():
             corpus_paths.append(client_corpus)
 

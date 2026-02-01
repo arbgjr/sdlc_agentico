@@ -12,7 +12,7 @@
 ```
 
 **What it does**:
-1. Validates that client profile exists in `clients/` directory
+1. Validates that client profile exists in `.sdlc_clients/` directory
 2. Writes client ID to `.project/.client` (persisted)
 3. Exports `SDLC_CLIENT` environment variable (current session)
 4. Future workflows will use this client's customizations
@@ -26,7 +26,7 @@ If you don't run `/set-client`, the framework will auto-detect based on:
 **Client Resolution Order**:
 1. **Explicit**: User ran `/set-client yourco`
 2. **Persisted**: `.project/.client` exists (from previous session)
-3. **Auto-Detect**: Matches marker in `clients/*/profile.yml`
+3. **Auto-Detect**: Matches marker in `.sdlc_clients/*/profile.yml`
 4. **Fallback**: Uses `generic` (base framework)
 
 **Related Commands**:
@@ -35,5 +35,5 @@ If you don't run `/set-client`, the framework will auto-detect based on:
 - `/quick-fix` - Uses active client for quick fix
 
 **See Also**:
-- `clients/_base/README.md` - How to create client profiles
-- `clients/demo-client/` - Example client profile
+- `.sdlc_clients/_base/README.md` - How to create client profiles
+- `.sdlc_clients/demo-client/` - Example client profile
