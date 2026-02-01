@@ -54,7 +54,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/validate-commit.sh"
+            "command": "python3 .claude/hooks/validate-commit.py || python .claude/hooks/validate-commit.py"
           },
           {
             "type": "command",
@@ -67,7 +67,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/check-gate.sh auto"
+            "command": "python3 .claude/hooks/check-gate.py auto || python .claude/hooks/check-gate.py auto"
           }
         ]
       }
