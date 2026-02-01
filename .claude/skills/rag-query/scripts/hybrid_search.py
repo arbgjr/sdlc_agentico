@@ -23,6 +23,7 @@ Usage:
 """
 
 import re
+import sys
 import yaml
 import json
 import math
@@ -485,11 +486,58 @@ class GraphSearcher:
         return self._node_index.get(node_id)
 
 
+def get_corpus_paths(client_id: Optional[str] = None) -> List[Path]:
+    """
+    Get all corpus paths to search (multi-client support v3.0.0).
+
+    Priority order:
+    1. Base corpus (.agentic_sdlc/corpus) - always included
+    2. Client corpus (clients/{client_id}/corpus) - if client != "generic"
+    3. Project corpus (.project/corpus) - always included
+
+    Args:
+        client_id: Client ID (auto-detected if None)
+
+    Returns:
+        List[Path]: Corpus paths to search (in priority order)
+    """
+    import os
+
+    # Auto-detect client if not provided
+    if client_id is None:
+        client_id = os.getenv("SDLC_CLIENT", "generic")
+
+    corpus_paths: List[Path] = []
+
+    # 1. Base corpus (always first)
+    base_corpus = Path(".agentic_sdlc/corpus")
+    if base_corpus.exists():
+        corpus_paths.append(base_corpus)
+
+    # 2. Client corpus (if not generic)
+    if client_id != "generic":
+        client_corpus = Path(f"clients/{client_id}/corpus")
+        if client_corpus.exists():
+            corpus_paths.append(client_corpus)
+
+    # 3. Project corpus (always last)
+    project_corpus = Path(".project/corpus")
+    if project_corpus.exists():
+        corpus_paths.append(project_corpus)
+
+    return corpus_paths
+
+
 class HybridSearcher:
     """
     Combined text and graph search.
 
     Merges results from text search and graph expansion.
+
+    Multi-Client Support (v3.0.0):
+    - Searches across base, client, and project corpus
+    - Merges results with proper de-duplication
+    - Maintains backward compatibility (single corpus)
     """
 
     # Weights for combining scores
@@ -497,14 +545,55 @@ class HybridSearcher:
     GRAPH_WEIGHT = 0.3
     DECAY_BOOST_WEIGHT = 0.5  # How much decay affects final score
 
-    def __init__(self, corpus_path: Optional[Path] = None):
-        """Initialize hybrid searcher."""
-        if corpus_path is None:
-            corpus_path = Path(".project/corpus")
+    def __init__(
+        self,
+        corpus_path: Optional[Path] = None,
+        client_id: Optional[str] = None,
+        multi_corpus: bool = True,
+    ):
+        """
+        Initialize hybrid searcher.
 
-        self.corpus_path = Path(corpus_path)
-        self.text_index = TextIndex(corpus_path)
-        self.graph_searcher = GraphSearcher(corpus_path)
+        Args:
+            corpus_path: Single corpus path (legacy mode)
+            client_id: Client ID for multi-corpus (auto-detected if None)
+            multi_corpus: Enable multi-corpus search (default: True)
+
+        If multi_corpus=True, searches base + client + project corpus.
+        If multi_corpus=False or corpus_path provided, uses single corpus.
+        """
+        # Legacy mode: single corpus path provided
+        if corpus_path is not None:
+            self.corpus_paths = [Path(corpus_path)]
+            self.multi_corpus = False
+
+        # Multi-corpus mode (v3.0.0)
+        elif multi_corpus:
+            self.corpus_paths = get_corpus_paths(client_id)
+            self.multi_corpus = True
+
+        # Fallback: project corpus only
+        else:
+            self.corpus_paths = [Path(".project/corpus")]
+            self.multi_corpus = False
+
+        # Create indexes for each corpus
+        self.text_indexes: List[TextIndex] = []
+        self.graph_searchers: List[GraphSearcher] = []
+
+        for path in self.corpus_paths:
+            if path.exists():
+                try:
+                    self.text_indexes.append(TextIndex(path))
+                    self.graph_searchers.append(GraphSearcher(path))
+                except Exception as e:
+                    print(f"[WARN] Could not index corpus: {path} - {e}", file=sys.stderr)
+
+        # Legacy attributes for backward compatibility
+        self.corpus_path = self.corpus_paths[0] if self.corpus_paths else Path(".project/corpus")
+        self.text_index = self.text_indexes[0] if self.text_indexes else None
+        self.graph_searcher = self.graph_searchers[0] if self.graph_searchers else None
+
         self._decay_index: Optional[Dict[str, Any]] = None
 
     def _load_decay_index(self) -> Dict[str, Any]:
