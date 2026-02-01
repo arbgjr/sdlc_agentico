@@ -296,6 +296,19 @@
     ]
   },
   "sdlc": {
+    "token_budget": {
+      "enabled": true,
+      "global_max": 200000,
+      "per_agent_max": 50000,
+      "orchestrator_max": 80000,
+      "warning_threshold": 0.8,
+      "action_on_overflow": "warn",
+      "monitoring": {
+        "track_tool_schemas": true,
+        "track_bootstrap_files": true,
+        "track_conversation_history": true
+      }
+    },
     "feature_flags": {
       "multi_client_architecture": false
     },
