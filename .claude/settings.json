@@ -286,11 +286,15 @@
     ]
   },
   "sdlc": {
+    "feature_flags": {
+      "multi_client_architecture": false
+    },
     "clients": {
-      "enabled": true,
+      "enabled": false,
       "directory": ".sdlc_clients",
       "default_profile": "generic",
-      "auto_detect": true
+      "auto_detect": true,
+      "note": "Enable via feature_flags.multi_client_architecture"
     },
     "phases": [
       {
