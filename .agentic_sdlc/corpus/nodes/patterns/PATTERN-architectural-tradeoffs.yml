@@ -1,0 +1,136 @@
+id: PATTERN-TRADEOFFS-001
+type: pattern
+title: "Architectural Trade-offs and Decision Framework"
+category: architecture
+created_at: "2026-01-31T00:00:00Z"
+status: active
+confidence: 0.95
+
+description: |
+  Fundamental architectural trade-offs that must be considered during system design.
+  Based on industry-standard patterns and CAP theorem.
+
+content: |
+  ## Core Trade-offs in System Design
+
+  ### 1. Simplicidade vs. Flexibilidade
+  - **Simplicidade**: Código direto, fácil de entender, rápido de implementar
+  - **Flexibilidade**: Preparado para mudanças, extensível, configurável
+  - **Quando escolher Simplicidade**: MVPs, projetos pequenos, equipes pequenas
+  - **Quando escolher Flexibilidade**: Produtos de longo prazo, requisitos incertos
+
+  ### 2. Performance vs. Manutenibilidade
+  - **Performance**: Código otimizado, algoritmos eficientes, cache agressivo
+  - **Manutenibilidade**: Código legível, bem estruturado, documentado
+  - **Quando escolher Performance**: APIs de alta carga, processamento real-time
+  - **Quando escolher Manutenibilidade**: Aplicações de negócio, sistemas complexos
+
+  ### 3. Consistência vs. Disponibilidade (CAP Theorem)
+  - **CA (Consistency + Availability)**: Single server, sem partição tolerante
+    - Exemplo: Servidor único, banco relacional tradicional
+    - Trade-off: Ponto único de falha
+
+  - **CP (Consistency + Partition Tolerance)**: Múltiplos servidores, strong consistency
+    - Exemplo: Paxos, Raft, ZooKeeper, etcd
+    - Trade-off: Sistema pode ficar indisponível durante partições
+
+  - **AP (Availability + Partition Tolerance)**: Múltiplos servidores, eventual consistency
+    - Exemplo: Cassandra, DynamoDB, Riak
+    - Trade-off: Dados podem ficar temporariamente inconsistentes
+
+  **Guideline**: Em sistemas distribuídos, Partition Tolerance é inevitável.
+  A escolha real é entre Consistency (CP) vs. Availability (AP).
+
+  ### 4. Monolito vs. Microservices
+  - **Monolito**: Simplicidade operacional, deploy único, transações ACID
+  - **Microservices**: Escalabilidade independente, tecnologias heterogêneas
+  - **Quando escolher Monolito**: Startups, MVPs, equipes pequenas (< 10)
+  - **Quando escolher Microservices**: Escala, múltiplos times, domínios complexos
+
+  ## Clean Architecture: Quando Usar?
+
+  ### Vantagens
+  - ✅ Framework-independent (testável sem UI, DB, servidor)
+  - ✅ UI-independent (pode trocar React por Vue sem afetar regras)
+  - ✅ Database-independent (pode trocar PostgreSQL por MongoDB)
+  - ✅ Extremamente bem documentada (livro, comunidade ativa)
+  - ✅ Testável (camadas isoladas, mocks simples)
+
+  ### Desvantagens
+  - ❌ Muita cerimônia para projetos simples (overkill em CRUDs)
+  - ❌ "Over-engineering" é comum (abstração excessiva)
+  - ❌ Requer maturidade da equipe (curva de aprendizado)
+  - ❌ Mais arquivos e indireções (navegação difícil)
+  - ❌ Pode virar "Clean Theater" (performance de pureza sem valor real)
+  - ❌ Implementações variam muito (cada projeto faz diferente)
+
+  ### Quando Usar Clean Architecture?
+  - ✅ Sistemas de longo prazo (> 5 anos de vida útil)
+  - ✅ Domínio complexo (regras de negócio não-triviais)
+  - ✅ Múltiplas interfaces (web, mobile, CLI, API)
+  - ✅ Equipe experiente (> 3 anos de experiência)
+
+  ### Quando NÃO Usar?
+  - ❌ MVPs e protótipos (priorize velocidade)
+  - ❌ CRUDs simples (use framework MVC)
+  - ❌ Equipes juniores (use padrões mais simples)
+  - ❌ Projetos descartáveis (< 1 ano de vida)
+
+examples:
+  - scenario: "Sistema de e-commerce com 100k usuários"
+    trade_offs:
+      - dimension: "Consistência vs. Disponibilidade"
+        choice: "AP (Eventual Consistency)"
+        rationale: "Carrinho de compras pode ter eventual consistency. Disponibilidade é mais importante que consistência imediata."
+
+      - dimension: "Monolito vs. Microservices"
+        choice: "Monolito modular"
+        rationale: "Ainda não atingiu escala que justifique complexidade de microservices. Monolito bem estruturado é suficiente."
+
+  - scenario: "Sistema bancário com transações financeiras"
+    trade_offs:
+      - dimension: "Consistência vs. Disponibilidade"
+        choice: "CP (Strong Consistency)"
+        rationale: "Transações financeiras DEVEM ser consistentes. Disponibilidade é secundária."
+
+      - dimension: "Performance vs. Manutenibilidade"
+        choice: "Manutenibilidade"
+        rationale: "Código financeiro deve ser legível e auditável. Performance otimizada apenas em hot paths."
+
+tags:
+  - trade-offs
+  - architecture
+  - cap-theorem
+  - clean-architecture
+  - decision-framework
+
+related_patterns:
+  - CQRS (Command Query Responsibility Segregation)
+  - Event Sourcing
+  - Hexagonal Architecture
+  - Microservices Patterns
+
+references:
+  - title: "CAP Theorem"
+    url: "https://en.wikipedia.org/wiki/CAP_theorem"
+  - title: "Clean Architecture (Robert C. Martin)"
+    url: "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html"
+  - title: "Monolith First (Martin Fowler)"
+    url: "https://martinfowler.com/bliki/MonolithFirst.html"
+
+usage_in_sdlc:
+  - agent: "tradeoff-challenger"
+    usage: "Use esses trade-offs como perguntas-guia ao desafiar decisões"
+  - agent: "system-architect"
+    usage: "Referencie esses padrões ao documentar decisões arquiteturais"
+  - agent: "requirements-interrogator"
+    usage: "Pergunte qual trade-off o cliente prioriza (performance vs. manutenibilidade?)"
+  - skill: "system-design-decision-engine"
+    usage: "Incorpore essas dimensões na matriz de decisão"
+
+decay_metadata:
+  last_validated_at: "2026-01-31T00:00:00Z"
+  last_accessed_at: "2026-01-31T00:00:00Z"
+  access_count_30d: 0
+  decay_score: 1.0
+  decay_status: fresh

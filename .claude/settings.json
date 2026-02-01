@@ -195,6 +195,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "python3 .claude/hooks/detect-client.py || python .claude/hooks/detect-client.py"
+          },
+          {
+            "type": "command",
             "command": ".claude/hooks/detect-phase.sh"
           },
           {
@@ -282,6 +286,16 @@
     ]
   },
   "sdlc": {
+    "feature_flags": {
+      "multi_client_architecture": false
+    },
+    "clients": {
+      "enabled": false,
+      "directory": ".sdlc_clients",
+      "default_profile": "generic",
+      "auto_detect": true,
+      "note": "Enable via feature_flags.multi_client_architecture"
+    },
     "phases": [
       {
         "number": 0,
