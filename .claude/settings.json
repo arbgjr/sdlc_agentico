@@ -195,6 +195,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": ".claude/hooks/detect-client.sh"
+          },
+          {
+            "type": "command",
             "command": ".claude/hooks/detect-phase.sh"
           },
           {
