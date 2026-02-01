@@ -195,7 +195,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/detect-client.sh"
+            "command": "python3 .claude/hooks/detect-client.py || python .claude/hooks/detect-client.py"
           },
           {
             "type": "command",
