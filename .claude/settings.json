@@ -282,6 +282,12 @@
     ]
   },
   "sdlc": {
+    "clients": {
+      "enabled": true,
+      "directory": "clients",
+      "default_profile": "generic",
+      "auto_detect": true
+    },
     "phases": [
       {
         "number": 0,

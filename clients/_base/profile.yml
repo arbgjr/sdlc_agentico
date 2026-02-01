@@ -1,0 +1,111 @@
+# SDLC Agêntico - Client Profile Template
+# Version: 3.0.0
+# Purpose: Template for creating new client profiles
+
+client:
+  id: "YOUR-CLIENT-ID"           # Unique identifier (lowercase, hyphens)
+  name: "Your Client Name"       # Display name
+  domain: "industry"             # Industry domain (financial, healthcare, etc.)
+  version: "1.0.0"               # Client profile version
+
+  # Framework compatibility (SemVer ranges)
+  framework:
+    min_version: "3.0.0"         # Minimum framework version
+    max_version: "3.99.99"       # Maximum framework version
+
+  # Auto-detection configuration
+  detection:
+    markers:
+      # File presence detection
+      - path: ".your-client-marker"
+        type: file
+
+      # Environment variable detection
+      - env: "CLIENT_ID"
+        value: "your-client-id"
+        type: env
+
+      # Git remote detection (optional)
+      - remote: "github.com/your-org/"
+        type: git_remote
+
+# Agent overrides (replace base framework agents)
+agents:
+  overrides:
+    # Example: Override code-reviewer to add custom checklist
+    # - name: "code-reviewer"
+    #   path: "agents/code-reviewer.md"
+    #   reason: "Adds industry-specific code review checks"
+
+  # Agent additions (new agents specific to this client)
+  additions:
+    # Example: Add compliance agent
+    # - name: "compliance-auditor"
+    #   path: "agents/compliance-auditor.md"
+    #   phase: 6
+    #   reason: "Required for regulatory compliance"
+
+# Skill overrides and additions
+skills:
+  overrides:
+    # Example: Override gate-evaluator to add custom gates
+    # - name: "gate-evaluator"
+    #   path: "skills/gate-evaluator"
+    #   reason: "Adds industry-specific quality gates"
+
+  additions:
+    # Example: Add new skill
+    # - name: "custom-validator"
+    #   path: "skills/custom-validator"
+    #   reason: "Client-specific validation logic"
+
+# Quality gates (additions to base gates)
+gates:
+  additions:
+    # Example: Add custom gate after Phase 6
+    # - name: "compliance-gate"
+    #   path: "skills/gate-evaluator/gates/compliance-gate.yml"
+    #   after_phase: 6
+    #   reason: "Validates regulatory requirements"
+
+# Template overrides
+templates:
+  overrides:
+    # Example: Custom ADR template
+    # - name: "adr-template"
+    #   path: "templates/adr-template.yml"
+    #   reason: "Adds required compliance fields"
+
+  additions:
+    # Example: Add new template type
+    # - name: "compliance-report"
+    #   path: "templates/compliance-report.yml"
+    #   reason: "Required regulatory documentation"
+
+# Corpus configuration
+corpus:
+  inherit_base: true              # Inherit base framework corpus
+  client_only: false              # Only use client corpus (not recommended)
+
+  # Client-specific knowledge nodes
+  patterns:
+    # Example: Industry-specific patterns
+    # - "clients/{client_id}/corpus/nodes/patterns/*.yml"
+
+  decisions:
+    # Example: Client-specific ADRs
+    # - "clients/{client_id}/corpus/nodes/decisions/*.yml"
+
+# Hooks configuration (optional)
+hooks:
+  overrides:
+    # Example: Custom validation hook
+    # - name: "validate-commit"
+    #   path: "hooks/validate-commit.sh"
+    #   reason: "Adds client-specific commit validation"
+
+# Documentation
+documentation:
+  readme: "README.md"             # Client-specific README
+  onboarding: "ONBOARDING.md"    # Onboarding guide for team
+  playbook: "PLAYBOOK.md"        # Client-specific development playbook
