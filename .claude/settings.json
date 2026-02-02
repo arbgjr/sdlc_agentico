@@ -212,10 +212,10 @@
       }
     },
     "feature_flags": {
-      "multi_client_architecture": false
+      "multi_client_architecture": true
     },
     "clients": {
-      "enabled": false,
+      "enabled": true,
       "directory": ".sdlc_clients",
       "default_profile": "generic",
       "auto_detect": true,
