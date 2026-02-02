@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/ensure-feature-branch.sh"
+            "command": "python3 .claude/hooks/ensure-feature-branch.py || python .claude/hooks/ensure-feature-branch.py"
           }
         ]
       },
@@ -36,7 +36,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/ensure-feature-branch.sh"
+            "command": "python3 .claude/hooks/ensure-feature-branch.py || python .claude/hooks/ensure-feature-branch.py"
           }
         ]
       },
@@ -45,7 +45,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/ensure-feature-branch.sh"
+            "command": "python3 .claude/hooks/ensure-feature-branch.py || python .claude/hooks/ensure-feature-branch.py"
           }
         ]
       },
@@ -209,7 +209,7 @@
           },
           {
             "type": "command",
-            "command": ".claude/hooks/detect-phase.sh"
+            "command": "python3 .claude/hooks/detect-phase.py || python .claude/hooks/detect-phase.py"
           },
           {
             "type": "command",
@@ -217,11 +217,11 @@
           },
           {
             "type": "command",
-            "command": ".claude/hooks/auto-migrate.sh"
+            "command": "python3 .claude/hooks/auto-migrate.py || python .claude/hooks/auto-migrate.py"
           },
           {
             "type": "command",
-            "command": ".claude/hooks/detect-documents.sh"
+            "command": "python3 .claude/hooks/detect-documents.py || python .claude/hooks/detect-documents.py"
           },
           {
             "type": "command",
