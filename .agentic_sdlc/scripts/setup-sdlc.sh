@@ -3,6 +3,14 @@
 # Setup Script para SDLC Agentico
 # Instala todas as dependencias necessarias para o workflow
 #
+# ⚠️  REQUISITOS:
+#    - Linux/macOS/Windows (Git Bash/WSL)
+#    - Privilégios sudo/root para instalação de ferramentas do sistema
+#    - Python 3.11+, Node.js 18+, Git
+#
+# O script instalará automaticamente ferramentas usando apt/brew conforme necessário.
+# Algumas instalações requerem sudo e solicitarão senha durante execução.
+#
 # Uso:
 #   # Instalacao completa do zero (requer repositorio clonado)
 #   ./\.agentic_sdlc/scripts/setup-sdlc.sh

@@ -95,6 +95,8 @@ O SDLC Agêntico é um framework que usa **39 agentes especializados** (33 orque
 
 ## Instalação
 
+⚠️ **IMPORTANTE**: O script de instalação requer privilégios **sudo** (Linux/macOS) ou **Administrador** (Windows) para instalar ferramentas do sistema (Python, Node.js, Git, GitHub CLI, poppler-utils, tesseract-ocr). O script solicitará senha durante a execução quando necessário.
+
 ### Opção 1: Download Direto (Linux/macOS/WSL)
 
 ```bash
@@ -104,7 +106,7 @@ VERSION="v3.0.0"
 # Download e extração (preserva permissões de execução)
 curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -
 
-# Executar setup
+# Executar setup (solicitará sudo quando necessário)
 ./\.agentic_sdlc/scripts/setup-sdlc.sh
 ```
 
@@ -127,6 +129,25 @@ Se o diretório `.claude/` já existir, o script perguntará o que fazer:
 2. Mesclar (manter existentes, adicionar novos)
 3. Substituir sem backup
 4. Cancelar
+
+### Opção 2a: Windows (PowerShell nativo)
+
+```powershell
+# Abra PowerShell como Administrador (botão direito > Executar como Administrador)
+
+# Definir versão desejada
+$VERSION = "v3.0.0"
+
+# Download e extração
+curl.exe -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/$VERSION/sdlc-agentico-$VERSION.zip" -o sdlc.zip
+Expand-Archive -Path sdlc.zip -DestinationPath . -Force
+Remove-Item sdlc.zip
+
+# Executar setup (requer privilégios de Administrador)
+.\.agentic_sdlc\scripts\setup-sdlc.ps1
+```
+
+> **Alternativa Git Bash**: Se você tem Git for Windows instalado, pode usar os comandos da Opção 1 no Git Bash (terminal incluído com Git).
 
 ### Opção 3: Clone do Repositório
 
