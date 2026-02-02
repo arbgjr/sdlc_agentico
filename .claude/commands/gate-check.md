@@ -87,7 +87,7 @@ if [ $RESULT -eq 0 ]; then
     fi
     
     # 4c. Extrair learnings (session-analyzer)
-    .claude/skills/session-analyzer/scripts/analyze.sh --extract-learnings
+    python3 .claude/skills/session-analyzer/scripts/extract_learnings.py --persist
 
     # 4d. Indexar ADRs no corpus RAG (rag-curator)
     python3 .claude/skills/rag-curator/scripts/index_adrs.py

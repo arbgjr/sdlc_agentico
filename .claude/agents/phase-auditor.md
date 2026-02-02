@@ -322,7 +322,7 @@ grep -L "try\|except" src/**/*.py
 ```yaml
 orchestrator_integration:
   trigger: "After gate passes"
-  hook: "post-gate-audit.sh"
+  hook: "post-gate-audit.py"
 
   workflow:
     1. Phase completes

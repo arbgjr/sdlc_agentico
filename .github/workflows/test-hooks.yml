@@ -1,0 +1,58 @@
+name: Test Python Hooks
+
+on:
+  push:
+    branches: [ main, feature/** ]
+    paths:
+      - '.claude/hooks/*.py'
+      - '.claude/lib/python/**'
+      - 'tests/hooks/**'
+      - 'pytest.ini'
+      - '.github/workflows/test-hooks.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '.claude/hooks/*.py'
+      - '.claude/lib/python/**'
+      - 'tests/hooks/**'
+      - 'pytest.ini'
+
+jobs:
+  test:
+    name: Test Hooks
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov pyyaml
+
+      - name: Run hook tests
+        run: |
+          pytest tests/hooks/ -v --tb=short
+
+      - name: Check hook executability
+        run: |
+          test -x .claude/hooks/validate-commit.py
+          test -x .claude/hooks/check-gate.py
+          test -x .claude/hooks/auto-branch.py
+
+      - name: Verify no shell hooks remain
+        run: |
+          # Ensure we deleted the shell versions
+          test ! -f .claude/hooks/validate-commit.sh
+          test ! -f .claude/hooks/check-gate.sh
+          test ! -f .claude/hooks/auto-branch.sh

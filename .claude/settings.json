@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/ensure-feature-branch.sh"
+            "command": "python3 .claude/hooks/ensure-feature-branch.py || python .claude/hooks/ensure-feature-branch.py"
           }
         ]
       },
@@ -36,7 +36,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/ensure-feature-branch.sh"
+            "command": "python3 .claude/hooks/ensure-feature-branch.py || python .claude/hooks/ensure-feature-branch.py"
           }
         ]
       },
@@ -45,7 +45,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/ensure-feature-branch.sh"
+            "command": "python3 .claude/hooks/ensure-feature-branch.py || python .claude/hooks/ensure-feature-branch.py"
           }
         ]
       },
@@ -54,11 +54,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/validate-commit.sh"
-          },
-          {
-            "type": "command",
-            "command": ".claude/hooks/update-project-timestamp.sh"
+            "command": "python3 .claude/hooks/validate-commit.py || python .claude/hooks/validate-commit.py"
           }
         ]
       },
@@ -67,7 +63,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/check-gate.sh auto"
+            "command": "python3 .claude/hooks/check-gate.py auto || python .claude/hooks/check-gate.py auto"
           }
         ]
       }
@@ -108,96 +104,6 @@
             "command": "echo 'Spec criada - considere usar /auto-branch feature'"
           }
         ]
-      },
-      {
-        "matcher": "Edit(src/**/*)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/detect-adr-need.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit(infrastructure/**/*)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/detect-adr-need.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit(**/docker-compose*.yml)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/detect-adr-need.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.agentic_sdlc/projects/*/planning/task-breakdown.yml)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/phase-commit-reminder.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.agentic_sdlc/projects/*/decisions/adr-*.yml)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/phase-commit-reminder.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.agentic_sdlc/projects/*/specs/*.spec.md)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/phase-commit-reminder.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.claude/agents/*.md)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/auto-update-component-counts.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.claude/skills/**/SKILL.md)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/auto-update-component-counts.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.claude/commands/*.md)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/auto-update-component-counts.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.claude/hooks/*.sh)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/auto-update-component-counts.sh"
-          }
-        ]
       }
     ],
     "UserPromptSubmit": [
@@ -209,23 +115,19 @@
           },
           {
             "type": "command",
-            "command": ".claude/hooks/detect-phase.sh"
+            "command": "python3 .claude/hooks/detect-phase.py || python .claude/hooks/detect-phase.py"
           },
           {
             "type": "command",
-            "command": ".claude/hooks/query-phase-learnings.sh"
+            "command": "python3 .claude/hooks/auto-migrate.py || python .claude/hooks/auto-migrate.py"
           },
           {
             "type": "command",
-            "command": ".claude/hooks/auto-migrate.sh"
+            "command": "python3 .claude/hooks/detect-documents.py || python .claude/hooks/detect-documents.py"
           },
           {
             "type": "command",
-            "command": ".claude/hooks/detect-documents.sh"
-          },
-          {
-            "type": "command",
-            "command": ".claude/hooks/validate-framework-structure.sh"
+            "command": "python3 .claude/hooks/validate-framework-structure.py || python .claude/hooks/validate-framework-structure.py"
           }
         ]
       }
@@ -310,10 +212,10 @@
       }
     },
     "feature_flags": {
-      "multi_client_architecture": false
+      "multi_client_architecture": true
     },
     "clients": {
-      "enabled": false,
+      "enabled": true,
       "directory": ".sdlc_clients",
       "default_profile": "generic",
       "auto_detect": true,

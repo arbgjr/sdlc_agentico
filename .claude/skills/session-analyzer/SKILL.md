@@ -27,21 +27,9 @@ Esta skill analisa sessoes do Claude Code para:
 
 ## Scripts Disponíveis
 
-### analyze.sh (wrapper)
+**⚠️ v3.0.0 Update:** Wrapper `analyze.sh` removido (Natural Language First principle).
 
-```bash
-# Analisar sessão mais recente
-.claude/skills/session-analyzer/scripts/analyze.sh
-
-# Analisar e persistir
-.claude/skills/session-analyzer/scripts/analyze.sh --persist
-
-# Extrair learnings para RAG corpus
-.claude/skills/session-analyzer/scripts/analyze.sh --extract-learnings
-
-# Especificar projeto
-.claude/skills/session-analyzer/scripts/analyze.sh --project /path/to/project
-```
+Use diretamente:
 
 ### extract_learnings.py
 

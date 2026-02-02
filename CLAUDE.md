@@ -119,7 +119,7 @@ gh auth status
 
 ### Configuration-Driven Design
 All behavior is defined in `.claude/settings.json`, which configures:
-- 38 agents organized by SDLC phase (33 orchestrated + 4 consultive + 1 meta)
+- 39 agents organized by SDLC phase (33 orchestrated + 4 consultive + 1 meta + 1 importer)
 - Git hooks for validation and automation
 - Quality gates between phases (including Security Gate)
 - Complexity levels (0-3) that determine which phases are executed

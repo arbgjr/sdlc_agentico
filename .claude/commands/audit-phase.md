@@ -72,7 +72,7 @@ findings:
 ## Integration
 
 This command is automatically called by:
-- `post-gate-audit.sh` hook (after gates pass)
+- `post-gate-audit.py` hook (after gates pass)
 - Orchestrator (if adversarial audit enabled)
 
 You can also call it manually for ad-hoc audits.
@@ -100,7 +100,7 @@ Configure in `.claude/settings.json`:
 
 - Agent: `phase-auditor`
 - Skill: `adversarial-validator`
-- Hook: `post-gate-audit.sh`
+- Hook: `post-gate-audit.py`
 
 ---
 
