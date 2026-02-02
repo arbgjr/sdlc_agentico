@@ -24,79 +24,98 @@ jobs:
         run: |
           # Create temporary directory for package
           mkdir -p release-package
+          cd release-package
 
-          # Copy .claude/ directory (excluding local/documentation files)
-          cp -r .claude release-package/
-          rm -f release-package/.claude/settings.local.json
-          rm -rf release-package/.claude/memory
-          rm -rf release-package/.claude/guides
-          rm -f release-package/.claude/best-practices.md
-          rm -f release-package/.claude/quick-reference.md
+          # Copy .claude/ excluding unnecessary files (v3.0.0 - corrected process)
+          echo "📦 Copying .claude/ (excluding __pycache__, tests/, local files)..."
+          rsync -av --exclude='__pycache__' \
+                   --exclude='tests/' \
+                   --exclude='*.pyc' \
+                   --exclude='settings.local.json' \
+                   --exclude='memory/' \
+                   --exclude='guides/' \
+                   --exclude='best-practices.md' \
+                   --exclude='quick-reference.md' \
+                   ../.claude/ .claude/
 
           # Remove framework-specific automation (not for end-users)
-          rm -f release-package/.claude/scripts/update-component-counts.sh
-          rm -f release-package/.claude/hooks/auto-update-component-counts.sh
-          rm -f release-package/.claude/commands/update-docs.md
-          rm -rf release-package/.claude/skills/update-docs
+          rm -f .claude/scripts/update-component-counts.sh
+          rm -f .claude/hooks/auto-update-component-counts.sh
+          rm -f .claude/commands/update-docs.md
+          rm -rf .claude/skills/update-docs
 
-          # Ensure all scripts have executable permissions
-          chmod +x release-package/.claude/hooks/*.sh 2>/dev/null || true
-          find release-package/.claude/skills -name "*.sh" -type f -exec chmod +x {} \; 2>/dev/null || true
-          find release-package/.claude/skills -name "*.py" -type f -exec chmod +x {} \; 2>/dev/null || true
+          # Set executable permissions
+          find .claude/hooks -name "*.py" -type f -exec chmod +x {} \; 2>/dev/null || true
+          find .claude/skills -name "*.sh" -type f -exec chmod +x {} \; 2>/dev/null || true
+          find .claude/skills -name "*.py" -type f -exec chmod +x {} \; 2>/dev/null || true
+          find .claude/commands -name "*.py" -type f -exec chmod +x {} \; 2>/dev/null || true
 
-          # Copy templates and patterns from .agentic_sdlc/
-          mkdir -p release-package/.agentic_sdlc
+          echo "✅ .claude/ copied successfully"
 
-          # Copy templates
-          if [ -d ".agentic_sdlc/templates" ]; then
-            cp -r .agentic_sdlc/templates release-package/.agentic_sdlc/
-          fi
+          # Create .agentic_sdlc/ structure
+          echo "📦 Copying .agentic_sdlc/ framework assets..."
+          mkdir -p .agentic_sdlc
 
-          # Copy schemas and examples
-          if [ -d ".agentic_sdlc/schemas" ]; then
-            cp -r .agentic_sdlc/schemas release-package/.agentic_sdlc/
-          fi
+          # Copy templates, schemas
+          cp -r ../.agentic_sdlc/templates .agentic_sdlc/ 2>/dev/null || true
+          cp -r ../.agentic_sdlc/schemas .agentic_sdlc/ 2>/dev/null || true
 
-          if [ -d ".agentic_sdlc/examples" ]; then
-            cp -r .agentic_sdlc/examples release-package/.agentic_sdlc/
-          fi
+          # Copy scripts
+          cp -r ../.agentic_sdlc/scripts .agentic_sdlc/
+          chmod +x .agentic_sdlc/scripts/*.sh 2>/dev/null || true
 
-          # Copy documentation (now inside .agentic_sdlc/)
-          if [ -d ".agentic_sdlc/docs" ]; then
-            cp -r .agentic_sdlc/docs release-package/.agentic_sdlc/
-          fi
+          # Copy splash and logo
+          cp ../.agentic_sdlc/splash.py .agentic_sdlc/
+          chmod +x .agentic_sdlc/splash.py
+          cp ../.agentic_sdlc/logo.png .agentic_sdlc/
 
-          # Copy scripts (now inside .agentic_sdlc/)
-          if [ -d ".agentic_sdlc/scripts" ]; then
-            cp -r .agentic_sdlc/scripts release-package/.agentic_sdlc/
-            chmod +x release-package/.agentic_sdlc/scripts/*.sh 2>/dev/null || true
-          fi
+          # Copy docs SELECTIVELY (excluding development docs)
+          echo "📦 Copying documentation (excluding development docs)..."
+          mkdir -p .agentic_sdlc/docs
+          cp ../.agentic_sdlc/docs/README.md .agentic_sdlc/docs/
+          cp ../.agentic_sdlc/docs/enrichment-guide.md .agentic_sdlc/docs/
+          cp -r ../.agentic_sdlc/docs/engineering-playbook .agentic_sdlc/docs/
+          cp -r ../.agentic_sdlc/docs/guides .agentic_sdlc/docs/
+          cp -r ../.agentic_sdlc/docs/sdlc .agentic_sdlc/docs/
 
-          # Copy splash.py and logo from .agentic_sdlc/ root
-          if [ -f ".agentic_sdlc/splash.py" ]; then
-            cp .agentic_sdlc/splash.py release-package/.agentic_sdlc/
-            chmod +x release-package/.agentic_sdlc/splash.py
-          fi
+          # Explicitly EXCLUDE development docs
+          echo "🚫 Excluding development docs:"
+          echo "  - v3-migration-guide.md (v3.0.0 release notes)"
+          echo "  - shell-to-python-migration.md (development history)"
+          echo "  - agent-session-isolation.md (implementation details)"
+          echo "  - splash-integration.md (implementation details)"
 
-          if [ -f ".agentic_sdlc/logo.png" ]; then
-            cp .agentic_sdlc/logo.png release-package/.agentic_sdlc/
-          fi
+          echo "✅ .agentic_sdlc/ copied successfully"
 
           # Create empty .project/ structure for user data
-          mkdir -p release-package/.project/{corpus,references,phases,architecture,security,reports,sessions}
-          mkdir -p release-package/.project/corpus/nodes/{decisions,learnings,patterns,concepts}
-          touch release-package/.project/.gitkeep
+          echo "📦 Creating .project/ structure..."
+          mkdir -p .project/{corpus,references,phases,architecture,security,reports,sessions}
+          mkdir -p .project/corpus/nodes/{decisions,learnings,patterns,concepts}
+          touch .project/.gitkeep
 
           # Copy root files
           # NOTE: README.md and CHANGELOG.md are NOT included - repository-specific
           # NOTE: CLAUDE.md is NOT included - project-specific
-          cp LICENSE release-package/
-          cp requirements.txt release-package/
+          cp ../LICENSE .
+          cp ../requirements.txt .
 
-          # Verify permissions before creating archive
-          echo "Verifying executable permissions:"
-          ls -la release-package/.claude/hooks/*.sh | head -5
-          ls -la release-package/.agentic_sdlc/scripts/*.sh
+          echo "✅ Package structure created"
+
+          # Clean up any remaining development artifacts
+          find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+          find . -name ".pytest_cache" -type d -exec rm -rf {} + 2>/dev/null || true
+          find . -name "*.pyc" -type f -delete 2>/dev/null || true
+          find . -name "IMPLEMENTATION_SUMMARY*.md" -type f -delete 2>/dev/null || true
+          find . -name "BUG_FIXES*.md" -type f -delete 2>/dev/null || true
+          find . -name "TODO.md" -type f -delete 2>/dev/null || true
+          find . -name "POST_IMPORT_VALIDATION_IMPLEMENTATION.md" -type f -delete 2>/dev/null || true
+          rm -rf .claude/test-reports/ 2>/dev/null || true
+
+          # Verify exclusions
+          echo "❌ Verifying exclusions (should be empty):"
+          find . -name "__pycache__" -o -name "*.pyc" -o -name "tests" || echo "✅ All development artifacts excluded"
+
+          cd ..
 
           # Create tar.gz (preserves Unix permissions correctly)
           cd release-package
