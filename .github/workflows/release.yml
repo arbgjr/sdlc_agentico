@@ -91,6 +91,7 @@ jobs:
           # NOTE: README.md and CHANGELOG.md are NOT included - repository-specific
           # NOTE: CLAUDE.md is NOT included - project-specific
           cp LICENSE release-package/
+          cp requirements.txt release-package/
 
           # Verify permissions before creating archive
           echo "Verifying executable permissions:"
@@ -158,6 +159,7 @@ jobs:
           echo "    - \`engineering-playbook/\` - Development standards and practices" >> release_notes.md
           echo "  - \`scripts/\` - Setup and utility scripts" >> release_notes.md
           echo "- \`.project/\` - Empty structure for project-specific artifacts" >> release_notes.md
+          echo "- \`requirements.txt\` - Python dependencies (installed in .venv)" >> release_notes.md
           echo "- \`LICENSE\` - License information" >> release_notes.md
 
       - name: Create GitHub Release

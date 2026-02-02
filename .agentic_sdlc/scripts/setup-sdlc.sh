@@ -83,8 +83,6 @@ sleep 2
 FROM_RELEASE=false
 VERSION="latest"
 SKIP_DEPS=false
-INSTALL_OPTIONAL=false
-CHECK_OPTIONAL=false
 FORCE_UPDATE=false
 
 # Parse de argumentos
@@ -101,14 +99,6 @@ parse_args() {
                 ;;
             --skip-deps)
                 SKIP_DEPS=true
-                shift
-                ;;
-            --install-optional)
-                INSTALL_OPTIONAL=true
-                shift
-                ;;
-            --check-optional)
-                CHECK_OPTIONAL=true
                 shift
                 ;;
             --force)
@@ -136,8 +126,6 @@ show_usage() {
     echo "  --from-release      Instala a partir de uma release do GitHub"
     echo "  --version <tag>     Especifica versao (ex: v1.0.0). Padrao: latest"
     echo "  --skip-deps         Pula instalacao de dependencias (Python, Node, etc)"
-    echo "  --install-optional  Instala dependencias opcionais (document-processor, frontend-testing)"
-    echo "  --check-optional    Apenas verifica dependencias opcionais"
     echo "  --force             Força atualização sem perguntar"
     echo "  --help              Mostra esta mensagem"
     echo ""
@@ -949,37 +937,88 @@ check_optional_deps() {
     echo ""
 }
 
-# Instalar dependencias opcionais
-install_optional_deps() {
-    log_info "Instalando dependencias opcionais dos skills..."
+# Setup Python virtualenv
+setup_python_venv() {
+    log_info "Configurando ambiente virtual Python..."
     echo ""
 
-    # Dependencias Python
-    log_info "Instalando pacotes Python..."
-    pip install pdfplumber openpyxl python-docx pandas playwright pytest-playwright defusedxml 2>/dev/null || {
-        log_warn "Alguns pacotes Python podem nao ter sido instalados"
+    # Criar .venv se não existir
+    if [[ ! -d ".venv" ]]; then
+        log_info "Criando virtualenv em .venv..."
+        python3 -m venv .venv || {
+            log_error "Falha ao criar virtualenv"
+            exit 1
+        }
+        log_success "Virtualenv criado"
+    else
+        log_success "Virtualenv já existe"
+    fi
+
+    # Ativar virtualenv
+    log_info "Ativando virtualenv..."
+    source .venv/bin/activate || {
+        log_error "Falha ao ativar virtualenv"
+        exit 1
     }
+    log_success "Virtualenv ativado"
+
+    # Atualizar pip
+    log_info "Atualizando pip..."
+    python -m pip install --upgrade pip setuptools wheel --quiet || {
+        log_warn "Falha ao atualizar pip"
+    }
+
+    echo ""
+}
+
+# Instalar dependencias Python
+install_python_deps() {
+    log_info "Instalando dependencias Python..."
+    echo ""
+
+    # Verificar se requirements.txt existe
+    if [[ ! -f "requirements.txt" ]]; then
+        log_error "requirements.txt nao encontrado!"
+        log_info "Certifique-se de estar no diretorio raiz do projeto"
+        exit 1
+    fi
+
+    # Instalar via requirements.txt (dentro do venv)
+    log_info "Instalando pacotes de requirements.txt..."
+    pip install -r requirements.txt || {
+        log_error "Falha ao instalar dependencias Python"
+        exit 1
+    }
+    log_success "Dependencias Python instaladas"
 
     # Instalar browser do Playwright
     log_info "Instalando browser Chromium para Playwright..."
-    python3 -m playwright install chromium 2>/dev/null || {
+    python -m playwright install chromium 2>/dev/null || {
         log_warn "Playwright browser nao foi instalado"
     }
 
-    # Dependencias de sistema (Linux apenas)
+    echo ""
+}
+
+# Instalar ferramentas de sistema
+install_system_tools() {
+    log_info "Instalando ferramentas de sistema..."
+    echo ""
+
+    # Dependencias de sistema
     if [[ "$OS" == "linux" ]]; then
-        log_info "Instalando ferramentas de sistema..."
+        log_info "Instalando poppler-utils e tesseract-ocr (Linux)..."
         sudo apt-get install -y poppler-utils tesseract-ocr 2>/dev/null || {
             log_warn "Algumas ferramentas de sistema nao foram instaladas"
         }
     elif [[ "$OS" == "macos" ]]; then
-        log_info "Instalando ferramentas de sistema..."
+        log_info "Instalando poppler e tesseract (macOS)..."
         brew install poppler tesseract 2>/dev/null || {
             log_warn "Algumas ferramentas de sistema nao foram instaladas"
         }
     fi
 
-    log_success "Dependencias opcionais instaladas"
+    log_success "Ferramentas de sistema instaladas"
     echo ""
 }
 
@@ -1012,9 +1051,10 @@ print_summary() {
     echo "  # Seguranca:"
     echo "  ./.agentic_sdlc/scripts/install-security-tools.sh --all"
     echo ""
-    echo "  # Skills (document-processor, frontend-testing):"
-    echo "  ./.agentic_sdlc/scripts/setup-sdlc.sh --check-optional    # Verificar"
-    echo "  ./.agentic_sdlc/scripts/setup-sdlc.sh --install-optional  # Instalar"
+    echo "Virtualenv Python:"
+    echo "  source .venv/bin/activate    # Ativar venv antes de usar Claude Code"
+    echo ""
+    echo "  (Todas as dependências Python já foram instaladas no venv)"
     echo ""
     echo "Documentacao:"
     echo "  - .agentic_sdlc/docs/QUICKSTART.md"
@@ -1119,6 +1159,9 @@ main() {
         echo ""
 
         check_python
+        setup_python_venv
+        install_python_deps
+        install_system_tools
         install_uv
         check_git
         check_gh
@@ -1136,15 +1179,6 @@ main() {
     check_claude_structure
     enable_copilot_agent
     run_checks
-
-    # Dependencias opcionais
-    if [[ "$CHECK_OPTIONAL" == "true" ]]; then
-        check_optional_deps
-    fi
-
-    if [[ "$INSTALL_OPTIONAL" == "true" ]]; then
-        install_optional_deps
-    fi
 
     print_summary
 }

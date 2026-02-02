@@ -55,10 +55,6 @@
           {
             "type": "command",
             "command": "python3 .claude/hooks/validate-commit.py || python .claude/hooks/validate-commit.py"
-          },
-          {
-            "type": "command",
-            "command": ".claude/hooks/update-project-timestamp.sh"
           }
         ]
       },
@@ -108,96 +104,6 @@
             "command": "echo 'Spec criada - considere usar /auto-branch feature'"
           }
         ]
-      },
-      {
-        "matcher": "Edit(src/**/*)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/detect-adr-need.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit(infrastructure/**/*)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/detect-adr-need.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit(**/docker-compose*.yml)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/detect-adr-need.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.agentic_sdlc/projects/*/planning/task-breakdown.yml)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/phase-commit-reminder.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.agentic_sdlc/projects/*/decisions/adr-*.yml)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/phase-commit-reminder.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.agentic_sdlc/projects/*/specs/*.spec.md)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/phase-commit-reminder.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.claude/agents/*.md)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/auto-update-component-counts.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.claude/skills/**/SKILL.md)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/auto-update-component-counts.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.claude/commands/*.md)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/auto-update-component-counts.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write(.claude/hooks/*.sh)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/auto-update-component-counts.sh"
-          }
-        ]
       }
     ],
     "UserPromptSubmit": [
@@ -210,10 +116,6 @@
           {
             "type": "command",
             "command": "python3 .claude/hooks/detect-phase.py || python .claude/hooks/detect-phase.py"
-          },
-          {
-            "type": "command",
-            "command": ".claude/hooks/query-phase-learnings.sh"
           },
           {
             "type": "command",
