@@ -60,9 +60,21 @@ jobs:
           cp -r ../.agentic_sdlc/templates .agentic_sdlc/ 2>/dev/null || true
           cp -r ../.agentic_sdlc/schemas .agentic_sdlc/ 2>/dev/null || true
 
-          # Copy scripts
-          cp -r ../.agentic_sdlc/scripts .agentic_sdlc/
+          # Copy scripts (EXCLUDING test scripts)
+          echo "📦 Copying scripts (excluding test scripts)..."
+          mkdir -p .agentic_sdlc/scripts
+          cp ../.agentic_sdlc/scripts/setup-sdlc.sh .agentic_sdlc/scripts/
+          cp ../.agentic_sdlc/scripts/migrate-artifacts.sh .agentic_sdlc/scripts/
+          cp ../.agentic_sdlc/scripts/install-security-tools.sh .agentic_sdlc/scripts/
+          cp ../.agentic_sdlc/scripts/validate-sdlc-phase.sh .agentic_sdlc/scripts/
           chmod +x .agentic_sdlc/scripts/*.sh 2>/dev/null || true
+
+          echo "🚫 Excluding test scripts:"
+          echo "  - clean-test-repo.sh (framework testing)"
+          echo "  - test-framework-e2e.sh (framework testing)"
+          echo "  - test-framework-full-sdlc.sh (framework testing)"
+          echo "  - update-doc-counts.sh (framework development)"
+          echo "  - validate-doc-counts.sh (framework development)"
 
           # Copy splash and logo
           cp ../.agentic_sdlc/splash.py .agentic_sdlc/
