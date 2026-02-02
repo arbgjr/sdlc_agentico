@@ -127,7 +127,7 @@
           },
           {
             "type": "command",
-            "command": ".claude/hooks/validate-framework-structure.sh"
+            "command": "python3 .claude/hooks/validate-framework-structure.py || python .claude/hooks/validate-framework-structure.py"
           }
         ]
       }

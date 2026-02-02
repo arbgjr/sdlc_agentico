@@ -716,7 +716,7 @@ Decision: FAIL | PASS_WITH_WARNINGS | PASS
 
 ### Quando Executar
 
-Adversarial audit é executado AUTOMATICAMENTE via hook `post-gate-audit.sh` quando:
+Adversarial audit é executado AUTOMATICAMENTE via hook `post-gate-audit.py` quando:
 - Gate passou
 - `adversarial_audit.enabled: true` em settings.json
 - Fase está na lista `adversarial_audit.phases` (default: [3, 5, 6])
@@ -725,8 +725,8 @@ Adversarial audit é executado AUTOMATICAMENTE via hook `post-gate-audit.sh` qua
 
 1. **Hook detecta gate passou**
    ```bash
-   # post-gate-audit.sh executado automaticamente
-   PHASE=5 GATE_RESULT=passed ./claude/hooks/post-gate-audit.sh
+   # post-gate-audit.py executado automaticamente
+   PHASE=5 GATE_RESULT=passed python3 .claude/hooks/post-gate-audit.py
    ```
 
 2. **Verifica configuração**

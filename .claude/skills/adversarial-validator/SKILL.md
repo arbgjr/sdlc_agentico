@@ -46,7 +46,7 @@ Phase Execution → Self-Validation → Gate → Adversarial Audit → Decision
 ### Via Hook (Automatic)
 
 ```bash
-# Executed automatically by post-gate-audit.sh hook
+# Executed automatically by post-gate-audit.py hook
 # No manual invocation needed
 ```
 
