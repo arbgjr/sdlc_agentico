@@ -1,6 +1,6 @@
 <!-- Core Badges -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.3.3-blue.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v2.3.3)
+[![Version](https://img.shields.io/badge/version-3.0.0-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v3.0.0)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 
 <!-- AI Compatibility -->
@@ -38,7 +38,7 @@ O SDLC Agêntico é um framework que usa **39 agentes especializados** (33 orque
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         SDLC AGÊNTICO v2.3.3                            │
+│                         SDLC AGÊNTICO v3.0.0                            │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  Ideia → [Intake] → [Discovery] → [Requirements] → [Architecture]       │
@@ -48,6 +48,7 @@ O SDLC Agêntico é um framework que usa **39 agentes especializados** (33 orque
 │  39 Agentes | 9 Fases | Quality Gates | Security by Design              │
 │  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot         │
 │                                                                         │
+│  v3.0.0: Python-First | 100% Python Hooks | Progressive Disclosure | 64%↓│
 │  v2.3.3: HOTFIX | Silent Failures | 3 CRITICAL Bugs | Artifacts Validated│
 │  v2.3.2: Sprint Fixes | 14 Bugs Fixed | CI/CD Ready | Quality Gates    │
 │  v2.3.1: CRITICAL Fixes | sdlc-import LLM | 4 Bugs | No Crashes | 9 ADRs │
@@ -98,7 +99,7 @@ O SDLC Agêntico é um framework que usa **39 agentes especializados** (33 orque
 
 ```bash
 # Definir versão desejada (consulte releases para última versão)
-VERSION="v2.3.3"
+VERSION="v3.0.0"
 
 # Download e extração (preserva permissões de execução)
 curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -
@@ -118,7 +119,7 @@ curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}
 curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release
 
 # Versão específica
-curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release --version v2.3.0
+curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release --version v3.0.0
 ```
 
 Se o diretório `.claude/` já existir, o script perguntará o que fazer:

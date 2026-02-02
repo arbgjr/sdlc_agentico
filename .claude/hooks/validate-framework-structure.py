@@ -26,10 +26,8 @@ REQUIRED_FILES: List[str] = [
     ".agentic_sdlc/templates/odr-template.yml",
     ".agentic_sdlc/templates/spec-template.md",
     ".agentic_sdlc/templates/threat-model-template.yml",
-
     # Schemas
     ".agentic_sdlc/schemas/adr-schema.json",
-
     # Core documentation
     ".agentic_sdlc/docs/README.md",
     ".agentic_sdlc/docs/enrichment-guide.md",
@@ -40,7 +38,6 @@ REQUIRED_FILES: List[str] = [
     ".agentic_sdlc/docs/sdlc/agents.md",
     ".agentic_sdlc/docs/sdlc/commands.md",
     ".agentic_sdlc/docs/sdlc/overview.md",
-
     # Engineering playbook
     ".agentic_sdlc/docs/engineering-playbook/README.md",
     ".agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/principios.md",
@@ -50,7 +47,6 @@ REQUIRED_FILES: List[str] = [
     ".agentic_sdlc/docs/engineering-playbook/stacks/devops/security.md",
     ".agentic_sdlc/docs/engineering-playbook/stacks/devops/ci-cd.md",
     ".agentic_sdlc/docs/engineering-playbook/stacks/devops/observability.md",
-
     # Scripts
     ".agentic_sdlc/scripts/setup-sdlc.sh",
     ".agentic_sdlc/scripts/validate-sdlc-phase.sh",
@@ -90,12 +86,11 @@ def validate_files(files: List[str], category: str) -> Tuple[int, int]:
             missing += 1
             logger.error(
                 f"Required {category} file missing",
-                extra={"file": filepath, "category": category}
+                extra={"file": filepath, "category": category},
             )
         else:
             logger.debug(
-                f"{category.capitalize()} file exists",
-                extra={"file": filepath}
+                f"{category.capitalize()} file exists", extra={"file": filepath}
             )
 
     return missing, len(files)
@@ -119,10 +114,7 @@ def main():
     if total_missing == 0:
         logger.info(
             "Framework structure validation passed",
-            extra={
-                "checked": total_checked,
-                "missing": 0
-            }
+            extra={"checked": total_checked, "missing": 0},
         )
     else:
         logger.warning(
@@ -131,8 +123,8 @@ def main():
                 "checked": total_checked,
                 "missing": total_missing,
                 "files_missing": files_missing,
-                "gates_missing": gates_missing
-            }
+                "gates_missing": gates_missing,
+            },
         )
 
         # Print summary to console (visible to user)
