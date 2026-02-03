@@ -8,6 +8,64 @@ mode: "strict"
 max_warnings: 3
 
 checks:
+  # FIX BUG-001: Validate required modules exist
+  - id: "required_modules_exist"
+    name: "All required Python modules present"
+    metric: "modules.decision_extractor_exists"
+    operator: "=="
+    value: true
+    severity: "error"
+    message: "Missing required module: decision_extractor.py"
+    remediation: "Reinstall sdlc-import skill or update to latest version"
+
+  - id: "threat_modeler_exists"
+    name: "Threat modeler module present"
+    metric: "modules.threat_modeler_exists"
+    operator: "=="
+    value: true
+    severity: "error"
+    message: "Missing required module: threat_modeler.py"
+    remediation: "Reinstall sdlc-import skill or update to latest version"
+
+  - id: "tech_debt_detector_exists"
+    name: "Tech debt detector module present"
+    metric: "modules.tech_debt_detector_exists"
+    operator: "=="
+    value: true
+    severity: "error"
+    message: "Missing required module: tech_debt_detector.py"
+    remediation: "Reinstall sdlc-import skill or update to latest version"
+
+  # FIX BUG-002, BUG-003: Validate ADR count consistency
+  - id: "adr_count_consistent"
+    name: "ADR count consistent across sources"
+    metric: "decisions.adr_count_consistent"
+    operator: "=="
+    value: true
+    severity: "critical"
+    message: "ADR count mismatch detected (converted files != index.yml != import_results)"
+    remediation: "Check adr_index.yml and .project/corpus/nodes/decisions/ for discrepancies"
+
+  # FIX BUG-004: Validate confidence score coverage
+  - id: "confidence_score_coverage"
+    name: "Confidence scores present (>= 80%)"
+    metric: "decisions.confidence_score_coverage"
+    operator: ">="
+    value: 0.80
+    severity: "error"
+    message: "Less than 80% of ADRs have confidence scores"
+    remediation: "Ensure decision_extractor.py is calculating scores for all ADRs"
+
+  # FIX BUG-006: Validate graph.json exists
+  - id: "graph_json_exists"
+    name: "Knowledge graph generated"
+    metric: "knowledge_graph.graph_json_exists"
+    operator: "=="
+    value: true
+    severity: "error"
+    message: "graph.json was not generated"
+    remediation: "Check graph_generator.py for errors, ensure it runs even with 0 ADRs"
+
   # Branch validation
   - id: "branch_created"
     name: "Feature branch created"
