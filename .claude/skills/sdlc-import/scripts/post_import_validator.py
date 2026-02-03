@@ -305,8 +305,11 @@ class PostImportValidator:
                     'correction': 'Using default values'
                 })
 
-        # 4. Validate artifact completeness
-        completeness_result = self.fixers['completeness'].fix(output_dir=output_dir)
+        # 4. Validate artifact completeness (FIX BUG-002, BUG-003: pass import_results)
+        completeness_result = self.fixers['completeness'].fix(
+            output_dir=output_dir,
+            import_results=import_results
+        )
 
         if completeness_result['missing_artifacts']:
             issues_detected.append({
@@ -314,6 +317,21 @@ class PostImportValidator:
                 'severity': 'warning',
                 'message': f"Missing {len(completeness_result['missing_artifacts'])} required artifacts",
                 'details': completeness_result['missing_artifacts']
+            })
+
+        # FIX BUG-002, BUG-003: Add ADR count consistency check
+        if not completeness_result.get('adr_count_consistent', True):
+            adr_details = completeness_result.get('adr_count_details', {})
+            issues_detected.append({
+                'category': 'adr_consistency',
+                'severity': 'critical',
+                'message': 'ADR count mismatch detected',
+                'details': {
+                    'converted_files': adr_details.get('converted_count'),
+                    'index_yml_count': adr_details.get('index_count'),
+                    'import_results_count': adr_details.get('import_results_count'),
+                    'expected': 'All counts should match'
+                }
             })
 
         # FIX C5 (v2.3.2): Validate security threats
