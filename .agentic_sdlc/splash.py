@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
 Splash Screen - SDLC Agêntico
-Arte ASCII com mice à esquerda e dolphins à direita
-"""
+Exibe um splash screen colorido com informações do projeto."""
 
 import sys
 import time
