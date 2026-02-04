@@ -4,7 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Major Rules
 
-- This project is natural language first
+- **This project is natural language first** - All agents, skills, and orchestration logic MUST be implemented using natural language (English) in markdown files. Programming languages are ONLY allowed as a last resort for:
+  - External service connectors (APIs, databases, file systems)
+  - Performance-critical operations
+  - System-level integrations that cannot be expressed in natural language
 - This project is compatible with linux and windows
 - Always follow the **Anti-Mock Policy** (CRITICAL)
 
