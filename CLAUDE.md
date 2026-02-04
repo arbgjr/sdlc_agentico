@@ -17,6 +17,7 @@ SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orc
 ## Anti-Mock Policy (CRITICAL)
 
 **Absolutely prohibited** in production code:
+
 - Mock/stub/fake/dummy implementations of external services or MCP
 - Hardcoded test data or pattern-based bypasses
 - Keywords: `mock|stub|fake|dummy|simulator|emulator|inmemory`
@@ -51,6 +52,7 @@ When services are unavailable, use resilience patterns: timeout, retry, circuit 
 ### Configuration-Driven Design
 
 All behavior is defined in `.claude/settings.json`:
+
 - 38 specialized agents organized by SDLC phase
 - Git hooks for validation and automation
 - Quality gates between phases (including Security Gate)
@@ -98,6 +100,7 @@ All behavior is defined in `.claude/settings.json`:
 | `framework_artifacts_dir` | **APENAS** quando desenvolvendo o próprio framework (este repo) | `.agentic_sdlc/` |
 
 **Configuration in `.claude/settings.json`:**
+
 ```json
 {
   "sdlc": {
@@ -110,11 +113,13 @@ All behavior is defined in `.claude/settings.json`:
 ```
 
 **Priority Order:**
+
 1. `.claude/settings.json` → `sdlc.output.project_artifacts_dir`
 2. `import_config.yml` → `general.output_dir` (fallback, deprecated)
 3. Default: `.project`
 
 **Examples:**
+
 - `/sdlc-import` em qualquer projeto → `.project/`
 - `/new-feature "auth"` em qualquer projeto → `.project/corpus/nodes/decisions/`
 - ADRs SOBRE o framework sdlc_agentico → `.agentic_sdlc/corpus/nodes/decisions/`
@@ -134,6 +139,7 @@ Phase 8 (Operations)     → incident-commander, rca-analyst, metrics-analyst, o
 ```
 
 **Cross-Phase Agents (Meta):**
+
 - **orchestrator**: Coordinates phase transitions, evaluates gates
 - **playbook-governance**: Monitors drift, detects patterns, proposes updates
 
@@ -147,6 +153,7 @@ Phase 8 (Operations)     → incident-commander, rca-analyst, metrics-analyst, o
 ### Security by Design
 
 Mandatory security gates in phases 2, 3, 5, 6, 7:
+
 - Phase 2: Security requirements documented
 - Phase 3: Threat model (STRIDE), HIGH/CRITICAL risks mitigated
 - Phase 5: No hardcoded secrets, input validation
@@ -221,6 +228,7 @@ All skills are located in `.claude/skills/` and automatically available to agent
 ### Observability
 
 Structured logging with Loki/Tempo/Grafana integration available via:
+
 - Python: `.claude/lib/python/sdlc_logging.py`
 - Shell: `.claude/lib/shell/logging_utils.sh`
 - Config: `.claude/config/logging/logging.yml`
@@ -231,6 +239,7 @@ Environment variables: `SDLC_LOG_LEVEL`, `SDLC_LOKI_ENABLED`, `SDLC_LOKI_URL`, `
 ## Hook System
 
 Hooks trigger automatically:
+
 - **PreToolUse**: Validates commits, checks gates, updates timestamps
 - **PostToolUse**: Formats Python files, reminds about ADR updates
 - **UserPromptSubmit**: Detects SDLC phase and documents
@@ -284,6 +293,7 @@ Patterns documented at: `.agentic_sdlc/corpus/patterns/anthropic-skills-patterns
 **Version History**: Full changelog available in `.claude/VERSION`
 
 **Semantic Versioning**:
+
 - **Major (X.0.0)**: Breaking changes, major architecture changes
 - **Minor (x.Y.0)**: New features, new skills, significant enhancements
 - **Patch (x.y.Z)**: Bug fixes, documentation updates, minor improvements
