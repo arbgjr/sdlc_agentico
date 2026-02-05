@@ -1,43 +1,43 @@
-# Copilot Coding Agent Instructions for SDLC Agêntico
+# Copilot Coding Agent Instructions for Agentic SDLC
 
-## Visão Geral
-Este repositório implementa o **SDLC Agêntico**: um framework de orquestração de desenvolvimento orientado por agentes de IA, cobrindo todas as fases do ciclo de vida de software. O projeto é altamente configurável, dirigido por arquivos em `.claude/` e `\.agentic_sdlc/docs/`.
+## Overview
+This repository implements the **Agentic SDLC**: an AI agent-oriented development orchestration framework, covering all phases of the software lifecycle. The project is highly configurable, driven by files in `.claude/` and `\.agentic_sdlc/docs/`.
 
-## Como ser produtivo aqui
-- **Nunca escreva código "solto"**: toda implementação deve ser guiada por specs, user stories ou decisões documentadas (ADRs).
-- **Siga o fluxo SDLC**: use comandos como `/sdlc-start`, `/sdlc-create-issues`, `/gate-check` para navegar entre fases e garantir qualidade.
-- **Respeite os quality gates**: cada transição de fase exige validação automática (ver `.claude/skills/gate-evaluator/gates/`).
-- **Implemente por agente**: cada agente tem responsabilidades e outputs YAML claros (veja `\.agentic_sdlc/docs/AGENTS.md`).
-- **Documente decisões**: toda mudança relevante de arquitetura deve gerar um ADR.
+## How to be productive here
+- **Never write "loose" code**: every implementation must be guided by specs, user stories, or documented decisions (ADRs).
+- **Follow the SDLC flow**: use commands like `/sdlc-start`, `/sdlc-create-issues`, `/gate-check` to navigate between phases and ensure quality.
+- **Respect quality gates**: each phase transition requires automatic validation (see `.claude/skills/gate-evaluator/gates/`).
+- **Implement by agent**: each agent has clear responsibilities and YAML outputs (see `\.agentic_sdlc/docs/AGENTS.md`).
+- **Document decisions**: every relevant architecture change must generate an ADR.
 
-## Estrutura e Arquitetura
-- `.claude/settings.json`: configura agentes, fases, hooks e gates.
-- `.claude/agents/`, `\.agentic_sdlc/docs/AGENTS.md`: catálogo e responsabilidades dos agentes.
-- `.claude/skills/`: skills reutilizáveis (ex: `rag-query`, `memory-manager`).
-- `\.agentic_sdlc/docs/`: documentação, playbook, comandos e infraestrutura.
-- `\.agentic_sdlc/scripts/setup-sdlc.sh`: instalação automatizada de dependências.
+## Structure and Architecture
+- `.claude/settings.json`: configures agents, phases, hooks, and gates.
+- `.claude/agents/`, `\.agentic_sdlc/docs/AGENTS.md`: agent catalog and responsibilities.
+- `.claude/skills/`: reusable skills (e.g., `rag-query`, `memory-manager`).
+- `\.agentic_sdlc/docs/`: documentation, playbook, commands, and infrastructure.
+- `\.agentic_sdlc/scripts/setup-sdlc.sh`: automated dependency installation.
 
-## Workflows e Comandos Essenciais
-- `./\.agentic_sdlc/scripts/setup-sdlc.sh`: instala tudo (Python, Node, CLI, etc).
-- `claude`: CLI principal para orquestração e comandos SDLC.
-- `/sdlc-start "Nova feature"`: inicia workflow.
-- `/sdlc-create-issues --assign-copilot`: cria issues e atribui ao Copilot.
-- `/gate-check`: valida transição de fase.
-- `/adr-create`: registra decisão arquitetural.
+## Workflows and Essential Commands
+- `./\.agentic_sdlc/scripts/setup-sdlc.sh`: installs everything (Python, Node, CLI, etc).
+- `claude`: main CLI for orchestration and SDLC commands.
+- `/sdlc-start "New feature"`: starts workflow.
+- `/sdlc-create-issues --assign-copilot`: creates issues and assigns to Copilot.
+- `/gate-check`: validates phase transition.
+- `/adr-create`: records architectural decision.
 
-## Convenções e Padrões
-- **Commits e PRs**: devem referenciar fases, agentes e outputs YAML.
-- **Testes**: obrigatórios para toda feature (veja outputs de `test-author`).
-- **Observabilidade**: sempre inclua métricas e logs conforme outputs de `observability-engineer`.
-- **Pequenas mudanças**: prefira PRs pequenos e incrementais.
-- **Integração Copilot**: issues podem ser atribuídas ao Copilot para implementação automática.
+## Conventions and Standards
+- **Commits and PRs**: must reference phases, agents, and YAML outputs.
+- **Tests**: required for every feature (see `test-author` outputs).
+- **Observability**: always include metrics and logs according to `observability-engineer` outputs.
+- **Small changes**: prefer small and incremental PRs.
+- **Copilot Integration**: issues can be assigned to Copilot for automatic implementation.
 
-## Exemplos de Outputs YAML
+## YAML Output Examples
 - User Story:
   ```yaml
   user_story:
     id: "US-001"
-    story: "Como usuário, quero..."
+    story: "As a user, I want to..."
     acceptance_criteria:
       - given: "..."
         when: "..."
@@ -53,15 +53,15 @@ Este repositório implementa o **SDLC Agêntico**: um framework de orquestraçã
       failed: 0
   ```
 
-## Integrações
-- **GitHub Copilot Coding Agent**: issues podem ser atribuídas para implementação automática.
-- **Spec Kit**: especificação e validação de requisitos.
-- **Claude Code CLI**: orquestração de agentes e comandos SDLC.
+## Integrations
+- **GitHub Copilot Coding Agent**: issues can be assigned for automatic implementation.
+- **Spec Kit**: requirements specification and validation.
+- **Claude Code CLI**: agent orchestration and SDLC commands.
 
-## Referências
-- `\.agentic_sdlc/docs/AGENTS.md`: catálogo de agentes e outputs esperados
-- `.claude/settings.json`: configuração central
-- `\.agentic_sdlc/docs/playbook.md`: princípios e padrões de desenvolvimento
-- `\.agentic_sdlc/docs/COMMANDS.md`: referência de comandos
+## References
+- `\.agentic_sdlc/docs/AGENTS.md`: agent catalog and expected outputs
+- `.claude/settings.json`: central configuration
+- `\.agentic_sdlc/docs/playbook.md`: development principles and standards
+- `\.agentic_sdlc/docs/COMMANDS.md`: command reference
 
-> Siga sempre o fluxo SDLC, documente decisões e utilize os agentes conforme suas responsabilidades.
+> Always follow the SDLC flow, document decisions, and use agents according to their responsibilities.

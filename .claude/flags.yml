@@ -1,93 +1,93 @@
-# SDLC Agêntico Feature Flags
-# Gerencie via /sdlc-flags ou editando este arquivo
+# Agentic SDLC Feature Flags
+# Manage via /sdlc-flags or by editing this file
 
 flags:
-  # Integrações GitHub
+  # GitHub Integrations
   github_projects:
     enabled: true
-    description: "Integração com GitHub Projects V2"
+    description: "GitHub Projects V2 Integration"
     since: "1.0.0"
     
   wiki_sync:
     enabled: true
-    description: "Sincronização automática de Wiki"
+    description: "Automatic Wiki Synchronization"
     since: "1.0.0"
     
   github_milestones:
     enabled: true
-    description: "Criação automática de Milestones"
+    description: "Automatic Milestone Creation"
     since: "1.0.0"
 
-  # Memória e RAG
+  # Memory and RAG
   rag_indexing:
     enabled: true
-    description: "Indexação automática do RAG corpus"
+    description: "Automatic RAG corpus indexing"
     since: "1.0.0"
     
   session_analyzer:
     enabled: true
-    description: "Análise de sessões para learnings"
+    description: "Session analysis for learnings"
     since: "1.0.0"
     
   memory_persistence:
     enabled: true
-    description: "Persistência de contexto entre sessões"
+    description: "Context persistence between sessions"
     since: "1.0.0"
 
-  # Automação
+  # Automation
   auto_commit:
     enabled: false
-    description: "Commits automáticos por fase"
+    description: "Automatic commits per phase"
     since: "1.0.0"
     experimental: true
-    warning: "Pode criar commits indesejados"
+    warning: "May create unwanted commits"
     
   copilot_assign:
     enabled: false
-    description: "Atribuir issues ao Copilot por default"
+    description: "Assign issues to Copilot by default"
     since: "1.0.0"
     
   auto_issue_create:
     enabled: false
-    description: "Criar issues automaticamente na Phase 4"
+    description: "Automatically create issues in Phase 4"
     since: "1.0.0"
 
   # Quality Gates
   strict_gates:
     enabled: false
-    description: "Gates obrigatórios (bloqueia avanço)"
+    description: "Mandatory gates (blocks progress)"
     since: "1.0.0"
-    warning: "Pode impedir progresso se artefatos faltando"
+    warning: "May prevent progress if artifacts are missing"
     
   gate_notifications:
     enabled: true
-    description: "Notificações ao passar gates"
+    description: "Notifications when passing gates"
     since: "1.0.0"
 
-  # Experimentação
+  # Experimentation
   ab_experiments:
     enabled: false
-    description: "Experimentos A/B nos fluxos"
+    description: "A/B experiments in workflows"
     since: "1.0.0"
     experimental: true
 
-  # Logging e Observabilidade
+  # Logging and Observability
   loki_integration:
     enabled: false
-    description: "Enviar logs para Loki"
+    description: "Send logs to Loki"
     since: "1.0.0"
-    requires: "Loki disponível em localhost:3100"
+    requires: "Loki available at localhost:3100"
     
   verbose_logging:
     enabled: false
-    description: "Logging detalhado para debug"
+    description: "Detailed logging for debugging"
     since: "1.0.0"
 
-# Configurações de Experimentos A/B
+# A/B Experiment Settings
 experiments:
   gate_notification_style:
     enabled: false
-    description: "Testar estilos de notificação de gate"
+    description: "Test gate notification styles"
     variants:
       - name: "minimal"
         weight: 50
@@ -102,7 +102,7 @@ experiments:
       - "user_action_time"
       - "gate_retry_rate"
 
-# Overrides por ambiente
+# Environment Overrides
 environments:
   development:
     verbose_logging: true

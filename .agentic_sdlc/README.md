@@ -1,33 +1,33 @@
-# SDLC Agêntico - Framework Assets
+# Agentic SDLC - Framework Assets
 
-Este diretório contém todos os assets do framework SDLC Agêntico, que são **reutilizáveis** entre múltiplos projetos.
+This directory contains all Agentic SDLC framework assets, which are **reusable** across multiple projects.
 
-## Estrutura
+## Structure
 
 ```
 .agentic_sdlc/
-├── templates/         # Templates reutilizáveis (ADR, spec, threat-model)
-├── schemas/           # Schemas JSON para validação de dados
-├── examples/          # Exemplos de artifacts
-├── docs/              # Documentação do framework
-│   ├── guides/        # Guias de uso (quickstart, troubleshooting)
-│   ├── sdlc/          # Documentação SDLC (agents, commands)
-│   └── engineering-playbook/  # Padrões e práticas
-├── scripts/           # Scripts de setup e utilitários
-└── logo.png           # Logo do framework
+├── templates/         # Reusable templates (ADR, spec, threat-model)
+├── schemas/           # JSON Schemas for data validation
+├── examples/          # Artifact examples
+├── docs/              # Framework documentation
+│   ├── guides/        # Usage guides (quickstart, troubleshooting)
+│   ├── sdlc/          # SDLC documentation (agents, commands)
+│   └── engineering-playbook/  # Standards and practices
+├── scripts/           # Setup and utility scripts
+└── logo.png           # Framework logo
 ```
 
-## Instalação
+## Installation
 
-O framework é instalado via script de setup:
+The framework is installed via setup script:
 
 ```bash
 ./.agentic_sdlc/scripts/setup-sdlc.sh
 ```
 
-## Reutilização em Múltiplos Projetos
+## Reuse Across Multiple Projects
 
-Para usar o mesmo framework em vários projetos, crie symlinks:
+To use the same framework in multiple projects, create symlinks:
 
 ```bash
 cd ~/projects/my-project
@@ -36,22 +36,22 @@ ln -s ~/sdlc-agentico/.agentic_sdlc .agentic_sdlc
 mkdir -p .project
 ```
 
-## Separação Framework vs Projeto
+## Framework vs Project Separation
 
-- **Framework** (`.agentic_sdlc/`): Assets reutilizáveis, versionados neste repositório
-- **Projeto** (`.project/`): Artifacts específicos do projeto (corpus, decisions, reports)
+- **Framework** (`.agentic_sdlc/`): Reusable assets, versioned in this repository
+- **Project** (`.project/`): Project-specific artifacts (corpus, decisions, reports)
 
-Esta separação permite:
-- ✅ Reutilizar framework em N projetos
-- ✅ Portabilidade (copiar 2 diretórios = framework pronto)
-- ✅ Gitignore seletivo (versionar decisions, ignorar sessions)
-- ✅ Clareza (desenvolvedor sabe o que é framework vs projeto)
+This separation enables:
+- ✅ Reuse framework across N projects
+- ✅ Portability (copy 2 directories = ready framework)
+- ✅ Selective gitignore (version decisions, ignore sessions)
+- ✅ Clarity (developer knows what is framework vs project)
 
-## Versionamento
+## Versioning
 
-O framework segue [Semantic Versioning](https://semver.org/):
-- **Major**: Breaking changes, mudanças arquiteturais
-- **Minor**: Novas features, novos agentes
-- **Patch**: Bug fixes, documentação
+The framework follows [Semantic Versioning](https://semver.org/):
+- **Major**: Breaking changes, architectural changes
+- **Minor**: New features, new agents
+- **Patch**: Bug fixes, documentation
 
-Veja `.claude/VERSION` para versão atual.
+See `.claude/VERSION` for the current version.

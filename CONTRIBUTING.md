@@ -1,54 +1,54 @@
-# Contribuindo para o SDLC Agêntico
+# Contributing to Agentic SDLC
 
-Obrigado pelo interesse em contribuir! Este documento explica como participar do desenvolvimento.
+Thank you for your interest in contributing! This document explains how to participate in development.
 
-## Como Contribuir
+## How to Contribute
 
-### 1. Reportar Bugs
+### 1. Report Bugs
 
-Abra uma issue com:
-- Descrição clara do problema
-- Passos para reproduzir
-- Comportamento esperado vs atual
-- Versão do Claude Code e sistema operacional
+Open an issue with:
+- Clear description of the problem
+- Steps to reproduce
+- Expected vs actual behavior
+- Claude Code version and operating system
 
-### 2. Sugerir Features
+### 2. Suggest Features
 
-Antes de implementar, abra uma issue para discussão:
-- Descreva o caso de uso
-- Explique o benefício esperado
-- Proponha uma solução inicial
+Before implementing, open an issue for discussion:
+- Describe the use case
+- Explain the expected benefit
+- Propose an initial solution
 
-### 3. Contribuir Código
+### 3. Contribute Code
 
 ```bash
-# 1. Fork e clone
+# 1. Fork and clone
 git clone https://github.com/arbgjr/sdlc_agentico.git
 cd sdlc_agentico
 
-# 2. Crie uma branch
-git checkout -b feat/nome-da-feature
+# 2. Create a branch
+git checkout -b feat/feature-name
 
-# 3. Faça as mudanças
-# ... código ...
+# 3. Make changes
+# ... code ...
 
-# 4. Teste localmente
+# 4. Test locally
 ./\.agentic_sdlc/scripts/setup-sdlc.sh
 claude
-/sdlc-start "teste"
+/sdlc-start "test"
 
-# 5. Commit seguindo Conventional Commits
+# 5. Commit following Conventional Commits
 git commit -m "feat(agents): add new agent for X"
 
-# 6. Push e abra PR
-git push origin feat/nome-da-feature
+# 6. Push and open PR
+git push origin feat/feature-name
 ```
 
-## Padrões de Código
+## Code Standards
 
 ### Commits
 
-Usamos [Conventional Commits](https://www.conventionalcommits.org/):
+We use [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
 <type>(<scope>): <description>
@@ -56,37 +56,37 @@ Usamos [Conventional Commits](https://www.conventionalcommits.org/):
 [optional body]
 ```
 
-**Tipos permitidos:**
-- `feat` - Nova funcionalidade
-- `fix` - Correção de bug
-- `docs` - Documentação
-- `refactor` - Refatoração sem mudança funcional
-- `test` - Adição/modificação de testes
-- `chore` - Manutenção
+**Allowed types:**
+- `feat` - New feature
+- `fix` - Bug fix
+- `docs` - Documentation
+- `refactor` - Refactoring without functional change
+- `test` - Adding/modifying tests
+- `chore` - Maintenance
 
-**Escopos comuns:**
-- `agents` - Agentes (.claude/agents/)
+**Common scopes:**
+- `agents` - Agents (.claude/agents/)
 - `skills` - Skills (.claude/skills/)
-- `commands` - Comandos (.claude/commands/)
+- `commands` - Commands (.claude/commands/)
 - `hooks` - Hooks (.claude/hooks/)
 - `gates` - Quality gates
-- `docs` - Documentação
+- `docs` - Documentation
 
-**Exemplos:**
+**Examples:**
 ```bash
 feat(agents): add compliance-guardian agent
 fix(hooks): correct phase detection regex
 docs(readme): update installation instructions
 ```
 
-### Estrutura de Agentes
+### Agent Structure
 
-Cada agente deve seguir este template:
+Each agent must follow this template:
 
 ```markdown
 ---
 name: agent-name
-description: Descrição breve
+description: Brief description
 model: sonnet | opus | haiku
 skills:
   - skill-name
@@ -98,14 +98,14 @@ tools:
 
 # Agent Name
 
-## Propósito
-Descrição detalhada do propósito.
+## Purpose
+Detailed description of purpose.
 
-## Quando Usar
-- Situação 1
-- Situação 2
+## When to Use
+- Situation 1
+- Situation 2
 
-## Input Esperado
+## Expected Input
 ```yaml
 input:
   field1: type
@@ -119,170 +119,170 @@ output:
   field2: type
 ```
 
-## Processo
-1. Passo 1
-2. Passo 2
-3. Passo 3
+## Process
+1. Step 1
+2. Step 2
+3. Step 3
 
 ## Checklist
 - [ ] Item 1
 - [ ] Item 2
 ```
 
-### Estrutura de Skills
+### Skill Structure
 
 ```markdown
 ---
 name: skill-name
-description: Descrição breve
+description: Brief description
 ---
 
 # Skill Name
 
-## Propósito
-O que a skill faz.
+## Purpose
+What the skill does.
 
-## Como Usar
-Instruções de uso.
+## How to Use
+Usage instructions.
 
-## Parâmetros
-- `param1`: Descrição
-- `param2`: Descrição
+## Parameters
+- `param1`: Description
+- `param2`: Description
 
-## Exemplos
+## Examples
 ```bash
-# Exemplo 1
+# Example 1
 ```
 ```
 
-### Estrutura de Comandos
+### Command Structure
 
 ```markdown
 ---
 name: /command-name
-description: Descrição breve
+description: Brief description
 arguments:
   - name: arg1
     required: true
-    description: O que é
+    description: What it is
 ---
 
 # /command-name
 
-## Uso
+## Usage
 ```bash
 /command-name <arg1> [options]
 ```
 
-## Parâmetros
-- `arg1` (obrigatório): Descrição
+## Parameters
+- `arg1` (required): Description
 
-## O Que Faz
-1. Passo 1
-2. Passo 2
+## What It Does
+1. Step 1
+2. Step 2
 
-## Exemplos
+## Examples
 ```bash
-/command-name valor
+/command-name value
 ```
 ```
 
-## Adicionando Novos Componentes
+## Adding New Components
 
-### Novo Agente
+### New Agent
 
-1. Crie arquivo em `.claude/agents/nome-agente.md`
-2. Siga o template acima
-3. Adicione ao `settings.json` em `agents.available_agents`
-4. Adicione ao `\.agentic_sdlc/docs/AGENTS.md`
-5. Teste: `"Use o nome-agente para..."`
+1. Create file at `.claude/agents/agent-name.md`
+2. Follow the template above
+3. Add to `settings.json` in `agents.available_agents`
+4. Add to `\.agentic_sdlc/docs/AGENTS.md`
+5. Test: `"Use the agent-name for..."`
 
-### Nova Skill
+### New Skill
 
-1. Crie diretório em `.claude/skills/nome-skill/`
-2. Crie `SKILL.md` com o template
-3. Adicione scripts necessários
-4. Teste invocando de um agente
+1. Create directory at `.claude/skills/skill-name/`
+2. Create `SKILL.md` with the template
+3. Add necessary scripts
+4. Test by invoking from an agent
 
-### Novo Comando
+### New Command
 
-1. Crie arquivo em `.claude/commands/nome.md`
-2. Siga o template acima
-3. Adicione ao `\.agentic_sdlc/docs/COMMANDS.md`
-4. Teste: `/nome-comando`
+1. Create file at `.claude/commands/name.md`
+2. Follow the template above
+3. Add to `\.agentic_sdlc/docs/COMMANDS.md`
+4. Test: `/command-name`
 
-### Novo Hook
+### New Hook
 
-1. Crie script em `.claude/hooks/nome.sh`
-2. Torne executável: `chmod +x .claude/hooks/nome.sh`
-3. Configure em `.claude/settings.json`
-4. Teste a trigger
+1. Create script at `.claude/hooks/name.sh`
+2. Make executable: `chmod +x .claude/hooks/name.sh`
+3. Configure in `.claude/settings.json`
+4. Test the trigger
 
-### Novo Gate
+### New Gate
 
-1. Crie arquivo em `.claude/skills/gate-evaluator/gates/phase-X-to-Y.yml`
-2. Defina artefatos obrigatórios
-3. Defina critérios de qualidade
-4. Adicione ao `\.agentic_sdlc/docs/COMMANDS.md`
+1. Create file at `.claude/skills/gate-evaluator/gates/phase-X-to-Y.yml`
+2. Define required artifacts
+3. Define quality criteria
+4. Add to `\.agentic_sdlc/docs/COMMANDS.md`
 
-## Testes
+## Tests
 
-### Testes Manuais
+### Manual Tests
 
 ```bash
-# Testar workflow completo
+# Test complete workflow
 claude
-/sdlc-start "Feature de teste"
+/sdlc-start "Test feature"
 
-# Testar gate específico
+# Test specific gate
 /gate-check phase-2-to-3
 
-# Testar comando
+# Test command
 /security-scan
 ```
 
-### Checklist de PR
+### PR Checklist
 
-Antes de abrir PR, verifique:
+Before opening a PR, verify:
 
-- [ ] Código segue os padrões estabelecidos
-- [ ] Documentação atualizada
-- [ ] Testado localmente
-- [ ] Sem secrets no código
-- [ ] Commits seguem Conventional Commits
-- [ ] PR tem descrição clara
+- [ ] Code follows established standards
+- [ ] Documentation updated
+- [ ] Tested locally
+- [ ] No secrets in code
+- [ ] Commits follow Conventional Commits
+- [ ] PR has clear description
 
-## Processo de Review
+## Review Process
 
-1. **Autor**: Abre PR com descrição clara
-2. **Reviewer**: Revisa código e documentação
-3. **CI**: Valida hooks e formatação
-4. **Merge**: Squash merge para main
+1. **Author**: Opens PR with clear description
+2. **Reviewer**: Reviews code and documentation
+3. **CI**: Validates hooks and formatting
+4. **Merge**: Squash merge to main
 
-## Governança
+## Governance
 
-### Decisões Arquiteturais
+### Architectural Decisions
 
-Para mudanças significativas:
-1. Abra issue de discussão
-2. Se aprovada, crie ADR
-3. Implemente após aprovação
+For significant changes:
+1. Open discussion issue
+2. If approved, create ADR
+3. Implement after approval
 
 ### Breaking Changes
 
-- Requer discussão prévia
-- Documentar migração
-- Bump de versão major
+- Requires prior discussion
+- Document migration
+- Major version bump
 
-## Contato
+## Contact
 
 - Issues: [GitHub Issues](https://github.com/arbgjr/sdlc_agentico/issues)
-- Discussões: [GitHub Discussions](https://github.com/arbgjr/sdlc_agentico/discussions)
+- Discussions: [GitHub Discussions](https://github.com/arbgjr/sdlc_agentico/discussions)
 
-## Licença
+## License
 
-Ao contribuir, você concorda que suas contribuições serão licenciadas sob a mesma licença do projeto (MIT).
+By contributing, you agree that your contributions will be licensed under the same license as the project (MIT).
 
 ---
 
-Obrigado por contribuir!
+Thank you for contributing!

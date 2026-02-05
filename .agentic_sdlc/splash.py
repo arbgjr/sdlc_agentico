@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-Splash Screen - SDLC Agêntico
-Exibe um splash screen colorido com informações do projeto."""
+Splash Screen - Agentic SDLC
+Displays a colorful splash screen with project information."""
 
 import sys
 import time
 import re
 from pathlib import Path
 
-# Função para ler versão do arquivo VERSION
+# Function to read version from VERSION file
 def get_version():
-    """Lê a versão do arquivo .claude/VERSION"""
+    """Reads version from .claude/VERSION file"""
     try:
         # Detecta o diretório do projeto
         script_dir = Path(__file__).resolve().parent
@@ -26,10 +26,10 @@ def get_version():
     except Exception:
         pass
 
-    # Fallback se não conseguir ler
+    # Fallback if unable to read
     return "not found"
 
-# Cores ANSI
+# ANSI Colors
 CYAN = "\033[96m"
 BLUE = "\033[94m"
 MAGENTA = "\033[95m"
@@ -40,8 +40,8 @@ BOLD = "\033[1m"
 DIM = "\033[2m"
 RESET = "\033[0m"
 
-# ASCII Art - Trocado corretamente: MICE à esquerda, DOLPHINS à direita
-# Original tinha dolphins à esquerda e mice à direita - agora invertido
+# ASCII Art - Correctly swapped: MICE on left, DOLPHINS on right
+# Original had dolphins on left and mice on right - now inverted
 LOGO_ASCII = r'''
 .
                 _                       __                                                __
@@ -73,18 +73,18 @@ TITLE = r"""
 """
 
 def clear_screen():
-    """Limpa a tela do terminal."""
+    """Clears the terminal screen."""
     print("\033[2J\033[H", end="")
     sys.stdout.flush()
 
 def print_colored_logo():
-    """Imprime o logo com cores - mice em branco (esquerda), dolphins em ciano (direita)."""
+    """Prints the logo with colors - mice in white (left), dolphins in cyan (right)."""
     lines = LOGO_ASCII.strip().split('\n')
 
     for i, line in enumerate(lines):
         if i < len(lines) - 1:
-            # Dividir a linha - mice à esquerda (branco), dolphins à direita (ciano)
-            # Split point é aproximadamente coluna 51
+            # Split the line - mice on left (white), dolphins on right (cyan)
+            # Split point is approximately column 51
             if len(line) > COL_SEPARA:
                 left = line[:COL_SEPARA]
                 right = line[COL_SEPARA:]
@@ -92,28 +92,28 @@ def print_colored_logo():
             else:
                 print(f"{WHITE}{line}{RESET}")
         else:
-            # Última linha com os labels
+            # Last line with labels
             print(f"{BOLD}{line}{RESET}")
 
 def print_title():
-    """Imprime o título estilizado."""
+    """Prints the stylized title."""
     if TITLE:
         print(f"{BOLD}{CYAN}{TITLE}{RESET}")
 
 def print_info():
-    """Imprime informações do projeto."""
+    """Prints project information."""
     version = get_version()
 
     print(f"\n{DIM}{'─' * 80}{RESET}")
-    print(f"\n{WHITE}  🚀 {BOLD}Framework de Orquestração de Desenvolvimento{RESET}")
-    print(f"{WHITE}     {BOLD}Orientado por Agentes de IA{RESET}")
-    print(f"{DIM}     Cobrindo todas as fases do ciclo de vida de software{RESET}")
-    print(f"\n{GREEN}  ▸ {WHITE}Repositório: {CYAN}github.com/arbgjr/sdlc_agentico{RESET}")
-    print(f"{GREEN}  ▸ {WHITE}Versão:      {YELLOW}{version}{RESET}")
-    print(f"{GREEN}  ▸ {WHITE}Licença:     {MAGENTA}MIT{RESET}")
+    print(f"\n{WHITE}  🚀 {BOLD}Development Orchestration Framework{RESET}")
+    print(f"{WHITE}     {BOLD}Driven by AI Agents{RESET}")
+    print(f"{DIM}     Covering all phases of the software lifecycle{RESET}")
+    print(f"\n{GREEN}  ▸ {WHITE}Repository:  {CYAN}github.com/arbgjr/sdlc_agentico{RESET}")
+    print(f"{GREEN}  ▸ {WHITE}Version:     {YELLOW}{version}{RESET}")
+    print(f"{GREEN}  ▸ {WHITE}License:     {MAGENTA}MIT{RESET}")
     print(f"{GREEN}  ▸ {WHITE}Changelog:   {CYAN}github.com/arbgjr/sdlc_agentico/blob/main/CHANGELOG.md{RESET}")
 
-    # Changelog resumido da versão atual
+    # Current version changelog summary
     print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{YELLOW}  📋 {BOLD}v{version} Highlights{RESET}")
     print(f"{DIM}     Configuration & Path Management - Critical Fixes{RESET}")
@@ -124,14 +124,14 @@ def print_info():
     print(f"{GREEN}     • {WHITE}Framework/Project Separation - Clear REGRA DE OURO documentation{RESET}")
 
     print(f"\n{DIM}{'─' * 80}{RESET}")
-    print(f"\n{DIM}  Comandos principais:{RESET}")
-    print(f"  {CYAN}/sdlc-start{WHITE}         Inicia novo workflow SDLC completo{RESET}")
-    print(f"  {CYAN}/sdlc-import{WHITE}        Importa projeto existente (até 900k LOC){RESET}")
-    print(f"  {CYAN}/wiki-sync{WHITE}          Sincroniza docs com GitHub Wiki {DIM}(criar 1ª página antes){RESET}")
+    print(f"\n{DIM}  Main commands:{RESET}")
+    print(f"  {CYAN}/sdlc-start{WHITE}         Start new complete SDLC workflow{RESET}")
+    print(f"  {CYAN}/sdlc-import{WHITE}        Import existing project (up to 900k LOC){RESET}")
+    print(f"  {CYAN}/wiki-sync{WHITE}          Sync docs with GitHub Wiki {DIM}(create 1st page first){RESET}")
     print()
 
 def animate_splash():
-    """Exibe a splash screen com animação."""
+    """Displays the splash screen with animation."""
     clear_screen()
     print_colored_logo()
     time.sleep(0.3)
@@ -140,7 +140,7 @@ def animate_splash():
     print_info()
 
 def show_splash(animate: bool = True):
-    """Exibe a splash screen."""
+    """Displays the splash screen."""
     if animate:
         animate_splash()
     else:
