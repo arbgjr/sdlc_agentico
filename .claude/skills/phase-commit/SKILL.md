@@ -62,7 +62,8 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ```yaml
 phase_commit_process:
   1_identify_phase:
-    - Ler .claude/memory/project.yml ou .agentic_sdlc/projects/*/manifest.yml
+    - Usar path_resolver para obter PROJECT_DIR
+    - Ler ${PROJECT_DIR}/projects/*/manifest.yml
     - Identificar fase atual
     - Identificar projeto
 
@@ -166,10 +167,10 @@ MESSAGE="${3:-}"
 
 # Obter fase atual se nao especificada
 if [ -z "$PHASE" ]; then
-  if [ -f ".claude/memory/project.yml" ]; then
-    PHASE=$(grep "current_phase:" .claude/memory/project.yml | awk '{print $2}')
-  elif [ -f ".agentic_sdlc/projects/${PROJECT_ID}/manifest.yml" ]; then
-    PHASE=$(grep "current_phase:" .agentic_sdlc/projects/${PROJECT_ID}/manifest.yml | awk '{print $2}')
+  PROJECT_DIR=$(python3 .claude/lib/python/path_resolver.py --project-dir)
+  MANIFEST="${PROJECT_DIR}/projects/${PROJECT_ID}/manifest.yml"
+  if [ -f "$MANIFEST" ]; then
+    PHASE=$(grep "current_phase:" "$MANIFEST" | awk '{print $2}')
   fi
 fi
 

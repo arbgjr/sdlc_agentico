@@ -54,7 +54,7 @@ python3 .claude/skills/github-sync/scripts/milestone_sync.py create \
 Busque por tasks em:
 - `.specify/tasks/*.md` (Spec Kit)
 - `.agentic_sdlc/projects/*/tasks/*.yml` (Memory Manager)
-- `.claude/memory/tasks/*.yml` (Legacy)
+- `.project/tasks/*.yml` (Legacy)
 - Contexto da conversa atual
 
 ### 2. Para Cada Task, Criar Issue com Labels SDLC
@@ -206,7 +206,7 @@ Antes de criar issues, verifique:
 
 4. **Tasks Existentes**
    ```bash
-   ls .specify/tasks/ 2>/dev/null || ls .claude/memory/tasks/ 2>/dev/null
+   ls .specify/tasks/ 2>/dev/null || ls .project/tasks/ 2>/dev/null
    ```
 
 ## Tratamento de Erros

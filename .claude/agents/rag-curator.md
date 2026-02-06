@@ -38,7 +38,6 @@ description: |
 
 model: sonnet
 skills:
-  - memory-manager
   - rag-query
 ---
 
@@ -82,7 +81,7 @@ garantir que o conhecimento seja bem organizado, acessivel e de alta qualidade.
 ## Estrutura do Corpus
 
 ```
-.claude/knowledge/
+
 ├── domains/
 │   ├── backend/
 │   │   ├── patterns/

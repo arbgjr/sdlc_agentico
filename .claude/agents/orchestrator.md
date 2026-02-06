@@ -40,7 +40,6 @@ description: |
 model: opus
 skills:
   - gate-evaluator
-  - memory-manager
   - rag-query
   - mcp-connector
   - spec-kit-integration
@@ -122,7 +121,7 @@ Phase 8: Operations       → monitoring, incidents, learning
 ### Critical Rules (Top 5)
 
 1. **Never skip quality gates** - Each transition MUST pass gate evaluation
-2. **Always persist decisions** - Use memory-manager, create ADRs
+2. **Always persist decisions** - Use rag-curator to index ADRs to corpus
 3. **Escalate to humans** when:
    - Budget > R$ 50k
    - Security CVSS >= 7.0
@@ -201,21 +200,84 @@ Phase 8: Operations       → monitoring, incidents, learning
 
 ---
 
+### 1.1. GitHub Integration (Level 2+)
+
+**CRITICAL**: For Level 2/3 projects, execute GitHub setup at start of Phase 0:
+
+```bash
+# 1. Resolve project directory
+PROJECT_DIR=$(python3 .claude/lib/python/path_resolver.py --project-dir)
+
+# 2. Create GitHub Project V2
+python3 .claude/skills/github-projects/scripts/project_manager.py create \
+  --title "SDLC: {feature_name}"
+
+# 3. Configure custom fields (Phase, Sprint, Story Points)
+python3 .claude/skills/github-projects/scripts/project_manager.py configure-fields \
+  --project-number {N}
+
+# 4. Create first Milestone (Sprint 1)
+python3 .claude/skills/github-sync/scripts/milestone_sync.py create \
+  --title "Sprint 1" \
+  --description "Sprint inicial" \
+  --due-date "$(python3 -c 'import datetime; print((datetime.date.today() + datetime.timedelta(days=14)).isoformat())')"
+
+# 5. Initialize state tracking
+mkdir -p "${PROJECT_DIR}/state"
+echo "0" > "${PROJECT_DIR}/state/current_phase.txt"
+```
+
+**Why this is critical**: Without GitHub Project, phase cards won't be created and progress tracking fails.
+
+---
+
+### 1.2. State Tracking
+
+**After completing EACH phase**, update persistent state:
+
+```bash
+PROJECT_DIR=$(python3 .claude/lib/python/path_resolver.py --project-dir)
+
+# Write next phase number
+echo "$((CURRENT_PHASE + 1))" > "${PROJECT_DIR}/state/current_phase.txt"
+
+# Log phase completion
+echo "$(date -Iseconds)|phase-${CURRENT_PHASE}|completed" >> "${PROJECT_DIR}/state/phase_history.log"
+```
+
+**Completion Criteria per Phase**:
+- **Phase 0**: intake-analyst produces project manifest
+- **Phase 1**: domain-researcher indexes findings to corpus
+- **Phase 2**: requirements-analyst creates all user stories
+- **Phase 3**: system-architect creates ADRs, threat-modeler completes STRIDE
+- **Phase 4**: delivery-planner creates sprint breakdown
+- **Phase 5**: code-author implements ALL acceptance criteria
+- **Phase 6**: qa-analyst validates ALL criteria, security-scanner passes
+- **Phase 7**: release-manager creates release notes and tags
+- **Phase 8**: observability-engineer configures dashboards
+
+---
+
 ### 2. Phase Execution
 
-```
-For each phase:
-  1. Load agents for phase (client-aware)
-  2. Execute agent tasks
-  3. Collect artifacts
-  4. Self-validation (agent checklists)
-  5. Gate evaluation (gate-evaluator)
-  6. Adversarial audit (if phase configured)
-  7. Stakeholder notification
-  8. Phase commit (automatic)
-  9. Extract learnings
-  10. Advance to next phase
-```
+**Execute phases in order**: 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 (→ 8 for operations)
+
+**For EACH phase**:
+
+1. **Load agents for phase** (client-aware resolution)
+2. **Execute agent tasks** (agents work autonomously)
+3. **Collect artifacts** (check completion criteria above)
+4. **Self-validation** (agent checklists pass)
+5. **Gate evaluation** (use gate-evaluator skill)
+   - If gate FAILS: STOP, report missing items, fix before continuing
+   - If gate PASSES: proceed to step 6
+6. **Adversarial audit** (phases 3, 5, 6 only - use adversarial-validator)
+7. **Update state** (write phase+1 to current_phase.txt)
+8. **Phase commit** (automatic via phase-commit skill)
+9. **Extract learnings** (index to corpus via rag-curator)
+10. **Proceed to next phase** (repeat this loop)
+
+**After Phase 7 (Release)**: Workflow complete. Phase 8 (Operations) is optional.
 
 **📖 References**:
 - Phases: [`orchestrator/reference/phases.md`](orchestrator/reference/phases.md)

@@ -174,7 +174,6 @@
   "skills": {
     "available_skills": [
       "gate-evaluator",
-      "memory-manager",
       "rag-query",
       "spec-kit-integration",
       "bmad-integration",
