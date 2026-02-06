@@ -23,7 +23,7 @@ description: |
 model: sonnet
 skills:
   - rag-query
-  - memory-manager
+  - 
   - document-enricher
 # Tool Access Control (OpenClaw pattern)
 # threat-modeler should READ architecture and WRITE threat models
@@ -477,7 +477,7 @@ Before saving threat model, you MUST verify:
 - [ ] Priorities defined (P0, P1, P2 with clear criteria)
 - [ ] Blockers identified (P0 mitigations that block release)
 - [ ] Mitigation plan created (who, what, when)
-- [ ] Document registered in RAG (memory-manager called)
+- [ ] Document registered in RAG ( called)
 - [ ] **Timestamps are REAL UTC with seconds** (not date-only like `2026-01-11`)
 
 **CRITICAL:** If ANY STRIDE category is missing for ANY component, the analysis is INCOMPLETE.

@@ -32,7 +32,7 @@ model: sonnet
 skills:
   - system-design-decision-engine
   - rag-query
-  - memory-manager
+  - 
 references:
   - path: \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/principios.md
     purpose: Principios arquiteturais e restricoes

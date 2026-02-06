@@ -20,7 +20,7 @@ description: |
 model: opus
 skills:
   - rag-query
-  - memory-manager
+  - 
 ---
 
 # Strategic Simulator Agent

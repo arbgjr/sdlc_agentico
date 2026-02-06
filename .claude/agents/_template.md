@@ -22,7 +22,7 @@ description: |
 model: sonnet  # or opus for complex reasoning
 skills:
   - rag-query
-  - memory-manager
+  - 
 # Tool Access Control (OpenClaw pattern)
 # https://github.com/openclaw/openclaw/blob/main/AGENTS.md
 allowed_tools:

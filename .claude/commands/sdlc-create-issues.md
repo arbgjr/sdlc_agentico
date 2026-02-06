@@ -147,7 +147,7 @@ python3 .claude/skills/github-projects/scripts/project_manager.py add-item \
 Salve mapeamento task -> issue:
 
 ```yaml
-# .claude/memory/issue-mapping.yml
+# .project/issue-mapping.yml
 mapping:
   - task_id: "TASK-001"
     issue_number: 123

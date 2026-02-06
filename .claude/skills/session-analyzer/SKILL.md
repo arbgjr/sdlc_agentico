@@ -69,9 +69,6 @@ on_phase_complete:
     persist: true
 ```
 
-### Com memory-manager
-
-Learnings são persistidos automaticamente:
 
 ```yaml
 on_learning_found:

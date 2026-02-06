@@ -113,7 +113,7 @@ python3 .claude/skills/decay-scoring/scripts/decay_trigger.py --priority critica
 
 ## Integracao
 
-- **memory-manager**: Adiciona contexto de decay ao recuperar informacoes
+- ****: Adiciona contexto de decay ao recuperar informacoes
 - **rag-curator**: Usa triggers para sugerir acoes de curadoria
 - **hybrid_search.py**: Aplica boost de decay nos resultados de busca
 - **gate-evaluator**: Valida saude do corpus antes de releases

@@ -14,14 +14,14 @@ required_artifacts:
     agent: "release-manager"
 
   - name: "Deploy Evidence"
-    path: ".agentic_sdlc/projects/*/releases/*.yml"
-    fallback_path: ".claude/memory/releases/*.yml"
+    path: ".project/projects/*/releases/*.yml"
+    
     description: "Evidencia de deploy em producao"
     agent: "release-manager"
 
   - name: "Change Request"
-    path: ".agentic_sdlc/projects/*/changes/*.yml"
-    fallback_path: ".claude/memory/changes/*.yml"
+    path: ".project/projects/*/changes/*.yml"
+    
     description: "Change request aprovado"
     agent: "change-manager"
 
@@ -31,14 +31,14 @@ required_artifacts:
     agent: "release-manager"
 
   - name: "Observability Config"
-    path: ".agentic_sdlc/projects/*/observability/*.yml"
-    fallback_path: ".claude/memory/observability/*.yml"
+    path: ".project/projects/*/observability/*.yml"
+    
     description: "Configuracao de observabilidade (logs, metricas, traces)"
     agent: "observability-engineer"
 
   - name: "Monitoring Setup"
-    path: ".agentic_sdlc/projects/*/monitoring/*.yml"
-    fallback_path: ".claude/memory/monitoring/*.yml"
+    path: ".project/projects/*/monitoring/*.yml"
+    
     description: "Alertas e dashboards configurados"
     agent: "observability-engineer"
 
@@ -52,25 +52,25 @@ quality_checks:
     validation: "curl -s $PROD_URL/health | grep -q 'ok'"
 
   - check: "Metricas fluindo"
-    validation: "grep -r 'metrics_configured: true' .agentic_sdlc/projects/*/releases/ .claude/memory/releases/ 2>/dev/null | head -1"
+    validation: "grep -r 'metrics_configured: true' .project/projects/*/releases/ 2>/dev/null | head -1"
 
   - check: "Alertas configurados"
-    validation: "grep -r 'alerts_configured: true' .agentic_sdlc/projects/*/releases/ .claude/memory/releases/ 2>/dev/null | head -1"
+    validation: "grep -r 'alerts_configured: true' .project/projects/*/releases/ 2>/dev/null | head -1"
 
   - check: "Rollback plan documentado"
-    validation: "grep -r 'rollback_plan:' .agentic_sdlc/projects/*/releases/ .claude/memory/releases/ 2>/dev/null | head -1"
+    validation: "grep -r 'rollback_plan:' .project/projects/*/releases/ 2>/dev/null | head -1"
 
   - check: "Change request aprovado"
-    validation: "grep -r 'status: approved' .agentic_sdlc/projects/*/changes/ .claude/memory/changes/ 2>/dev/null | head -1"
+    validation: "grep -r 'status: approved' .project/projects/*/changes/ 2>/dev/null | head -1"
 
   - check: "Comunicacao enviada"
-    validation: "grep -r 'communication_sent: true' .agentic_sdlc/projects/*/changes/ .claude/memory/changes/ 2>/dev/null | head -1"
+    validation: "grep -r 'communication_sent: true' .project/projects/*/changes/ 2>/dev/null | head -1"
 
   - check: "Observabilidade configurada"
-    validation: "grep -r 'tracing:' .agentic_sdlc/projects/*/observability/ .claude/memory/observability/ 2>/dev/null | head -1"
+    validation: "grep -r 'tracing:' .project/projects/*/observability/ 2>/dev/null | head -1"
 
   - check: "SLOs definidos"
-    validation: "grep -r 'slos:' .agentic_sdlc/projects/*/observability/ .claude/memory/observability/ 2>/dev/null | head -1"
+    validation: "grep -r 'slos:' .project/projects/*/observability/ 2>/dev/null | head -1"
 
 human_approval:
   required: true

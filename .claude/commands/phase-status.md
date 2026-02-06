@@ -4,7 +4,7 @@ description: "Mostra o status atual do workflow SDLC"
 
 # Status do Workflow SDLC
 
-Use @memory-manager para carregar o estado atual e exibir:
+Use @ para carregar o estado atual e exibir:
 
 ## 1. Informacoes do Projeto
 

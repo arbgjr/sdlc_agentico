@@ -289,5 +289,5 @@ Se não houver resposta de stakeholder após deadline:
 
 - Template ODR: `.agentic_sdlc/templates/odr-template.yml`
 - Guia ADR vs ODR: `\.agentic_sdlc/docs/guides/adr-vs-odr.md`
-- Schema: `.claude/skills/memory-manager/SKILL.md`
+- Schema: `.claude/skills//SKILL.md`
 - Issue #3: Alinhamento Humano-Organizacional

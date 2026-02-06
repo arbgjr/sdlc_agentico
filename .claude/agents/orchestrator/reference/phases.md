@@ -209,7 +209,7 @@ Phase 0 → Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 
 3. All gate criteria met
 4. Adversarial audit passed (if enabled for phase)
 5. Phase commit executed (artifacts committed)
-6. State updated (`memory-manager`)
+6. State updated (``)
 
 ### Blocking Conditions
 

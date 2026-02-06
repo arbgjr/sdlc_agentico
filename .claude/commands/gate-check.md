@@ -173,7 +173,7 @@ gate_evaluation:
 
 Quando executado pelo @orchestrator, o gate-check:
 
-1. Registra resultado no memory-manager
+1. Registra resultado no 
 2. Atualiza manifest do projeto
 3. Dispara transicao de fase automaticamente
 4. Notifica stakeholders se necessario

@@ -29,7 +29,7 @@ dependencies:
     - pyyaml
     - gitpython
   skills:
-    - memory-manager
+    - 
     - gate-evaluator
 
 hooks:

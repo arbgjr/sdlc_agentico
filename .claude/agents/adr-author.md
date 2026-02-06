@@ -23,7 +23,7 @@ description: |
 model: sonnet
 skills:
   - rag-query
-  - memory-manager
+  - 
   - document-enricher
 ---
 
@@ -208,7 +208,7 @@ adr_process:
 
   5_store_and_index:
     - Salvar em docs/adr/
-    - Adicionar ao RAG (memory-manager)
+    - Adicionar ao RAG ()
     - Atualizar indice de ADRs
 ```
 
@@ -298,7 +298,7 @@ Apos criar ADR:
 
 2. **Adicionar ao RAG**
    ```yaml
-   # Via memory-manager
+   # Via 
    memory_entry:
      type: adr
      id: "ADR-0001"
@@ -343,7 +343,7 @@ Before saving ADR, you MUST verify:
 - [ ] References to discussions included (Slack threads, meeting notes, etc.)
 - [ ] File saved in `docs/adr/` with correct naming (`XXXX-slug.md`)
 - [ ] Index updated (`docs/adr/index.md`)
-- [ ] RAG updated (memory-manager called)
+- [ ] RAG updated ( called)
 - [ ] **Timestamps are REAL UTC with seconds** (not rounded like `19:30:00Z`)
 
 **CRITICAL:** If you cannot check ALL items above, the ADR is INCOMPLETE.

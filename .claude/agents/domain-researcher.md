@@ -23,7 +23,7 @@ description: |
 model: sonnet
 skills:
   - rag-query
-  - memory-manager
+  - 
   - document-processor
   - document-enricher
 allowed-tools:
@@ -289,7 +289,7 @@ research_with_documents:
     - Identificar gaps
 
   4_index:
-    - Adicionar ao corpus RAG via memory-manager
+    - Adicionar ao corpus RAG via 
     - Criar referencias para consulta futura
 ```
 
@@ -298,7 +298,7 @@ research_with_documents:
 ```yaml
 document_to_rag:
   extraction: "/doc-extract documento.pdf"
-  indexing: "memory-manager adiciona ao corpus"
+  indexing: " adiciona ao corpus"
   query: "rag-query recupera quando relevante"
 ```
 

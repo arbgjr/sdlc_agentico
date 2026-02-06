@@ -23,7 +23,7 @@ description: |
 model: sonnet
 skills:
   - rag-query
-  - memory-manager
+  - 
 ---
 
 # Metrics Analyst Agent

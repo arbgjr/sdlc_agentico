@@ -9,13 +9,12 @@ gate:
 
 required_artifacts:
   - name: "Research Brief"
-    path: ".agentic_sdlc/projects/*/research/*.yml"
-    fallback_path: ".claude/memory/research/*.yml"
+    path: ".project/projects/*/research/*.yml"
     description: "Documentacao de pesquisa de dominio"
     agent: "domain-researcher"
 
   - name: "Domain Knowledge"
-    path: ".agentic_sdlc/projects/*/knowledge/*.md"
+    path: ".project/projects/*/knowledge/*.md"
     fallback_path: ".specify/knowledge/*.md"
     description: "Conhecimento de dominio documentado"
     agent: "domain-researcher"
@@ -35,10 +34,10 @@ required_artifacts:
 
 quality_checks:
   - check: "Best practices documentadas"
-    validation: "grep -r 'best_practices' .agentic_sdlc/projects/*/research/ .claude/memory/research/ 2>/dev/null | head -1"
+    validation: "grep -r 'best_practices' .project/projects/*/research/ 2>/dev/null | head -1"
 
   - check: "Fontes referenciadas"
-    validation: "grep -r 'sources:' .agentic_sdlc/projects/*/research/ .claude/memory/research/ 2>/dev/null | head -1"
+    validation: "grep -r 'sources:' .project/projects/*/research/ 2>/dev/null | head -1"
 
   - check: "Documentacao oficial capturada"
     validation: "ls .project/corpus/docs/ .claude/rag/docs/ 2>/dev/null | head -1"

@@ -237,9 +237,6 @@ include:
 
 ## Integracoes
 
-### Com memory-manager
-- Recebe decisoes e learnings automaticamente
-- Sincroniza com contexto de fases
 
 ### Com rag-query
 - Alimenta o corpus que sera consultado

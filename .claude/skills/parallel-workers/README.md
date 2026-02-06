@@ -264,7 +264,7 @@ Workers execute using existing SDLC agents:
 
 Integrates with:
 - `gate-evaluator` - Quality gates
-- `memory-manager` - Context persistence
+- `` - Context persistence
 - `phase-commit` - Automatic commits
 
 ### With GitHub

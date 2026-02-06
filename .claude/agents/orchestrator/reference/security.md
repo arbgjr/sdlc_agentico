@@ -25,7 +25,7 @@ Security is integrated into every phase of the SDLC. The orchestrator enforces s
 
 ### 2. Always Persist Decisions
 
-- Before transitioning phases, save to `memory-manager`
+- Before transitioning phases, save to ``
 - Architecture decisions → ADRs (Architecture Decision Records)
 - Business decisions → ODRs (Organizational Decision Records)
 - Technical decisions → Decision log in RAG corpus

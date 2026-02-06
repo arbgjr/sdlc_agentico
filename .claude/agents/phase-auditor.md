@@ -24,7 +24,7 @@ model: opus  # Usa opus para analise critica profunda
 skills:
   - rag-query
   - gate-evaluator
-  - memory-manager
+  - 
 ---
 
 # Phase Auditor Agent

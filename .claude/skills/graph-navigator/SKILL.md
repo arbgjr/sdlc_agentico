@@ -184,7 +184,7 @@ Results include:
 - Graph-expanded related nodes
 - Combined relevance scores
 
-### memory-manager
+### 
 
 When saving decisions/learnings, the graph can be updated incrementally:
 

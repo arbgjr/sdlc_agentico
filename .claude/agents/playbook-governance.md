@@ -39,7 +39,7 @@ description: |
 model: sonnet
 skills:
   - governance-rules
-  - memory-manager
+  - 
   - rag-query
 ---
 

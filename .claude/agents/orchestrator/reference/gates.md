@@ -33,7 +33,7 @@ After phase execution, before advancing:
 
 - [ ] **Resultados validados contra critérios do gate**
 - [ ] **Adversarial audit executado** (se fase configurada)
-- [ ] **Decisões persistidas no memory-manager**
+- [ ] **Decisões persistidas no **
 - [ ] **Próximos passos definidos**
 - [ ] **Métricas coletadas** (tempo, artefatos, issues)
 - [ ] **Status atualizado para stakeholders**

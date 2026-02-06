@@ -10,7 +10,7 @@
 ## Completed
 
 - Implementar skill parallel-workers para execução paralela (Task #35)
-- Integrar sistema de memória simplificado ao memory-manager (Task #36)
+- Integrar sistema de memória simplificado ao  (Task #36)
 - Implementar geração automática de Session Handoff Summaries (Task #37)
 - Committed: feat(epic-33): integrate claude-orchestrator patterns
 
@@ -31,8 +31,8 @@
 - `.claude/skills/parallel-workers/scripts/worker_manager.py`
 - `.claude/skills/parallel-workers/scripts/state_tracker.py`
 - `.claude/skills/parallel-workers/scripts/worktree_manager.sh`
-- `.claude/skills/memory-manager/scripts/simple_store.py`
-- `.claude/skills/memory-manager/README.md`
+- `.claude/skills//scripts/simple_store.py`
+- `.claude/skills//README.md`
 - `.claude/skills/session-analyzer/scripts/handoff.py`
 - `.project/corpus/nodes/learnings/LEARN-claude-orchestrator-patterns.yml`
 

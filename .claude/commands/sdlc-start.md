@@ -101,7 +101,7 @@ python3 .claude/skills/github-sync/scripts/milestone_sync.py create \
 
 ## 3. Iniciar Memoria do Projeto
 
-Use @memory-manager para:
+Use @ para:
 - Criar registro do projeto com ID unico
 - Definir fase inicial baseada no nivel
 - Registrar complexidade detectada
@@ -128,7 +128,7 @@ orchestrator_request:
 
 O @orchestrator ira:
 1. Validar pre-requisitos
-2. Carregar contexto do memory-manager
+2. Carregar contexto do 
 3. Iniciar fase apropriada
 4. Delegar para agentes especificos
 5. Gerenciar transicoes de fase automaticamente

@@ -23,7 +23,7 @@ description: |
 model: sonnet
 skills:
   - rag-query
-  - memory-manager
+  - 
 # Tool Access Control (OpenClaw pattern)
 # code-author needs full file system and runtime access for implementation
 # This is one of the few agents that SHOULD have Bash access

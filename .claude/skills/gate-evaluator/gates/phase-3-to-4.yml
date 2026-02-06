@@ -9,63 +9,62 @@ gate:
 
 required_artifacts:
   - name: "Architecture Overview"
-    path: ".agentic_sdlc/projects/*/architecture/*.md"
+    path: ".project/projects/*/architecture/*.md"
     fallback_path: ".specify/plans/*.md"
     description: "Documento de arquitetura de alto nivel"
     agent: "system-architect"
 
   - name: "ADRs"
-    path: ".agentic_sdlc/projects/*/decisions/adr-*.yml"
+    path: ".project/projects/*/decisions/adr-*.yml"
     fallback_path: "docs/adr/*.md"
     description: "Architecture Decision Records para decisoes significativas"
     agent: "adr-author"
 
   - name: "Technical Plan"
-    path: ".agentic_sdlc/projects/*/plans/*-technical-plan.md"
+    path: ".project/projects/*/plans/*-technical-plan.md"
     fallback_path: ".specify/plans/*-technical-plan.md"
     description: "Plano tecnico detalhado"
     agent: "system-architect"
 
   - name: "Data Model"
-    path: ".agentic_sdlc/projects/*/data/*.md"
+    path: ".project/projects/*/data/*.md"
     fallback_path: "docs/data/*.md"
     description: "Modelo de dados e relacionamentos"
     agent: "data-architect"
 
   - name: "API Contracts"
-    path: ".agentic_sdlc/projects/*/api/*.yml"
+    path: ".project/projects/*/api/*.yml"
     fallback_path: "docs/api/*.yml"
     description: "Contratos de API (OpenAPI/AsyncAPI)"
     agent: "data-architect"
     optional_for_levels: [0, 1]
 
   - name: "Threat Model"
-    path: ".agentic_sdlc/projects/*/security/threat-model*.yml"
-    fallback_path: ".claude/memory/security/*.yml"
+    path: ".project/projects/*/security/threat-model*.yml"
     description: "Analise de ameacas STRIDE"
     agent: "threat-modeler"
 
 quality_checks:
   - check: "Componentes definidos"
-    validation: "grep -r 'components:' .agentic_sdlc/projects/*/architecture/ .specify/plans/ 2>/dev/null | head -1"
+    validation: "grep -r 'components:' .project/projects/*/architecture/ .specify/plans/ 2>/dev/null | head -1"
 
   - check: "Tecnologias escolhidas"
-    validation: "grep -r 'technology_choices:' .agentic_sdlc/projects/*/architecture/ .specify/plans/ 2>/dev/null | head -1"
+    validation: "grep -r 'technology_choices:' .project/projects/*/architecture/ .specify/plans/ 2>/dev/null | head -1"
 
   - check: "NFRs enderecados"
-    validation: "grep -r 'nfr_approach:' .agentic_sdlc/projects/*/architecture/ .specify/plans/ 2>/dev/null | head -1"
+    validation: "grep -r 'nfr_approach:' .project/projects/*/architecture/ .specify/plans/ 2>/dev/null | head -1"
 
   - check: "Trade-offs documentados"
-    validation: "ls .agentic_sdlc/projects/*/decisions/adr-*.yml docs/adr/*.md 2>/dev/null | head -1"
+    validation: "ls .project/projects/*/decisions/adr-*.yml docs/adr/*.md 2>/dev/null | head -1"
 
   - check: "Threat model realizado"
-    validation: "grep -r 'threat_model:' .agentic_sdlc/projects/*/security/ .claude/memory/ 2>/dev/null | head -1"
+    validation: "grep -r 'threat_model:' .project/projects/*/security/2>/dev/null | head -1"
 
   - check: "Modelo de dados definido"
-    validation: "grep -r 'entities:' .agentic_sdlc/projects/*/data/ docs/data/ 2>/dev/null | head -1"
+    validation: "grep -r 'entities:' .project/projects/*/data/ docs/data/ 2>/dev/null | head -1"
 
   - check: "Contratos de API especificados"
-    validation: "ls .agentic_sdlc/projects/*/api/*.yml docs/api/*.yml 2>/dev/null | head -1"
+    validation: "ls .project/projects/*/api/*.yml docs/api/*.yml 2>/dev/null | head -1"
 
 human_approval:
   required: true
@@ -110,26 +109,26 @@ stakeholder_review:
   reviewers:
     - role: tech_lead
       files:
-        - pattern: ".agentic_sdlc/projects/*/architecture/*.md"
+        - pattern: ".project/projects/*/architecture/*.md"
           priority: high
           description: "Arquitetura de alto nivel"
-        - pattern: ".agentic_sdlc/projects/*/decisions/adr-*.yml"
+        - pattern: ".project/projects/*/decisions/adr-*.yml"
           priority: high
           description: "Decisoes arquiteturais (ADRs)"
-        - pattern: ".agentic_sdlc/projects/*/plans/*-technical-plan.md"
+        - pattern: ".project/projects/*/plans/*-technical-plan.md"
           priority: high
           description: "Plano tecnico detalhado"
     - role: security_lead
       files:
-        - pattern: ".agentic_sdlc/projects/*/security/threat-model*.yml"
+        - pattern: ".project/projects/*/security/threat-model*.yml"
           priority: critical
           description: "Modelo de ameacas STRIDE"
     - role: data_lead
       files:
-        - pattern: ".agentic_sdlc/projects/*/data/*.md"
+        - pattern: ".project/projects/*/data/*.md"
           priority: high
           description: "Modelo de dados"
-        - pattern: ".agentic_sdlc/projects/*/api/*.yml"
+        - pattern: ".project/projects/*/api/*.yml"
           priority: medium
           description: "Contratos de API"
   message_template: |

@@ -28,14 +28,14 @@ gate:
         - name: security_requirements_documented
           description: "Requisitos de seguranca devem estar documentados"
           check_type: file_exists
-          path_pattern: ".agentic_sdlc/projects/*/specs/*.spec.md"
+          path_pattern: ".project/projects/*/specs/*.spec.md"
           fallback_pattern: "*.spec.md"
           content_required: "Security Considerations"
 
         - name: compliance_requirements_identified
           description: "Requisitos de compliance identificados (LGPD, PCI, etc)"
           check_type: content_search
-          path_pattern: ".agentic_sdlc/projects/*/specs/*.spec.md"
+          path_pattern: ".project/projects/*/specs/*.spec.md"
           fallback_pattern: "*.spec.md"
           patterns:
             - "LGPD|GDPR|PCI|SOC|ISO"
@@ -51,13 +51,13 @@ gate:
         - name: threat_model_exists
           description: "Threat model (STRIDE) deve existir"
           check_type: file_exists
-          path_pattern: ".agentic_sdlc/projects/*/security/threat-model*.yml"
+          path_pattern: ".project/projects/*/security/threat-model*.yml"
           fallback_pattern: "docs/security/threat-model*.yml"
 
         - name: high_risks_mitigated
           description: "Ameacas HIGH/CRITICAL devem ter mitigacao"
           check_type: yaml_query
-          path_pattern: ".agentic_sdlc/projects/*/security/threat-model*.yml"
+          path_pattern: ".project/projects/*/security/threat-model*.yml"
           fallback_pattern: "docs/security/threat-model*.yml"
           query: "threat_model.threats.*.[] | select(.risk_level == 'high' or .risk_level == 'critical') | select(.mitigation.status != 'implemented' and .mitigation.status != 'accepted_risk')"
           expected_count: 0
@@ -65,7 +65,7 @@ gate:
         - name: auth_design_documented
           description: "Design de autenticacao/autorizacao documentado"
           check_type: content_search
-          path_pattern: ".agentic_sdlc/projects/*/decisions/adr-*.yml"
+          path_pattern: ".project/projects/*/decisions/adr-*.yml"
           fallback_pattern: "docs/adr/*.md"
           patterns:
             - "autenticacao|authentication"
@@ -114,7 +114,7 @@ gate:
         - name: sast_executed
           description: "SAST (Static Analysis) executado"
           check_type: file_exists
-          path_pattern: ".agentic_sdlc/projects/*/security/sast-report.*"
+          path_pattern: ".project/projects/*/security/sast-report.*"
           fallback_pattern: "docs/security/sast-report.*"
 
         - name: sast_no_critical_high
@@ -135,7 +135,7 @@ gate:
         - name: sca_executed
           description: "SCA (Dependency Check) executado"
           check_type: file_exists
-          path_pattern: ".agentic_sdlc/projects/*/security/sca-report.*"
+          path_pattern: ".project/projects/*/security/sca-report.*"
           fallback_pattern: "docs/security/sca-report.*"
 
         - name: sca_no_critical_high
@@ -173,14 +173,14 @@ gate:
         - name: security_checklist_complete
           description: "Checklist de seguranca para release completo"
           check_type: file_exists
-          path_pattern: ".agentic_sdlc/projects/*/security/release-security-checklist.yml"
+          path_pattern: ".project/projects/*/security/release-security-checklist.yml"
           fallback_pattern: "docs/security/release-security-checklist.yml"
 
         - name: all_security_gates_passed
           description: "Todos os gates de seguranca anteriores passaram"
           check_type: command
           command: |
-            grep -r "status: blocked" .agentic_sdlc/projects/*/security/*.yml 2>/dev/null | wc -l || echo "0"
+            grep -r "status: blocked" .project/projects/*/security/*.yml 2>/dev/null | wc -l || echo "0"
           expected: "0"
 
         - name: encryption_verified
