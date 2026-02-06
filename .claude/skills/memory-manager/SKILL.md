@@ -25,11 +25,17 @@ Esta skill gerencia a memoria persistente do projeto, incluindo:
 
 ## Estrutura de Armazenamento
 
-**IMPORTANTE:** A partir da v1.2.0, todos os artefatos devem ser salvos em `.agentic_sdlc/`.
-O diretorio `.claude/memory/` e legado e sera migrado automaticamente.
+**IMPORTANTE:** Todos os artefatos devem ser salvos no diretório configurado em `settings.json` → `sdlc.output.project_artifacts_dir` (default: `.project`).
+
+Use o path resolver para obter o diretório correto:
+```bash
+PROJECT_DIR=$(python3 .claude/lib/python/path_resolver.py --project-dir)
+```
+
+**NOTA DE DEPRECIAÇÃO:** Este skill será removido na v3.1.0. Use apenas `rag-curator` e `rag-query` para gerenciar conhecimento do projeto.
 
 ```
-.agentic_sdlc/
+${PROJECT_DIR}/                  # Resolve via path_resolver.py (default: .project)
 ├── projects/
 │   └── {project-id}/
 │       ├── manifest.yml         # Estado do projeto (antigo project.yml)
@@ -56,7 +62,7 @@ O diretorio `.claude/memory/` e legado e sera migrado automaticamente.
 
 ### Migracao Automatica
 
-O hook `auto-migrate.sh` migra automaticamente de `.claude/memory/` para `.agentic_sdlc/` na primeira execucao de cada dia.
+O hook `auto-migrate.sh` migra automaticamente de `.claude/memory/` para o diretório configurado (via path_resolver) na primeira execucao de cada dia.
 
 ## Schema de Dados
 
@@ -338,7 +344,23 @@ O memory-manager alimenta o corpus RAG:
 #!/usr/bin/env python3
 """
 Operacoes de memoria para o SDLC.
-v1.2.0 - Usa .agentic_sdlc como diretorio principal
+
+⚠️ DEPRECATION WARNING ⚠️
+Este script será REMOVIDO na v3.1.0.
+Use rag-curator e rag-query para gerenciar conhecimento do projeto.
+
+TODO: Atualizar para usar path_resolver.py ao invés de paths hardcoded:
+  from pathlib import Path
+  import subprocess
+
+  def get_project_dir() -> Path:
+      result = subprocess.run(
+          ["python3", ".claude/lib/python/path_resolver.py", "--project-dir"],
+          capture_output=True, text=True, check=True
+      )
+      return Path(result.stdout.strip())
+
+  PROJECT_DIR = get_project_dir()
 """
 import yaml
 from pathlib import Path
@@ -346,8 +368,8 @@ from datetime import datetime
 from typing import Optional, Dict, List, Any
 import os
 
-# Diretorio principal (v1.2.0+)
-AGENTIC_SDLC_DIR = Path(".agentic_sdlc")
+# ⚠️ HARDCODED PATHS - Deve usar path_resolver.py (ver TODO acima)
+AGENTIC_SDLC_DIR = Path(".agentic_sdlc")  # TODO: Usar path_resolver
 # Diretorio legado (para compatibilidade)
 LEGACY_MEMORY_DIR = Path(".claude/memory")
 

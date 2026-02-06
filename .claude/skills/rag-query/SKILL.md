@@ -76,27 +76,40 @@ results = query(
 
 ## Estrutura do Corpus
 
-O corpus RAG esta consolidado em `.project/corpus/`:
+O corpus RAG está consolidado no diretório de projeto (via `path_resolver.py`):
 
-```
-.project/corpus/
-├── decisions/           # ADRs e decisoes
-│   └── *.yml
-├── docs/                # Documentacao oficial
-│   ├── official/        # Docs de libs/frameworks
-│   ├── internal/        # Docs do projeto
-│   └── reference/       # Referencias externas
-├── patterns/            # Padroes conhecidos
-│   └── *.yml
-├── learnings/           # Licoes aprendidas
-│   └── *.yml
-└── index.yml            # Indice do corpus
+```bash
+# Resolve project directory dynamically
+PROJECT_DIR=$(python3 .claude/lib/python/path_resolver.py --project-dir)
+
+# Corpus structure:
+${PROJECT_DIR}/corpus/
+├── nodes/
+│   ├── decisions/       # ADRs e decisoes indexadas
+│   │   └── *.yml
+│   ├── learnings/       # Licoes aprendidas
+│   │   └── *.yml
+│   ├── patterns/        # Padroes conhecidos
+│   │   └── *.yml
+│   └── concepts/        # Conceitos de dominio
+│       └── *.yml
+├── graph.json           # Grafo semantico
+└── index.yml            # Indice textual
+
+# Project-specific decisions (not yet indexed):
+${PROJECT_DIR}/projects/{project-id}/
+├── decisions/           # ADRs do projeto atual
+├── specs/               # Especificacoes
+└── manifest.yml         # Estado do projeto
 ```
 
-**Nota**: Por compatibilidade, o sistema tambem busca em:
-- `.claude/knowledge/` (legado)
-- `.claude/memory/` (legado)
-- `.project/references/` (documentos externos via reference-indexer)
+**Path Resolution**:
+- Paths are resolved from `settings.json` (default: `.project`)
+- Compatible with "Natural Language First" policy
+- Never hardcodes `.agentic_sdlc/` (framework files only)
+
+**External References**:
+- `${PROJECT_DIR}/references/` - Documentos externos via reference-indexer
 
 ## Formato de Resultado
 
@@ -124,16 +137,19 @@ query_result:
 
 ## Integracoes
 
-### Com memory-manager
-
-O rag-query le dados salvos pelo memory-manager:
-- Decisoes em `.project/corpus/decisions/` (ou `.claude/memory/decisions/` legado)
-- Learnings em `.project/corpus/learnings/` (ou `.claude/memory/learnings/` legado)
-- Contextos em `.agentic_sdlc/projects/*/context/` (ou `.claude/memory/context/` legado)
-
 ### Com rag-curator
 
-O rag-curator adiciona e organiza o corpus que o rag-query consulta.
+O rag-curator adiciona e organiza o corpus que o rag-query consulta:
+- Indexa ADRs de `${PROJECT_DIR}/projects/{id}/decisions/` para `${PROJECT_DIR}/corpus/nodes/decisions/`
+- Indexa learnings para `${PROJECT_DIR}/corpus/nodes/learnings/`
+- Mantém grafo semântico em `${PROJECT_DIR}/corpus/graph.json`
+
+### Com path_resolver
+
+Usa `path_resolver.py` para resolver paths dinamicamente:
+```bash
+PROJECT_DIR=$(python3 .claude/lib/python/path_resolver.py --project-dir)
+```
 
 ## Scripts
 
