@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.3] - 2026-02-06
+
+### Fixed - Docs Version Sync
+
+- **Version references updated across all documentation and source files**
+  - README.md: badge, banner, install commands updated to v3.0.3
+  - CLAUDE.md: "Current Version" was still showing v2.3.3, updated to v3.0.3
+  - .claude/VERSION: version field and release notes updated
+  - All Python hook/command version headers updated (6 files)
+  - Orchestrator agent and 6 reference documents version footers updated
+  - PowerShell setup script version and examples updated
+  - tests/__init__.py docstring updated
+  - researches/milestone-plan.md current version updated
+
+### Added
+
+- CHANGELOG entries for v3.0.1 and v3.0.2 (previously untracked releases)
+
+## [3.0.2] - 2026-02-06
+
+### Fixed
+
+- fix(gates): correct hardcoded paths in gate evaluator
+- refactor(memory): remove memory-manager skill, consolidate into RAG
+
+## [3.0.1] - 2026-02-04
+
+### Fixed
+
+- docs(claude.md): remove memory-manager references, update skill list
+- docs(CLAUDE.md): optimize file size from 73k to 12k chars (83% reduction)
+- docs(CLAUDE.md): add Natural Language First policy as critical rule
+- refactor: update documentation and feature flags
+- feat: Remove obsolete scripts and update documentation
+- fix(paths): implement dynamic path resolution for project artifacts
+
 ## [3.0.0] - 2026-02-02
 
 ### Major - Python-First Framework Refactoring
@@ -1369,7 +1405,11 @@ APÓS GATE → Extrai learnings → Grava no RAG
 
 ---
 
-[Unreleased]: https://github.com/arbgjr/sdlc_agentico/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/arbgjr/sdlc_agentico/compare/v3.0.3...HEAD
+[3.0.3]: https://github.com/arbgjr/sdlc_agentico/compare/v3.0.2...v3.0.3
+[3.0.2]: https://github.com/arbgjr/sdlc_agentico/compare/v3.0.1...v3.0.2
+[3.0.1]: https://github.com/arbgjr/sdlc_agentico/compare/v3.0.0...v3.0.1
+[3.0.0]: https://github.com/arbgjr/sdlc_agentico/compare/v2.3.3...v3.0.0
 [1.7.0]: https://github.com/arbgjr/sdlc_agentico/compare/v1.6.1...v1.7.0
 [1.6.1]: https://github.com/arbgjr/sdlc_agentico/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/arbgjr/sdlc_agentico/compare/v1.5.0...v1.6.0

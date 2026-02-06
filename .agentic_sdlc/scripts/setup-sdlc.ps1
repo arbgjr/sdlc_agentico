@@ -17,7 +17,7 @@
     Instala a partir de uma release do GitHub (baixa e extrai)
 
 .PARAMETER Version
-    Especifica a versão a instalar (ex: "v3.0.0"). Padrão: "latest"
+    Especifica a versão a instalar (ex: "v3.0.3"). Padrão: "latest"
 
 .PARAMETER SkipDeps
     Pula a instalação de dependências (Python, Node, etc)
@@ -38,7 +38,7 @@
 
 .EXAMPLE
     # Instalação de versão específica
-    .\setup-sdlc.ps1 -FromRelease -Version "v3.0.0"
+    .\setup-sdlc.ps1 -FromRelease -Version "v3.0.3"
 
 .EXAMPLE
     # Instalação sem dependências (apenas configuração)
@@ -46,7 +46,7 @@
 
 .NOTES
     Author: SDLC Agentico Team
-    Version: 3.0.0
+    Version: 3.0.3
     Requires: PowerShell 5.1+ and Administrator privileges
 #>
 

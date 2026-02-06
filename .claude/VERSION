@@ -1,7 +1,21 @@
 # SDLC Agêntico Version
-version: "3.0.0"
-build_date: "2026-02-02"
+version: "3.0.3"
+build_date: "2026-02-06"
 release_notes: |
+  v3.0.3 - Docs Version Sync (all version references updated)
+
+  FIXES:
+  - All documentation version references updated from v3.0.0 to v3.0.3
+  - CLAUDE.md was still showing v2.3.3
+  - README badges, install instructions, and banner updated
+  - All Python script version headers updated
+  - Agent reference documents version footers updated
+  - CHANGELOG entries added for v3.0.1, v3.0.2, v3.0.3
+
+  Previous releases (not documented in CHANGELOG):
+  v3.0.2 - fix(gates): hardcoded paths + remove memory-manager
+  v3.0.1 - docs(claude.md): remove memory-manager references
+
   v3.0.0 - Python-First Framework Refactoring (Week 3 complete)
 
   CRITICAL FIXES:

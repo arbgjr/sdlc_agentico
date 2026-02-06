@@ -2,7 +2,7 @@
 """
 Hook: validate-framework-structure
 Validates that all required framework files exist.
-Version: 3.0.0 (Python-First)
+Version: 3.0.3 (Python-First)
 
 Cross-platform (Linux, macOS, Windows)
 Logs missing files to Loki for monitoring.

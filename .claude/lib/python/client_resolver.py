@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 client_resolver.py - Cross-platform client profile resolution
-Version: 3.0.0
+Version: 3.0.3
 Part of: Phase 1 - Foundation (Multi-Client Architecture)
 
 Provides client detection, validation, and resource resolution.

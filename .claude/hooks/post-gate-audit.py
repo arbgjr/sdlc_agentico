@@ -2,7 +2,7 @@
 """
 Hook: post-gate-audit
 Executes adversarial audit after quality gate passes.
-Version: 3.0.0 (Python-First)
+Version: 3.0.3 (Python-First)
 
 Triggered by: orchestrator after gate-evaluator passes
 Purpose: Adversarial quality assurance - find problems self-validation missed

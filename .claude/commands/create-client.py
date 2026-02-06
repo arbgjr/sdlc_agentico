@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 create_client.py - Create new SDLC Agêntico client profile from template
-Version: 3.0.0
+Version: 3.0.3
 Part of: Phase 5 - Documentation & Tooling (Multi-Client Architecture)
 
 Cross-platform (Linux, macOS, Windows)

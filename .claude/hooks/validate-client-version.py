@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 validate-client-version.py - Validate client profile version compatibility
-Version: 3.0.0
+Version: 3.0.3
 Hook: Can be called before workflow execution
 Part of: Phase 2 - Orchestrator Refactoring (Multi-Client Architecture)
 

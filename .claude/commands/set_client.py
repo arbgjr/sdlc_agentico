@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 set_client.py - Set active SDLC Agêntico client profile
-Version: 3.0.0
+Version: 3.0.3
 Part of: Phase 1 - Foundation (Multi-Client Architecture)
 
 Cross-platform (Linux, macOS, Windows)

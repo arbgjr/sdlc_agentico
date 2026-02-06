@@ -442,5 +442,5 @@ Estimated update time: 2-5 minutes
 
 ---
 
-**Version**: 3.0.0
+**Version**: 3.0.3
 **Last Updated**: 2026-02-02

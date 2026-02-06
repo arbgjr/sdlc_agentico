@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 detect-client.py - Auto-detect active SDLC Agêntico client profile
-Version: 3.0.0
+Version: 3.0.3
 Hook: UserPromptSubmit
 Part of: Phase 1 - Foundation (Multi-Client Architecture)
 
