@@ -192,7 +192,6 @@ All skills are located in `.claude/skills/` and automatically available to agent
 | Skill | Purpose |
 |-------|---------|
 | `gate-evaluator` | Evaluates quality gates between phases |
-| `memory-manager` | Manages project context and state persistence |
 | `rag-query` | Queries RAG knowledge corpus |
 | `auto-branch` | Automatic branch creation (fix/, feature/, hotfix/, release/) |
 | `phase-commit` | Commits artifacts at end of each phase |

@@ -1,93 +1,17 @@
-gate_name: implementation_to_quality
-from_phase: 5
-to_phase: 6
-description: "Transicao de Implementacao para Qualidade"
+---
+gate:
+  name: "phase-5-to-6"
+  from_phase: 5
+  to_phase: 6
+  description: "Implementation → Quality transition"
 
-required_artifacts:
-  - type: source_code
-    description: "Codigo fonte implementado"
-    validation:
-      - compiles: true
-      - no_syntax_errors: true
-    path_pattern: "src/**/*"
+  required_conditions:
+    - condition: "All acceptance criteria implemented"
+      severity: "BLOCKER"
+    - condition: "Unit tests pass"
+      severity: "BLOCKER"
+    - condition: "No hardcoded secrets"
+      severity: "BLOCKER"
 
-  - type: unit_tests
-    description: "Testes unitarios"
-    validation:
-      - all_passing: true
-      - coverage_minimum: 80  # Percentual minimo de cobertura (80%)
-    path_pattern: "tests/unit/**/*"
-
-  - type: integration_tests
-    description: "Testes de integracao"
-    validation:
-      - all_passing: true
-    path_pattern: "tests/integration/**/*"
-    optional: true
-
-  - type: code_review
-    description: "Code review aprovado"
-    validation:
-      - approved: true
-      - no_blocking_comments: true
-    path_pattern: ".github/reviews/*.md"
-
-  - type: changelog
-    description: "Changelog atualizado"
-    validation:
-      - has_current_version: true
-    path_pattern: "CHANGELOG.md"
-
-  - type: frontend_components
-    description: "Componentes frontend testados (se aplicavel)"
-    validation:
-      - components_render: true
-      - data_testid_present: true
-    path_pattern: "src/components/**/*"
-    conditional: "has_frontend"
-
-quality_checks:
-  - name: build_status
-    metric: build_passing
-    threshold: 1
-    comparison: equal
-    description: "Build deve passar sem erros"
-
-  - name: unit_test_coverage
-    metric: unit_test_coverage
-    threshold: 80  # 80% de cobertura minima
-    comparison: greater_or_equal
-    description: "Cobertura de testes unitarios deve ser >= 80%"
-
-  - name: code_quality_score
-    metric: code_quality_score
-    threshold: 0.7
-    comparison: greater_or_equal
-
-  - name: critical_issues
-    metric: critical_issue_count
-    threshold: 0
-    comparison: equal
-
-  - name: code_review_approval
-    metric: review_approved
-    threshold: 1
-    comparison: equal
-
-  - name: frontend_build_status
-    metric: frontend_build_passing
-    threshold: 1
-    comparison: equal
-    conditional: "has_frontend"
-    description: "Build do frontend deve passar (se aplicavel)"
-
-human_approval:
-  required: false
-  roles: []
-  timeout_hours: 0
-
-gate_conditions:
-  - all_artifacts_present: true
-  - all_quality_checks_passed: true
-  - build_green: true
-  - no_critical_issues: true
+  approval_required: false
+  can_skip: false
