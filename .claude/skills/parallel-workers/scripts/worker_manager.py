@@ -32,11 +32,11 @@ class WorkerManager:
         self.project_name = project_name
         self.state_tracker = StateTracker()
         self.worktree_script = (
-            Path(__file__).parent / "worktree_manager.sh"
+            Path(__file__).parent / "worktree_manager.py"
         ).resolve()
 
         if not self.worktree_script.exists():
-            raise FileNotFoundError(f"worktree_manager.sh not found: {self.worktree_script}")
+            raise FileNotFoundError(f"worktree_manager.py not found: {self.worktree_script}")
 
         logger.info(
             "WorkerManager initialized",
@@ -44,7 +44,7 @@ class WorkerManager:
         )
 
     def _run_worktree_command(self, *args: str) -> subprocess.CompletedProcess:
-        """Run worktree_manager.sh command"""
+        """Run worktree_manager.py command"""
         cmd = [str(self.worktree_script)] + list(args)
         logger.debug("Running worktree command", extra={"cmd": " ".join(cmd)})
 
