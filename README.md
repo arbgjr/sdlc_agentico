@@ -534,3 +534,4 @@ Veja [CONTRIBUTING.md](CONTRIBUTING.md) para guidelines de contribuição.
 ---
 
 **Criado em conjunto com** Claude Code + GitHub Copilot
+
