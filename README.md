@@ -1,6 +1,6 @@
 <!-- Core Badges -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-3.0.3-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v3.0.3)
+[![Version](https://img.shields.io/badge/version-3.0.4-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v3.0.4)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 
 <!-- AI Compatibility -->
@@ -34,21 +34,21 @@ Sistema de desenvolvimento de software orientado por agentes de IA que automatiz
 
 ## O Que É
 
-O SDLC Agêntico é um framework que usa **39 agentes especializados** (33 orquestrados + 4 consultivos + 1 meta) para guiar seu projeto através de **9 fases (0-8)** do ciclo de desenvolvimento, desde a ideia inicial até a operação em produção.
+O SDLC Agêntico é um framework que usa **45 agentes especializados** (33 orquestrados + 4 consultivos + 1 meta) para guiar seu projeto através de **9 fases (0-8)** do ciclo de desenvolvimento, desde a ideia inicial até a operação em produção.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         SDLC AGÊNTICO v3.0.3                            │
+│                         SDLC AGÊNTICO v3.0.4                            │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  Ideia → [Intake] → [Discovery] → [Requirements] → [Architecture]       │
 │                                         ↓                               │
 │  Produção ← [Release] ← [Quality] ← [Implementation] ← [Planning]       │
 │                                                                         │
-│  39 Agentes | 9 Fases | Quality Gates | Security by Design              │
+│  45 Agentes | 9 Fases | Quality Gates | Security by Design              │
 │  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot         │
 │                                                                         │
-│  v3.0.3: Docs Version Sync | All Version References Updated              │
+│  v3.0.4: GitHub Integration Hotfix | Orchestrator Auto-Sync After Phase 4│
 │  v3.0.0: Python-First | 100% Python Hooks | Progressive Disclosure | 64%↓│
 │  v2.3.3: HOTFIX | Silent Failures | 3 CRITICAL Bugs | Artifacts Validated│
 │  v2.3.2: Sprint Fixes | 14 Bugs Fixed | CI/CD Ready | Quality Gates    │
@@ -102,7 +102,7 @@ O SDLC Agêntico é um framework que usa **39 agentes especializados** (33 orque
 
 ```bash
 # Definir versão desejada (consulte releases para última versão)
-VERSION="v3.0.3"
+VERSION="v3.0.4"
 
 # Download e extração (preserva permissões de execução)
 curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}/sdlc-agentico-${VERSION}.tar.gz" | tar -xzf -
@@ -122,7 +122,7 @@ curl -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/${VERSION}
 curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release
 
 # Versão específica
-curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release --version v3.0.3
+curl -fsSL https://raw.githubusercontent.com/arbgjr/sdlc_agentico/main/\.agentic_sdlc/scripts/setup-sdlc.sh | bash -s -- --from-release --version v3.0.4
 ```
 
 Se o diretório `.claude/` já existir, o script perguntará o que fazer:
@@ -137,7 +137,7 @@ Se o diretório `.claude/` já existir, o script perguntará o que fazer:
 # Abra PowerShell como Administrador (botão direito > Executar como Administrador)
 
 # Definir versão desejada
-$VERSION = "v3.0.3"
+$VERSION = "v3.0.4"
 
 # Download e extração
 curl.exe -fsSL "https://github.com/arbgjr/sdlc_agentico/releases/download/$VERSION/sdlc-agentico-$VERSION.zip" -o sdlc.zip
@@ -421,8 +421,8 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 
 ```
 .claude/
-├── agents/           # 39 agentes especializados (33 + 4 consultivos + 1 meta)
-├── skills/           # 31 skills reutilizáveis
+├── agents/           # 45 agentes especializados (33 + 4 consultivos + 1 meta)
+├── skills/           # 30 skills reutilizáveis
 ├── commands/         # 29 comandos do usuário
 ├── hooks/            # 14 hooks de automação (100% Python)
 ├── lib/              # Bibliotecas compartilhadas (v1.7.0)

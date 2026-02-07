@@ -264,6 +264,12 @@ spec_kit_flow:
 **IMPORTANTE:** Após criar `task-breakdown.yml`, você DEVE executar automaticamente
 os 3 scripts de automação EM SEQUÊNCIA:
 
+**Integração com Orchestrator (v3.0.4+):**
+- Este workflow é executado AUTOMATICAMENTE pelo orchestrator após Phase 4
+- Está integrado na seção "2.1. Post-Phase 4 GitHub Synchronization"
+- Gate 4-to-5 DEPENDE deste workflow (valida `issue-mapping.yml`)
+- Referência: [orchestrator.md:290-345](orchestrator.md#L290-L345)
+
 ```bash
 # 1. CREATE ALL MILESTONES (must run first)
 python3 .claude/skills/github-sync/scripts/create_all_sprints.py \

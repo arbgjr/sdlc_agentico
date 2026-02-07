@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 SDLC Agêntico is an AI-driven Software Development Lifecycle framework that orchestrates **38 specialized agents** through **9 development phases (0-8)**. This is a **configuration and orchestration framework**, not a traditional application codebase.
 
-**Current Version**: v3.0.3 (Docs Version Sync)
+**Current Version**: v3.0.4 (GitHub Integration Hotfix)
 
 ## Anti-Mock Policy (CRITICAL)
 

@@ -268,14 +268,16 @@ echo "$(date -Iseconds)|phase-${CURRENT_PHASE}|completed" >> "${PROJECT_DIR}/sta
 2. **Execute agent tasks** (agents work autonomously)
 3. **Collect artifacts** (check completion criteria above)
 4. **Self-validation** (agent checklists pass)
-5. **Gate evaluation** (use gate-evaluator skill)
+5. **Post-phase automation** (phase-specific workflows)
+   - **After Phase 4 ONLY**: Execute GitHub synchronization workflow
+6. **Gate evaluation** (use gate-evaluator skill)
    - If gate FAILS: STOP, report missing items, fix before continuing
-   - If gate PASSES: proceed to step 6
-6. **Adversarial audit** (phases 3, 5, 6 only - use adversarial-validator)
-7. **Update state** (write phase+1 to current_phase.txt)
-8. **Phase commit** (automatic via phase-commit skill)
-9. **Extract learnings** (index to corpus via rag-curator)
-10. **Proceed to next phase** (repeat this loop)
+   - If gate PASSES: proceed to step 7
+7. **Adversarial audit** (phases 3, 5, 6 only - use adversarial-validator)
+8. **Update state** (write phase+1 to current_phase.txt)
+9. **Phase commit** (automatic via phase-commit skill)
+10. **Extract learnings** (index to corpus via rag-curator)
+11. **Proceed to next phase** (repeat this loop)
 
 **After Phase 7 (Release)**: Workflow complete. Phase 8 (Operations) is optional.
 
@@ -283,6 +285,83 @@ echo "$(date -Iseconds)|phase-${CURRENT_PHASE}|completed" >> "${PROJECT_DIR}/sta
 - Phases: [`orchestrator/reference/phases.md`](orchestrator/reference/phases.md)
 - Gates: [`orchestrator/reference/gates.md`](orchestrator/reference/gates.md)
 - Coordination: [`orchestrator/reference/coordination.md`](orchestrator/reference/coordination.md)
+
+---
+
+### 2.1. Post-Phase 4 GitHub Synchronization (MANDATORY)
+
+**CRITICAL**: After Phase 4 (Planning) completes and BEFORE Gate 4-to-5 evaluation, execute the GitHub synchronization workflow automatically.
+
+**Why this is mandatory**:
+- Gate 4-to-5 REQUIRES `issue-mapping.yml` to exist
+- Issues must be created in GitHub Projects for Phase 5 tracking
+- Without this step, Gate 4-to-5 will FAIL with "Issues não criadas no GitHub"
+
+**Execution Trigger**:
+```python
+if current_phase == 4 and complexity_level >= 2:
+    execute_github_sync_workflow()
+```
+
+**Workflow Steps** (execute in sequence):
+
+```bash
+PROJECT_DIR=$(python3 .claude/lib/python/path_resolver.py --project-dir)
+TASK_BREAKDOWN="${PROJECT_DIR}/planning/task-breakdown.yml"
+
+# Step 1: Create all sprint milestones (MUST run first)
+python3 .claude/skills/github-sync/scripts/create_all_sprints.py \
+  "${TASK_BREAKDOWN}" \
+  --base-date "$(date +%Y-%m-%d)"
+
+# Verify: Check command exit code
+if [ $? -ne 0 ]; then
+    logger.error("Failed to create milestones - aborting sync")
+    exit 1
+fi
+
+# Step 2: Create all issues (MUST run second)
+python3 .claude/skills/github-sync/scripts/bulk_create_issues.py \
+  "${TASK_BREAKDOWN}" \
+  ${PROJECT_NUMBER}
+
+# Verify: Check command exit code
+if [ $? -ne 0 ]; then
+    logger.error("Failed to create issues - aborting sync")
+    exit 1
+fi
+
+# Step 3: Assign issues to milestones (MUST run last)
+python3 .claude/skills/github-sync/scripts/assign_issues_bulk.py \
+  "${TASK_BREAKDOWN}"
+
+# Verify: Check command exit code
+if [ $? -ne 0 ]; then
+    logger.error("Failed to assign issues - aborting sync")
+    exit 1
+fi
+
+# Step 4: Verify issue-mapping.yml was created
+if [ ! -f "${PROJECT_DIR}/issue-mapping.yml" ]; then
+    logger.error("issue-mapping.yml not found after sync - CRITICAL")
+    exit 1
+fi
+
+logger.info("GitHub synchronization complete - ready for Gate 4-to-5")
+```
+
+**Error Handling**:
+- If any script fails (exit code != 0): STOP workflow, report error, do NOT proceed to gate
+- If `issue-mapping.yml` not created: CRITICAL error, block phase advancement
+- User must fix issues manually before retrying
+
+**Success Criteria**:
+- All 3 scripts executed successfully (exit code 0)
+- `issue-mapping.yml` exists in project directory
+- All issues created in GitHub with correct labels/milestones
+- Gate 4-to-5 can now validate the artifact
+
+**📖 Reference**: See [delivery-planner.md:262-289](delivery-planner.md#L262-L289) for detailed script documentation.
 
 ---
 

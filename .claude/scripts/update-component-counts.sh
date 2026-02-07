@@ -23,7 +23,7 @@ echo -e "${GREEN}🔄 Atualizando contadores de componentes...${NC}"
 AGENTS=$(find .claude/agents -name "*.md" 2>/dev/null | wc -l)
 SKILLS=$(find .claude/skills -maxdepth 1 -type d 2>/dev/null | tail -n +2 | wc -l)
 COMMANDS=$(find .claude/commands -name "*.md" 2>/dev/null | wc -l)
-HOOKS=$(find .claude/hooks -name "*.sh" 2>/dev/null | wc -l)
+HOOKS=$(find .claude/hooks -name "*.py" 2>/dev/null | wc -l)
 
 echo "📊 Contadores detectados:"
 echo "   Agents:   $AGENTS"
