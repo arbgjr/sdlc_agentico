@@ -48,24 +48,7 @@ jobs:
             exit 1
           fi
 
-      - name: Test simple-memory
-        id: memory_tests
-        run: |
-          cd .claude/skills/memory-manager/scripts
-
-          # Test add-fact
-          python3 simple_store.py add-fact "CI test" --tags ci test || exit 1
-
-          # Test recall
-          python3 simple_store.py recall "CI" | grep -q "CI test" || exit 1
-
-          # Test add-tool
-          python3 simple_store.py add-tool test-tool --repo "https://example.com" --version "1.0.0" || exit 1
-
-          # Test search
-          python3 simple_store.py search "test" | grep -q "test-tool" || exit 1
-
-          echo "status=passing" >> $GITHUB_OUTPUT
+      # Test simple-memory removed - memory-manager consolidated into RAG (commits: 54f5edf, 8eee1a8, ec378b9)
 
       - name: Test session-handoff
         id: handoff_tests
@@ -81,20 +64,18 @@ jobs:
         id: coverage
         run: |
           # Integration tests: 9
-          # Memory tests: 4
+          # Memory tests: 4 (REMOVED - memory-manager consolidated into RAG)
           # Handoff tests: 1
-          # Total: 14 automated tests in CI
+          # Total: 10 automated tests in CI
 
-          TOTAL=14
-          PASSED=14
+          TOTAL=10
+          PASSED=10
 
           if [ "${{ steps.tests.outputs.status }}" != "passing" ]; then
             PASSED=$((PASSED - 9 + ${{ steps.tests.outputs.tests_passed }}))
           fi
 
-          if [ "${{ steps.memory_tests.outputs.status }}" != "passing" ]; then
-            PASSED=$((PASSED - 4))
-          fi
+          # Memory tests removed - no longer decrement
 
           if [ "${{ steps.handoff_tests.outputs.status }}" != "passing" ]; then
             PASSED=$((PASSED - 1))
@@ -124,7 +105,6 @@ jobs:
           # Test Summary
 
           - **Integration Tests:** ${{ steps.tests.outputs.status }}
-          - **Memory Tests:** ${{ steps.memory_tests.outputs.status }}
           - **Handoff Tests:** ${{ steps.handoff_tests.outputs.status }}
 
           **Total:** ${{ steps.coverage.outputs.tests_passed }}/${{ steps.coverage.outputs.tests_total }} passing
