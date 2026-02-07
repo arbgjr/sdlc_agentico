@@ -86,6 +86,36 @@ O SDLC Agêntico é um framework que usa **45 agentes especializados** (33 orque
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
+## Diagramas Mermaid
+
+### Fluxo do SDLC Agêntico
+
+```mermaid
+flowchart TB
+  Idea["Ideia ou Problema"] --> Prep["Fase 0: Preparação"]
+  Prep --> Discovery["Fase 1: Descoberta"]
+  Discovery --> Req["Fase 2: Requisitos"]
+  Req --> Arch["Fase 3: Arquitetura"]
+  Arch --> Plan["Fase 4: Planejamento"]
+  Plan --> Impl["Fase 5: Implementação"]
+  Impl --> Qual["Fase 6: Qualidade"]
+  Qual --> Release["Fase 7: Release"]
+  Release --> Ops["Fase 8: Operação"]
+```
+
+### Quality Gates e Segurança
+
+```mermaid
+flowchart LR
+  Start["Entrada (issue ou feature)"] --> Analyze["Análise e Requisitos"]
+  Analyze --> Design["Design e ADRs"]
+  Design --> Build["Implementação"]
+  Build --> Tests["Testes e Linters"]
+  Tests --> Gate{"Quality Gate"}
+  Gate -->|"Aprovado"| Release["Release"]
+  Gate -->|"Ajustes"| Build
+```
+
 ## Requisitos
 
 - **Python** 3.11+
@@ -360,37 +390,6 @@ python3 .claude/skills/parallel-workers/scripts/loop.py --project sdlc_agentico
 
 Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanças.
 
-**Destaques da v2.0.0:**
-- **sdlc-import skill**: Importação e engenharia reversa de projetos existentes
-- **Language detection expansion**: 10 → 30 tecnologias detectadas (3x aumento)
-- **Backend/Infrastructure (9 novas)**: C++, Rust enhanced, Ansible, Jenkins, Chef, Puppet, Gradle, Selenium, Bicep
-- **Frontend/Testing (6 novas)**: Playwright, TypeScript enhanced, Vue.js, Svelte, Tailwind CSS, Vite/Webpack
-- **Mobile (5 novas)**: React Native, Flutter/Dart, Swift, Kotlin enhanced, Xamarin
-- **Production ready**: 255/255 testes passando, zero regressões
-- **LSP integration**: clangd-lsp (C++), dart-lsp (Flutter), sourcekit-lsp (Swift)
-- **Disambiguation logic**: Chef/Ruby, Ansible/YAML, Gradle/Kotlin
-- **Configuration-driven**: language_patterns.yml com 669 linhas (+383)
-- **Novo agent**: sdlc-importer para Phase 0 (Preparation)
-- **Quality gate**: sdlc-import-gate.yml com 6 validações críticas
-
-**Destaques da v1.7.0:**
-- Logging estruturado com integração Loki/Tempo/Grafana
-- Módulos Python e Shell para logging consistente
-- Dashboard Grafana pré-configurado para SDLC
-- Correlation IDs para rastreamento de requisições
-- Tracing distribuído com OpenTelemetry
-
-**Destaques da v1.6.0:**
-- Integração nativa com GitHub Projects V2
-- Milestones automatizados por sprint
-- Sincronização de documentação com GitHub Wiki
-- Dashboard consolidado do projeto (`/github-dashboard`)
-
-**Destaques da v1.5.0:**
-- Decay scoring para freshness de conhecimento
-- Sugestões automáticas de curadoria para conteúdo obsoleto
-- Resultados de busca priorizados por freshness
-- Quality gate de saúde do corpus
 
 ## Comandos Disponíveis
 
@@ -517,7 +516,7 @@ O sistema rastreia automaticamente:
 
 ### Integrações
 - **GitHub Copilot Coding Agent**: Requer GitHub Copilot Pro+/Business/Enterprise
-- **RAG Corpus**: Funcionalidade experimental, corpus precisa ser populado manualmente
+- **RAG Corpus**: Funcionalidade experimental, corpus é populado pelo framework.
 
 ## Troubleshooting
 
