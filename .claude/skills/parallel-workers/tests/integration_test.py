@@ -81,46 +81,8 @@ def test_worker_lifecycle():
     print("✅ All tests passed!\n")
 
 
-def test_simple_store():
-    """Test simple memory store"""
-    print("Testing simple memory store...")
-
-    sys.path.insert(0, str(Path(__file__).parents[2] / "memory-manager" / "scripts"))
-    from simple_store import SimpleStore
-
-    # Use temp directory for tests
-    with tempfile.TemporaryDirectory() as tmpdir:
-        store = SimpleStore(Path(tmpdir))
-
-        # Test 1: Add fact
-        print("  [1/4] Testing add fact...")
-        fact_id = store.add_fact("Test fact", tags=["test"], project="test-project")
-        assert fact_id, "Fact not added"
-        print(f"    ✓ Fact added: {fact_id}")
-
-        # Test 2: Recall fact
-        print("  [2/4] Testing recall...")
-        facts = store.recall_facts(query="test", project="test-project")
-        assert len(facts) > 0, "Fact not recalled"
-        assert facts[0]["text"] == "Test fact", "Wrong fact text"
-        print("    ✓ Fact recalled correctly")
-
-        # Test 3: Add tool
-        print("  [3/4] Testing add tool...")
-        store.add_tool("test-tool", repo="https://example.com", version="1.0.0")
-        tool = store.get_tool("test-tool")
-        assert tool, "Tool not added"
-        assert tool["version"] == "1.0.0", "Wrong tool version"
-        print("    ✓ Tool added correctly")
-
-        # Test 4: Search
-        print("  [4/4] Testing search...")
-        results = store.search("test")
-        assert len(results["facts"]) > 0, "Fact not in search results"
-        assert len(results["tools"]) > 0, "Tool not in search results"
-        print("    ✓ Search works correctly")
-
-    print("✅ All tests passed!\n")
+# test_simple_store() was removed because memory-manager skill was consolidated into RAG
+# See commits: 54f5edf, 8eee1a8, ec378b9
 
 
 def main():
@@ -132,7 +94,7 @@ def main():
 
     try:
         test_worker_lifecycle()
-        test_simple_store()
+        # test_simple_store() removed - memory-manager consolidated into RAG
 
         print("=" * 60)
         print("✅ ALL INTEGRATION TESTS PASSED")
