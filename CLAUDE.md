@@ -56,7 +56,7 @@ When services are unavailable, use resilience patterns: timeout, retry, circuit 
 
 All behavior is defined in `.claude/settings.json`:
 
-- 45 specialized agents organized by SDLC phase
+- 45 agents organized by SDLC phase
 - Git hooks for validation and automation
 - Quality gates between phases (including Security Gate)
 - Complexity levels (0-3) that determine phase execution
@@ -66,7 +66,7 @@ All behavior is defined in `.claude/settings.json`:
 
 ```
 .claude/
-├── agents/           # Agent specs (45 specialized roles)
+├── agents/           # Agent specs (markdown) - 45 specialized roles
 ├── skills/           # Reusable capabilities with scripts
 ├── commands/         # Slash commands
 ├── hooks/            # Git automation
