@@ -131,6 +131,18 @@
           }
         ]
       }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/pre-compact-analyzer.py || python .claude/hooks/pre-compact-analyzer.py",
+            "description": "Extract learnings from session before automatic compaction"
+          }
+        ]
+      }
     ]
   },
   "agents": {
