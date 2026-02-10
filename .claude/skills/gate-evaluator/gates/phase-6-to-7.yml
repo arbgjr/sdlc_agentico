@@ -1,123 +1,17 @@
-gate_name: quality_to_release
-from_phase: 6
-to_phase: 7
-description: "Transicao de Qualidade para Release"
+---
+gate:
+  name: "phase-6-to-7"
+  from_phase: 6
+  to_phase: 7
+  description: "Implementation → Quality transition"
 
-required_artifacts:
-  - type: qa_report
-    description: "Relatorio de QA completo"
-    agent: "qa-analyst"
-    validation:
-      - all_tests_executed: true
-      - no_critical_defects: true
-    path_pattern: "docs/qa/*.md"
+  required_conditions:
+    - condition: "All acceptance criteria implemented"
+      severity: "BLOCKER"
+    - condition: "Unit tests pass"
+      severity: "BLOCKER"
+    - condition: "No hardcoded secrets"
+      severity: "BLOCKER"
 
-  - type: frontend_test_report
-    description: "Relatorio de testes E2E frontend (se aplicavel)"
-    agent: "qa-analyst"
-    skill: "frontend-testing"
-    validation:
-      - e2e_tests_executed: true
-      - screenshots_captured: true
-      - no_console_errors: true
-    path_pattern: "docs/qa/frontend-*.md"
-    conditional: "has_frontend"
-
-  - type: security_scan_report
-    description: "Relatorio de scan de seguranca"
-    agent: "security-scanner"
-    validation:
-      - scan_completed: true
-      - no_critical_vulnerabilities: true
-      - no_high_vulnerabilities: true
-    path_pattern: "docs/security/*.md"
-
-  - type: performance_report
-    description: "Relatorio de performance e resiliencia"
-    agent: "performance-analyst"
-    validation:
-      - load_test_executed: true
-      - stress_test_executed: true
-      - benchmarks_met: true
-      - slo_compliance_verified: true
-    path_pattern: "docs/performance/*.md"
-
-  - type: compliance_validation
-    description: "Validacao de compliance"
-    validation:
-      - all_checks_passed: true
-    path_pattern: "docs/compliance/validation*.md"
-
-quality_checks:
-  - name: test_pass_rate
-    metric: test_pass_rate
-    threshold: 1.0
-    comparison: equal
-
-  - name: security_critical_count
-    metric: security_critical_count
-    threshold: 0
-    comparison: equal
-
-  - name: security_high_count
-    metric: security_high_count
-    threshold: 0
-    comparison: equal
-
-  - name: defect_count
-    metric: open_critical_defects
-    threshold: 0
-    comparison: equal
-
-  - name: performance_slo
-    metric: performance_slo_met
-    threshold: 1
-    comparison: equal
-
-  - name: latency_p99
-    metric: latency_p99_ms
-    threshold: 1000
-    comparison: less_or_equal
-
-  - name: error_rate
-    metric: error_rate_percent
-    threshold: 1
-    comparison: less_or_equal
-
-  - name: resilience_validated
-    metric: circuit_breaker_tested
-    threshold: 1
-    comparison: equal
-
-  - name: frontend_e2e_pass_rate
-    metric: frontend_e2e_pass_rate
-    threshold: 1.0
-    comparison: equal
-    conditional: "has_frontend"
-    description: "Testes E2E frontend devem passar (se aplicavel)"
-
-  - name: frontend_console_errors
-    metric: frontend_console_error_count
-    threshold: 0
-    comparison: equal
-    conditional: "has_frontend"
-    description: "Console do browser sem erros criticos"
-
-human_approval:
-  required: true
-  roles:
-    - qa_lead
-    - security_lead
-    - tech_lead
-  timeout_hours: 48
-  escalation_path:
-    - engineering_manager
-    - cto
-
-gate_conditions:
-  - all_artifacts_present: true
-  - all_quality_checks_passed: true
-  - required_approvals_obtained: true
-  - no_security_blockers: true
-  - no_compliance_blockers: true
-  - performance_slos_met: true
+  approval_required: false
+  can_skip: false

@@ -1,0 +1,104 @@
+# Gate: Phase 8 (Release) -> Phase 9 (Operations)
+# Valida que release foi bem sucedido e sistema esta em producao
+
+gate:
+  name: "Release to Operations"
+  from_phase: 8
+  to_phase: 9
+  description: "Valida que deploy em producao foi bem sucedido"
+
+required_artifacts:
+  - name: "Release Notes"
+    path: "CHANGELOG.md"
+    description: "Release notes publicadas"
+    agent: "release-manager"
+
+  - name: "Deploy Evidence"
+    path: ".project/projects/*/releases/*.yml"
+    
+    description: "Evidencia de deploy em producao"
+    agent: "release-manager"
+
+  - name: "Change Request"
+    path: ".project/projects/*/changes/*.yml"
+    
+    description: "Change request aprovado"
+    agent: "change-manager"
+
+  - name: "Runbook"
+    path: "docs/runbooks/*.md"
+    description: "Runbook operacional atualizado"
+    agent: "release-manager"
+
+  - name: "Observability Config"
+    path: ".project/projects/*/observability/*.yml"
+    
+    description: "Configuracao de observabilidade (logs, metricas, traces)"
+    agent: "observability-engineer"
+
+  - name: "Monitoring Setup"
+    path: ".project/projects/*/monitoring/*.yml"
+    
+    description: "Alertas e dashboards configurados"
+    agent: "observability-engineer"
+
+  - name: "CI/CD Pipeline"
+    path: ".github/workflows/*.yml"
+    description: "Pipeline de deploy configurado"
+    agent: "cicd-engineer"
+
+quality_checks:
+  - check: "Health checks passando"
+    validation: "curl -s $PROD_URL/health | grep -q 'ok'"
+
+  - check: "Metricas fluindo"
+    validation: "grep -r 'metrics_configured: true' .project/projects/*/releases/ 2>/dev/null | head -1"
+
+  - check: "Alertas configurados"
+    validation: "grep -r 'alerts_configured: true' .project/projects/*/releases/ 2>/dev/null | head -1"
+
+  - check: "Rollback plan documentado"
+    validation: "grep -r 'rollback_plan:' .project/projects/*/releases/ 2>/dev/null | head -1"
+
+  - check: "Change request aprovado"
+    validation: "grep -r 'status: approved' .project/projects/*/changes/ 2>/dev/null | head -1"
+
+  - check: "Comunicacao enviada"
+    validation: "grep -r 'communication_sent: true' .project/projects/*/changes/ 2>/dev/null | head -1"
+
+  - check: "Observabilidade configurada"
+    validation: "grep -r 'tracing:' .project/projects/*/observability/ 2>/dev/null | head -1"
+
+  - check: "SLOs definidos"
+    validation: "grep -r 'slos:' .project/projects/*/observability/ 2>/dev/null | head -1"
+
+human_approval:
+  required: true
+  approvers:
+    - role: "Release Manager"
+      reason: "Confirmacao de deploy bem sucedido"
+    - role: "Change Manager"
+      reason: "Aprovacao de change request"
+    - role: "On-Call Engineer"
+      reason: "Confirmacao de prontidao operacional"
+
+post_deploy_monitoring:
+  duration: "30 minutos"
+  metrics_to_watch:
+    - "error_rate"
+    - "latency_p95"
+    - "availability"
+    - "saturation"
+  rollback_triggers:
+    - "error_rate > 5%"
+    - "latency_p95 > 500ms"
+    - "availability < 99%"
+
+blockers:
+  - "Deploy falhou"
+  - "Health checks falhando"
+  - "Metricas nao fluindo"
+  - "Alertas nao configurados"
+  - "Runbook nao atualizado"
+  - "Change request nao aprovado"
+  - "Observabilidade nao configurada"

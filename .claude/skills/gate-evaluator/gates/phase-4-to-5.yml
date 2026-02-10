@@ -1,46 +1,87 @@
-# Gate: Phase 4 (Planning) -> Phase 5 (Implementation)
-# Valida que planejamento foi concluido e time esta pronto
-
+---
 gate:
-  name: "Planning to Implementation"
+  name: "phase-4-to-5"
   from_phase: 4
   to_phase: 5
-  description: "Valida que planejamento de delivery esta completo"
+  description: "Design System & UX → Planning transition"
 
-required_artifacts:
-  - name: "Sprint Plan"
-    path: ".project/projects/*/plans/*-sprint-*.md"
-    fallback_path: ".specify/plans/*-sprint-*.md"
-    description: "Plano de sprint com stories alocadas"
+  required_artifacts:
+    - path: "{project_dir}/design/specifications/visual-design-spec.md"
+      description: "Visual design specifications"
+      validation: "file_exists"
 
-  - name: "Tasks"
-    path: ".project/projects/*/tasks/*.md"
-    fallback_path: ".specify/tasks/*.md"
-    description: "Tasks quebradas e estimadas"
+    - path: "{project_dir}/design/design-system/tokens.yml"
+      description: "Design tokens (Style Dictionary format)"
+      validation: "file_exists_and_valid_yaml"
 
-  - name: "Issues Created"
-    path: ".project/projects/*/issue-mapping.yml"
-    description: "Issues criadas no GitHub"
+    - path: "{project_dir}/design/design-system/components/"
+      description: "Component specifications (minimum 5)"
+      validation: "directory_has_min_files"
+      min_files: 5
 
-quality_checks:
-  - check: "Tasks estimadas"
-    validation: "grep -r 'estimate:' .project/projects/*/tasks/ .specify/tasks/ 2>/dev/null | head -1"
+    - path: "{project_dir}/design/accessibility-checklist.md"
+      description: "Accessibility checklist (WCAG AA)"
+      validation: "file_exists"
 
-  - check: "Dependencias mapeadas"
-    validation: "grep -r 'dependencies:' .project/projects/*/tasks/ .specify/tasks/ 2>/dev/null | head -1"
+    - path: "{project_dir}/design/handoff/"
+      description: "Design handoff documentation"
+      validation: "directory_exists"
 
-  - check: "Owners atribuidos"
-    validation: "grep -r 'assignee:' .project/projects/*/tasks/ .specify/tasks/ 2>/dev/null | head -1"
+  quality_checks:
+    - check: "Design tokens valid"
+      validation: "python3 .claude/lib/python/design_validation.py validate-tokens {project_dir}/design/design-system/tokens.yml"
+      severity: "high"
 
-  - check: "Sprint capacity validada"
-    validation: "grep -r 'capacity:' .project/projects/*/plans/*-sprint-* .specify/plans/*-sprint-* 2>/dev/null | head -1"
+    - check: "Accessibility compliant"
+      validation: "python3 .claude/lib/python/design_validation.py check-accessibility {project_dir}/design/"
+      severity: "medium"
 
-human_approval:
-  required: false
-  reason: "Planning e revisado em sprint planning meeting"
+    - check: "Component specs complete"
+      validation: "python3 .claude/lib/python/design_validation.py lint-components {project_dir}/design/design-system/components/"
+      severity: "medium"
 
-blockers:
-  - "Tasks nao quebradas"
-  - "Estimativas nao realizadas"
-  - "Issues nao criadas no GitHub"
-  - "Dependencias bloqueantes nao resolvidas"
+  approval_required: false
+  can_skip: true
+
+  skip_conditions:
+    - condition: "complexity_level in [0, 1]"
+      reason: "Quick fixes and simple features skip design phase"
+    - condition: "project_type == 'backend-only'"
+      reason: "Backend-only projects don't require UI design"
+
+  level_overrides:
+    0:
+      enabled: false
+    1:
+      enabled: false
+    2:
+      enabled: true
+      approval_required: false
+    3:
+      enabled: true
+      approval_required: true
+      reviewers:
+        - role: "Design Lead"
+        - role: "Accessibility Specialist"
+
+  escalation_triggers:
+    - condition: "accessibility_score < 0.70"
+      action: "require_human_approval"
+    - condition: "missing_core_components > 2"
+      action: "block"
+    - condition: "token_validation_errors > 0"
+      action: "block"
+
+  pass_threshold: 0.80
+
+  success_message: |
+    ✅ Design System & UX gate passed!
+
+    Next: Phase 5 (Planning) - delivery-planner will create sprint plan
+
+    Ready to proceed? Run: /gate-check phase-4-to-5 --advance
+
+  metadata:
+    created: "2026-02-09"
+    version: "1.0.0"
+    framework_version: "3.1.0"
