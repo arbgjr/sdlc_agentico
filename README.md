@@ -34,7 +34,7 @@ Sistema de desenvolvimento de software orientado por agentes de IA que automatiz
 
 ## O Que É
 
-O SDLC Agêntico é um framework que usa **45 agentes especializados** (33 orquestrados + 4 consultivos + 1 meta) para guiar seu projeto através de **9 fases (0-8)** do ciclo de desenvolvimento, desde a ideia inicial até a operação em produção.
+O SDLC Agêntico é um framework que usa **47 agentes especializados** (33 orquestrados + 4 consultivos + 1 meta) para guiar seu projeto através de **9 fases (0-8)** do ciclo de desenvolvimento, desde a ideia inicial até a operação em produção.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -45,7 +45,7 @@ O SDLC Agêntico é um framework que usa **45 agentes especializados** (33 orque
 │                                         ↓                               │
 │  Produção ← [Release] ← [Quality] ← [Implementation] ← [Planning]       │
 │                                                                         │
-│  45 Agentes | 9 Fases | Quality Gates | Security by Design              │
+│  47 Agentes | 9 Fases | Quality Gates | Security by Design              │
 │  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot         │
 │                                                                         │
 │  v3.0.4: GitHub Integration Hotfix | Orchestrator Auto-Sync After Phase 4│
@@ -420,10 +420,10 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 
 ```
 .claude/
-├── agents/           # 45 agentes especializados (33 + 4 consultivos + 1 meta)
+├── agents/           # 47 agentes especializados (33 + 4 consultivos + 1 meta)
 ├── skills/           # 30 skills reutilizáveis
 ├── commands/         # 29 comandos do usuário
-├── hooks/            # 14 hooks de automação (100% Python)
+├── hooks/            # 15 hooks de automação (100% Python)
 ├── lib/              # Bibliotecas compartilhadas (v1.7.0)
 │   ├── python/       # sdlc_logging.py, sdlc_tracing.py
 │   └── shell/        # logging_utils.sh
