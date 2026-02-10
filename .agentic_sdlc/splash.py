@@ -116,12 +116,12 @@ def print_info():
     # Current version changelog summary
     print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{YELLOW}  📋 {BOLD}v{version} Highlights{RESET}")
-    print(f"{DIM}     Configuration & Path Management - Critical Fixes{RESET}")
-    print(f"{GREEN}     • {WHITE}Configurable Output Directories - settings.json support for project/framework paths{RESET}")
-    print(f"{GREEN}     • {WHITE}Fixed project_path Bug - Auto-detect skill directory vs CWD{RESET}")
-    print(f"{GREEN}     • {WHITE}Removed ALL Hardcoded Paths - Dynamic path construction everywhere{RESET}")
-    print(f"{GREEN}     • {WHITE}Settings Priority - settings.json > import_config.yml > default{RESET}")
-    print(f"{GREEN}     • {WHITE}Framework/Project Separation - Clear REGRA DE OURO documentation{RESET}")
+    print(f"{DIM}     Design System Phase - BREAKING CHANGE (phases 4-8 → 5-9){RESET}")
+    print(f"{GREEN}     • {WHITE}Phase 4 (Design System & UX) - Visual design, tokens, component specs{RESET}")
+    print(f"{GREEN}     • {WHITE}2 New Agents - product-designer (sonnet), design-system-architect (opus){RESET}")
+    print(f"{GREEN}     • {WHITE}Design Templates - Style Dictionary tokens, component specs, a11y checklist{RESET}")
+    print(f"{GREEN}     • {WHITE}Complexity Scaling - Skip Phase 4 for backend (L0/L1), require for UI (L2/L3){RESET}")
+    print(f"{GREEN}     • {WHITE}Migration Support - Automated Python script + comprehensive guide{RESET}")
 
     print(f"\n{DIM}{'─' * 80}{RESET}")
     print(f"\n{DIM}  Main commands:{RESET}")
