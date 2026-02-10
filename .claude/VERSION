@@ -1,39 +1,37 @@
 # SDLC Agêntico Version
-version: "3.0.4"
-build_date: "2026-02-07"
+version: "3.1.0"
+build_date: "2026-02-09"
 release_notes: |
-  v3.0.4 - GitHub Integration Hotfix (orchestrator auto-sync)
+  v3.1.0 - Design System Phase (MAJOR FEATURE - BREAKING CHANGE)
 
-  CRITICAL HOTFIX:
-  - Orchestrator now automatically executes GitHub synchronization after Phase 4
-  - Fixes: Gate 4-to-5 was failing because issues were not created automatically
-  - Added: Section 2.1 "Post-Phase 4 GitHub Synchronization (MANDATORY)"
-  - Integration: 3 scripts executed in sequence (milestones → issues → assignment)
-  - Validation: issue-mapping.yml existence verified before gate evaluation
-  - Documentation: orchestrator.md and delivery-planner.md updated with workflow
+  🎨 NEW PHASE ADDED: Phase 4 (Design System & UX)
 
-  Root Cause Analysis:
-  - Gate 4-to-5 REQUIRED issue-mapping.yml but orchestrator never created it
-  - Scripts existed and were documented as MANDATORY in delivery-planner.md
-  - Orchestrator was missing automatic invocation of GitHub sync workflow
-  - Result: Phase 4 → Gate 4-to-5 always failed with "Issues não criadas"
+  BREAKING CHANGE: Phase numbers 4-8 shifted to 5-9
 
-  Solution:
-  - New step 5 in "Phase Execution": Post-phase automation (phase-specific)
-  - New section 2.1: Detailed GitHub sync workflow with error handling
-  - Workflow executes BEFORE Gate 4-to-5 evaluation
-  - Gate can now validate issue-mapping.yml artifact successfully
+  NEW AGENTS (2):
+  - product-designer: Visual design specs, mockups, brand consistency
+  - design-system-architect: Design tokens, component specs, governance
 
-  Impact:
-  - Level 2/3 projects now properly create GitHub issues automatically
-  - Gate 4-to-5 validation passes without manual intervention
-  - Phase 5 (Implementation) has issues ready for tracking
-  - GitHub Projects dashboard reflects actual sprint planning
+  NEW QUALITY GATE:
+  - phase-4-to-5.yml: Design artifacts validation before planning
 
-  Files Modified:
-  - .claude/agents/orchestrator.md (+65 lines): Section 2.1 added
-  - .claude/agents/delivery-planner.md (+4 lines): Integration note
-  - .claude/VERSION: Hotfix v3.0.4 changelog
+  NEW TEMPLATES (3):
+  - design-system-tokens.yml (Style Dictionary format)
+  - component-spec.md (Component specifications)
+  - accessibility-checklist.md (WCAG AA compliance)
+
+  NEW VALIDATION:
+  - design_validation.py: Cross-platform validation utilities
+
+  COMPLEXITY SCALING:
+  - Level 0/1: Skip Phase 4 (backend-only, simple features)
+  - Level 2/3: Require Phase 4 (new products, enterprise)
+
+  MIGRATION: Run python3 .agentic_sdlc/scripts/migrate_to_v3_1.py
+
+  FILES MODIFIED (12): settings.json, 2 agents, 5 gates, 3 templates, validation
+
+  ---
 
   Previous release:
   v3.0.3 - Docs Version Sync (all version references updated)
@@ -452,6 +450,31 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "3.1.0"
+    date: "2026-02-09"
+    changes:
+      - "feat(MAJOR): Phase 4 (Design System & UX) added to SDLC framework"
+      - "feat(agents): product-designer (sonnet, ~370 lines) - Visual specs, mockups, brand"
+      - "feat(agents): design-system-architect (opus, ~400 lines) - Tokens, component specs"
+      - "feat(gate): phase-4-to-5.yml - Design artifacts validation"
+      - "feat(templates): design-system-tokens.yml (Style Dictionary format)"
+      - "feat(templates): component-spec.md (Component specifications)"
+      - "feat(templates): accessibility-checklist.md (WCAG AA compliance)"
+      - "feat(validation): design_validation.py - Cross-platform validation utilities"
+      - "fix(BREAKING): Phase numbers 4-8 shifted to 5-9"
+      - "fix(gates): Renamed phase-4-to-5 → phase-5-to-6 (Planning → Implementation)"
+      - "fix(gates): Renamed phase-5-to-6 → phase-6-to-7 (Implementation → Quality)"
+      - "fix(gates): Renamed phase-6-to-7 → phase-7-to-8 (Quality → Release)"
+      - "fix(gates): Renamed phase-7-to-8 → phase-8-to-9 (Release → Operations)"
+      - "fix(settings): Complexity levels updated - [6,7], [2,6,7], [0-8], [0-9]"
+      - "fix(security): Added phase-4-to-5 to security_by_design mandatory gates"
+      - "feat(complexity): Level 0/1 skip Phase 4 (backend-only, simple features)"
+      - "feat(complexity): Level 2/3 require Phase 4 (new products, enterprise)"
+      - "migration: python3 .agentic_sdlc/scripts/migrate_to_v3_1.py"
+      - "impact: UI/UX projects now have formal design phase"
+      - "impact: Design systems architected before implementation"
+      - "impact: Accessibility validated at design phase"
+      - "severity: MAJOR - Breaking change to phase numbering"
   - version: "3.0.4"
     date: "2026-02-07"
     changes:

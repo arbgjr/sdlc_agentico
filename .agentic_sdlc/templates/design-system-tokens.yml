@@ -1,0 +1,72 @@
+# Design Tokens - Style Dictionary Format
+# Template for SDLC Agêntico v3.1.0
+# Customize all values marked with {{PLACEHOLDER}}
+
+version: "1.0.0"
+
+color:
+  primary:
+    value: "{{PRIMARY_COLOR}}" # Example: "#007AFF"
+    type: "color"
+    description: "Primary brand color"
+  
+  neutral:
+    50: { value: "{{NEUTRAL_50}}", type: "color" }
+    100: { value: "{{NEUTRAL_100}}", type: "color" }
+    300: { value: "{{NEUTRAL_300}}", type: "color" }
+    500: { value: "{{NEUTRAL_500}}", type: "color" }
+    700: { value: "{{NEUTRAL_700}}", type: "color" }
+    900: { value: "{{NEUTRAL_900}}", type: "color" }
+
+spacing:
+  xs: { value: "4px", type: "dimension" }
+  sm: { value: "8px", type: "dimension" }
+  md: { value: "16px", type: "dimension" }
+  lg: { value: "24px", type: "dimension" }
+  xl: { value: "32px", type: "dimension" }
+
+typography:
+  font-family:
+    primary: { value: "{{FONT_FAMILY}}, system-ui, sans-serif", type: "fontFamily" }
+  
+  font-size:
+    h1: { value: "39px", type: "dimension" }
+    body: { value: "16px", type: "dimension" }
+    caption: { value: "12px", type: "dimension" }
+  
+  font-weight:
+    regular: { value: "400", type: "fontWeight" }
+    medium: { value: "500", type: "fontWeight" }
+    bold: { value: "700", type: "fontWeight" }
+
+border:
+  width:
+    thin: { value: "1px", type: "dimension" }
+    medium: { value: "2px", type: "dimension" }
+  
+  radius:
+    small: { value: "4px", type: "dimension" }
+    medium: { value: "8px", type: "dimension" }
+    full: { value: "9999px", type: "dimension" }
+
+shadow:
+  level-1: { value: "0 1px 2px rgba(0,0,0,0.05)", type: "shadow" }
+  level-2: { value: "0 4px 8px rgba(0,0,0,0.1)", type: "shadow" }
+
+animation:
+  duration:
+    fast: { value: "150ms", type: "time" }
+    normal: { value: "250ms", type: "time" }
+  
+  easing:
+    ease-in-out: { value: "cubic-bezier(0.4, 0, 0.2, 1)", type: "cubicBezier" }
+
+breakpoint:
+  sm: { value: "640px", type: "dimension" }
+  md: { value: "768px", type: "dimension" }
+  lg: { value: "1024px", type: "dimension" }
+
+metadata:
+  project: "{{PROJECT_NAME}}"
+  version: "1.0.0"
+  generated_by: "design-system-architect (SDLC Agêntico v3.1.0)"

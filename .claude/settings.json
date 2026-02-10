@@ -163,6 +163,8 @@
       "adr-author",
       "data-architect",
       "threat-modeler",
+      "product-designer",
+      "design-system-architect",
       "delivery-planner",
       "code-author",
       "code-reviewer",
@@ -273,13 +275,21 @@
       },
       {
         "number": 4,
+        "name": "Design System & UX",
+        "agents": [
+          "product-designer",
+          "design-system-architect"
+        ]
+      },
+      {
+        "number": 5,
         "name": "Planning",
         "agents": [
           "delivery-planner"
         ]
       },
       {
-        "number": 5,
+        "number": 6,
         "name": "Implementation",
         "agents": [
           "code-author",
@@ -289,7 +299,7 @@
         ]
       },
       {
-        "number": 6,
+        "number": 7,
         "name": "Quality",
         "agents": [
           "qa-analyst",
@@ -298,7 +308,7 @@
         ]
       },
       {
-        "number": 7,
+        "number": 8,
         "name": "Release",
         "agents": [
           "release-manager",
@@ -308,7 +318,7 @@
         ]
       },
       {
-        "number": 8,
+        "number": 9,
         "name": "Operations",
         "agents": [
           "incident-commander",
@@ -329,8 +339,8 @@
         "description": "Bug fix, typo, small change",
         "command": "/quick-fix",
         "phases": [
-          5,
-          6
+          6,
+          7
         ],
         "time_estimate": "~5 min",
         "auto_branch": true,
@@ -342,8 +352,8 @@
         "command": "/new-feature",
         "phases": [
           2,
-          5,
-          6
+          6,
+          7
         ],
         "time_estimate": "~15-30 min",
         "auto_branch": true,
@@ -361,7 +371,8 @@
           4,
           5,
           6,
-          7
+          7,
+          8
         ],
         "time_estimate": "~30 min - hours",
         "auto_branch": true,
@@ -380,7 +391,8 @@
           5,
           6,
           7,
-          8
+          8,
+          9
         ],
         "time_estimate": "variable",
         "human_approval_at_all_gates": true,
@@ -393,8 +405,9 @@
       "mandatory_gates": [
         "phase-2-to-3",
         "phase-3-to-4",
-        "phase-5-to-6",
-        "phase-6-to-7"
+        "phase-4-to-5",
+        "phase-6-to-7",
+        "phase-7-to-8"
       ],
       "escalation_triggers": {
         "cvss_threshold": 7.0,

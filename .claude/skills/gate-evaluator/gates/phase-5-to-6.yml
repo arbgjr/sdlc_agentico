@@ -1,17 +1,46 @@
----
+# Gate: Phase 5 (Planning) -> Phase 6 (Implementation)
+# Valida que planejamento foi concluido e time esta pronto
+
 gate:
-  name: "phase-5-to-6"
+  name: "Planning to Implementation"
   from_phase: 5
   to_phase: 6
-  description: "Implementation → Quality transition"
+  description: "Valida que planejamento de delivery esta completo"
 
-  required_conditions:
-    - condition: "All acceptance criteria implemented"
-      severity: "BLOCKER"
-    - condition: "Unit tests pass"
-      severity: "BLOCKER"
-    - condition: "No hardcoded secrets"
-      severity: "BLOCKER"
+required_artifacts:
+  - name: "Sprint Plan"
+    path: ".project/projects/*/plans/*-sprint-*.md"
+    fallback_path: ".specify/plans/*-sprint-*.md"
+    description: "Plano de sprint com stories alocadas"
 
-  approval_required: false
-  can_skip: false
+  - name: "Tasks"
+    path: ".project/projects/*/tasks/*.md"
+    fallback_path: ".specify/tasks/*.md"
+    description: "Tasks quebradas e estimadas"
+
+  - name: "Issues Created"
+    path: ".project/projects/*/issue-mapping.yml"
+    description: "Issues criadas no GitHub"
+
+quality_checks:
+  - check: "Tasks estimadas"
+    validation: "grep -r 'estimate:' .project/projects/*/tasks/ .specify/tasks/ 2>/dev/null | head -1"
+
+  - check: "Dependencias mapeadas"
+    validation: "grep -r 'dependencies:' .project/projects/*/tasks/ .specify/tasks/ 2>/dev/null | head -1"
+
+  - check: "Owners atribuidos"
+    validation: "grep -r 'assignee:' .project/projects/*/tasks/ .specify/tasks/ 2>/dev/null | head -1"
+
+  - check: "Sprint capacity validada"
+    validation: "grep -r 'capacity:' .project/projects/*/plans/*-sprint-* .specify/plans/*-sprint-* 2>/dev/null | head -1"
+
+human_approval:
+  required: false
+  reason: "Planning e revisado em sprint planning meeting"
+
+blockers:
+  - "Tasks nao quebradas"
+  - "Estimativas nao realizadas"
+  - "Issues nao criadas no GitHub"
+  - "Dependencias bloqueantes nao resolvidas"
