@@ -423,7 +423,7 @@ Veja [CHANGELOG.md](CHANGELOG.md) para histórico completo de versões e mudanç
 ```
 .claude/
 ├── agents/           # 47 agentes especializados (33 + 4 consultivos + 1 meta)
-├── skills/           # 30 skills reutilizáveis
+├── skills/           # 31 skills reutilizáveis
 ├── commands/         # 29 comandos do usuário
 ├── hooks/            # 15 hooks de automação (100% Python)
 ├── lib/              # Bibliotecas compartilhadas (v1.7.0)
