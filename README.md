@@ -1,6 +1,6 @@
 <!-- Core Badges -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-3.0.4-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v3.0.4)
+[![Version](https://img.shields.io/badge/version-3.2.0-red.svg)](https://github.com/arbgjr/sdlc_agentico/releases/tag/v3.2.0)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
 
 <!-- AI Compatibility -->
@@ -38,7 +38,7 @@ O SDLC Agêntico é um framework que usa **47 agentes especializados** (33 orque
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         SDLC AGÊNTICO v3.0.4                            │
+│                         SDLC AGÊNTICO v3.2.0                            │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  Ideia → [Intake] → [Discovery] → [Requirements] → [Architecture]       │
@@ -47,7 +47,9 @@ O SDLC Agêntico é um framework que usa **47 agentes especializados** (33 orque
 │                                                                         │
 │  47 Agentes | 9 Fases | Quality Gates | Security by Design              │
 │  Auto-Branch | IaC Generation | Doc Generation | GitHub Copilot         │
+│  Agent Teams (Experimental) | Hybrid Parallelization | Strategy Selection│
 │                                                                         │
+│  v3.2.0: Hybrid Parallelization | Agent Teams (Experimental) | ADR-001  │
 │  v3.0.4: GitHub Integration Hotfix | Orchestrator Auto-Sync After Phase 4│
 │  v3.0.0: Python-First | 100% Python Hooks | Progressive Disclosure | 64%↓│
 │  v2.3.3: HOTFIX | Silent Failures | 3 CRITICAL Bugs | Artifacts Validated│

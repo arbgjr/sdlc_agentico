@@ -1,7 +1,72 @@
 # SDLC Agêntico Version
-version: "3.1.0"
-build_date: "2026-02-09"
+version: "3.2.0"
+build_date: "2026-02-10"
 release_notes: |
+  v3.2.0 - Hybrid Parallelization Strategy (EXPERIMENTAL)
+
+  ⚡ NEW FEATURE: Agent Teams Integration (Experimental)
+
+  NEW SKILL:
+  - agent-teams-manager: Manages parallelization strategies (Agent Teams vs Parallel Workers)
+
+  NEW CONFIGURATION:
+  - feature_flags.agent_teams: false (experimental - disabled by default)
+  - feature_flags.agent_teams_phases: [1, 2, 3, 6] (allowed phases)
+  - parallelization.strategies: Defines both Agent Teams and Parallel Workers
+  - env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "0" (must be "1" to enable)
+
+  NEW SCRIPTS:
+  - select_strategy.py: Automatic strategy selection logic based on phase, task type, token budget
+
+  NEW DOCUMENTATION:
+  - ADR-001-hybrid-parallelization-strategy.yml: Architecture decision record
+  - agent-teams-implementation-summary.md: Complete implementation guide
+  - agent-teams-manager/SKILL.md: Complete skill documentation (450+ lines)
+  - agent-teams-manager/QUICKREF.md: Quick reference for orchestrator
+
+  PARALLELIZATION STRATEGY:
+  - Agent Teams for research/discussion phases (1, 2, 3, 7)
+  - Parallel Workers for implementation phase (6)
+  - Sequential as fallback for single tasks or low token budget
+
+  DECISION TREE:
+  - Phase 1, 2, 3 + research → Agent Teams (if enabled)
+  - Phase 6 + implementation → Parallel Workers (always)
+  - Phase 7 + review → Agent Teams (if enabled)
+  - Task count < 2 → Sequential
+
+  BENEFITS:
+  - ✅ Agent Teams enables real-time collaboration and debate
+  - ✅ Parallel Workers maintains file isolation (zero conflicts)
+  - ✅ Automatic strategy selection reduces cognitive load
+  - ✅ Feature flag allows gradual rollout
+  - ✅ Token costs controlled (Agent Teams only where it adds value)
+
+  LIMITATIONS:
+  - ⚠️  Experimental feature (may be unstable)
+  - ⚠️  3x token usage for Agent Teams phases
+  - ⚠️  No session resumption for Agent Teams
+  - ⚠️  Requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 environment variable
+
+  ROADMAP:
+  - Phase 1 (Current): Infrastructure complete, testing pending
+  - Phase 2 (Sprint +1): Validation in Phases 1 and 3
+  - Phase 3 (Sprint +2): Production readiness, launch in v3.2.0
+
+  FILES ADDED (6):
+  - .claude/skills/agent-teams-manager/SKILL.md (450+ lines)
+  - .claude/skills/agent-teams-manager/QUICKREF.md (quick reference)
+  - .claude/skills/agent-teams-manager/README.md (overview)
+  - .claude/skills/agent-teams-manager/scripts/select_strategy.py (strategy logic)
+  - .agentic_sdlc/corpus/nodes/decisions/ADR-001-hybrid-parallelization-strategy.yml
+  - .agentic_sdlc/docs/agent-teams-implementation-summary.md
+
+  FILES MODIFIED (1):
+  - .claude/settings.json (feature flags, parallelization config, env vars)
+
+  ---
+
+  Previous release:
   v3.1.0 - Design System Phase (MAJOR FEATURE - BREAKING CHANGE)
 
   🎨 NEW PHASE ADDED: Phase 4 (Design System & UX)
@@ -450,6 +515,39 @@ release_notes: |
   - import_config.yml (+20 lines): Configuration
 
 changelog:
+  - version: "3.2.0"
+    date: "2026-02-10"
+    changes:
+      - "feat(EXPERIMENTAL): Hybrid parallelization strategy (Agent Teams + Parallel Workers)"
+      - "feat(skill): agent-teams-manager - Manages parallelization strategies"
+      - "feat(skill): agent-teams-manager/SKILL.md (450+ lines) - Complete documentation"
+      - "feat(skill): agent-teams-manager/QUICKREF.md - Quick reference for orchestrator"
+      - "feat(skill): agent-teams-manager/README.md - Skill overview"
+      - "feat(scripts): select_strategy.py - Automatic strategy selection logic"
+      - "feat(adr): ADR-001-hybrid-parallelization-strategy.yml - Architecture decision"
+      - "feat(docs): agent-teams-implementation-summary.md - Implementation guide"
+      - "feat(config): feature_flags.agent_teams (disabled by default)"
+      - "feat(config): feature_flags.agent_teams_phases [1, 2, 3, 6]"
+      - "feat(config): parallelization.strategies (Agent Teams + Parallel Workers)"
+      - "feat(env): CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS environment variable"
+      - "feat(strategy): Agent Teams for research/discussion phases (1, 2, 3, 7)"
+      - "feat(strategy): Parallel Workers for implementation phase (6)"
+      - "feat(strategy): Sequential fallback for single tasks"
+      - "feat(workflow): Automatic strategy selection based on phase, task type, token budget"
+      - "feat(benefits): Real-time collaboration via Agent Teams messaging"
+      - "feat(benefits): File isolation via Parallel Workers git worktrees"
+      - "feat(benefits): Token cost control (Agent Teams only where valuable)"
+      - "fix(experimental): Feature disabled by default (requires env var)"
+      - "test(scripts): select_strategy.py validated with 3 scenarios"
+      - "docs(quickref): Decision tree for strategy selection"
+      - "docs(examples): Phase 1 Discovery, Phase 6 Implementation, fallback scenarios"
+      - "impact: Enables parallel discussion in research/architecture phases"
+      - "impact: Maintains file isolation in implementation phase"
+      - "impact: Reduces orchestrator cognitive load via auto-selection"
+      - "warning: Experimental feature - 3x token usage for Agent Teams"
+      - "warning: No session resumption for Agent Teams"
+      - "roadmap: Phase 1 complete (infrastructure), testing pending"
+      - "severity: MINOR - Experimental feature, no breaking changes"
   - version: "3.1.0"
     date: "2026-02-09"
     changes:

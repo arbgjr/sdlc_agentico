@@ -1,0 +1,155 @@
+decision:
+  id: adr-001
+  type: architectural
+  title: "Hybrid Parallelization Strategy: Agent Teams and Parallel Workers"
+  created_at: "2026-02-10T00:00:00Z"
+  status: proposed
+
+  context: |
+    SDLC Agêntico v3.0.4 implements parallel-workers skill for Phase 6 (Implementation) using git worktrees
+    to isolate concurrent development. This approach works well for implementation but is suboptimal for
+    research, architecture, and review phases where real-time collaboration and discussion are beneficial.
+
+    Claude Code introduced Agent Teams (experimental feature) that enables:
+    - Direct communication between agents (message, broadcast)
+    - Real-time coordination via team lead
+    - Shared task lists with automatic dependency management
+    - Multiple perspectives in parallel (beneficial for research/review)
+
+    However, Agent Teams has limitations:
+    - 3x token usage (each teammate = separate Claude instance)
+    - No session resumption for in-process teammates
+    - Potential file conflicts when editing same files
+    - Experimental status (disabled by default)
+
+    Parallel Workers has different trade-offs:
+    - Guaranteed file isolation via git worktrees
+    - No extra token usage (uses Python scripts)
+    - Integrated with CI/CD (automatic PRs, gates)
+    - Production-ready and stable
+    - But: No direct agent communication, research limited, coordination via polling
+
+    The question: Should we replace Parallel Workers with Agent Teams, or adopt a hybrid approach?
+
+  decision: |
+    Adopt a **hybrid parallelization strategy** where:
+
+    1. **Agent Teams** for research, discussion, and review phases (Phases 1, 2, 3, 7)
+       - Phase 1 (Discovery): Multiple domain-researchers explore in parallel
+       - Phase 2 (Requirements): Product-owner + requirements-analyst discuss
+       - Phase 3 (Architecture): Architects debate trade-offs, threat-modelers challenge
+       - Phase 7 (Quality): Multiple QA analysts review with different lenses
+
+    2. **Parallel Workers** for implementation phase (Phase 6)
+       - File isolation prevents merge conflicts
+       - Automatic PR creation and gate validation
+       - Proven stability for production use
+
+    3. **Strategy Selection** is automatic (via agent-teams-manager skill):
+       - Orchestrator calls `select_strategy.py` script
+       - Decision based on: phase number, task type, task count, token budget
+       - Fallback to sequential if neither parallelization is beneficial
+
+    4. **Feature Flag** controls Agent Teams availability:
+       - `sdlc.feature_flags.agent_teams: false` (default - experimental)
+       - Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` environment variable
+       - Can be enabled per-phase: `agent_teams_phases: [1, 2, 3, 7]`
+
+    5. **agent-teams-manager** skill orchestrates both strategies:
+       - Detects optimal strategy per context
+       - Creates teams or spawns workers as appropriate
+       - Monitors execution and handles failures
+       - Falls back to alternative strategy if primary fails
+
+  consequences:
+    positive:
+      - "Maximizes benefits of both approaches (discussion + isolation)"
+      - "Agent Teams enables research quality improvements (parallel exploration, debate)"
+      - "Parallel Workers maintains implementation stability (zero file conflicts)"
+      - "Automatic strategy selection reduces cognitive load on orchestrator"
+      - "Feature flag allows gradual rollout (experimental → production)"
+      - "Token costs controlled (Agent Teams only where it adds value)"
+      - "Architecture discussions benefit from real-time trade-off debate"
+      - "QA reviews gain multiple specialized perspectives"
+
+    negative:
+      - "Increased system complexity (two parallelization mechanisms)"
+      - "Agent Teams still experimental (may have bugs/instability)"
+      - "Token usage 3x higher for Agent Teams phases"
+      - "Requires monitoring both strategies (different failure modes)"
+      - "Learning curve for understanding when each strategy applies"
+
+    risks:
+      - "Risk: Agent Teams feature becomes unstable → Mitigation: Fallback to sequential, feature flag disable"
+      - "Risk: Token budget exhausted by Agent Teams → Mitigation: Auto-detection prevents enabling when budget < 50k"
+      - "Risk: File conflicts with Agent Teams in Phase 6 → Mitigation: Strategy selection forces Parallel Workers for implementation"
+      - "Risk: Users confused about which strategy is used → Mitigation: Clear logging of strategy selection rationale"
+
+  alternatives:
+    - name: "Replace Parallel Workers entirely with Agent Teams"
+      description: "Use only Agent Teams for all parallelization"
+      rejected_because: |
+        Agent Teams cannot guarantee file isolation in Phase 6 (Implementation).
+        Two teammates editing the same file will cause merge conflicts.
+        Parallel Workers' git worktrees solve this problem by design.
+        Also, 3x token usage for implementation is unnecessary overhead.
+
+    - name: "Keep only Parallel Workers"
+      description: "Ignore Agent Teams feature, continue with current approach"
+      rejected_because: |
+        Misses significant value in research/review phases where discussion
+        and real-time collaboration improve output quality.
+        Architecture decisions benefit from debate, not just parallel execution.
+        QA reviews benefit from multiple perspectives discussing findings.
+
+    - name: "Manual strategy selection by user"
+      description: "User chooses which strategy to use each time"
+      rejected_because: |
+        Adds unnecessary cognitive load and potential for suboptimal choices.
+        Orchestrator has all context needed for automatic selection.
+        User can override via force-strategy flag if needed.
+
+  phase: 3  # Architecture phase
+  author: "Claude Sonnet 4.5 (SDLC Agêntico Orchestrator)"
+  approvers: []
+  related_decisions: []
+
+  metadata:
+    complexity: high
+    reversible: true  # Can disable agent_teams flag to revert
+    cost_impact: |
+      Token usage increases 3x for Agent Teams phases (1, 2, 3, 7).
+      Estimated impact: 20-30% overall token increase (assuming 40% of work in these phases).
+      Offset by efficiency gains (faster convergence in architecture discussions).
+
+    security_impact: |
+      No security impact. Both strategies use same agents and security gates.
+      Agent Teams messaging is internal to Claude Code (no external communication).
+
+    performance_impact: |
+      Positive: Parallel execution reduces wall-clock time.
+      Agent Teams: Real-time coordination faster than polling (Parallel Workers).
+      Trade-off: Token processing time vs wall-clock time.
+
+  implementation_notes: |
+    Phase 1 (Sprint Current):
+    1. ✅ Add feature flag to .claude/settings.json
+    2. ✅ Create agent-teams-manager skill
+    3. ✅ Create select_strategy.py script
+    4. ✅ Document in ADR-001
+    5. [ ] Test in Phase 1 (Discovery) with 2-3 domain-researchers
+    6. [ ] Collect metrics (token usage, time, quality)
+
+    Phase 2 (Sprint +1):
+    1. [ ] Test in Phase 3 (Architecture) with system-architect + teammates
+    2. [ ] Validate strategy selection logic
+    3. [ ] Update orchestrator to call agent-teams-manager
+    4. [ ] Document learnings
+
+    Phase 3 (Sprint +2):
+    1. [ ] Update playbook with guidelines
+    2. [ ] Update CLAUDE.md with strategy rules
+    3. [ ] Launch in v3.2.0 (Hybrid Parallelization)
+    4. [ ] Create case studies and examples
+
+  supersedes: null

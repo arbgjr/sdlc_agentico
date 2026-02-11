@@ -8,7 +8,8 @@
   "env": {
     "SDLC_LOG_LEVEL": "WARNING",
     "SDLC_LOKI_ENABLED": "false",
-    "SDLC_LOKI_URL": "http://localhost:3100"
+    "SDLC_LOKI_URL": "http://localhost:3100",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0"
   },
   "hooks": {
     "PreToolUse": [
@@ -207,7 +208,9 @@
       "github-wiki",
       "alignment-workflow",
       "doc-generator",
-      "sdlc-import"
+      "sdlc-import",
+      "agent-teams-manager",
+      "parallel-workers"
     ]
   },
   "sdlc": {
@@ -225,7 +228,26 @@
       }
     },
     "feature_flags": {
-      "multi_client_architecture": true
+      "multi_client_architecture": true,
+      "agent_teams": false,
+      "agent_teams_phases": [1, 2, 3, 6]
+    },
+    "parallelization": {
+      "strategies": {
+        "parallel_workers": {
+          "enabled": true,
+          "phases": [6],
+          "max_workers": 5,
+          "requires_git_worktrees": true
+        },
+        "agent_teams": {
+          "enabled": false,
+          "phases": [1, 2, 3, 6],
+          "requires_experimental_flag": true,
+          "token_budget_multiplier": 3.0
+        }
+      },
+      "strategy_selection": "auto"
     },
     "clients": {
       "enabled": true,
