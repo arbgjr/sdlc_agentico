@@ -1,0 +1,65 @@
+---
+# RAG Corpus Node - Concept
+# Generated: 2026-02-12T20:24:42Z
+
+concept:
+  id: "CONCEPT-COPILOT-001"
+  title: "GitHub Copilot Usage Metrics"
+  type: "concept"
+  created_at: "2026-02-12T20:24:42Z"
+  created_by: "domain-researcher"
+  project: "metrics-collector-20260212"
+  phase: 1
+
+  summary: |
+    GitHub Copilot provides usage metrics through dedicated API endpoints
+    for measuring adoption, engagement, and productivity impact.
+
+  content: |
+    ## Key Metric Categories
+
+    ### Adoption Metrics
+    - Daily Active Users (DAU)
+    - Weekly Active Users (WAU)
+    - Monthly Active Users (MAU)
+    - Agent Adoption Rate
+
+    ### Code Completion Metrics
+    - Acceptance Rate = Suggestions Accepted / Suggestions Shown
+    - Total Suggestions Shown
+    - Total Suggestions Accepted
+
+    ### Usage Breakdown
+    - By Programming Language
+    - By Editor/IDE
+    - By AI Model
+
+    ### Code Generation
+    - Lines of Code Suggested
+    - Lines of Code Added
+    - User-Initiated Interactions
+
+    ## API Access
+
+    Enterprise: `/enterprises/{enterprise}/copilot/metrics`
+    Organization: `/orgs/{org}/copilot/metrics`
+
+    **IMPORTANT**: Current endpoints deprecated April 2, 2026.
+    Use newer Copilot usage metrics endpoints.
+
+    ## Constraints
+    - Minimum 5 licensed users for data
+    - Data available within 3 days
+    - Historical range: 100 days
+    - Enterprise endpoints require classic PAT
+
+  tags:
+    - "copilot"
+    - "metrics"
+    - "github"
+    - "ai"
+    - "productivity"
+
+  relations:
+    - type: "relatedTo"
+      target: "RESEARCH-GITHUB-API-001"

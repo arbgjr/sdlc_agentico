@@ -1,0 +1,44 @@
+---
+# RAG Corpus Index
+# Generated: 2026-02-12T20:24:42Z
+# Updated by: rag-curator
+
+corpus_index:
+  version: "1.0.0"
+  updated_at: "2026-02-12T20:24:42Z"
+
+  nodes:
+    concepts:
+      - id: "CONCEPT-DORA-001"
+        title: "DORA Metrics"
+        path: "nodes/concepts/CONCEPT-dora-metrics.yml"
+        tags: ["dora", "metrics", "devops"]
+
+      - id: "CONCEPT-COPILOT-001"
+        title: "GitHub Copilot Usage Metrics"
+        path: "nodes/concepts/CONCEPT-copilot-metrics.yml"
+        tags: ["copilot", "metrics", "github", "ai"]
+
+    decisions: []
+
+    learnings: []
+
+    patterns: []
+
+  projects:
+    - id: "metrics-collector-20260212"
+      research:
+        - path: "projects/metrics-collector-20260212/research/github-api-research.yml"
+          title: "GitHub APIs for Metrics Collection"
+          type: "research_brief"
+      knowledge:
+        - path: "projects/metrics-collector-20260212/knowledge/github-metrics-domain.md"
+          title: "GitHub Metrics Domain Knowledge"
+          type: "domain_knowledge"
+
+  statistics:
+    total_nodes: 2
+    concepts: 2
+    decisions: 0
+    learnings: 0
+    patterns: 0

@@ -1,0 +1,60 @@
+---
+# RAG Corpus Node - Concept
+# Generated: 2026-02-12T20:24:42Z
+
+concept:
+  id: "CONCEPT-DORA-001"
+  title: "DORA Metrics"
+  type: "concept"
+  created_at: "2026-02-12T20:24:42Z"
+  created_by: "domain-researcher"
+  project: "metrics-collector-20260212"
+  phase: 1
+
+  summary: |
+    DevOps Research and Assessment (DORA) metrics are four key performance
+    indicators used to measure software delivery performance and operational
+    efficiency.
+
+  content: |
+    ## The Four DORA Metrics
+
+    1. **Deployment Frequency**
+       - Definition: How often an organization successfully deploys to production
+       - Elite: Multiple per day
+       - Low: Less than once per month
+
+    2. **Lead Time for Changes**
+       - Definition: Time from commit to running in production
+       - Elite: Less than 1 hour
+       - Low: More than 6 months
+
+    3. **Mean Time to Recovery (MTTR)**
+       - Definition: How long to recover from production failure
+       - Elite: Less than 1 hour
+       - Low: More than 1 week
+
+    4. **Change Failure Rate**
+       - Definition: Percentage of deployments causing failure
+       - Elite: 0-15%
+       - Low: 46-60%
+
+    ## Calculation from GitHub
+
+    - Deployment Frequency: Count successful workflow runs
+    - Lead Time: PR merge time + deployment time
+    - MTTR: Requires external incident tracking
+    - Change Failure Rate: Requires failure classification
+
+  tags:
+    - "dora"
+    - "metrics"
+    - "devops"
+    - "performance"
+    - "deployment"
+
+  relations:
+    - type: "relatedTo"
+      target: "CONCEPT-VELOCITY-001"
+    - type: "relatedTo"
+      target: "RESEARCH-GITHUB-API-001"

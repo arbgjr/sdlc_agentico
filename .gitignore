@@ -20,13 +20,6 @@ Thumbs.db
 .venv/
 __pycache__/
 
-# Arquivos temporários de projeto
-.project/corpus/
-.project/reports/
-.project/security/
-.project/phase-artifacts/
-.project/references/
-
 # Python
 __pycache__/
 *.py[cod]
