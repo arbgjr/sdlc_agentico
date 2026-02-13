@@ -53,3 +53,5 @@ wheels/
 venv/
 ENV/
 env/
+/WINDOWS_COMPATIBILITY_CHANGES.md
+/WINDOWS_SETUP.md
