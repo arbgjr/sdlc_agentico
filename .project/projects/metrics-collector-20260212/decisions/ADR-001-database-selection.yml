@@ -1,0 +1,152 @@
+---
+# Architecture Decision Record
+# REVISED: Based on user feedback - local-first architecture
+# Phase: 3 (Architecture)
+# Date: 2026-02-12T21:35:00Z
+# Previous: PostgreSQL Flexible Server (REJECTED by user)
+
+decision:
+  id: "ADR-001"
+  title: "Database Selection - SQLite Local"
+  status: "accepted"
+  created_at: "2026-02-12T21:35:00Z"
+  created_by: "system-architect"
+  project: "metrics-collector-20260212"
+  phase: 3
+  revision: 2
+  supersedes: "ADR-001-v1 (PostgreSQL)"
+
+  context: |
+    O sistema precisa armazenar metricas coletadas do GitHub para queries
+    e analise. O usuario REJEITOU a proposta anterior (PostgreSQL cloud) por:
+
+    Restricoes do usuario:
+    1. Budget limitado: $0 de custo adicional
+    2. Compliance rigoroso: tudo deve rodar na VPN corporativa
+    3. Aprovacoes Azure: demoram meses para aprovar novos recursos
+    4. Sistema atual: ja funciona com JSON files locais
+    5. Simplicidade: prioridade maxima
+
+    Sistema existente (ghc_metrics):
+    - Execucao local (Windows, Python)
+    - Task Scheduler (diario)
+    - JSON files como storage
+    - OneDrive como intermediario
+    - PowerBI Import Mode
+    - Funcionando bem
+
+  decision: |
+    Usar **SQLite Local** como banco de dados.
+
+    Configuracao:
+    - Arquivo: data/metrics.db
+    - Versao: SQLite 3.x (embutido no Python)
+    - Storage: Dual (JSON backup + SQLite queries)
+    - Backup: Copia diaria para OneDrive
+
+    Vantagens sobre JSON puro:
+    - Queries SQL para calculos DORA/Velocity
+    - Indices para performance
+    - Atomicidade em operacoes
+    - Schema validado
+
+  rationale: |
+    **Por que SQLite sobre PostgreSQL cloud:**
+
+    1. **Custo zero**: SQLite e embutido no Python
+       - PostgreSQL Flexible Server: ~$12/mes
+       - SQLite: $0
+
+    2. **Zero infraestrutura**: Arquivo local
+       - Nenhuma aprovacao necessaria
+       - Nenhuma VPN exception necessaria
+       - Funciona imediatamente
+
+    3. **Compativel com sistema atual**: Mesma abordagem
+       - ghc_metrics ja usa arquivos locais
+       - Adicionar SQLite nao muda workflow
+
+    4. **Queries poderosas**: Para calculos DORA
+       - JSON nao suporta queries complexas
+       - SQLite permite agregacoes, joins, window functions
+
+    5. **Backup trivial**: Copiar arquivo
+       - Backup para OneDrive via shutil.copy2
+       - Dump SQL semanal comprimido
+
+    **Por que NAO PostgreSQL cloud:**
+    - Custo mensal ($12+)
+    - Aprovacoes Azure (meses)
+    - Complexidade de network (VPN)
+    - Overengineering para o caso de uso
+
+    **Por que NAO apenas JSON:**
+    - Queries complexas sao lentas
+    - Sem indices
+    - Calculos DORA exigem joins
+
+  consequences:
+    positive:
+      - Custo zero ($0/mes)
+      - Zero aprovacoes necessarias
+      - Funciona imediatamente
+      - Compativel com workflow existente
+      - Queries SQL para DORA
+      - Backup simples (copiar arquivo)
+    negative:
+      - Sem acesso concorrente (ok - single process)
+      - Limite de tamanho (2GB, mas nosso uso ~10MB/ano)
+      - Sem replicacao (ok - backup para OneDrive)
+    mitigations:
+      - "Backup diario para OneDrive"
+      - "SQL dump semanal comprimido"
+      - "JSON files como backup secundario"
+
+  alternatives_considered:
+    - option: "PostgreSQL Flexible Server"
+      rejected_because: "Custo $12/mes, aprovacoes demoradas, overengineering"
+
+    - option: "Azure SQL Database"
+      rejected_because: "Custo maior ainda, mesmos problemas de aprovacao"
+
+    - option: "JSON files only"
+      rejected_because: "Sem queries SQL para calculos DORA complexos"
+
+    - option: "DuckDB"
+      rejected_because: "SQLite e mais maduro e ja embutido no Python"
+
+  implementation:
+    steps:
+      - "Criar schema SQLite (tabelas, indices)"
+      - "Implementar StorageManager com dual storage"
+      - "Testar queries DORA no SQLite"
+      - "Configurar backup para OneDrive"
+    estimated_effort: "4-6 horas"
+
+    file_structure:
+      database: "data/metrics.db"
+      json_backup: "data/output/*.json"
+      sqlite_backup: "data/backup/metrics_YYYYMMDD.db"
+
+  validation:
+    criteria:
+      - "SQLite criado e funcionando"
+      - "Queries DORA executando < 1s"
+      - "Backup para OneDrive funcionando"
+      - "Tamanho DB < 100MB apos 1 ano"
+
+  cost_analysis:
+    before:
+      postgresql: "$12/month"
+      key_vault: "$1/month"
+      total: "$13/month (~$156/year)"
+    after:
+      sqlite: "$0"
+      total: "$0/month ($0/year)"
+    savings: "$156/year"
+
+  tags:
+    - "database"
+    - "sqlite"
+    - "local"
+    - "zero-cost"

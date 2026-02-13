@@ -1,0 +1,59 @@
+project:
+  id: "metrics-collector-20260212"
+  name: "GitHub Metrics Collector"
+  description: |
+    Aplicação para extração de métricas de uso do GitHub Copilot e Git (DORA, Velocity, etc).
+    Coleta dados de 2 GitHub Enterprise Cloud organizations para consumo no PowerBI.
+
+  complexity_level: 2
+  current_phase: 0
+  started_at: "2026-02-12T00:00:00Z"
+
+  github:
+    repository: "SU-AIOFFICE/github-metrics-collector"
+    url: "https://github.com/SU-AIOFFICE/github-metrics-collector"
+    visibility: "private"
+    labels_created: true
+    project_number: null  # Token precisa scope 'project'
+    milestone: "Sprint 1 - MVP"  # Será criado manualmente
+
+  scope:
+    - "Extração de métricas GitHub Copilot usage"
+    - "Extração de métricas Git (DORA: Lead Time, Deploy Frequency, MTTR, Change Failure Rate)"
+    - "Extração de métricas Velocity (commits, PRs, reviews)"
+    - "Suporte a 2 GitHub Enterprise Cloud organizations"
+    - "Exportação de dados para consumo no PowerBI"
+
+  technical_context:
+    platforms:
+      - "GitHub Enterprise Cloud"
+      - "PowerBI"
+    apis:
+      - "GitHub REST API"
+      - "GitHub GraphQL API"
+      - "GitHub Copilot Usage API"
+    metrics:
+      dora:
+        - "Lead Time for Changes"
+        - "Deployment Frequency"
+        - "Mean Time to Recovery (MTTR)"
+        - "Change Failure Rate"
+      velocity:
+        - "Commit frequency"
+        - "PR throughput"
+        - "Review time"
+        - "Code churn"
+      copilot:
+        - "Acceptance rate"
+        - "Usage by language"
+        - "Usage by editor"
+        - "Active users"
+
+  constraints:
+    - "Multi-enterprise: 2 organizations"
+    - "Enterprise Cloud (não Server/GHES)"
+    - "Dados sensíveis corporativos"
+    - "Integração com PowerBI como destino final"
+
+  artifacts: []
+  pending_decisions: []

@@ -7,8 +7,15 @@
 
     ⚠️  REQUISITOS:
     - Windows 10+ (para tar e curl nativos)
-    - PowerShell 5.1+ (ou PowerShell Core 7+)
+    - PowerShell 5.1+ (PowerShell Core 7+ RECOMENDADO)
     - Privilégios de Administrador para instalação de ferramentas globais
+
+    ✨ OTIMIZADO PARA POWERSHELL CORE 7+:
+    - Compatibilidade multiplataforma com Join-Path
+    - ErrorAction consistente em vez de redirecionamento 2>$null
+    - Instalação segura de ferramentas sem Invoke-Expression direto
+    - Suporte para verificação de privilégios em Windows/Linux/macOS
+    - Melhor tratamento de erros e logging
 
     O script tentará instalar ferramentas usando winget (Windows Package Manager).
     Se winget não estiver disponível, fornecerá instruções manuais.
@@ -46,8 +53,10 @@
 
 .NOTES
     Author: SDLC Agentico Team
-    Version: 3.0.3
-    Requires: PowerShell 5.1+ and Administrator privileges
+    Version: 3.0.4-pwsh7
+    Requires: PowerShell 5.1+ (PowerShell Core 7+ recommended)
+    Last Updated: 2026-02-12
+    Changelog: Otimizado para PowerShell Core 7+ com melhor compatibilidade multiplataforma
 #>
 
 [CmdletBinding()]
@@ -103,18 +112,22 @@ function Show-Splash {
 
     $SplashPath = $null
 
-    # Priority 1: Relative to framework root
-    if (Test-Path "$FrameworkRoot\.agentic_sdlc\splash.py") {
-        $SplashPath = "$FrameworkRoot\.agentic_sdlc\splash.py"
+    # Priority 1: Relative to framework root (using Join-Path for cross-platform compatibility)
+    $candidatePath = Join-Path $FrameworkRoot ".agentic_sdlc" | Join-Path -ChildPath "splash.py"
+    if (Test-Path $candidatePath) {
+        $SplashPath = $candidatePath
     }
     # Priority 2: Current directory
-    elseif (Test-Path ".agentic_sdlc\splash.py") {
-        $SplashPath = ".agentic_sdlc\splash.py"
+    else {
+        $candidatePath = Join-Path ".agentic_sdlc" "splash.py"
+        if (Test-Path $candidatePath) {
+            $SplashPath = $candidatePath
+        }
     }
 
     if ($SplashPath -and (Test-Path $SplashPath)) {
         try {
-            python $SplashPath --no-animate 2>$null
+            & python $SplashPath --no-animate -ErrorAction SilentlyContinue
         }
         catch {
             Write-Host ""
@@ -133,11 +146,25 @@ function Show-Splash {
     }
 }
 
-# Check if running as Administrator
+# Check if running as Administrator (Windows only)
 function Test-Administrator {
-    $user = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $principal = New-Object Security.Principal.WindowsPrincipal $user
-    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    # Only check on Windows
+    if ($IsWindows -or ($PSVersionTable.PSVersion.Major -lt 6)) {
+        try {
+            $user = [Security.Principal.WindowsIdentity]::GetCurrent()
+            $principal = New-Object Security.Principal.WindowsPrincipal $user
+            return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+        }
+        catch {
+            Write-Warn "Não foi possível verificar privilégios de administrador"
+            return $false
+        }
+    }
+    # On non-Windows, check if running as root
+    elseif ($IsLinux -or $IsMacOS) {
+        return (id -u) -eq 0
+    }
+    return $false
 }
 
 # Detect installed version
@@ -156,7 +183,7 @@ function Get-InstalledVersion {
     # Method 2: Git tag (if git repo)
     if (-not $installedVersion -and (Test-Path ".git")) {
         try {
-            $installedVersion = git describe --tags --abbrev=0 2>$null
+            $installedVersion = git describe --tags --abbrev=0 -ErrorAction SilentlyContinue
         }
         catch {
             # Ignore
@@ -173,20 +200,22 @@ function Get-InstalledVersion {
 
 # Check project artifacts in .agentic_sdlc
 function Test-ProjectArtifactsInAgentic {
-    if (-not (Test-Path ".agentic_sdlc")) {
+    $agenticPath = ".agentic_sdlc"
+    if (-not (Test-Path $agenticPath)) {
         return $false
     }
 
     $projectDirs = @(
-        ".agentic_sdlc\corpus\nodes\decisions",
-        ".agentic_sdlc\architecture",
-        ".agentic_sdlc\security",
-        ".agentic_sdlc\reports"
+        (Join-Path $agenticPath "corpus" | Join-Path -ChildPath "nodes" | Join-Path -ChildPath "decisions"),
+        (Join-Path $agenticPath "architecture"),
+        (Join-Path $agenticPath "security"),
+        (Join-Path $agenticPath "reports")
     )
 
     foreach ($dir in $projectDirs) {
         if (Test-Path $dir) {
-            $fileCount = (Get-ChildItem -Path $dir -Recurse -File | Where-Object { $_.Name -ne ".gitkeep" }).Count
+            $fileCount = (Get-ChildItem -Path $dir -Recurse -File -ErrorAction SilentlyContinue |
+                         Where-Object { $_.Name -ne ".gitkeep" }).Count
             if ($fileCount -gt 0) {
                 return $true
             }
@@ -201,28 +230,31 @@ function Move-ProjectArtifacts {
     Write-Info "Iniciando migração de artefatos..."
     Write-Host ""
 
+    $projectPath = ".project"
     # Create .project if not exists
-    if (-not (Test-Path ".project")) {
-        New-Item -ItemType Directory -Path ".project" -Force | Out-Null
+    if (-not (Test-Path $projectPath)) {
+        New-Item -ItemType Directory -Path $projectPath -Force | Out-Null
     }
 
     $migratedCount = 0
 
     $dirsToMigrate = @{
-        ".agentic_sdlc\corpus" = "corpus"
-        ".agentic_sdlc\architecture" = "architecture"
-        ".agentic_sdlc\security" = "security"
-        ".agentic_sdlc\reports" = "reports"
-        ".agentic_sdlc\references" = "references"
-        ".agentic_sdlc\sessions" = "sessions"
+        "corpus" = "corpus"
+        "architecture" = "architecture"
+        "security" = "security"
+        "reports" = "reports"
+        "references" = "references"
+        "sessions" = "sessions"
     }
 
-    foreach ($sourceDir in $dirsToMigrate.Keys) {
-        $destName = $dirsToMigrate[$sourceDir]
-        $destDir = ".project\$destName"
+    foreach ($dirName in $dirsToMigrate.Keys) {
+        $sourceDir = Join-Path ".agentic_sdlc" $dirName
+        $destName = $dirsToMigrate[$dirName]
+        $destDir = Join-Path $projectPath $destName
 
         if (Test-Path $sourceDir) {
-            $fileCount = (Get-ChildItem -Path $sourceDir -Recurse -File | Where-Object { $_.Name -ne ".gitkeep" }).Count
+            $fileCount = (Get-ChildItem -Path $sourceDir -Recurse -File -ErrorAction SilentlyContinue |
+                         Where-Object { $_.Name -ne ".gitkeep" }).Count
 
             if ($fileCount -gt 0) {
                 Write-Info "Migrando $sourceDir → $destDir"
@@ -233,11 +265,13 @@ function Move-ProjectArtifacts {
                 }
 
                 # Copy content (preserving structure)
-                Copy-Item -Path "$sourceDir\*" -Destination $destDir -Recurse -Force 2>$null
+                $sourcePath = Join-Path $sourceDir "*"
+                Copy-Item -Path $sourcePath -Destination $destDir -Recurse -Force -ErrorAction SilentlyContinue
 
                 # Remove .gitkeep if exists in destination
-                if (Test-Path "$destDir\.gitkeep") {
-                    Remove-Item "$destDir\.gitkeep" -Force
+                $gitkeepPath = Join-Path $destDir ".gitkeep"
+                if (Test-Path $gitkeepPath) {
+                    Remove-Item $gitkeepPath -Force -ErrorAction SilentlyContinue
                 }
 
                 $migratedCount++
@@ -266,7 +300,7 @@ function Clear-AgenticArtifacts {
 
     # Create backup
     $backupDir = ".agentic_sdlc.backup-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
-    Copy-Item -Path ".agentic_sdlc" -Destination $backupDir -Recurse -Force 2>$null
+    Copy-Item -Path ".agentic_sdlc" -Destination $backupDir -Recurse -Force -ErrorAction SilentlyContinue
 
     if (Test-Path $backupDir) {
         Write-Info "Backup criado em: $backupDir"
@@ -619,13 +653,27 @@ function Install-Uv {
     Write-Info "Instalando uv..."
 
     try {
-        # Windows installer for uv
-        Invoke-WebRequest -Uri "https://astral.sh/uv/install.ps1" -UseBasicParsing | Invoke-Expression
+        # Download installer script
+        $tempFile = Join-Path $env:TEMP "install-uv.ps1"
+        Write-Info "Baixando instalador do uv..."
+        Invoke-WebRequest -Uri "https://astral.sh/uv/install.ps1" -OutFile $tempFile -UseBasicParsing
+
+        # Execute the installer script
+        Write-Info "Executando instalador..."
+        & $tempFile
+
+        # Clean up
+        Remove-Item $tempFile -ErrorAction SilentlyContinue
+
         Write-Success "uv instalado"
+
+        # Refresh PATH for current session
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+
         return $true
     }
     catch {
-        Write-Warn "Falha ao instalar uv automaticamente"
+        Write-Warn "Falha ao instalar uv automaticamente: $_"
         Write-Host ""
         Write-Host "Instale manualmente:"
         Write-Host "  irm https://astral.sh/uv/install.ps1 | iex"
@@ -672,7 +720,7 @@ function Test-GH {
 
         # Check authentication
         try {
-            gh auth status 2>$null | Out-Null
+            gh auth status -ErrorAction SilentlyContinue | Out-Null
             Write-Success "GitHub CLI autenticado"
             Test-GHProjectScope
         }
@@ -716,14 +764,15 @@ function Test-GHProjectScope {
 
     # Check via API
     try {
-        $scopes = gh api user -H "X-OAuth-Scopes: true" 2>&1 | Select-Object -First 1
+        $scopes = gh api user -H "X-OAuth-Scopes: true" -ErrorAction Stop | Select-Object -First 1
         if ($scopes -match "project") {
             Write-Success "Scope 'project' disponível"
             return $true
         }
     }
     catch {
-        # Ignore errors
+        # Ignore errors - scope check failed
+        Write-Verbose "Não foi possível verificar scopes via API"
     }
 
     Write-Warn "Scope 'project' não encontrado"
@@ -872,7 +921,7 @@ function Install-PythonDeps {
     # Install Playwright browser
     Write-Info "Instalando browser Chromium para Playwright..."
     try {
-        python -m playwright install chromium 2>$null
+        python -m playwright install chromium -ErrorAction SilentlyContinue
     }
     catch {
         Write-Warn "Playwright browser não foi instalado"
@@ -910,7 +959,7 @@ function Initialize-SpecKit {
 
     Write-Info "Executando specify init..."
     try {
-        specify init . --ai claude --force 2>$null
+        specify init . --ai claude --force -ErrorAction SilentlyContinue
     }
     catch {
         Write-Warn "Spec Kit init falhou (pode ser normal se diretório não estiver vazio)"

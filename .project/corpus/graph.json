@@ -1,100 +1,48 @@
 {
   "version": "2.1.0",
-  "generated_by": "sdlc-import",
-  "updated_at": "2026-01-25T04:27:07.429295Z",
+  "generated_by": "rag-curator",
+  "updated_at": "2026-02-12T20:24:42Z",
   "nodes": [
     {
-      "id": "ADR-INFERRED-006",
-      "type": "Decision",
-      "title": "Use Pytest as Testing Framework",
-      "status": "inferred",
-      "confidence": 0.85,
-      "category": "testing",
-      "tags": [],
-      "concepts": [
-        "testing"
-      ]
+      "id": "CONCEPT-DORA-001",
+      "type": "concept",
+      "title": "DORA Metrics",
+      "tags": ["dora", "metrics", "devops", "performance"]
     },
     {
-      "id": "ADR-INFERRED-003",
-      "type": "Decision",
-      "title": "Use Jwt as Authentication Method",
-      "status": "inferred",
-      "confidence": 0.805,
-      "category": "authentication",
-      "tags": [],
-      "concepts": [
-        "authentication"
-      ]
+      "id": "CONCEPT-COPILOT-001",
+      "type": "concept",
+      "title": "GitHub Copilot Usage Metrics",
+      "tags": ["copilot", "metrics", "github", "ai"]
     },
     {
-      "id": "ADR-INFERRED-004",
-      "type": "Decision",
-      "title": "Use Oauth2 as Authentication Method",
-      "status": "inferred",
-      "confidence": 0.6266666666666667,
-      "category": "authentication",
-      "tags": [],
-      "concepts": [
-        "authentication"
-      ]
-    },
-    {
-      "id": "ADR-INFERRED-001",
-      "type": "Decision",
-      "title": "Use Postgresql as Primary Database",
-      "status": "inferred",
-      "confidence": 0.49333333333333335,
-      "category": "database",
-      "tags": [],
-      "concepts": [
-        "database"
-      ]
-    },
-    {
-      "id": "ADR-INFERRED-002",
-      "type": "Decision",
-      "title": "Use Mongodb as Primary Database",
-      "status": "inferred",
-      "confidence": 0.49333333333333335,
-      "category": "database",
-      "tags": [],
-      "concepts": [
-        "database"
-      ]
-    },
-    {
-      "id": "ADR-INFERRED-005",
-      "type": "Decision",
-      "title": "Use Redis as Caching Strategy",
-      "status": "inferred",
-      "confidence": 0.49333333333333335,
-      "category": "caching",
-      "tags": [],
-      "concepts": [
-        "caching"
-      ]
+      "id": "RESEARCH-GITHUB-API-001",
+      "type": "research",
+      "title": "GitHub APIs for Metrics Collection",
+      "tags": ["github", "api", "rest", "graphql", "copilot"]
     }
   ],
   "edges": [
     {
-      "source": "ADR-INFERRED-003",
-      "relation": "relatedTo",
-      "target": "ADR-INFERRED-004",
-      "reason": "Both related to authentication"
+      "source": "CONCEPT-DORA-001",
+      "target": "RESEARCH-GITHUB-API-001",
+      "relation": "documentedIn"
     },
     {
-      "source": "ADR-INFERRED-001",
-      "relation": "relatedTo",
-      "target": "ADR-INFERRED-002",
-      "reason": "Both related to database"
+      "source": "CONCEPT-COPILOT-001",
+      "target": "RESEARCH-GITHUB-API-001",
+      "relation": "documentedIn"
+    },
+    {
+      "source": "CONCEPT-DORA-001",
+      "target": "CONCEPT-COPILOT-001",
+      "relation": "relatedTo"
     }
   ],
   "metadata": {
-    "node_count": 6,
-    "edge_count": 2,
-    "relation_types": [
-      "relatedTo"
-    ]
+    "node_count": 3,
+    "edge_count": 3,
+    "relation_types": ["relatedTo", "documentedIn"],
+    "project": "metrics-collector-20260212"
   }
 }

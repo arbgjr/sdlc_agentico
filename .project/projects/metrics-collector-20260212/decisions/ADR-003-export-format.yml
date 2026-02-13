@@ -1,0 +1,145 @@
+---
+# Architecture Decision Record
+# REVISED: Added GZIP compression + OneDrive integration
+# Phase: 3 (Architecture)
+# Date: 2026-02-12T21:35:00Z
+
+decision:
+  id: "ADR-003"
+  title: "Export Format - CSV with GZIP Compression"
+  status: "accepted"
+  created_at: "2026-02-12T21:35:00Z"
+  created_by: "system-architect"
+  project: "metrics-collector-20260212"
+  phase: 3
+  revision: 2
+
+  context: |
+    O sistema precisa exportar dados para consumo no PowerBI via OneDrive.
+
+    NOTA: SharePoint foi substituido por OneDrive porque:
+    - OneDrive funciona (usuario ja usa)
+    - SharePoint requer app registration (nao aprovado)
+    - Power Automate trigger funciona com OneDrive
+
+    Requisitos:
+    1. PowerBI deve conseguir ler o formato nativamente
+    2. Tamanho de arquivo razoavel para upload OneDrive
+    3. Facilidade de debug/inspecao manual
+    4. Power Automate trigger funciona com arquivo novo
+
+    Adicao nesta revisao:
+    - Compressao GZIP para reduzir tamanho (~80% menor)
+    - Upload mais rapido para OneDrive
+    - Menos banda consumida na VPN
+
+  decision: |
+    Usar **CSV com UTF-8 BOM, semicolon delimiter, e compressao GZIP**.
+
+    Configuracao:
+    - Encoding: UTF-8 com BOM (para Excel/PowerBI)
+    - Delimitador: ponto-e-virgula (;) - padrao brasileiro
+    - Escape: aspas duplas para campos com delimitador
+    - Headers: sempre na primeira linha
+    - Datas: ISO 8601 (YYYY-MM-DD)
+    - Decimais: ponto (.) como separador decimal
+    - Compressao: GZIP (.csv.gz)
+
+    Estrutura de arquivos:
+    - copilot_metrics_YYYYMMDD.csv.gz
+    - copilot_premium_requests_YYYYMMDD.csv.gz
+    - dora_metrics_YYYYMMDD.csv.gz
+    - velocity_metrics_YYYYMMDD.csv.gz
+
+    Processo:
+    1. Gerar CSV em memoria/temp
+    2. Comprimir com GZIP
+    3. Salvar .csv.gz localmente
+    4. Copiar para OneDrive via shutil.copy2
+
+  rationale: |
+    **Por que CSV:**
+    - Universalmente suportado
+    - PowerBI le nativamente
+    - Debug facil (descompactar e abrir no notepad)
+
+    **Por que GZIP:**
+    - Reducao de ~80% no tamanho
+    - Upload OneDrive mais rapido
+    - Menos banda na VPN
+    - PowerBI suporta importar .csv.gz diretamente
+    - Python tem gzip built-in (zero dependencia)
+
+    **Por que OneDrive (nao SharePoint):**
+    - Ja funciona no sistema atual
+    - Nao requer app registration
+    - Power Automate trigger disponivel
+    - Zero aprovacoes necessarias
+
+    **Tamanho estimado:**
+    - CSV bruto: ~500KB/dia
+    - CSV.GZ: ~100KB/dia (80% menor)
+    - Economia mensal: ~12MB de banda
+
+  consequences:
+    positive:
+      - Arquivos 80% menores
+      - Upload mais rapido
+      - PowerBI suporta nativamente
+      - Python gzip e built-in
+      - OneDrive ja funciona
+    negative:
+      - Debug requer descompactar primeiro
+      - Passo adicional no pipeline
+    mitigations:
+      - "Manter CSV descompactado localmente para debug"
+      - "OneDrive recebe apenas versao compactada"
+
+  implementation:
+    steps:
+      - "Atualizar CSVExporter para gerar .csv.gz"
+      - "Testar import no PowerBI com arquivo compactado"
+      - "Configurar copia para OneDrive"
+      - "Configurar cleanup de arquivos antigos"
+    estimated_effort: "2-3 horas"
+
+    python_example: |
+      import gzip
+      import csv
+      import shutil
+      from pathlib import Path
+
+      def export_to_gzip_csv(data, filepath):
+          with gzip.open(filepath, 'wt', encoding='utf-8-sig', newline='') as f:
+              writer = csv.DictWriter(f, fieldnames=data[0].keys(), delimiter=';')
+              writer.writeheader()
+              writer.writerows(data)
+
+      def copy_to_onedrive(source, onedrive_path):
+          shutil.copy2(source, onedrive_path)
+
+    csv_configuration:
+      encoding: "UTF-8 BOM"
+      delimiter: ";"
+      quote_char: "\""
+      date_format: "YYYY-MM-DD"
+      decimal_separator: "."
+      null_representation: ""
+      header: true
+      compression: "gzip"
+      extension: ".csv.gz"
+
+  validation:
+    criteria:
+      - "CSV.GZ gerado corretamente"
+      - "PowerBI importa sem erros"
+      - "Tamanho ~80% menor que CSV bruto"
+      - "OneDrive recebe arquivos"
+
+  tags:
+    - "export"
+    - "csv"
+    - "gzip"
+    - "compression"
+    - "onedrive"
+    - "powerbi"

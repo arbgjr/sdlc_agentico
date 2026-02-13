@@ -1,7 +1,0 @@
-graph LR
-    User((User)) --> |HTTP Request| API[API Gateway]
-    API --> |Route| Backend[Backend Service]
-    Backend --> |Query| DB[(Database)]
-    DB --> |Result| Backend
-    Backend --> |Response| API
-    API --> |HTTP Response| User

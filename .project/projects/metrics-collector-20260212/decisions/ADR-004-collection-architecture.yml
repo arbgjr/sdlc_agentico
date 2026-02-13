@@ -1,0 +1,181 @@
+---
+# Architecture Decision Record
+# REVISED: Based on user feedback - local-first architecture
+# Phase: 3 (Architecture)
+# Date: 2026-02-12T21:35:00Z
+# Previous: Azure Functions Timer Trigger (REJECTED by user)
+
+decision:
+  id: "ADR-004"
+  title: "Collection Architecture - Local Python + Task Scheduler"
+  status: "accepted"
+  created_at: "2026-02-12T21:35:00Z"
+  created_by: "system-architect"
+  project: "metrics-collector-20260212"
+  phase: 3
+  revision: 2
+  supersedes: "ADR-004-v1 (Azure Functions)"
+
+  context: |
+    O sistema precisa executar coleta diaria de metricas.
+    O usuario REJEITOU Azure Functions por:
+
+    Restricoes do usuario:
+    1. Azure Functions demoraria meses para aprovar
+    2. Sistema atual usa Windows Task Scheduler (funciona bem)
+    3. Zero mudanca de infraestrutura desejada
+    4. Budget: $0
+
+    Sistema existente (ghc_metrics):
+    - Python script local
+    - Windows Task Scheduler (8:00 AM diario)
+    - Execucao na VPN corporativa
+    - Funcionando ha meses sem problemas
+
+  decision: |
+    Usar **Local Python Script + Windows Task Scheduler**.
+
+    Configuracao:
+    - Script: src/main.py (ou collector.py)
+    - Scheduler: Windows Task Scheduler
+    - Horario: 8:00 AM (hora local)
+    - Retry: 3 tentativas com backoff
+    - Logs: data/logs/collector_YYYYMMDD.log
+
+    Arquitetura:
+    ```
+    Windows Task Scheduler (8:00 AM)
+        |
+        v
+    Python Script (collector.py)
+        |
+        +-- GitHub API Collectors
+        |     +-- CopilotMetricsCollector
+        |     +-- PremiumRequestsCollector
+        |     +-- GitActivityCollector
+        |     +-- VelocityMetricsCollector
+        |
+        +-- Storage Manager (dual)
+        |     +-- JSON files (backup)
+        |     +-- SQLite (queries)
+        |
+        +-- DORA Calculator (SQL queries)
+        |
+        +-- CSV Exporter (UTF-8 BOM, GZIP)
+        |
+        +-- OneDrive Copier (shutil.copy2)
+        |
+        +-- Alert System (se falhas >= 3)
+    ```
+
+  rationale: |
+    **Por que Local Python sobre Azure Functions:**
+
+    1. **Zero aprovacoes**: Task Scheduler ja existe
+       - Azure Functions: meses para aprovar
+       - Task Scheduler: disponivel imediatamente
+
+    2. **Zero custo**: Usa recursos existentes
+       - Azure Functions Consumption: ~$5/mes
+       - Local: $0
+
+    3. **Compativel com sistema atual**: Mesma abordagem
+       - ghc_metrics ja usa Task Scheduler
+       - Nao muda workflow operacional
+
+    4. **Funciona na VPN**: Sem firewall rules
+       - Azure Functions requer configuracao de rede
+       - Local ja esta dentro da VPN
+
+    5. **Debug facil**: Logs locais, IDE local
+       - Pode rodar manualmente a qualquer momento
+       - Sem necessidade de portal Azure
+
+    **Por que NAO Azure Functions:**
+    - Aprovacoes demoradas (meses)
+    - Custo adicional (~$5/mes)
+    - Complexidade de rede (VPN)
+    - Overengineering para batch diario simples
+
+    **Por que NAO GitHub Actions:**
+    - Limite de minutos no plano gratuito
+    - Nao roda dentro da VPN
+    - Secrets management menos integrado
+
+  consequences:
+    positive:
+      - Custo zero ($0/mes)
+      - Zero aprovacoes necessarias
+      - Funciona imediatamente
+      - Debug local facil
+      - Compativel com sistema existente
+    negative:
+      - Depende de maquina estar ligada
+      - Sem auto-retry built-in (implementar manualmente)
+      - Logs locais (nao centralizados)
+    mitigations:
+      - "Implementar retry decorator (3x com backoff)"
+      - "Log rotation com 30 dias"
+      - "Alertas via Power Automate se falhas"
+      - "Maquina fica ligada 24/7 (padrao corporativo)"
+
+  alternatives_considered:
+    - option: "Azure Functions Timer Trigger"
+      rejected_because: "Aprovacoes demoradas, custo $5/mes"
+
+    - option: "GitHub Actions Scheduled"
+      rejected_because: "Limite de minutos, fora da VPN"
+
+    - option: "Azure Container Instances"
+      rejected_because: "Mesmo problema de aprovacoes do Azure"
+
+    - option: "Kubernetes CronJob"
+      rejected_because: "Overengineering, nao existe K8s interno"
+
+  implementation:
+    steps:
+      - "Criar estrutura de projeto Python"
+      - "Implementar coletores com retry decorator"
+      - "Criar StorageManager (JSON + SQLite)"
+      - "Configurar Task Scheduler (8:00 AM)"
+      - "Testar execucao manual e agendada"
+    estimated_effort: "2-4 horas"
+
+    task_scheduler_config:
+      name: "GitHub Metrics Collector"
+      trigger: "Daily at 8:00 AM"
+      action: "python C:\\path\\to\\collector.py"
+      working_directory: "C:\\path\\to\\project"
+      run_as: "Current User"
+      settings:
+        wake_to_run: false
+        stop_if_on_battery: false
+        start_when_available: true
+
+    retry_policy:
+      max_retries: 3
+      initial_delay_seconds: 60
+      backoff_multiplier: 2
+      max_delay_seconds: 300
+
+  validation:
+    criteria:
+      - "Task Scheduler executando diariamente"
+      - "Coleta completa em < 30 minutos"
+      - "Logs gerados corretamente"
+      - "Retry funcionando em caso de falha"
+
+  cost_analysis:
+    before:
+      azure_functions: "$5/month"
+      total: "$5/month (~$60/year)"
+    after:
+      task_scheduler: "$0"
+      total: "$0/month ($0/year)"
+    savings: "$60/year"
+
+  tags:
+    - "architecture"
+    - "local"
+    - "task-scheduler"
+    - "zero-cost"

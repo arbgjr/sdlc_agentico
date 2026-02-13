@@ -1,0 +1,208 @@
+---
+# Architecture Decision Record
+# NEW: Backup and Cleanup Strategy for Local-First Architecture
+# Phase: 3 (Architecture)
+# Date: 2026-02-12T21:45:00Z
+
+decision:
+  id: "ADR-006"
+  title: "Backup and Cleanup Strategy - Local First"
+  status: "accepted"
+  created_at: "2026-02-12T21:45:00Z"
+  created_by: "system-architect"
+  project: "metrics-collector-20260212"
+  phase: 3
+  revision: 1
+
+  context: |
+    O sistema usa arquitetura local-first (ADR-001, ADR-004) com:
+    - SQLite como banco de dados (data/metrics.db)
+    - JSON files como backup/audit trail
+    - OneDrive como destino de CSV exports
+
+    Precisamos definir:
+    1. Como fazer backup do SQLite
+    2. Quanto tempo manter arquivos raw/logs
+    3. Como automatizar cleanup
+    4. Como alertar se algo falhar
+
+    Restricoes:
+    - Zero custo ($0)
+    - Sem servicos cloud adicionais
+    - Tudo local ou OneDrive
+
+  decision: |
+    Implementar **estrategia de backup e cleanup automatizada**.
+
+    ## Backup Strategy
+
+    ### SQLite Backup (Diario)
+    - **Quando**: Apos coleta diaria completa
+    - **Destino**: OneDrive (mesmo folder dos CSVs)
+    - **Arquivo**: metrics_YYYYMMDD.db
+    - **Metodo**: shutil.copy2 (preserva metadata)
+    - **Retencao OneDrive**: 30 dias (mais antigos sobrescritos)
+
+    ### SQLite Dump (Semanal)
+    - **Quando**: Domingos 23:00 (via Task Scheduler separado)
+    - **Arquivo**: metrics_dump_YYYYMMDD.sql.gz
+    - **Destino**: data/backup/ local + OneDrive
+    - **Retencao**: 4 dumps (1 mes)
+    - **Proposito**: Recovery point + portabilidade
+
+    ### JSON Files (Continuous)
+    - **Proposito**: Audit trail + debugging
+    - **Destino**: data/output/*.json
+    - **Retencao**: 90 dias localmente
+
+    ## Cleanup Strategy
+
+    ### Arquivos Locais
+    | Tipo | Retencao | Acao |
+    |------|----------|------|
+    | JSON raw (data/output) | 90 dias | Delete automatico |
+    | Logs (data/logs) | 30 dias | Delete automatico |
+    | SQLite backups locais | 7 dias | Delete automatico |
+    | SQL dumps | 30 dias (4 arquivos) | Delete automatico |
+
+    ### OneDrive
+    | Tipo | Retencao | Acao |
+    |------|----------|------|
+    | CSV exports | 90 dias | Sobrescrever |
+    | SQLite daily | 30 dias | Sobrescrever |
+    | SQL dumps | 30 dias | Sobrescrever |
+
+    ## Alertas
+    - **Trigger**: 3+ falhas consecutivas de backup
+    - **Metodo**: Power Automate flow
+    - **Destino**: Email do responsavel
+
+  rationale: |
+    **Por que backup diario do SQLite:**
+    - SQLite e single-file, backup trivial
+    - shutil.copy2 e atomico para arquivos pequenos (~10MB)
+    - OneDrive ja esta no workflow, zero infra adicional
+
+    **Por que dump SQL semanal:**
+    - SQL dump e portavel (pode restaurar em outro SQLite ou migrar)
+    - GZIP reduz ~90% do tamanho
+    - Recovery point independente do arquivo binario
+
+    **Por que 90 dias para JSON raw:**
+    - Permite debugging retroativo
+    - Espaco em disco e barato localmente
+    - JSON comprime bem se necessario
+
+    **Por que 30 dias para logs:**
+    - Suficiente para troubleshooting
+    - Evita acumulo excessivo
+    - Log rotation padrao da industria
+
+    **Por que nao usar servicos cloud:**
+    - Budget $0
+    - OneDrive ja disponivel e gratuito
+    - Simplicidade maxima
+
+  consequences:
+    positive:
+      - Zero custo adicional
+      - Recovery point diario (SQLite) e semanal (SQL)
+      - Cleanup automatico evita disco cheio
+      - Auditoria completa (90 dias JSON)
+    negative:
+      - Se maquina falhar, perde dados do dia
+      - OneDrive depende de rede/VPN
+    mitigations:
+      - "SQLite e copiado para OneDrive apos cada coleta"
+      - "SQL dump semanal como safety net"
+      - "Alerta se backup falhar 3x"
+
+  implementation:
+    steps:
+      - "Implementar BackupManager class"
+      - "Adicionar backup ao final do collector.py"
+      - "Criar Task Scheduler para SQL dump semanal"
+      - "Implementar CleanupManager class"
+      - "Configurar Power Automate para alertas"
+    estimated_effort: "3-4 horas"
+
+    python_example: |
+      import gzip
+      import shutil
+      import sqlite3
+      from pathlib import Path
+      from datetime import datetime, timedelta
+
+      class BackupManager:
+          def __init__(self, db_path, onedrive_path):
+              self.db_path = Path(db_path)
+              self.onedrive_path = Path(onedrive_path)
+
+          def backup_sqlite(self):
+              """Daily SQLite backup to OneDrive"""
+              date_str = datetime.now().strftime('%Y%m%d')
+              backup_name = f"metrics_{date_str}.db"
+              dest = self.onedrive_path / backup_name
+              shutil.copy2(self.db_path, dest)
+              return dest
+
+          def dump_sql(self, output_dir):
+              """Weekly SQL dump with GZIP"""
+              date_str = datetime.now().strftime('%Y%m%d')
+              dump_path = Path(output_dir) / f"metrics_dump_{date_str}.sql.gz"
+
+              conn = sqlite3.connect(self.db_path)
+              with gzip.open(dump_path, 'wt', encoding='utf-8') as f:
+                  for line in conn.iterdump():
+                      f.write(f'{line}\n')
+              conn.close()
+              return dump_path
+
+      class CleanupManager:
+          def cleanup_old_files(self, directory, pattern, max_age_days):
+              """Delete files older than max_age_days"""
+              cutoff = datetime.now() - timedelta(days=max_age_days)
+              deleted = []
+              for f in Path(directory).glob(pattern):
+                  if datetime.fromtimestamp(f.stat().st_mtime) < cutoff:
+                      f.unlink()
+                      deleted.append(f.name)
+              return deleted
+
+    task_scheduler_config:
+      weekly_dump:
+        name: "GitHub Metrics SQL Dump"
+        trigger: "Weekly on Sunday at 23:00"
+        action: "python C:\\path\\to\\dump_sql.py"
+
+    cleanup_schedule:
+      json_raw:
+        directory: "data/output"
+        pattern: "*.json"
+        retention_days: 90
+      logs:
+        directory: "data/logs"
+        pattern: "*.log"
+        retention_days: 30
+      sqlite_local_backup:
+        directory: "data/backup"
+        pattern: "metrics_*.db"
+        retention_days: 7
+      sql_dumps:
+        directory: "data/backup"
+        pattern: "metrics_dump_*.sql.gz"
+        retention_days: 30
+
+  validation:
+    criteria:
+      - "Backup SQLite executando diariamente"
+      - "SQL dump semanal funcionando"
+      - "Cleanup removendo arquivos antigos"
+      - "Alertas disparando apos 3 falhas"
+
+  tags:
+    - "backup"
+    - "cleanup"
+    - "maintenance"
+    - "zero-cost"
+    - "onedrive"

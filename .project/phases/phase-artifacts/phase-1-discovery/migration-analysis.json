@@ -1,9 +1,0 @@
-{
-  "decisions": [],
-  "count": 0,
-  "by_framework": {
-    "ef_core": 0,
-    "alembic": 0,
-    "flyway": 0
-  }
-}

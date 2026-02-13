@@ -1,0 +1,298 @@
+---
+# Project Manifest
+# SDLC Agentico - Project Tracking
+# Generated: 2026-02-12T20:12:08Z
+# Last Updated: 2026-02-12T21:55:00Z
+# REVISED: Local-First Architecture
+
+project:
+  id: "metrics-collector-20260212"
+  name: "GitHub Metrics Collector"
+  description: |
+    Aplicacao para extracao automatizada de metricas de uso do GitHub Copilot
+    e metricas de engenharia (DORA, Velocity) de 2 organizacoes GitHub Enterprise Cloud,
+    com exportacao de dados estruturados para consumo no PowerBI via Import Mode.
+
+    ARQUITETURA REVISADA: Local-first (SQLite + Task Scheduler + OneDrive)
+    CUSTO: $0/mes
+
+  repository:
+    owner: "SU-AIOFFICE"
+    name: "github-metrics-collector"
+    url: "https://github.com/SU-AIOFFICE/github-metrics-collector"
+    visibility: "private"
+
+  complexity_level: 2
+  complexity_name: "BMAD Method"
+
+  workflow:
+    current_phase: 4
+    phase_name: "Planning"
+    phases_to_execute: [0, 1, 2, 3, 4, 5, 6, 7]
+    phases_completed: [0, 1, 2, 3, 4]
+    human_approval_gates: ["phase-6-to-7"]
+
+  status:
+    state: "in_progress"
+    started_at: "2026-02-12T20:10:47Z"
+    last_updated_at: "2026-02-12T21:55:00Z"
+    estimated_completion: "2026-04-11"
+    architecture_revision: "2026-02-12T21:35:00Z"
+
+  classification:
+    type: "feature"
+    priority: "high"
+    risk_level: "low"  # Reduced from medium - simpler architecture
+
+  team:
+    requester: "AI Office - SU-AIOFFICE"
+    stakeholders:
+      - "Engineering Leadership"
+      - "DevOps/Platform Teams"
+      - "AI Office"
+      - "Business Intelligence Team"
+
+  scope:
+    included:
+      - "Metricas GitHub Copilot (acceptance rate, usage by language/editor, active users)"
+      - "Metricas de Requests Premium Copilot (premium vs standard, tokens, modelo)"
+      - "Metricas DORA (Lead Time, Deploy Frequency, MTTR, Change Failure Rate)"
+      - "Metricas Velocity (commit frequency, PR throughput, review time, code churn)"
+      - "Suporte a 2 organizacoes GitHub Enterprise Cloud"
+      - "Exportacao de dados para PowerBI via Import Mode (OneDrive + CSV.GZ)"
+      - "Retry automatico com backoff exponencial"
+      - "Backup automatico (SQLite + SQL dump)"
+      - "Cleanup automatico de arquivos antigos"
+      - "Alertas via Power Automate"
+    excluded:
+      - "GitHub Enterprise Server (GHES) - apenas Cloud"
+      - "Integracao real-time com outros dashboards"
+      - "Metricas de outras plataformas (GitLab, Bitbucket)"
+      - "Self-service configuration UI (MVP)"
+      - "Direct Query PowerBI (decisao do usuario)"
+      - "Recursos cloud Azure (rejeitado pelo usuario)"
+
+  constraints:
+    technical:
+      - "GitHub APIs rate limits (5000 req/hour)"
+      - "Copilot Usage API requer permissoes de organization admin"
+      - "Copilot enterprise endpoints requerem Classic PAT (nao fine-grained)"
+      - "Dados de 2 organizacoes distintas"
+      - "Execucao local na VPN corporativa"
+    business:
+      - "Dados sensiveis de produtividade corporativa"
+      - "Confidencialidade entre organizacoes"
+      - "Budget: $0 adicional"
+    compliance:
+      - "Segregacao de dados obrigatoria (column-based enterprise_id)"
+      - "Credenciais em environment variable (nao codigo)"
+      - "Audit trail obrigatorio (SQLite + JSON)"
+
+  decisions_made:
+    - id: "DM-001"
+      title: "Estrategia de anonimizacao"
+      decision: "NAO - metricas individuais necessarias por desenvolvedor/time"
+      decided_at: "2026-02-12T20:30:00Z"
+      decided_by: "user"
+
+    - id: "DM-002"
+      title: "Frequencia de coleta"
+      decision: "Diaria (balance entre freshness e rate limits)"
+      decided_at: "2026-02-12T20:30:00Z"
+      decided_by: "user"
+
+    - id: "DM-003"
+      title: "Periodo historico"
+      decision: "Desde 2023 (importar posteriormente)"
+      decided_at: "2026-02-12T20:30:00Z"
+      decided_by: "user"
+
+    - id: "DM-004"
+      title: "Infraestrutura de dados"
+      decision: "Local-first (SQLite + Task Scheduler + OneDrive)"
+      decided_at: "2026-02-12T21:35:00Z"
+      decided_by: "user"
+      supersedes: "Comecar do zero, sem DW existente"
+
+    - id: "DM-005"
+      title: "Volume esperado"
+      decision: "Medio (1K-100K registros/dia)"
+      decided_at: "2026-02-12T20:30:00Z"
+      decided_by: "user"
+
+    - id: "DM-006"
+      title: "PowerBI Integration Mode"
+      decision: "Import Mode via OneDrive (NAO SharePoint)"
+      decided_at: "2026-02-12T21:35:00Z"
+      decided_by: "user"
+      supersedes: "Import Mode via SharePoint"
+
+    - id: "DM-007"
+      title: "Arquitetura cloud vs local"
+      decision: "LOCAL - zero custo, zero aprovacoes, funciona imediatamente"
+      decided_at: "2026-02-12T21:35:00Z"
+      decided_by: "user"
+      rationale: "Azure Functions/PostgreSQL rejeitados por: custo, aprovacoes, complexidade"
+
+  architecture_decisions:
+    - adr_id: "ADR-001"
+      title: "Database Selection"
+      decision: "SQLite Local"
+      status: "accepted"
+      revision: 2
+      supersedes: "PostgreSQL Flexible Server"
+
+    - adr_id: "ADR-002"
+      title: "GitHub Authentication"
+      decision: "Classic PAT (required for Copilot enterprise)"
+      status: "accepted"
+
+    - adr_id: "ADR-003"
+      title: "Export Format"
+      decision: "CSV with GZIP compression (.csv.gz)"
+      status: "accepted"
+      revision: 2
+      supersedes: "CSV plain"
+
+    - adr_id: "ADR-004"
+      title: "Collection Architecture"
+      decision: "Local Python + Windows Task Scheduler"
+      status: "accepted"
+      revision: 2
+      supersedes: "Azure Functions Timer Trigger"
+
+    - adr_id: "ADR-005"
+      title: "Data Segregation"
+      decision: "Column-based (enterprise_id)"
+      status: "accepted"
+
+    - adr_id: "ADR-006"
+      title: "Backup Strategy"
+      decision: "Daily SQLite copy + Weekly SQL dump to OneDrive"
+      status: "accepted"
+
+  artifacts:
+    phase_0:
+      - path: "intake-result.yml"
+        type: "intake_analysis"
+        created_at: "2026-02-12T20:10:47Z"
+        agent: "intake-analyst"
+      - path: "compliance-assessment.yml"
+        type: "compliance_assessment"
+        created_at: "2026-02-12T20:12:08Z"
+        agent: "compliance-guardian"
+
+    phase_1:
+      - path: "research/github-api-research.yml"
+        type: "research_brief"
+        created_at: "2026-02-12T20:20:00Z"
+        agent: "domain-researcher"
+      - path: "knowledge/github-metrics-domain.md"
+        type: "domain_knowledge"
+        created_at: "2026-02-12T20:22:00Z"
+        agent: "domain-researcher"
+
+    phase_2:
+      - path: "specs/github-metrics-collector.spec.md"
+        type: "specification"
+        created_at: "2026-02-12T20:35:00Z"
+        agent: "requirements-analyst"
+      - path: "requirements/user-stories.yml"
+        type: "user_stories"
+        created_at: "2026-02-12T20:36:00Z"
+        updated_at: "2026-02-12T21:45:00Z"
+        agent: "requirements-analyst"
+        note: "Added US-017 to US-022"
+      - path: "requirements/nfr-document.yml"
+        type: "nfr_document"
+        created_at: "2026-02-12T20:37:00Z"
+        agent: "requirements-analyst"
+      - path: "requirements/data-model.yml"
+        type: "data_model"
+        created_at: "2026-02-12T20:38:00Z"
+        agent: "data-architect"
+
+    phase_3:
+      - path: "decisions/ADR-001-database-selection.yml"
+        type: "adr"
+        created_at: "2026-02-12T20:46:44Z"
+        updated_at: "2026-02-12T21:35:00Z"
+        agent: "system-architect"
+        revision: 2
+      - path: "decisions/ADR-002-github-authentication.yml"
+        type: "adr"
+        created_at: "2026-02-12T20:46:44Z"
+        agent: "system-architect"
+      - path: "decisions/ADR-003-export-format.yml"
+        type: "adr"
+        created_at: "2026-02-12T20:52:17Z"
+        updated_at: "2026-02-12T21:35:00Z"
+        agent: "system-architect"
+        revision: 2
+      - path: "decisions/ADR-004-collection-architecture.yml"
+        type: "adr"
+        created_at: "2026-02-12T20:52:17Z"
+        updated_at: "2026-02-12T21:35:00Z"
+        agent: "system-architect"
+        revision: 2
+      - path: "decisions/ADR-005-data-segregation.yml"
+        type: "adr"
+        created_at: "2026-02-12T20:52:17Z"
+        agent: "system-architect"
+      - path: "decisions/ADR-006-backup-strategy.yml"
+        type: "adr"
+        created_at: "2026-02-12T21:45:00Z"
+        agent: "system-architect"
+      - path: "architecture/component-diagram.md"
+        type: "architecture_diagram"
+        created_at: "2026-02-12T20:55:00Z"
+        agent: "system-architect"
+      - path: "architecture/threat-model.yml"
+        type: "threat_model"
+        created_at: "2026-02-12T20:55:33Z"
+        agent: "threat-modeler"
+      - path: "architecture/architecture-summary.md"
+        type: "architecture_document"
+        created_at: "2026-02-12T20:58:00Z"
+        updated_at: "2026-02-12T21:50:00Z"
+        agent: "system-architect"
+        revision: 2
+      - path: "data/data-model.md"
+        type: "data_model_detailed"
+        created_at: "2026-02-12T21:00:00Z"
+        updated_at: "2026-02-12T21:45:00Z"
+        agent: "data-architect"
+        revision: 2
+
+    phase_4:
+      - path: "planning/task-breakdown.yml"
+        type: "task_breakdown"
+        created_at: "2026-02-12T21:22:15Z"
+        updated_at: "2026-02-12T21:50:00Z"
+        agent: "delivery-planner"
+        revision: 2
+        note: "Rewritten for 4 sprints, local-first architecture"
+      - path: "planning/sprint-plan.md"
+        type: "sprint_plan"
+        created_at: "2026-02-12T21:25:00Z"
+        agent: "delivery-planner"
+
+  pending_decisions: []
+
+  cost_summary:
+    original_estimate: "$20/month (~$240/year)"
+    revised_estimate: "$0/month ($0/year)"
+    savings: "$240/year"
+    reason: "Local-first architecture using existing infrastructure"
+
+  github_integration:
+    project_number: null  # A ser criado
+    milestone: "Sprint 1 - Foundation"
+    labels_created: true
+
+  next_phase:
+    number: 5
+    name: "Implementation"
+    agents: ["code-author", "test-author", "code-reviewer"]
+    gate_required: "phase-4-to-5"
+    expected_duration: "8 weeks (4 sprints)"
