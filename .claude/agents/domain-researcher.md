@@ -32,8 +32,38 @@ allowed-tools:
   - Grep
   - WebSearch
   - WebFetch
----
 
+# --- Agent Contract (Constitution v1.0.0 Principle XI, tier-2 auto-migrated) ---
+contract_version: "1.0"
+inputs:
+  - name: request
+    type: markdown
+    required: true
+    description: "Pesquisador de dominio que busca conhecimento externo e interno."
+outputs:
+  - name: result
+    type: markdown
+    description: "Output produced by domain-researcher; see agent body for format details."
+context_budget:
+  max_tokens: 30000
+  required_files:
+    - .specify/memory/constitution.md
+preconditions:
+  - caller has provided a parseable request
+postconditions:
+  - output respects the agent's declared output type
+failure_modes:
+  - trigger: request cannot be parsed
+    severity: medium
+    recovery: return structured error; do not guess intent
+sla:
+  wallclock_seconds_p95: 180
+observability:
+  emit_event: domain-researcher.completed
+  metrics:
+    - tokens_consumed
+    - tool_calls
+---
 # Domain Researcher Agent
 
 ## Missao

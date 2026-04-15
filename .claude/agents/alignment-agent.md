@@ -15,8 +15,38 @@ allowed-tools:
   - TodoWrite
 user-invocable: true
 version: "1.0.0"
----
 
+# --- Agent Contract (Constitution v1.0.0 Principle XI, tier-2 auto-migrated) ---
+contract_version: "1.0"
+inputs:
+  - name: request
+    type: markdown
+    required: true
+    description: "Agente especializado em capturar, documentar e versionar decis\u00f5es organizacionais (ODRs)."
+outputs:
+  - name: result
+    type: yaml
+    description: "Output produced by alignment-agent; see agent body for format details."
+context_budget:
+  max_tokens: 25000
+  required_files:
+    - .specify/memory/constitution.md
+preconditions:
+  - caller has provided a parseable request
+postconditions:
+  - output respects the agent's declared output type
+failure_modes:
+  - trigger: request cannot be parsed
+    severity: medium
+    recovery: return structured error; do not guess intent
+sla:
+  wallclock_seconds_p95: 90
+observability:
+  emit_event: alignment-agent.completed
+  metrics:
+    - tokens_consumed
+    - tool_calls
+---
 # Alignment Agent
 
 ## Propósito

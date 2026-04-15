@@ -39,8 +39,38 @@ description: |
 model: sonnet
 skills:
   - rag-query
----
 
+# --- Agent Contract (Constitution v1.0.0 Principle XI, tier-2 auto-migrated) ---
+contract_version: "1.0"
+inputs:
+  - name: request
+    type: markdown
+    required: true
+    description: "Curador do corpus RAG. Gerencia adicao, organizacao e manutencao"
+outputs:
+  - name: result
+    type: yaml
+    description: "Output produced by rag-curator; see agent body for format details."
+context_budget:
+  max_tokens: 20000
+  required_files:
+    - .specify/memory/constitution.md
+preconditions:
+  - caller has provided a parseable request
+postconditions:
+  - output respects the agent's declared output type
+failure_modes:
+  - trigger: request cannot be parsed
+    severity: medium
+    recovery: return structured error; do not guess intent
+sla:
+  wallclock_seconds_p95: 60
+observability:
+  emit_event: rag-curator.completed
+  metrics:
+    - tokens_consumed
+    - tool_calls
+---
 # RAG Curator Agent
 
 ## Missao

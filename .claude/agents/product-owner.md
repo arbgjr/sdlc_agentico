@@ -23,8 +23,38 @@ description: |
 model: sonnet
 skills:
   - rag-query
----
 
+# --- Agent Contract (Constitution v1.0.0 Principle XI, tier-2 auto-migrated) ---
+contract_version: "1.0"
+inputs:
+  - name: request
+    type: markdown
+    required: true
+    description: "Product Owner que define visao, prioriza backlog e garante valor de negocio."
+outputs:
+  - name: result
+    type: markdown
+    description: "Output produced by product-owner; see agent body for format details."
+context_budget:
+  max_tokens: 25000
+  required_files:
+    - .specify/memory/constitution.md
+preconditions:
+  - caller has provided a parseable request
+postconditions:
+  - output respects the agent's declared output type
+failure_modes:
+  - trigger: request cannot be parsed
+    severity: medium
+    recovery: return structured error; do not guess intent
+sla:
+  wallclock_seconds_p95: 60
+observability:
+  emit_event: product-owner.completed
+  metrics:
+    - tokens_consumed
+    - tool_calls
+---
 # Product Owner Agent
 
 ## Missao

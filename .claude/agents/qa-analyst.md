@@ -38,8 +38,38 @@ denied_tools:
   - Edit           # No code modification
   - Write          # No creating production code (tests OK via Bash)
   - Task           # No spawning sub-agents
----
 
+# --- Agent Contract (Constitution v1.0.0 Principle XI, tier-2 auto-migrated) ---
+contract_version: "1.0"
+inputs:
+  - name: request
+    type: markdown
+    required: true
+    description: "Analista de QA que coordena estrategia de testes e valida qualidade."
+outputs:
+  - name: result
+    type: markdown
+    description: "Output produced by qa-analyst; see agent body for format details."
+context_budget:
+  max_tokens: 25000
+  required_files:
+    - .specify/memory/constitution.md
+preconditions:
+  - caller has provided a parseable request
+postconditions:
+  - output respects the agent's declared output type
+failure_modes:
+  - trigger: request cannot be parsed
+    severity: medium
+    recovery: return structured error; do not guess intent
+sla:
+  wallclock_seconds_p95: 90
+observability:
+  emit_event: qa-analyst.completed
+  metrics:
+    - tokens_consumed
+    - tool_calls
+---
 # QA Analyst Agent
 
 ## Missao

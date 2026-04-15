@@ -26,8 +26,9 @@ from _lib.harness import CaseResult, Report, cli_args, emit_report  # noqa: E402
 
 AGENTS_DIR = REPO_ROOT / ".claude" / "agents"
 
-# Phase B — priority agents that MUST carry contracts.
-PRIORITY_ALLOWLIST = {
+# Tier 1 — priority agents that carry FULL strict contracts (hand-authored).
+# These get the strict case body below plus the generic all-agents pass.
+TIER1_STRICT_ALLOWLIST = {
     "code-reviewer",
     "requirements-analyst",
     "system-architect",
@@ -35,6 +36,14 @@ PRIORITY_ALLOWLIST = {
     "security-scanner",
     "orchestrator",
 }
+
+def _list_all_agents() -> list[str]:
+    """Every .md file under .claude/agents/ that isn't a template or dotfile."""
+    return sorted(
+        p.stem
+        for p in AGENTS_DIR.glob("*.md")
+        if not p.name.startswith("_") and not p.name.startswith(".")
+    )
 
 REQUIRED_CONTRACT_KEYS = {
     "contract_version",
@@ -60,9 +69,32 @@ def _read_frontmatter(path: Path) -> dict | None:
         return None
 
 
+def case_all_agents_have_contract_key() -> list[CaseResult]:
+    """Tier-2 check: every agent under .claude/agents MUST declare contract_version.
+    Absence of the key is the minimum regression signal.
+    """
+    results: list[CaseResult] = []
+    for name in _list_all_agents():
+        path = AGENTS_DIR / f"{name}.md"
+        fm = _read_frontmatter(path) or {}
+        has_key = "contract_version" in fm
+        results.append(
+            CaseResult(
+                case_id=f"tier2-{name}",
+                passed=has_key,
+                failures=[] if has_key else ["contract_version missing"],
+                actual_summary={
+                    "contract_version": fm.get("contract_version"),
+                    "role_inferred": True if has_key else False,
+                },
+            )
+        )
+    return results
+
+
 def case_priority_agents_have_contracts() -> list[CaseResult]:
     results: list[CaseResult] = []
-    for name in sorted(PRIORITY_ALLOWLIST):
+    for name in sorted(TIER1_STRICT_ALLOWLIST):
         path = AGENTS_DIR / f"{name}.md"
         failures: list[str] = []
         if not path.exists():
@@ -151,6 +183,8 @@ def case_migration_progress() -> CaseResult:
 def main() -> int:
     (as_json,) = cli_args()
     report = Report(suite="agent-contracts")
+    for r in case_all_agents_have_contract_key():
+        report.add(r)
     for r in case_priority_agents_have_contracts():
         report.add(r)
     report.add(case_migration_progress())

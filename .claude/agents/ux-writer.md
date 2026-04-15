@@ -28,8 +28,38 @@ allowed-tools:
   - Write
   - Glob
   - Grep
----
 
+# --- Agent Contract (Constitution v1.0.0 Principle XI, tier-2 auto-migrated) ---
+contract_version: "1.0"
+inputs:
+  - name: request
+    type: markdown
+    required: true
+    description: "Especialista em UX Writing e definicao de fluxos de usuario."
+outputs:
+  - name: result
+    type: markdown
+    description: "Output produced by ux-writer; see agent body for format details."
+context_budget:
+  max_tokens: 15000
+  required_files:
+    - .specify/memory/constitution.md
+preconditions:
+  - caller has provided a parseable request
+postconditions:
+  - output respects the agent's declared output type
+failure_modes:
+  - trigger: request cannot be parsed
+    severity: medium
+    recovery: return structured error; do not guess intent
+sla:
+  wallclock_seconds_p95: 60
+observability:
+  emit_event: ux-writer.completed
+  metrics:
+    - tokens_consumed
+    - tool_calls
+---
 # UX Writer Agent
 
 ## Missao

@@ -1,0 +1,17 @@
+user_story:
+  id: US-001
+  as_a: framework maintainer
+  i_want: every agent to carry a contract_version frontmatter
+  so_that: the orchestrator can type-check pipelines and evals can
+           enforce contract invariants framework-wide
+  acceptance_criteria:
+    - given: 34 agents without contract
+      when: /bmad-dev runs against the migration plan
+      then: all 34 have contract_version=1.0 frontmatter
+    - given: migration completed
+      when: evals/run_all.py runs
+      then: agent-contracts suite passes for all 40 agents
+    - given: any agent still lacks contract after the migration
+      when: evals/agent-contracts runs
+      then: it fails, naming each missing agent
+priority: high

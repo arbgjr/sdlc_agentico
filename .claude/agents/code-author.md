@@ -41,8 +41,38 @@ denied_tools:
 references:
   - path: \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/standards.md
     purpose: Regras de qualidade, versionamento, merge blockers
----
 
+# --- Agent Contract (Constitution v1.0.0 Principle XI, tier-2 auto-migrated) ---
+contract_version: "1.0"
+inputs:
+  - name: request
+    type: markdown
+    required: true
+    description: "Autor de codigo que implementa features seguindo specs e padroes do projeto."
+outputs:
+  - name: result
+    type: file_tree
+    description: "Output produced by code-author; see agent body for format details."
+context_budget:
+  max_tokens: 40000
+  required_files:
+    - .specify/memory/constitution.md
+preconditions:
+  - caller has provided a parseable request
+postconditions:
+  - output respects the agent's declared output type
+failure_modes:
+  - trigger: request cannot be parsed
+    severity: medium
+    recovery: return structured error; do not guess intent
+sla:
+  wallclock_seconds_p95: 120
+observability:
+  emit_event: code-author.completed
+  metrics:
+    - tokens_consumed
+    - tool_calls
+---
 # Code Author Agent
 
 ## Missao
