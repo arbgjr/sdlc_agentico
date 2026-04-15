@@ -1,0 +1,6 @@
+case_id: 002-malformed-no-stride
+description: |
+  Negative case: a threat model that claims methodology other than
+  STRIDE must fail validation. Guards against silent regression of
+  the contract check.
+expect_failure: true

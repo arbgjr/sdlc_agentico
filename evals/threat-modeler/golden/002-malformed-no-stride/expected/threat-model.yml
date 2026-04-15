@@ -1,0 +1,7 @@
+threat_model:
+  methodology: OWASP-risk-rating    # deliberately wrong
+  threats:
+    - id: T-001
+      category: Tampering
+      asset: api
+      mitigation: logs

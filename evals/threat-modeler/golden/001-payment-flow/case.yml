@@ -1,0 +1,10 @@
+case_id: 001-payment-flow
+description: |
+  A well-formed STRIDE threat model for a payment integration. Must
+  cover at least Tampering (callback integrity) and Information
+  Disclosure (PII in payment records), each with actionable mitigation.
+min_threats: 3
+requires_categories:
+  - Tampering
+  - Information Disclosure
+min_high_severity: 1

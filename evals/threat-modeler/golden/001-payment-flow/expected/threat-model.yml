@@ -1,0 +1,36 @@
+threat_model:
+  methodology: STRIDE
+  scope: PIX payment integration (payment-service + order-service)
+  threats:
+    - id: T-001
+      category: Tampering
+      asset: payment_callback_endpoint
+      severity: HIGH
+      description: |
+        Malicious actor could forge a payment_confirmed callback to
+        mark orders paid without real settlement.
+      mitigation: |
+        Require HMAC-SHA256 signature on every provider callback,
+        validate against rotating shared secret; reject unsigned.
+    - id: T-002
+      category: Information Disclosure
+      asset: customer_cpf (PII)
+      severity: HIGH
+      description: |
+        customer_cpf stored with payment could leak via logs, traces,
+        or insecure queries.
+      mitigation: |
+        Encrypt cpf at rest with envelope encryption; redact in logs
+        via observability sanitizer; access-control DB queries.
+    - id: T-003
+      category: Repudiation
+      asset: payment_events
+      severity: MEDIUM
+      description: Disputes could arise if events cannot be traced
+      mitigation: Store signed event envelopes with correlation_id
+    - id: T-004
+      category: Denial of Service
+      asset: payment-service callback endpoint
+      severity: MEDIUM
+      description: Callback endpoint could be flooded
+      mitigation: Rate-limit per provider IP; circuit breaker around DB writes

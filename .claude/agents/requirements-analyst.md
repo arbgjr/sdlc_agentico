@@ -40,6 +40,53 @@ denied_tools:
   - Bash           # No command execution
   - Edit           # No code modification
   - Task           # No spawning sub-agents
+
+# --- Agent Contract (Constitution v1.0.0 Principle XI) ---
+contract_version: "1.0"
+inputs:
+  - name: feature_description
+    type: markdown
+    required: true
+    description: Free-form description from product-owner or user
+  - name: domain_context
+    type: markdown
+    required: false
+    description: Existing domain artifacts relevant to the request
+outputs:
+  - name: user_stories
+    type: yaml
+    path_pattern: .specify/specs/<slug>/requirements/US-*.yml
+    description: One YAML file per user story with Given/When/Then criteria
+    contains:
+      - every file has user_story.id
+      - every story has at least one acceptance_criteria entry
+      - every criteria entry has given/when/then keys
+  - name: nfr_document
+    type: yaml
+    path_pattern: .specify/specs/<slug>/requirements/nfr.yml
+    description: Non-functional requirements with quantified targets
+context_budget:
+  max_tokens: 25000
+  required_files:
+    - .specify/memory/constitution.md
+    - .agentic_sdlc/templates/spec-template.md
+preconditions:
+  - spec.md exists in draft or approved state
+postconditions:
+  - every acceptance criterion is testable (has a verifiable then-clause)
+  - no NFR is expressed with vague words (fast/many/low)
+failure_modes:
+  - trigger: ambiguity detected by requirements-interrogator
+    severity: high
+    recovery: loop via /clarify before approving
+sla:
+  wallclock_seconds_p95: 90
+observability:
+  emit_event: requirements.produced
+  metrics:
+    - stories_count
+    - nfr_count
+    - ambiguity_count_post_clarify
 ---
 
 # Requirements Analyst Agent

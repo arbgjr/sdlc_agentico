@@ -1,0 +1,201 @@
+# SDLC Agêntico — Service Level Objectives
+#
+# Each SLO is tracked via Loki/Tempo/Prometheus metrics emitted by the
+# skill that owns the signal. Burn-rate alerts fire via Grafana and
+# open a priority/p1 issue through observability-engineer automation
+# (see .claude/skills/copilot-cloud-agent/scripts/ + future
+# observability-engineer wiring).
+#
+# Constitution reference: Principle IV (observability is part of
+# delivery). Every skill that ships MUST either contribute a metric
+# here or explain in its SKILL.md why it is exempt.
+#
+# Format: one entry per SLO, loosely modeled after Google SRE's SLO
+# document. Thresholds are editable but movements require an ADR.
+
+version: 1
+schema_version: "1.0"
+
+defaults:
+  measurement_window: 7d
+  burn_rate_windows:
+    - short: 1h
+      long: 5m
+      factor: 14.4    # 2% of 30d budget consumed in 1h
+    - short: 6h
+      long: 30m
+      factor: 6       # 5% of 30d budget consumed in 6h
+
+slos:
+
+  # ---------------------------------------------------------------------
+  # Gate evaluation — the load-bearing decision point between phases
+  # ---------------------------------------------------------------------
+  - name: gate_evaluator_decision_latency
+    owner: gate-evaluator
+    description: >
+      Time from /gate-check invocation to structured decision (approve /
+      reject / escalate).
+    sli:
+      kind: latency
+      query: 'histogram_quantile(0.99, sdlc_gate_decision_seconds_bucket)'
+      unit: seconds
+    objective:
+      target: 8
+      comparison: less_or_equal
+      target_percentile: P99
+    burn_rate_alerts: inherit_from_defaults
+    evals:
+      - evals/gate-evaluator/runner.py
+
+  - name: gate_evaluator_availability
+    owner: gate-evaluator
+    description: >
+      Fraction of /gate-check runs that produce a structured decision
+      (not a runner exception).
+    sli:
+      kind: availability
+      query: 'sdlc_gate_runs_success_total / sdlc_gate_runs_total'
+      unit: ratio
+    objective:
+      target: 0.999
+      comparison: greater_or_equal
+    burn_rate_alerts: inherit_from_defaults
+
+  # ---------------------------------------------------------------------
+  # Phase 6 parallelization — Copilot Cloud Agent (default)
+  # ---------------------------------------------------------------------
+  - name: copilot_task_wallclock
+    owner: copilot-cloud-agent
+    description: >
+      End-to-end wallclock time from dispatcher.create_issue to PR
+      merged, including Copilot iterations and review-relay loops.
+    sli:
+      kind: latency
+      query: 'histogram_quantile(0.95, sdlc_copilot_task_wallclock_seconds_bucket)'
+      unit: seconds
+    objective:
+      target: 5400          # 90 minutes
+      comparison: less_or_equal
+      target_percentile: P95
+    escalation:
+      breach_action: auto_open_issue_priority_p2
+
+  - name: copilot_agent_retry_rate
+    owner: copilot-cloud-agent
+    description: >
+      Per-task retry count emitted by review_relay when Copilot needs
+      to address CRITICAL/HIGH findings.
+    sli:
+      kind: distribution
+      query: 'histogram_quantile(0.95, sdlc_copilot_agent_retry_count_bucket)'
+      unit: count
+    objective:
+      target: 1
+      comparison: less_or_equal
+      target_percentile: P95
+    rationale: >
+      If P95 tasks need more than 1 automated retry, the story-context
+      documents are leaking ambiguity and the /tasks shard step needs
+      strengthening.
+
+  - name: copilot_review_rejection_rate
+    owner: copilot-cloud-agent
+    description: >
+      Fraction of Copilot-authored PRs that review_relay sends back
+      with CRITICAL or HIGH findings on first pass.
+    sli:
+      kind: ratio
+      query: 'sdlc_copilot_prs_rejected_total / sdlc_copilot_prs_reviewed_total'
+      unit: ratio
+    objective:
+      target: 0.20
+      comparison: less_or_equal
+    rationale: >
+      > 20% first-pass rejections is a signal that something upstream
+      (plan, tasks, context bundle) is underspecified.
+
+  - name: copilot_review_rounds
+    owner: copilot-cloud-agent
+    description: Number of review rounds required per PR before merge.
+    sli:
+      kind: distribution
+      query: 'histogram_quantile(0.95, sdlc_copilot_review_rounds_bucket)'
+      unit: count
+    objective:
+      target: 2
+      comparison: less_or_equal
+      target_percentile: P95
+
+  # ---------------------------------------------------------------------
+  # Resilience layer — wraps every external/MCP call
+  # ---------------------------------------------------------------------
+  - name: resilience_circuit_open_minutes_daily
+    owner: resilience
+    description: >
+      Total minutes per day any named circuit breaker is open. High
+      values indicate a sick dependency, not sick business logic.
+    sli:
+      kind: duration_sum
+      query: 'sum(increase(sdlc_resilience_circuit_open_seconds_total[1d])) / 60'
+      unit: minutes
+    objective:
+      target: 5
+      comparison: less_or_equal
+
+  - name: resilience_retry_exhaustion_rate
+    owner: resilience
+    description: >
+      Rate of wrapped calls that exhausted all retry attempts. A high
+      rate means the default attempts count or backoff is wrong, not
+      that the operation is impossible.
+    sli:
+      kind: ratio
+      query: >
+        sdlc_resilience_retry_exhausted_total
+        /
+        sdlc_resilience_calls_total
+    objective:
+      target: 0.01
+      comparison: less_or_equal
+
+  # ---------------------------------------------------------------------
+  # Specification quality — SDD invariants
+  # ---------------------------------------------------------------------
+  - name: clarify_rounds_to_approval
+    owner: spec-kit-integration
+    description: >
+      How many /clarify rounds a spec needed before /analyze approved
+      it. Distribution is the signal, not the mean.
+    sli:
+      kind: distribution
+      query: 'histogram_quantile(0.95, sdlc_clarify_rounds_bucket)'
+      unit: count
+    objective:
+      target: 3
+      comparison: less_or_equal
+      target_percentile: P95
+
+  - name: constitution_amendment_cadence
+    owner: playbook-governance
+    description: >
+      Frequency of Constitution amendments. Too frequent = Constitution
+      too tactical. Never = Constitution ossified and ignored.
+    sli:
+      kind: event_rate
+      query: 'sdlc_constitution_amendments_total'
+      unit: count_per_quarter
+    objective:
+      target_min: 0
+      target_max: 2
+
+enforcement:
+  review: |
+    SLO changes require an ADR. New SLOs added by PRs that introduce a
+    new skill MUST reference the skill's SKILL.md section.
+  burn_rate_automation: |
+    Grafana alert rules in .claude/config/logging/dashboards/slo-burn-rate.json
+    (to be authored) open GitHub issues with priority labels when the
+    fast/long burn-rate windows breach. The observability-engineer
+    agent owns the runbook for each SLO in
+    .agentic_sdlc/docs/runbooks/slo-<name>.md.
