@@ -1,14 +1,17 @@
 case_id: 002-spec-and-requirements-present
 description: |
-  Phase 2→3 must APPROVE when both required artifacts (spec.md and
-  requirements YAML) exist. Sanity check on the happy path.
+  Phase 2→3 must ESCALATE (not approve silently) when all SDD artifacts
+  are present AND meet quality checks. Human approval is required by
+  Constitution Principle VIII for the Requirements → Architecture
+  transition, so the gate must route to human review — never auto-approve.
 agent: gate-evaluator
 inputs:
   from_phase: 2
   to_phase: 3
   project_id: synthetic-002
 expected:
-  decision: approve
+  decision: escalate
   passed: true
+  human_approval_required: true
   artifact_present_count: 2
   score_at_least: 0.99
