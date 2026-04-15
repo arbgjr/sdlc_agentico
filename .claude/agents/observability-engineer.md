@@ -33,8 +33,38 @@ allowed-tools:
 references:
   - path: \.agentic_sdlc/docs/engineering-playbook/stacks/devops/observability.md
     purpose: Padroes de monitoramento, logs, metricas, alertas
----
 
+# --- Agent Contract (Constitution v1.0.0 Principle XI, tier-2 auto-migrated) ---
+contract_version: "1.0"
+inputs:
+  - name: request
+    type: markdown
+    required: true
+    description: "Engenheiro de observabilidade responsavel por dashboards, alertas e tracing."
+outputs:
+  - name: result
+    type: file_tree
+    description: "Output produced by observability-engineer; see agent body for format details."
+context_budget:
+  max_tokens: 35000
+  required_files:
+    - .specify/memory/constitution.md
+preconditions:
+  - caller has provided a parseable request
+postconditions:
+  - output respects the agent's declared output type
+failure_modes:
+  - trigger: request cannot be parsed
+    severity: medium
+    recovery: return structured error; do not guess intent
+sla:
+  wallclock_seconds_p95: 180
+observability:
+  emit_event: observability-engineer.completed
+  metrics:
+    - tokens_consumed
+    - tool_calls
+---
 # Observability Engineer Agent
 
 ## Missao

@@ -48,6 +48,54 @@ skills:
   - github-wiki
   - github-sync
   - doc-generator
+
+# --- Agent Contract (Constitution v1.0.0 Principle XI) ---
+contract_version: "1.0"
+inputs:
+  - name: user_request
+    type: markdown
+    required: true
+    description: The top-level intent (feature description, request, or command)
+  - name: current_phase
+    type: integer
+    required: false
+    description: Current SDLC phase (0..9), inferred from state if absent
+outputs:
+  - name: next_action
+    type: yaml
+    description: Structured directive for the next step
+    contains:
+      - action in [invoke_command, invoke_agent, await_human, reject]
+      - target references a valid command or agent name
+      - reasoning is non-empty
+context_budget:
+  max_tokens: 80000
+  required_files:
+    - .specify/memory/constitution.md
+    - .agentic_sdlc/docs/playbook.md
+  optional_files:
+    - .project/state.yml
+preconditions:
+  - Constitution loaded and current
+  - SDLC state tracked or derivable
+postconditions:
+  - action is consistent with the complexity level and phase
+  - any cross-phase advance must include a gate_check reference
+failure_modes:
+  - trigger: user request is ambiguous
+    severity: medium
+    recovery: route to intake-analyst or requirements-interrogator
+  - trigger: a high-impact decision detected
+    severity: high
+    recovery: escalate to human approval (Constitution Principle V + security_by_design)
+sla:
+  wallclock_seconds_p95: 30
+observability:
+  emit_event: orchestration.decision
+  metrics:
+    - decisions_total
+    - escalations_total
+    - phase_advances
 ---
 
 # Orchestrator Agent

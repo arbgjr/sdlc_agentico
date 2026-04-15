@@ -33,8 +33,38 @@ allowed-tools:
 references:
   - path: \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/testes.md
     purpose: Estrategia de testes, piramide, cobertura por risco
----
 
+# --- Agent Contract (Constitution v1.0.0 Principle XI, tier-2 auto-migrated) ---
+contract_version: "1.0"
+inputs:
+  - name: request
+    type: markdown
+    required: true
+    description: "Autor de testes que cria testes unitarios, integracao e e2e."
+outputs:
+  - name: result
+    type: file_tree
+    description: "Output produced by test-author; see agent body for format details."
+context_budget:
+  max_tokens: 40000
+  required_files:
+    - .specify/memory/constitution.md
+preconditions:
+  - caller has provided a parseable request
+postconditions:
+  - output respects the agent's declared output type
+failure_modes:
+  - trigger: request cannot be parsed
+    severity: medium
+    recovery: return structured error; do not guess intent
+sla:
+  wallclock_seconds_p95: 120
+observability:
+  emit_event: test-author.completed
+  metrics:
+    - tokens_consumed
+    - tool_calls
+---
 # Test Author Agent
 
 ## Missao

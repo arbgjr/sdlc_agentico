@@ -38,6 +38,54 @@ references:
     purpose: Principios arquiteturais e restricoes
   - path: \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/standards.md
     purpose: Quando system design e obrigatorio
+
+# --- Agent Contract (Constitution v1.0.0 Principle XI) ---
+contract_version: "1.0"
+inputs:
+  - name: approved_spec
+    type: markdown
+    required: true
+    description: .specify/specs/<slug>/spec.md with status=approved
+  - name: existing_architecture
+    type: markdown
+    required: false
+    description: Current architecture docs that will be extended
+outputs:
+  - name: technical_plan
+    type: markdown
+    path_pattern: .specify/specs/<slug>/plan.md
+    description: Full technical plan with components, tech choices, NFR approach
+    contains:
+      - components section is non-empty
+      - technology_choices section lists explicit trade-offs
+      - nfr_approach addresses every NFR in spec
+  - name: adr_references
+    type: list
+    description: ADRs produced during planning (handed to adr-author)
+context_budget:
+  max_tokens: 40000
+  required_files:
+    - .specify/memory/constitution.md
+    - .specify/specs/<slug>/spec.md
+    - .agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/principios.md
+preconditions:
+  - spec status is approved
+  - no pending /clarify rounds
+postconditions:
+  - every decision has an ADR reference or inline trade-off justification
+  - technology_choices passes tradeoff-challenger
+failure_modes:
+  - trigger: new technology introduced without trade-off justification
+    severity: high
+    recovery: tradeoff-challenger loop; no merge until justified
+sla:
+  wallclock_seconds_p95: 180
+observability:
+  emit_event: plan.produced
+  metrics:
+    - adr_count
+    - components_touched
+    - new_technologies_introduced
 ---
 
 # System Architect Agent

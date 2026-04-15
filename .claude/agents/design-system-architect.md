@@ -25,8 +25,38 @@ references:
     purpose: Template para especificação técnica de componentes
   - path: .project/design/specifications/visual-design-spec.md
     purpose: Visual design specs do product-designer (Phase 4 input)
----
 
+# --- Agent Contract (Constitution v1.0.0 Principle XI, tier-2 auto-migrated) ---
+contract_version: "1.0"
+inputs:
+  - name: request
+    type: markdown
+    required: true
+    description: "Arquiteto de Design System que define tokens, especifica\u00e7\u00f5es de componentes e governan\u00e7a."
+outputs:
+  - name: result
+    type: markdown
+    description: "Output produced by design-system-architect; see agent body for format details."
+context_budget:
+  max_tokens: 40000
+  required_files:
+    - .specify/memory/constitution.md
+preconditions:
+  - caller has provided a parseable request
+postconditions:
+  - output respects the agent's declared output type
+failure_modes:
+  - trigger: request cannot be parsed
+    severity: medium
+    recovery: return structured error; do not guess intent
+sla:
+  wallclock_seconds_p95: 180
+observability:
+  emit_event: design-system-architect.completed
+  metrics:
+    - tokens_consumed
+    - tool_calls
+---
 # Design System Architect Agent
 
 ## Missão

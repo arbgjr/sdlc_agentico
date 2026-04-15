@@ -31,6 +31,53 @@ allowed-tools:
 references:
   - path: \.agentic_sdlc/docs/engineering-playbook/stacks/devops/security.md
     purpose: Requisitos de seguranca, thresholds de vulnerabilidades
+
+# --- Agent Contract (Constitution v1.0.0 Principle XI) ---
+contract_version: "1.0"
+inputs:
+  - name: source_tree
+    type: path
+    required: true
+    description: Project directory or diff to scan
+  - name: scan_scope
+    type: string
+    required: false
+    description: "sast | sca | secrets | full (default full)"
+outputs:
+  - name: scan_report
+    type: yaml
+    path_pattern: .project/reports/security-scan-<date>.yml
+    description: Aggregated findings from SAST + SCA + secrets
+    contains:
+      - findings is list
+      - every finding has tool, severity, cve_or_rule, file, line
+      - severity in [CRITICAL, HIGH, MEDIUM, LOW, INFO]
+context_budget:
+  max_tokens: 20000
+  required_files:
+    - .specify/memory/constitution.md
+    - .agentic_sdlc/docs/engineering-playbook/stacks/devops/security.md
+preconditions:
+  - source tree exists and is readable
+  - scan tools (bandit, pip-audit, etc.) installed when in Python mode
+postconditions:
+  - every CRITICAL finding has remediation guidance
+  - exit code non-zero if any CRITICAL or HIGH not waived
+failure_modes:
+  - trigger: CVSS >= 7.0 vulnerability
+    severity: critical
+    recovery: block release; escalate per security_by_design triggers
+  - trigger: secret pattern matched
+    severity: critical
+    recovery: rotate credential; block PR; require ADR exception if intentional
+sla:
+  wallclock_seconds_p95: 300
+observability:
+  emit_event: security_scan.completed
+  metrics:
+    - findings_by_severity
+    - cve_count
+    - secrets_count
 ---
 
 # Security Scanner Agent

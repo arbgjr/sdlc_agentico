@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/enforce-tool-access.py || python .claude/hooks/enforce-tool-access.py",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/enforce-tool-access.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/enforce-tool-access.py\"",
             "description": "Tool Access Control - validates tool usage against agent-specific allow/deny lists"
           }
         ]
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/ensure-feature-branch.py || python .claude/hooks/ensure-feature-branch.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ensure-feature-branch.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ensure-feature-branch.py\""
           }
         ]
       },
@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/ensure-feature-branch.py || python .claude/hooks/ensure-feature-branch.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ensure-feature-branch.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ensure-feature-branch.py\""
           }
         ]
       },
@@ -46,7 +46,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/ensure-feature-branch.py || python .claude/hooks/ensure-feature-branch.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ensure-feature-branch.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ensure-feature-branch.py\""
           }
         ]
       },
@@ -55,7 +55,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/validate-commit.py || python .claude/hooks/validate-commit.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/validate-commit.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/validate-commit.py\""
           }
         ]
       },
@@ -64,7 +64,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/check-gate.py auto || python .claude/hooks/check-gate.py auto"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/check-gate.py\" auto || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/check-gate.py\" auto"
           }
         ]
       }
@@ -112,23 +112,23 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/detect-client.py || python .claude/hooks/detect-client.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/detect-client.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/detect-client.py\""
           },
           {
             "type": "command",
-            "command": "python3 .claude/hooks/detect-phase.py || python .claude/hooks/detect-phase.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/detect-phase.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/detect-phase.py\""
           },
           {
             "type": "command",
-            "command": "python3 .claude/hooks/auto-migrate.py || python .claude/hooks/auto-migrate.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/auto-migrate.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/auto-migrate.py\""
           },
           {
             "type": "command",
-            "command": "python3 .claude/hooks/detect-documents.py || python .claude/hooks/detect-documents.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/detect-documents.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/detect-documents.py\""
           },
           {
             "type": "command",
-            "command": "python3 .claude/hooks/validate-framework-structure.py || python .claude/hooks/validate-framework-structure.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/validate-framework-structure.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/validate-framework-structure.py\""
           }
         ]
       }
@@ -139,7 +139,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/pre-compact-analyzer.py || python .claude/hooks/pre-compact-analyzer.py",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/pre-compact-analyzer.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/pre-compact-analyzer.py\"",
             "description": "Extract learnings from session before automatic compaction"
           }
         ]
@@ -234,11 +234,21 @@
     },
     "parallelization": {
       "strategies": {
+        "copilot_cloud_agent": {
+          "enabled": true,
+          "default_for_phases": [6],
+          "max_concurrent": 10,
+          "requires_github_copilot_agent": true,
+          "requires_feature_branch": true,
+          "retry_budget_per_task": 3,
+          "review_relay": true
+        },
         "parallel_workers": {
           "enabled": true,
           "phases": [6],
           "max_workers": 5,
-          "requires_git_worktrees": true
+          "requires_git_worktrees": true,
+          "role": "fallback_when_local_env_required"
         },
         "agent_teams": {
           "enabled": false,
@@ -247,7 +257,14 @@
           "token_budget_multiplier": 3.0
         }
       },
-      "strategy_selection": "auto"
+      "strategy_selection": "auto",
+      "default_strategy": "copilot_cloud_agent",
+      "selection_rules": [
+        "if task.parallelization_hint == 'human_only' then route_to_humans",
+        "if task.parallelization_hint == 'local_worker' then parallel_workers",
+        "if task.parallelization_hint == 'copilot_cloud_agent' then copilot_cloud_agent",
+        "else default_strategy"
+      ]
     },
     "clients": {
       "enabled": true,

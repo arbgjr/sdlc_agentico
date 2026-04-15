@@ -7,6 +7,118 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-04-15
+
+### Added — SDD activated natively
+
+- `.specify/memory/constitution.md` v1.0.0 with 11 ratified principles
+  (natural-language-first, anti-mock, security-by-design, observability,
+  ADR discipline, small-changes, quality-as-author, SDD, BMAD bifurcation,
+  Copilot cloud-first, harness integrity).
+- Native SDD commands: `/constitution`, `/specify`, `/plan`, `/tasks`,
+  `/clarify`, `/analyze`. Each delegates to the right local agents and
+  produces artifacts under `.specify/specs/<slug>/`.
+- `.agentic_sdlc/templates/story-context.md` — BMAD context-engineered
+  story template consumed verbatim by the dispatcher.
+
+### Added — BMAD planning / dev bifurcation
+
+- `/bmad-plan` and `/bmad-dev` commands split the canonical BMAD flow
+  (deliberative Planning Phase → executive Dev Cycle with frozen plan).
+- `.claude/skills/bmad-integration/scripts/detect_level.py` —
+  deterministic complexity classifier (Levels 0–3) with security
+  escalators (auth, PII, crypto, payments, CVSS ≥ 7.0).
+
+### Added — Copilot Cloud Agent as DEFAULT parallel strategy
+
+- New skill `.claude/skills/copilot-cloud-agent/` with `dispatcher.py`,
+  `status_tracker.py`, `review_relay.py`.
+- `review_relay` runs local SAST (bandit + ruff) plus an in-process
+  secret scanner scoped to diff added-lines; posts structured findings
+  with `@copilot` retry tag on CRITICAL/HIGH.
+- `settings.json` `sdlc.parallelization`: `copilot_cloud_agent` is
+  `default_strategy`; `parallel_workers` demoted to
+  `fallback_when_local_env_required`; four explicit `selection_rules`.
+
+### Added — Agent contracts
+
+- `.agentic_sdlc/templates/agent-contract.md` normative template.
+- 6 priority agents carry full tier-1 strict contracts (code-reviewer,
+  requirements-analyst, system-architect, threat-modeler,
+  security-scanner, orchestrator).
+- 34 remaining agents carry tier-2 auto-migrated contracts via
+  `.claude/skills/migrate-agent-contracts/scripts/bulk_migrate.py`
+  (idempotent, role-inferring, one-shot utility scheduled for removal
+  after first full release cycle).
+- Total coverage: **40 / 40 agents**.
+
+### Added — Resilience layer
+
+- `.claude/lib/python/resilience.py`: stdlib-only `@with_retry`,
+  `@with_timeout`, `@with_circuit_breaker`, composite `@resilient`.
+
+### Added — Eval harness (regression suite)
+
+- `evals/` tree with shared primitives (`_lib/harness.py`), discovery
+  runner (`run_all.py`), and **9 suites / 79 golden cases**:
+  agent-contracts (47), bmad-detect-level (8), code-reviewer (4),
+  gate-evaluator (4), parallelization-routing (5), resilience (5),
+  runbooks (3), settings-lint (1), threat-modeler (2).
+
+### Added — SLOs and runbooks
+
+- `.claude/config/slos.yml` with 10 SLOs (SLI queries, targets,
+  burn-rate windows).
+- `.claude/config/logging/dashboards/slo-burn-rate.json` Grafana panel.
+- `.agentic_sdlc/docs/runbooks/` with 4 authored runbooks and 6
+  explicitly-pending SLOs.
+
+### Added — Architectural Decision Records
+
+- **ADR-001** — hooks must resolve paths via `$CLAUDE_PROJECT_DIR`.
+- **ADR-002** — Copilot Cloud Agent as default Phase 6 strategy.
+
+### Changed — Blocking Phase 2→3 gate
+
+- `.claude/skills/gate-evaluator/gates/phase-2-to-3.yml` rewritten as a
+  real blocker. Refuses advancement unless
+  `.specify/specs/<slug>/spec.md` has `status: approved`,
+  `constitution_version` frontmatter, Given/When/Then criteria, and
+  `clarify_rounds_completed >= 1`. Previous version was echo-only.
+
+### Fixed
+
+- `.claude/skills/gate-evaluator/gates/phase-3-to-4.yml`: shell quoting
+  bug (`security/2>/dev/null` → `security/ 2>/dev/null`) that silently
+  failed the threat_model check. Caught by the new eval harness.
+- `.claude/skills/gate-evaluator/scripts/validate_gate.py`: extracted
+  from inline code in `SKILL.md` into an actual script; supports both
+  `metric/threshold` and `check/validation` YAML dialects.
+- `.claude/settings.json`: all 12 hook commands converted from relative
+  paths to `${CLAUDE_PROJECT_DIR:-.}` form (ADR-001). Fixes total
+  session lockup when Bash cwd drifts into a subdirectory.
+- `.claude/agents/sdlc-importer.md`: normalized from bare markdown
+  headers to proper YAML frontmatter — was the only outlier in the
+  40-agent catalogue.
+- `.claude/lib/python/resilience.py`: renamed log `extra.name` to
+  `extra.breaker_name` to avoid collision with `LogRecord.name`.
+
+### Deferred
+
+- `refactoring-surgeon` agent (named-smell → named-refactoring catalog).
+  Tracked in issue #149 with full design, eval-first requirements, and
+  explicit unblocking conditions. Deliberately not built now.
+- **Expansion packs structure** (item #9 of original plan). Not built
+  without at least two concrete domain packs requesting it — avoids
+  speculative abstraction.
+
+### Breaking
+
+- Hooks registered with relative `.claude/hooks/*` paths will stop
+  working with cwd drift. Follow ADR-001 in custom forks.
+- `/gate-check phase-2-to-3` now rejects projects without an approved
+  spec. To unblock, author via `/specify` → `/clarify` → `/analyze`.
+
 ## [3.0.3] - 2026-02-06
 
 ### Fixed - Docs Version Sync

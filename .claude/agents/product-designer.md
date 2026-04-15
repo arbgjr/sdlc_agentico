@@ -25,8 +25,38 @@ references:
     purpose: Diretrizes de marca do projeto (se existir)
   - path: .project/architecture/system-overview.md
     purpose: Arquitetura do sistema (Phase 3 output)
----
 
+# --- Agent Contract (Constitution v1.0.0 Principle XI, tier-2 auto-migrated) ---
+contract_version: "1.0"
+inputs:
+  - name: request
+    type: markdown
+    required: true
+    description: "Product Designer que cria especifica\u00e7\u00f5es visuais, mockups e garante consist\u00eancia de marca."
+outputs:
+  - name: result
+    type: file_tree
+    description: "Output produced by product-designer; see agent body for format details."
+context_budget:
+  max_tokens: 30000
+  required_files:
+    - .specify/memory/constitution.md
+preconditions:
+  - caller has provided a parseable request
+postconditions:
+  - output respects the agent's declared output type
+failure_modes:
+  - trigger: request cannot be parsed
+    severity: medium
+    recovery: return structured error; do not guess intent
+sla:
+  wallclock_seconds_p95: 180
+observability:
+  emit_event: product-designer.completed
+  metrics:
+    - tokens_consumed
+    - tool_calls
+---
 # Product Designer Agent
 
 ## Missão

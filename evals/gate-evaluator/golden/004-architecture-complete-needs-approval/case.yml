@@ -1,0 +1,16 @@
+case_id: 004-architecture-complete-needs-approval
+description: |
+  Phase 3→4 must ESCALATE (not approve) when all required artifacts are
+  present but human_approval is required by the gate definition. Validates
+  that the escalate path is wired and not silently downgraded to approve.
+agent: gate-evaluator
+inputs:
+  from_phase: 3
+  to_phase: 4
+  project_id: synthetic-004
+expected:
+  decision: escalate
+  passed: true
+  human_approval_required: true
+  artifact_present_count: 6
+  score_at_least: 0.99

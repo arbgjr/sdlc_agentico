@@ -3,13 +3,41 @@ gate:
   name: "phase-2-to-3"
   from_phase: 2
   to_phase: 3
-  description: "Requirements → Architecture transition"
+  description: |
+    Requirements to Architecture transition. Enforces Constitution
+    Principle VIII (SDD): spec, clarifications and requirements must all
+    exist before architecture work begins.
 
   required_artifacts:
-    - path: "{project_dir}/projects/{id}/requirements/*.yml"
+    - path: ".specify/specs/*/spec.md"
+      description: "Feature specification (Spec-Driven Development)"
+      agent: "requirements-analyst"
+    - path: ".specify/specs/*/requirements/*.yml"
+      fallback_path: "{project_dir}/projects/{id}/requirements/*.yml"
       description: "User stories with acceptance criteria"
-    - path: "{project_dir}/projects/{id}/specs/*.spec.md"
-      description: "Feature specification document"
+      agent: "requirements-analyst"
 
-  approval_required: false
+  quality_checks:
+    - check: "Spec has approved status"
+      validation: "grep -rE 'status:\\s*approved' .specify/specs/*/spec.md 2>/dev/null | head -1"
+    - check: "Spec references Constitution"
+      validation: "grep -r 'constitution_version:' .specify/specs/*/spec.md 2>/dev/null | head -1"
+    - check: "Spec has acceptance criteria"
+      validation: "grep -rE '(given:|acceptance_criteria)' .specify/specs/ 2>/dev/null | head -1"
+    - check: "At least one clarify round completed"
+      validation: "grep -r 'clarify_rounds_completed:' .specify/specs/*/spec.md 2>/dev/null | head -1"
+
+  approval_required: true
   can_skip: false
+
+  blockers:
+    - "No spec.md under .specify/specs/<slug>/"
+    - "Spec status is draft (must be 'approved' via /analyze)"
+    - "No clarify round completed (run /clarify <slug> at least once)"
+    - "Acceptance criteria missing or unstructured"
+    - "Spec does not reference constitution_version in frontmatter"
+
+  remediation_hints:
+    - "/specify <description> to create a new spec"
+    - "/clarify <slug> to eliminate ambiguities"
+    - "/analyze <slug> to validate and approve the spec"

@@ -1,0 +1,9 @@
+strategy:
+  primary: human_only
+  fallback: null
+  human_only_count: 6
+  parallel_count: 0
+  sequential_count: 6
+  rationale: |
+    Framework meta-file changes (Principle X carve-out). Not appropriate
+    for Copilot Cloud Agent dispatch; bulk migration script runs locally.

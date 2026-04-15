@@ -32,6 +32,60 @@ allowed-tools:
 references:
   - path: \.agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/qualidade.md
     purpose: Criterios de revisao, merge blockers, excecoes
+
+# --- Agent Contract (Constitution v1.0.0 Principle XI) ---
+contract_version: "1.0"
+inputs:
+  - name: pr_diff
+    type: markdown
+    required: true
+    description: Unified diff of the PR under review
+  - name: pr_metadata
+    type: yaml
+    required: true
+    description: PR number, branch, author, linked issue
+  - name: task_context
+    type: markdown
+    required: false
+    description: story-context document of the linked TASK, when available
+outputs:
+  - name: review_findings
+    type: yaml
+    description: List of findings with severity classification
+    contains:
+      - findings is list
+      - every finding has severity in [CRITICAL, HIGH, MEDIUM, LOW]
+      - every finding has title and body
+      - blocking_count is derived from CRITICAL+HIGH
+context_budget:
+  max_tokens: 30000
+  required_files:
+    - .specify/memory/constitution.md
+    - .agentic_sdlc/docs/engineering-playbook/manual-desenvolvimento/qualidade.md
+  optional_files:
+    - .specify/specs/<slug>/plan.md
+preconditions:
+  - PR exists and is not draft
+  - CI has completed at least one run
+postconditions:
+  - review_findings is well-formed YAML
+  - no finding has empty body
+failure_modes:
+  - trigger: diff exceeds 2000 lines
+    severity: medium
+    recovery: request re-split of PR; do not attempt full review
+  - trigger: secrets detected in diff
+    severity: critical
+    recovery: refuse to post review; raise alert; tag security-scanner
+sla:
+  wallclock_seconds_p95: 45
+  max_retries: 1
+observability:
+  emit_event: review.completed
+  metrics:
+    - findings_total
+    - blocking_findings
+    - tokens_consumed
 ---
 
 # Code Reviewer Agent

@@ -44,6 +44,56 @@ denied_tools:
 references:
   - path: \.agentic_sdlc/docs/engineering-playbook/stacks/devops/security.md
     purpose: Padroes de seguranca, STRIDE, escalation triggers
+
+# --- Agent Contract (Constitution v1.0.0 Principle XI) ---
+contract_version: "1.0"
+inputs:
+  - name: architecture_plan
+    type: markdown
+    required: true
+    description: .specify/specs/<slug>/plan.md with components and data flows
+  - name: data_model
+    type: markdown
+    required: true
+    description: Entities, relationships, PII/sensitive field markers
+outputs:
+  - name: threat_model
+    type: yaml
+    path_pattern: .specify/specs/<slug>/threat-model.yml
+    description: STRIDE analysis with threats and mitigations
+    contains:
+      - threat_model.methodology == "STRIDE"
+      - threats is non-empty list
+      - every threat has category, asset, mitigation
+      - every HIGH/CRITICAL threat has a mitigation that is actionable
+context_budget:
+  max_tokens: 35000
+  required_files:
+    - .specify/memory/constitution.md
+    - .specify/specs/<slug>/plan.md
+    - .specify/specs/<slug>/data-model.md
+    - .agentic_sdlc/docs/engineering-playbook/stacks/devops/security.md
+preconditions:
+  - plan.md exists and is approved
+  - data-model identifies PII and sensitive fields
+postconditions:
+  - every escalation_trigger in sdlc.security_by_design that applies is covered by a threat
+  - no HIGH/CRITICAL threat lacks a mitigation
+failure_modes:
+  - trigger: CVSS >= 7.0 threat identified
+    severity: critical
+    recovery: auto-escalate to human approval; block phase-3-to-4 gate
+  - trigger: PII flow not covered by a threat
+    severity: critical
+    recovery: refuse to mark complete; require second pass
+sla:
+  wallclock_seconds_p95: 240
+observability:
+  emit_event: threat_model.produced
+  metrics:
+    - threats_total
+    - threats_by_severity
+    - escalations_triggered
 ---
 
 # Threat Modeler Agent

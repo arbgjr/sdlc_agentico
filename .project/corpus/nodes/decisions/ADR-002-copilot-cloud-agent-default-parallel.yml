@@ -1,0 +1,107 @@
+adr:
+  id: ADR-002
+  title: Copilot Cloud Agent is the default parallel strategy for Phase 6
+  status: accepted
+  date: 2026-04-15
+  supersedes: null
+  deciders:
+    - framework-architect
+    - project-owner
+  context:
+    problem: |
+      Phase 6 (Implementation) in Level 2 and Level 3 work requires
+      running multiple implementation tasks concurrently. The framework
+      previously shipped with a single parallel strategy —
+      ``parallel-workers`` using git worktrees on the local host. That
+      strategy is powerful for CPU-bound or environment-coupled work,
+      but it makes the orchestrator machine carry the full cost:
+        * Disk — each worktree ≈ full repo size
+        * CPU — N concurrent build/test processes
+        * Cognitive — the human running the orchestrator must mentally
+          track N parallel file systems
+      For most implementation tasks in modern software (adapters,
+      endpoints, integrations), the work is better performed in the
+      cloud and the local machine should only coordinate.
+    opportunity: |
+      GitHub ships a Copilot coding agent (cloud agent) that accepts
+      issues assigned to ``@copilot``, opens a PR per issue, runs in
+      GitHub-hosted infrastructure, and closes the loop via PR review.
+      The framework already talks to GitHub through an MCP tool set
+      (assign_copilot_to_issue, create_pull_request_with_copilot,
+      get_copilot_job_status, pull_request_read, review_write). We can
+      make the cloud agent the **primary** parallel path with
+      parallel-workers as a fallback for genuinely local work.
+  decision: |
+    As of Constitution v1.0.0, ``copilot_cloud_agent`` is the
+    ``default_strategy`` under ``sdlc.parallelization`` in
+    ``.claude/settings.json``. ``parallel_workers`` is retained with the
+    role ``fallback_when_local_env_required``.
+
+    Routing rules (explicit in settings.json):
+      1. task.parallelization_hint == "human_only"      -> humans
+      2. task.parallelization_hint == "local_worker"    -> parallel_workers
+      3. task.parallelization_hint == "copilot_cloud_agent" -> copilot_cloud_agent
+      4. default                                         -> copilot_cloud_agent
+
+    Every story-context task file declares its parallelization_hint
+    in YAML frontmatter; ``/tasks`` must set this value deliberately.
+
+    The copilot_cloud_agent skill ships three Python scripts:
+      * dispatcher.py    — creates issues, assigns @copilot, preflights,
+                           secret-scans, writes issue-mapping.yml
+      * status_tracker.py — polls state transitions, updates mapping
+      * review_relay.py   — runs code-reviewer + security-scanner on
+                           each ready PR, posts structured findings,
+                           tags @copilot for retry on CRITICAL/HIGH,
+                           caps at 3 retries
+  consequences:
+    positive:
+      - Orchestrator machine no longer carries N concurrent worktrees.
+      - Each task has an audit trail in GitHub (issue, PR, review).
+      - Review loop is disciplined and gated (Constitution Principle VII).
+      - Retry budget is explicit and measurable per task.
+      - Scales horizontally with GitHub plan concurrency limits.
+    negative:
+      - Dependency on GitHub availability and Copilot agent quotas.
+      - Premium request consumption is billable.
+      - Tasks requiring local credentials/env must route to
+        parallel-workers explicitly.
+      - PRs created by the cloud agent may need human nudging for
+        ambiguous feedback (mitigated by structured review_relay output).
+    neutral:
+      - Observability lives across two planes: local Loki (dispatcher,
+        review_relay, status_tracker) and GitHub (issue/PR state).
+        Metric aggregation reconciles via correlation_id on issue body.
+  alternatives_considered:
+    - option: Keep parallel-workers as the only strategy
+      rejected_because: |
+        Makes the orchestrator the bottleneck for every parallelization
+        attempt; does not scale past ~5 concurrent workers; imposes
+        local env requirements on every task whether or not they are
+        intrinsic.
+    - option: Agent teams (experimental CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS)
+      rejected_because: |
+        Token-budget multiplier of 3x is prohibitive for implementation
+        work; better suited to deliberative phases (1, 2, 3).
+    - option: Adopt Copilot Cloud Agent but only opt-in per feature
+      rejected_because: |
+        Opt-in means the default path is the wrong one. Default
+        behavior should be the recommended behavior. Opt-out is still
+        available per task via parallelization_hint.
+  enforcement:
+    test: |
+      Future eval ``evals/parallelization-routing/runner.py`` will
+      assert that ``sdlc.parallelization.default_strategy`` is
+      ``copilot_cloud_agent`` and that selection_rules match the
+      documented order.
+    observability: |
+      SLOs defined in .claude/config/slos.yml track:
+        * tasks_dispatched daily rate
+        * wallclock_minutes_per_task P95
+        * agent_retry_count per task P95
+        * tasks_rejected_by_review rate
+        * review_round_count per task P95
+  related:
+    - Constitution Principle X (Parallelism prefers Copilot Cloud Agent)
+    - Skill .claude/skills/copilot-cloud-agent/SKILL.md
+    - ADR-001 (hooks must use absolute paths — same session)

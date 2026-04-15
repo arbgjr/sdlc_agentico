@@ -58,7 +58,7 @@ quality_checks:
     validation: "ls .project/projects/*/decisions/adr-*.yml docs/adr/*.md 2>/dev/null | head -1"
 
   - check: "Threat model realizado"
-    validation: "grep -r 'threat_model:' .project/projects/*/security/2>/dev/null | head -1"
+    validation: "grep -r 'threat_model:' .project/projects/*/security/ 2>/dev/null | head -1"
 
   - check: "Modelo de dados definido"
     validation: "grep -r 'entities:' .project/projects/*/data/ docs/data/ 2>/dev/null | head -1"
