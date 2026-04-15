@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/enforce-tool-access.py || python .claude/hooks/enforce-tool-access.py",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/enforce-tool-access.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/enforce-tool-access.py\"",
             "description": "Tool Access Control - validates tool usage against agent-specific allow/deny lists"
           }
         ]
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/ensure-feature-branch.py || python .claude/hooks/ensure-feature-branch.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ensure-feature-branch.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ensure-feature-branch.py\""
           }
         ]
       },
@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/ensure-feature-branch.py || python .claude/hooks/ensure-feature-branch.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ensure-feature-branch.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ensure-feature-branch.py\""
           }
         ]
       },
@@ -46,7 +46,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/ensure-feature-branch.py || python .claude/hooks/ensure-feature-branch.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ensure-feature-branch.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/ensure-feature-branch.py\""
           }
         ]
       },
@@ -55,7 +55,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/validate-commit.py || python .claude/hooks/validate-commit.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/validate-commit.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/validate-commit.py\""
           }
         ]
       },
@@ -64,7 +64,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/check-gate.py auto || python .claude/hooks/check-gate.py auto"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/check-gate.py\" auto || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/check-gate.py\" auto"
           }
         ]
       }
@@ -112,23 +112,23 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/detect-client.py || python .claude/hooks/detect-client.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/detect-client.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/detect-client.py\""
           },
           {
             "type": "command",
-            "command": "python3 .claude/hooks/detect-phase.py || python .claude/hooks/detect-phase.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/detect-phase.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/detect-phase.py\""
           },
           {
             "type": "command",
-            "command": "python3 .claude/hooks/auto-migrate.py || python .claude/hooks/auto-migrate.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/auto-migrate.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/auto-migrate.py\""
           },
           {
             "type": "command",
-            "command": "python3 .claude/hooks/detect-documents.py || python .claude/hooks/detect-documents.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/detect-documents.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/detect-documents.py\""
           },
           {
             "type": "command",
-            "command": "python3 .claude/hooks/validate-framework-structure.py || python .claude/hooks/validate-framework-structure.py"
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/validate-framework-structure.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/validate-framework-structure.py\""
           }
         ]
       }
@@ -139,7 +139,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/pre-compact-analyzer.py || python .claude/hooks/pre-compact-analyzer.py",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/pre-compact-analyzer.py\" || python \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/pre-compact-analyzer.py\"",
             "description": "Extract learnings from session before automatic compaction"
           }
         ]

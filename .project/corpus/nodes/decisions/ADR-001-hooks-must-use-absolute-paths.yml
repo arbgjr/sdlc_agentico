@@ -1,0 +1,79 @@
+adr:
+  id: ADR-001
+  title: All framework hooks must resolve paths via $CLAUDE_PROJECT_DIR
+  status: accepted
+  date: 2026-04-15
+  deciders:
+    - framework-architect
+  context:
+    problem: |
+      Hooks registered in .claude/settings.json were invoked with the
+      current Bash session's cwd. When an interactive Bash command ended
+      with a different cwd (e.g. after a diagnostic `cd` into a
+      subdirectory), every subsequent tool call attempted to resolve a
+      relative-path hook from the wrong directory and failed, blocking
+      every tool in the session including Read, Write, Edit, Grep, Bash
+      and ToolSearch.
+    triggering_incident: |
+      During implementation of evals/gate-evaluator/, a `cd` into a
+      golden-case subdirectory was used to verify shell quality checks.
+      The cwd persisted; subsequent calls failed with:
+        "PreToolUse hook error: python3: can't open file
+         '/home/user/sdlc_agentico/evals/.../project/.claude/hooks/
+         enforce-tool-access.py': [Errno 2] No such file or directory"
+      The session was completely wedged. The only recovery was external
+      user intervention to reset the session cwd.
+    cost: |
+      * Full tool lockup mid-session
+      * Context loss from the forced reset
+      * Production risk: the same pattern would block CI runs where
+        working directory is non-deterministic
+  decision: |
+    All hook commands registered in .claude/settings.json MUST resolve
+    their script paths via ${CLAUDE_PROJECT_DIR:-.}/..., not via
+    relative paths. Specifically:
+
+      # WRONG — breaks when cwd drifts
+      "command": "python3 .claude/hooks/foo.py"
+
+      # RIGHT — cwd-independent, falls back to relative if var unset
+      "command": "python3 \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/foo.py\""
+
+    The ${VAR:-.} form keeps behavior identical in legacy environments
+    where CLAUDE_PROJECT_DIR is not exported while guaranteeing
+    correctness in every Claude Code session where it is.
+  consequences:
+    positive:
+      - Hook invocation is cwd-independent.
+      - Sessions cannot be wedged by cwd drift.
+      - CI runs and non-interactive invocations become deterministic.
+    negative:
+      - Marginally longer command strings in settings.json.
+      - Environments that override CLAUDE_PROJECT_DIR must be careful.
+    neutral:
+      - Existing behavior preserved via ${VAR:-.} default.
+  alternatives_considered:
+    - option: Resolve paths inside each hook script via Path(__file__)
+      rejected_because: |
+        Hooks that fail to locate their own script (e.g. because the
+        Python interpreter cannot open the file) never reach that code
+        path. The problem must be solved at the invocation layer.
+    - option: Normalize cwd via a wrapper script
+      rejected_because: |
+        Adds an indirection layer and does not prevent the root cause
+        (relative-path resolution at invocation).
+    - option: Forbid `cd` in Bash tool usage
+      rejected_because: |
+        Unenforceable and punishes a legitimate diagnostic pattern.
+  enforcement:
+    test: |
+      A new eval case under evals/settings-lint/ asserts that no hook
+      command in .claude/settings.json matches the regex
+      `"command":\s*"python[3]?\s+\.claude/hooks/` (relative invocation).
+      The lint blocks any regression.
+  related:
+    - ADR affected hooks (10 total):
+        enforce-tool-access, ensure-feature-branch (x3), validate-commit,
+        check-gate, detect-client, detect-phase, auto-migrate,
+        detect-documents, validate-framework-structure,
+        pre-compact-analyzer
