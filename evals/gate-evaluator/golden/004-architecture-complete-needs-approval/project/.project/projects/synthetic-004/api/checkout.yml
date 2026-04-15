@@ -1,0 +1,11 @@
+openapi: 3.1.0
+info:
+  title: Checkout API
+  version: "1.0"
+paths:
+  /v1/charges:
+    post:
+      summary: Create a charge
+      responses:
+        "201":
+          description: Charge created

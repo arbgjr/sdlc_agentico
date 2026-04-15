@@ -1,0 +1,11 @@
+threat_model:
+  methodology: STRIDE
+  threats:
+    - id: T-001
+      category: Tampering
+      asset: payment_callback
+      mitigation: HMAC signature verification
+    - id: T-002
+      category: Information Disclosure
+      asset: customer_pii
+      mitigation: TLS 1.3 + field-level encryption at rest

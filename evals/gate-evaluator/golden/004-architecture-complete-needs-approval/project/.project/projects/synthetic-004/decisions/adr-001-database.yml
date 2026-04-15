@@ -1,0 +1,9 @@
+adr:
+  id: ADR-001
+  title: Use PostgreSQL for transactional store
+  status: accepted
+  context: We need ACID guarantees for the orders ledger.
+  decision: PostgreSQL 16 with logical replication.
+  consequences:
+    - Strong consistency
+    - Operational maturity

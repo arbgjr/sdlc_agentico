@@ -1,0 +1,13 @@
+user_story:
+  id: US-001
+  as_a: customer
+  i_want: to pay with PIX
+  so_that: I can complete the purchase quickly without a card
+  acceptance_criteria:
+    - given: I am at the checkout page
+      when: I select PIX as payment method
+      then: a QR code is displayed within 2 seconds
+    - given: I scanned the QR code and paid
+      when: my bank confirms the payment
+      then: the order is marked as paid within 30 seconds
+priority: high

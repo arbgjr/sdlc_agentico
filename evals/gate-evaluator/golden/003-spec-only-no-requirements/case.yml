@@ -1,0 +1,14 @@
+case_id: 003-spec-only-no-requirements
+description: |
+  Phase 2→3 must REJECT when spec.md exists but no requirements YAML.
+  Specs without requirements are a known anti-pattern (story-less spec).
+agent: gate-evaluator
+inputs:
+  from_phase: 2
+  to_phase: 3
+  project_id: synthetic-003
+expected:
+  decision: reject
+  passed: false
+  has_blocker_of_type: artifact
+  artifact_present_count: 1

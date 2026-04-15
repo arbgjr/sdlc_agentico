@@ -1,0 +1,15 @@
+case_id: 001-missing-spec
+description: |
+  Phase 2→3 must REJECT when no spec.md and no requirements YAML exist.
+  This is the most common failure mode and the gate must catch it.
+agent: gate-evaluator
+inputs:
+  from_phase: 2
+  to_phase: 3
+  project_id: synthetic-001
+expected:
+  decision: reject
+  passed: false
+  has_blocker_of_type: artifact
+  has_blocker_count_at_least: 2
+  score_at_most: 0.5
